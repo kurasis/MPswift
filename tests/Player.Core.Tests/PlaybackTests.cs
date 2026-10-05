@@ -74,6 +74,20 @@ public sealed class PlaybackTests
         Assert.Single(backend.Threads.Distinct());
     }
 
+    [Fact]
+    public async Task AlreadyCanceledReplacementSilencesPreviouslyPlayingSource()
+    {
+        var backend = new TestBackend();
+        await using var player = new SerializedAudioPlayer(() => backend);
+        await player.LoadAsync(Request("old"), true);
+        using var canceled = new CancellationTokenSource();
+        canceled.Cancel();
+        Assert.False(await player.LoadAsync(Request("new"), true, canceled.Token));
+        Assert.Null(backend.Path);
+        Assert.Equal(new[] { "old" }, backend.OpenedPaths);
+        Assert.Equal(PlaybackState.Stopped, player.Snapshot.State);
+    }
+
     [Theory]
     [InlineData(-5, 0)]
     [InlineData(100, 10)]

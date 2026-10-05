@@ -86,7 +86,18 @@ public sealed class SerializedAudioPlayer : IAudioPlayer
         catch (OperationCanceledException)
         {
             success = false;
-            if (IsCurrent(load.Generation)) Publish(Snapshot with { Generation = load.Generation, State = PlaybackState.Stopped });
+            if (IsCurrent(load.Generation))
+            {
+                try
+                {
+                    // A request canceled before Open must also silence the previously playing source.
+                    _backend?.CloseSource();
+                    _loadedEntry = null;
+                    _info = null;
+                    Publish(Snapshot with { Generation = load.Generation, State = PlaybackState.Stopped, CanSeek = false });
+                }
+                catch (Exception error) { Fail(error, load.Generation); }
+            }
         }
         catch (Exception error) { success = false; Fail(error, load.Generation); }
         load.Completion.TrySetResult(success);
