@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+    <resheader name="version"><value>2.0</value></resheader>
+    <data name="StageTitle" xml:space="preserve"><value>Stage A — dependency diagnostics</value></data>
+    <data name="StageDescription" xml:space="preserve"><value>This development build checks approved native libraries. Playback is currently exercised by the separate AudioSmoke tool. The player interface is the next milestone.</value></data>
+    <data name="VerifyNative" xml:space="preserve"><value>Verify native libraries</value></data>
+    <data name="InitialStatus" xml:space="preserve"><value>Native libraries have not been checked. No audio starts automatically.</value></data>
+    <data name="Checking" xml:space="preserve"><value>Checking library hashes and native versions…</value></data>
+    <data name="Verified" xml:space="preserve"><value>Native load verified. Output-device and audible playback tests have not run.</value></data>
+    <data name="Failed" xml:space="preserve"><value>Native check failed. Run scripts/Setup-Native.ps1, then retry. Details:</value></data>
+</root>

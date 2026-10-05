@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "platform": "win-x64",
+  "libraries": [
+    {
+      "name": "bass",
+      "version": "2.4.18.3",
+      "architecture": "x64",
+      "sourceUrl": "https://www.un4seen.com/files/bass24.zip",
+      "archiveSha256": "3a03ec9a33d0f4f9d167660da51c8bb1432e8977496995455ab137277d69636e",
+      "archiveEntry": "x64/bass.dll",
+      "fileName": "bass.dll",
+      "sha256": "febb2cf1882d554c3a958280777da0b69f07de6e262df271de11c56e4a54afd4",
+      "requiredCompanionFiles": [
+        "bass.txt"
+      ],
+      "license": "Proprietary; see upstream license text",
+      "distributionApproved": false
+    },
+    {
+      "name": "bassmix",
+      "version": "2.4.13",
+      "architecture": "x64",
+      "sourceUrl": "https://www.un4seen.com/files/bassmix24.zip",
+      "archiveSha256": "9e7fe1af3122c0d78d07cb2788cd52aef4e47b6c6f8ad0022ad5e40320516796",
+      "archiveEntry": "x64/bassmix.dll",
+      "fileName": "bassmix.dll",
+      "sha256": "3a1777cd14c0fc6e2d6f879ce9b66cb60cd1c6607f344d70d2434164526063ab",
+      "requiredCompanionFiles": [
+        "bassmix.txt"
+      ],
+      "license": "Proprietary; see upstream license text",
+      "distributionApproved": false
+    },
+    {
+      "name": "basswasapi",
+      "version": "2.4.4.1",
+      "architecture": "x64",
+      "sourceUrl": "https://www.un4seen.com/files/basswasapi24.zip",
+      "archiveSha256": "74b754a925feded1ddd6b8b7b1a37bdc9b185e86abebdd46b1a7e0ff67815779",
+      "archiveEntry": "x64/basswasapi.dll",
+      "fileName": "basswasapi.dll",
+      "sha256": "6f0869c11431e01f759fbe1cd6080299c833c519eb8ab1feae12106907b1fbd1",
+      "requiredCompanionFiles": [
+        "basswasapi.txt"
+      ],
+      "license": "Proprietary; see upstream license text",
+      "distributionApproved": false
+    }
+  ]
+}

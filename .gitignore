@@ -1,0 +1,10 @@
+**/bin/
+**/obj/
+.vs/
+.idea/
+TestResults/
+artifacts/
+native/win-x64/*
+!native/win-x64/.gitkeep
+*.user
+*.suo
