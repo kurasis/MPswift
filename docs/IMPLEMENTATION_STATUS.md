@@ -28,7 +28,7 @@ Updated: **2026-10-05**.
 
 Linux Release cross-build succeeds without warnings; all **22 core tests pass**. Native archives/hashes/PE architecture, repeatable scripts and generated WAV were checked. Self-contained development output was generated and required files audited. Native probe on Linux correctly reports `not-run`/exit 3. See [exact test evidence](TEST_RESULTS.md).
 
-[GitHub CI run 37344651363](https://github.com/kurasis/MPswift/actions/runs/37344651363) passed for source commit `0226ea6b10c03f8517b13a3e025fba488d5ecda2`: Linux and Windows builds/core tests succeeded; Windows native load/WAV decode/seek/end/disposal checks succeeded. Actual WASAPI output was deliberately not run in CI. WPF execution, real-device output, listening, capture, clean-machine/offline checks and licensing/distribution gates remain pending. No format or gapless support is advertised as verified.
+[GitHub CI run 37344651363](https://github.com/kurasis/MPswift/actions/runs/37344651363) passed for source commit `0226ea6b10c03f8517b13a3e025fba488d5ecda2`: Linux and Windows builds/core tests succeeded; Windows native load/WAV decode/seek/end/disposal checks succeeded on Windows Server 2025 10.0.26100, with [native JSON evidence](evidence/stage-a-windows-native.json) retained from the job log. Both local and Windows core suites ran 22 tests without failures/skips. Actual WASAPI output was deliberately not run in CI. WPF execution, real-device output, listening, capture, clean-machine/offline checks and licensing/distribution gates remain pending. No format or gapless support is advertised as verified.
 
 ## Artifacts and commands
 

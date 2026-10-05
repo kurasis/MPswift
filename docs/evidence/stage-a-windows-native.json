@@ -1,0 +1,45 @@
+{
+  "sourceCommit": "0226ea6b10c03f8517b13a3e025fba488d5ecda2",
+  "ciRun": "https://github.com/kurasis/MPswift/actions/runs/37344651363",
+  "jobId": 111880064076,
+  "operatingSystem": "Microsoft Windows Server 2025 Datacenter 10.0.26100",
+  "runnerImage": "windows-2025-vs2026 / 20260925.250.1",
+  "sdk": "10.0.401",
+  "coreTests": {
+    "passed": 22,
+    "failed": 0,
+    "skipped": 0
+  },
+  "probe": {
+    "Status": "native-load-passed",
+    "Versions": {
+      "bass": "2.4.18.3",
+      "bassmix": "2.4.13.0",
+      "basswasapi": "2.4.4.1"
+    },
+    "Environment": "Microsoft Windows 10.0.26100"
+  },
+  "decode": {
+    "Status": "decode-passed",
+    "Environment": "Microsoft Windows 10.0.26100",
+    "Architecture": "X64",
+    "Versions": {
+      "bass": "2.4.18.3",
+      "bassmix": "2.4.13.0",
+      "basswasapi": "2.4.4.1"
+    },
+    "SourceSha256": "265bfc54a7b0bfc2b75cf63c427873d00b516bbbb9dcaae17346de76cc4757fb",
+    "Decode": {
+      "SampleRate": 48000,
+      "Channels": 2,
+      "DurationSeconds": 3,
+      "DecodedBytes": 1152000,
+      "Peak": 0.049987793
+    },
+    "Output": null,
+    "SourceUnchanged": true,
+    "SourceHandleReleased": true,
+    "AudiblePlayback": "not-manually-verified",
+    "Gapless": "not-run"
+  }
+}
