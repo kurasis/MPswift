@@ -12,21 +12,17 @@ public sealed class BassSmokeSession : IDisposable
     private readonly WasapiProcedure _render;
     private int _source;
     private int _mixer;
-    private bool _bassInitialized;
+
     private bool _wasapiInitialized;
     private bool _disposed;
     private long _submittedBytes;
     private int _callbackError;
-    private readonly NativeDecoderPlugins _plugins;
+    private readonly NativeDecodeContext _context;
 
     public BassSmokeSession()
     {
         _render = Render;
-        NativeLibraryBootstrap.LoadAndVerify();
-        Check(Bass.Init(0), "BASS_Init(no-sound)");
-        _bassInitialized = true;
-        try { _plugins = new NativeDecoderPlugins(); }
-        catch { Bass.Free(); throw; }
+        _context = new NativeDecodeContext();
     }
 
     public DecodeEvidence Decode(string filePath)
@@ -136,8 +132,7 @@ public sealed class BassSmokeSession : IDisposable
         }
         if (_mixer != 0) { Check(Bass.StreamFree(_mixer), "BASS_StreamFree(mixer)"); _mixer = 0; }
         if (_source != 0) { Check(Bass.StreamFree(_source), "BASS_StreamFree(source)"); _source = 0; }
-        _plugins.Dispose();
-        if (_bassInitialized) { Check(Bass.Free(), "BASS_Free"); _bassInitialized = false; }
+        _context.Dispose();
         _disposed = true;
         GC.KeepAlive(_render);
     }

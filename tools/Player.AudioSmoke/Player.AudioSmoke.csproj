@@ -15,6 +15,9 @@
     <Compile Include="../../src/Player.App/Services/Audio/BassAudioBackend.cs" Link="Audio/BassAudioBackend.cs" />
     <Compile Include="../../src/Player.App/Services/Audio/NativeDecoderPlugins.cs" Link="Audio/NativeDecoderPlugins.cs" />
     <Compile Include="../../src/Player.App/Services/Audio/LocalFileAccess.cs" Link="Audio/LocalFileAccess.cs" />
+    <Compile Include="../../src/Player.App/Services/Audio/NativeDecodeContext.cs" Link="Audio/NativeDecodeContext.cs" />
+    <Compile Include="../../src/Player.App/Services/Waveforms/BassWaveformService.cs" Link="Waveforms/BassWaveformService.cs" />
+    <Compile Include="../../src/Player.App/Services/Storage/WaveformCache.cs" Link="Storage/WaveformCache.cs" />
     <Content Include="../../native/manifest.json" Link="native/manifest.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="../../native/win-x64/*.dll;../../native/win-x64/*.txt" Link="native/win-x64/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>

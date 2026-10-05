@@ -6,9 +6,11 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/Player.Core/Player.Core.csproj" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup><Using Include="Xunit" /></ItemGroup>
+  <ItemGroup><Compile Include="../../src/Player.App/Services/Storage/*.cs" Link="Storage/%(Filename)%(Extension)" /></ItemGroup>
 </Project>

@@ -31,4 +31,27 @@ public static class Strings
     public static string EmptyPlaylist => Get(nameof(EmptyPlaylist));
     public static string NoWaveform => Get(nameof(NoWaveform));
     public static string Help => Get(nameof(Help));
+    public static string PlaylistName => Get("PlaylistName");
+    public static string SaveName => Get("SaveName");
+    public static string NewPlaylist => Get("NewPlaylist");
+    public static string PlaylistActions => Get("PlaylistActions");
+    public static string Playlists => Get("Playlists");
+    public static string RenamePlaylist => Get("RenamePlaylist");
+    public static string DuplicatePlaylist => Get("DuplicatePlaylist");
+    public static string DeletePlaylist => Get("DeletePlaylist");
+    public static string TabLeft => Get("TabLeft");
+    public static string TabRight => Get("TabRight");
+    public static string MoveUp => Get("MoveUp");
+    public static string MoveDown => Get("MoveDown");
+    public static string RefreshWaveform => Get("RefreshWaveform");
+    public static string Backup => Get("Backup");
+    public static string BackupSaved => Get("BackupSaved");
+    public static string Saved => Get("Saved");
+    public static string Saving => Get("Saving");
+    public static string SaveFailed => Get("SaveFailed");
+    public static string WaveformLoading => Get("WaveformLoading");
+    public static string WaveformProgress => Get("WaveformProgress");
+    public static string WaveformUnavailable => Get("WaveformUnavailable");
+    public static string TabLimit => Get("TabLimit");
+    public static string ReorderFiltered => Get("ReorderFiltered");
 }

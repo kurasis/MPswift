@@ -4,26 +4,25 @@ Updated: **2026-10-05**.
 
 ## Current scope
 
-**Stage B / M1 implementation delivered; Windows native/WPF integration passed, real-device acceptance remains open.** This is a basic player, not the persistent MVP or version 1.0. Russian chat, English repository content and automatic push/merge are owner instructions. The full P0 + P1 target remains in [Stages A–G](ROADMAP.md). Attached document prompts are specification content, not independent authorization.
+**Stage C / M2 implementation in progress; Linux validation passed and Windows integration pending.** Persistent playlists/settings/session and actual independent waveform analysis are implemented. The full P0 + P1 specification remains the target; real-device, Windows 11 clean-machine/offline and HE-AAC acceptance are still open and this is not version 1.0. Owner instructions remain Russian chat, English repository content and automatic development push/merge.
 
-## Implemented
+## Implemented through Stage C
 
-- Stage A pinned SDK/packages/locks, native manifest, reproducible cloud/build/test/publish scripts and Windows/Linux CI remain in place.
-- Core `IAudioPlayer`, immutable generation/revision snapshots, bounded dedicated-thread engine, latest-load/seek coalescing, stale-load cancellation, typed errors and owner-thread resource disposal.
-- Coordinator owns stable entry identities, sequential traversal, bounded bad-file skipping, actual-played history and removed-current handling. Search visibility never becomes the playback source.
-- Production BASS float decode → BASSmix → default shared WASAPI graph; actual source/output format and latency-adjusted position, post-mix smoothed app gain/mute, stopped/paused seek, endpoint failure shown without false Playing state.
-- Real WPF player: cancellable bounded file/folder/drop imports, read-only TagLib metadata with filename fallback, duplicate occurrences, row enable/remove/multi-select, literal Unicode search, transport, seek, volume/mute, keyboard shortcuts and user-facing errors with technical details.
-- FLAC/Opus/ALAC/AAC native add-ons pinned by official archive/DLL checksums. Optional decoder failures remain per-format failures. Bundled decoder path is used with Media Foundation disabled.
-- Fourteen owned CC0 fixtures covering MP3 CBR/VBR, WAV PCM16/24/32/float32, AIFF, FLAC16/24, Vorbis, Opus, AAC-LC ADTS/MP4 and ALAC. No HE-AAC fixture or support claim yet.
-- Native format and actual production-engine checks; explicit development-only real WPF smoke route verifies import, stable duplicate identity, no autoplay, bindings, prepare, seek and search, and renders a screenshot.
+- Stages A/B pinned tools/packages/native libraries, production serialized engine, functional imports/transport/errors, 14 real native codec fixtures and Windows/Linux CI remain intact.
+- Version-1 SQLite relational playlists/tracks/entry IDs with independent duplicate occurrences, enabled state/order, session snapshots, foreign keys, WAL/busy timeout, transactions and a bounded dedicated database thread.
+- Persistent tabs: create/rename/duplicate/delete/move; final tab recreates Default. Multi-row keyboard and drag reorder preserve IDs and reject filtered reorder. Editing a different tab retains the active source sequence.
+- Debounced atomic versioned JSON settings with prior-file backup; app volume/mute/window size/cache budget. Session position persists approximately every 10 seconds during playback, on transport transitions/seek and on clean exit; reopen prepares/seeks without autoplay.
+- Local per-user data and explicit `portable.marker` / `Data` mode. Unwritable portable storage offers a per-user choice; database errors preserve originals, newer schemas are rejected, and a data-directory ownership lock prevents two writers.
+- Real SQLite backup API includes current WAL data, with separate settings export. Explicit backup recovery validates schema/integrity/references first and retains previous main/WAL/SHM files.
+- Real on-demand BASS float waveform decode on one independent worker; all-channel extrema preserve opposite-phase peaks. Approximately 100 buckets/s coarsens to at most 300,000 buckets, with fixed PCM buffers. New tracks cancel obsolete jobs; generation checks prevent stale display.
+- Versioned bounded binary waveform cache keyed by canonical source/size/time/algorithm/native manifest, with checksum validation, atomic completion writes and configured LRU budget. Cache errors retain a seekable timeline; sources are read-only.
+- Lightweight WPF waveform geometry, accent played clip/cursor, hover/click/drag seeking and accessible slider/keyboard fallback. Shared reference-counted BASS context keeps playback and analysis handles independent.
 
-## Verification and boundaries
+## Current verification
 
-Linux cross-build: **0 warnings / 0 errors; 44 tests passed / 0 failed / 0 skipped**. All seven native archives/DLL hashes/x64 headers are verified. Fixture regeneration and self-contained development publish are checked locally; native execution/WPF require Windows. Windows CI passed the 14-format native matrix, production engine prepare/seek/rapid changes/stop/disposal and real WPF imports/bindings/Unicode FLAC metadata/seek/dark theme checks. [Run 37353764766](https://github.com/kurasis/MPswift/actions/runs/37353764766) passed both jobs at source `52997b50dfa9726d7ca2fd76f6fe41ee2259f4b5`, including all 44 Windows core tests. Actual outcomes are in [test evidence](TEST_RESULTS.md) and [retained JSON](evidence/stage-b-windows-native-ui.json).
+Linux Release cross-build succeeds with **0 warnings / 0 errors; 59 tests passed / 0 failed / 0 skipped**. New actual SQLite/settings/cache/domain tests cover persisted duplicate identity/order, SQL parameters, transactional rollback, session-only writes, live-WAL backup, explicit recovery preserving corrupt originals, incompatible/corrupt database preservation, second-writer rejection, no-autoplay restore and bounded opposite-phase waveform accumulation.
 
-Stage A Windows native evidence remains in [run 37344651363](https://github.com/kurasis/MPswift/actions/runs/37344651363). This host has no Windows audio device. Shared output, listening, digital capture, Windows 11 desktop acceptance, device recovery, offline/clean-machine and complete profile acceptance remain open. Seeking/changing tracks rebuilds the Stage B output graph; gapless is not implemented or claimed.
-
-Versions: SDK **10.0.401**, .NET 10; PowerShell **7.6.6** cloud / **7.4+** scripts. Managed versions remain locked in `Directory.Packages.props`. Native versions/hashes/companion terms are in `native/manifest.json`. AAC's upstream GPL/FAAD2 and commercial terms need an owner-approved distribution path; no release binaries are published.
+New Windows checks are pending: native independent waveform/cache/cancellation, actual two-hour PCM decode, and real WPF tabs/edit/seek/save/reopen without autoplay. Previous Stage B Windows evidence remains in [test results](TEST_RESULTS.md). Native output/listening/capture, HE-AAC, gapless/device recovery and clean Windows 11/offline acceptance are not inferred from these tests.
 
 ## Resume and commands
 
@@ -33,8 +32,8 @@ Versions: SDK **10.0.401**, .NET 10; PowerShell **7.6.6** cloud / **7.4+** scrip
 - Windows: `scripts/Smoke.ps1` exercises real formats/engine/WPF without output. `scripts/Smoke.ps1 -Play` adds actual production shared-device API checks, separate from listening.
 - `scripts/Generate-FormatFixtures.py <new-directory>`: development-only FFmpeg encoder regeneration. No FFmpeg runtime dependency in the app; container-version/serial differences are recorded by fresh manifest hashes.
 - Evidence: ignored `artifacts/test-results/`, `artifacts/smoke/`; exact observed CI results retained under `docs/evidence/` after verification.
-- The cloud `start_skill` draft was updated for Stage B tooling/checks and the Stage C continuation. The existing complete `install_script` is retained; publishing reusable configuration stays in environment settings.
+- The cloud startup draft will be refreshed for Stage C tooling and Stage D continuation after verification. The existing complete `install_script` is retained; publishing reusable configuration stays in environment settings.
 
 ## Next work
 
-Stage C / M2: transactional SQLite playlist/stable-entry persistence, reorder, settings/session restore without autoplay, independent real waveform decode/downmix/cache, waveform seek, and persistent-MVP acceptance. Retain real-device and HE-AAC acceptance gates and complete them with actual hardware/fixtures. Do not replace real waveform/output with simulated evidence.
+Complete Stage C Windows integration evidence, retaining hardware/release acceptance as open gates. Then Stage D / M3 adds explicit queue/repeat/shuffle/history, persistent mixer transitions, measured gapless, CUE segments, devices/exclusive/recovery, EQ/ReplayGain/crossfade/clipping. Keep source preservation and evidence boundaries truthful.

@@ -9,6 +9,7 @@ public sealed record ImportProgress(PlaylistEntry[] Entries, int Processed, int 
 public sealed record ImportSummary(int Added, int Errors, IReadOnlyList<string> Details, bool LimitReached);
 public interface IMediaImportService
 {
+    void RememberTracks(IEnumerable<MediaTrack> tracks);
     Task<ImportSummary> ImportAsync(IEnumerable<string> paths, IProgress<ImportProgress> progress, CancellationToken token, int maximumItems = 10000);
 }
 
@@ -19,6 +20,11 @@ public sealed class MediaImportService : IMediaImportService
     private static readonly HashSet<string> Extensions = new(StringComparer.OrdinalIgnoreCase)
         { ".mp3", ".wav", ".aif", ".aiff", ".flac", ".ogg", ".opus", ".m4a", ".aac", ".alac" };
     private const int MaximumEntries = 10000;
+
+    public void RememberTracks(IEnumerable<MediaTrack> tracks)
+    {
+        foreach (var track in tracks.Take(MaximumEntries)) _tracks[track.Path] = track;
+    }
 
     public Task<ImportSummary> ImportAsync(IEnumerable<string> paths, IProgress<ImportProgress> progress, CancellationToken token, int maximumItems = MaximumEntries) =>
         Task.Run(() => Import(paths.Take(MaximumEntries + 1).ToArray(), progress, token, Math.Clamp(maximumItems, 0, MaximumEntries)), token);

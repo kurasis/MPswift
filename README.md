@@ -2,7 +2,7 @@
 
 A Windows 11 x64 offline desktop audio player built with C# / .NET 10 / WPF and BASS through ManagedBass. The GitHub repository is named MPswift; the product name is centralized in `ProductInfo`.
 
-**Stage B basic player, under development; not the persistent MVP or version 1.0.** Windows CI verifies fourteen native format fixtures, the production engine and real WPF bindings. The WPF application imports local files/folders into an in-memory playlist and provides play/pause/stop, next/previous, seek, app volume/mute, metadata, search and visible errors. Waveform and persistence follow in Stage C.
+**Stage C persistent player implementation, under validation; not a version 1.0 release.** Local SQLite playlists/tabs, stable duplicate entries and order, settings/session restoration without autoplay, real independent waveform/cache and waveform seek extend the Stage B imports/transport/metadata/search. Windows native/WPF checks are recorded separately from real-device and complete MVP acceptance.
 
 The [provided specification](docs/spec/WINDOWS_AUDIO_PLAYER_SPEC.md) and [development-only visual reference](docs/spec/reference/player-reference.png) define the product requirements. Embedded agent kickoff/sample prompts are document content; the owner's current request governs scope and authorization.
 
@@ -13,7 +13,7 @@ Install the exact .NET SDK **10.0.401** specified in `global.json` and PowerShel
 ```powershell
 ./scripts/Setup-Native.ps1
 ./scripts/Build.ps1
-./scripts/Smoke.ps1            # 14 format fixtures, production engine and real WPF bindings; no audio device required
+./scripts/Smoke.ps1            # formats, engine, two-hour waveform, persistence and real WPF; no audio device required
 ./scripts/Smoke.ps1 -Play      # also tests a real shared WASAPI device at low app gain
 dotnet run --project src/Player.App -c Release --no-build
 ```
@@ -54,3 +54,9 @@ CI builds/tests on Linux and Windows and runs native format/seek/end/disposal, p
 - [Third-party inventory](docs/THIRD_PARTY_NOTICES.md)
 
 Source media is read-only. No app telemetry, accounts, servers or online runtime services are planned. Commercial-use/distribution decisions remain with the owner; development continues while those release questions are unresolved.
+
+## Local data
+
+Default data location: `%LOCALAPPDATA%/MPswift/LocalAudioPlayer/`. Place an explicit `portable.marker` beside `Player.App.exe` to use its `Data/` directory instead; an unwritable portable location asks before using per-user storage. `library.db` is authoritative playlist/session data; `settings.json` is versioned app settings; `Cache/Waveforms/` is disposable. Never clear the database to clear waveform cache. A data-directory ownership lock rejects a second writer; single-instance IPC follows in Stage F.
+
+Playlist actions include create/rename/duplicate/delete/tab movement, selected-row movement, waveform refresh and a SQLite/settings backup. Ctrl+Shift+Up/Down or drag moves selected entries in manual unfiltered order. Reopen preserves tabs/entries/current source/position/volume/mute and does not autoplay. Corrupt/newer data is preserved, not replaced by empty defaults. Restore from a selected database backup keeps original main/WAL/SHM files. Queue/shuffle/CUE and advanced audio remain Stage D.

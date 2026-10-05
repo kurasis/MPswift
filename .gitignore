@@ -8,3 +8,10 @@ native/win-x64/*
 !native/win-x64/.gitkeep
 *.user
 *.suo
+
+# Local user state and disposable waveform peaks
+**/Data/
+*.db
+*.db-wal
+*.db-shm
+*.peaks

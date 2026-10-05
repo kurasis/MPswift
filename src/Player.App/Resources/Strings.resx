@@ -1,4 +1,3 @@
-<?xml version='1.0' encoding='utf-8'?>
 <root>
     <resheader name="resmimetype">
         <value>text/microsoft-resx</value>
@@ -63,7 +62,9 @@
     <data name="Mute" xml:space="preserve">
         <value>Mute</value>
     </data>
-    <data name="SourceBitDepth" xml:space="preserve"><value>{0}-bit</value></data>
+    <data name="SourceBitDepth" xml:space="preserve">
+        <value>{0}-bit</value>
+    </data>
     <data name="Volume" xml:space="preserve">
         <value>Volume</value>
     </data>
@@ -184,6 +185,75 @@ Ctrl+Left / Ctrl+Right: Seek 5 seconds
 Ctrl+Up / Ctrl+Down: Volume 5 percentage points
 Esc: Clear search
 
-This playlist is cleared when the application closes. Sources must be local and available offline. No internet requests are made by the application.</value>
+Playlists, order, volume and position are saved locally. Restore never starts playback. Ctrl+Shift+Up/Down moves selected rows; clear search first. Playlist actions include a database backup and waveform refresh. Sources must be local and available offline. No internet requests are made by the application.</value>
+    </data>
+    <data name="PlaylistName" xml:space="preserve">
+        <value>Playlist name</value>
+    </data>
+    <data name="SaveName" xml:space="preserve">
+        <value>Save</value>
+    </data>
+    <data name="NewPlaylist" xml:space="preserve">
+        <value>New playlist</value>
+    </data>
+    <data name="PlaylistActions" xml:space="preserve">
+        <value>Playlist actions</value>
+    </data>
+    <data name="Playlists" xml:space="preserve">
+        <value>Playlists</value>
+    </data>
+    <data name="RenamePlaylist" xml:space="preserve">
+        <value>Rename playlist…</value>
+    </data>
+    <data name="DuplicatePlaylist" xml:space="preserve">
+        <value>Duplicate playlist</value>
+    </data>
+    <data name="DeletePlaylist" xml:space="preserve">
+        <value>Delete playlist</value>
+    </data>
+    <data name="TabLeft" xml:space="preserve">
+        <value>Move tab left</value>
+    </data>
+    <data name="TabRight" xml:space="preserve">
+        <value>Move tab right</value>
+    </data>
+    <data name="MoveUp" xml:space="preserve">
+        <value>Move selected entries up</value>
+    </data>
+    <data name="MoveDown" xml:space="preserve">
+        <value>Move selected entries down</value>
+    </data>
+    <data name="RefreshWaveform" xml:space="preserve">
+        <value>Refresh waveform</value>
+    </data>
+    <data name="Backup" xml:space="preserve">
+        <value>Back up playlists and session…</value>
+    </data>
+    <data name="BackupSaved" xml:space="preserve">
+        <value>Database backup saved.</value>
+    </data>
+    <data name="Saved" xml:space="preserve">
+        <value>Saved</value>
+    </data>
+    <data name="Saving" xml:space="preserve">
+        <value>Saving…</value>
+    </data>
+    <data name="SaveFailed" xml:space="preserve">
+        <value>Changes could not be saved. Retry before closing.</value>
+    </data>
+    <data name="WaveformLoading" xml:space="preserve">
+        <value>Analyzing waveform…</value>
+    </data>
+    <data name="WaveformProgress" xml:space="preserve">
+        <value>Analyzing waveform… {0:P0}</value>
+    </data>
+    <data name="WaveformUnavailable" xml:space="preserve">
+        <value>Waveform unavailable — use the seek slider.</value>
+    </data>
+    <data name="TabLimit" xml:space="preserve">
+        <value>Up to 100 playlists are supported.</value>
+    </data>
+    <data name="ReorderFiltered" xml:space="preserve">
+        <value>Clear search before changing manual order.</value>
     </data>
 </root>

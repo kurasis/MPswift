@@ -1,4 +1,4 @@
-# Test evidence — Stages A and B
+# Test evidence — Stages A, B and C
 
 ## Local execution
 
@@ -67,3 +67,11 @@ The actual production engine passed stopped prepare, seek, 40 rapid prepares, fi
 An earlier CI screenshot exposed the implicit Window-style inheritance issue; the final window explicitly applies that style and CI asserts the expected background. Additional core checks cover natural-end exhaustion, prepared-then-played history, stopped selection versus paused resume, and pre-canceled replacement silencing an old source. Final local self-contained publish was rebuilt from the final source and all seven native DLL hashes/companions audited.
 
 `WasapiOutput` and `Listening` remain **not-run**. Device pause/resume/volume/callback behavior, audible latency/quality, digital capture, hotplug, gapless, HE-AAC and Windows 11 clean/offline acceptance are open gates. Stage B implementation is delivered; the full M1 audible acceptance set is not closed by hosted CI. No public binary release was published.
+
+## Stage C local verification (2026-10-05)
+
+Locked Release build passes with zero warnings/errors; **59 tests pass, 0 fail, 0 skip**. The actual application SQLite/settings/cache service sources are linked into the platform-neutral test assembly, using the already pinned Microsoft.Data.Sqlite 10.0.12. The intentional test-package addition updated only the test lock/transitive inventory; no version was loosened. SQLite runs on Linux, not as a fake repository.
+
+Covered: Unicode/SQL-looking text parameterization, duplicate track/stable entry identity and enabled/order round trip, session-only writes preserving playlist rows, full transaction rollback after an injected SQL constraint, valid live-WAL backup, corrupt/newer/unrecognized data preservation, explicit validated restore retaining original bytes, second-writer exclusion, atomic settings with previous backup/range checks, all-channel opposite-phase peaks, bounded multi-hour accumulator, corrupt/oversized cache rejection and cache eviction/clear preserving library data, restore prepare/seek without Play.
+
+Windows tests additionally request real BASS analysis with a prepared playback decoder alive, gain/mute independence, cache reload/corruption repair, two-hour owned PCM source boundaries, cancellation/disposal/file release and production-context survival. The real WPF smoke test duplicates/renames/reorders tabs, rejects filtered reorder, checks other-tab/source independence, closes/recreates the model against actual SQLite/settings, restores identity/order/enabled/position/gain/mute without autoplay and renders real waveform. These expanded Windows checks are **pending execution**.

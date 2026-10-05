@@ -1,0 +1,68 @@
+namespace Player.Core.Waveforms;
+
+public sealed record WaveformData(int SampleRate, int Channels, long FramesPerBucket, long TotalFrames, float[] Minimum, float[] Maximum)
+{
+    public const int MaximumBuckets = 300000;
+    public double DurationSeconds => (double)TotalFrames / SampleRate;
+    public void Validate()
+    {
+        if (SampleRate is < 1000 or > 768000 || Channels is < 1 or > 64 || FramesPerBucket < 1 || TotalFrames < 1 ||
+            Minimum.Length is < 1 or > MaximumBuckets || Maximum.Length != Minimum.Length ||
+            (TotalFrames - 1) / FramesPerBucket + 1 != Minimum.Length)
+            throw new InvalidDataException("Invalid waveform dimensions.");
+        for (var i = 0; i < Minimum.Length; i++)
+            if (!float.IsFinite(Minimum[i]) || !float.IsFinite(Maximum[i]) || Minimum[i] > Maximum[i] || Minimum[i] < -16 || Maximum[i] > 16)
+                throw new InvalidDataException("Invalid waveform peaks.");
+    }
+}
+
+/// <summary>Extrema across all channels, never a signed sum. Memory does not grow with decoded PCM.</summary>
+public sealed class WaveformAccumulator
+{
+    private readonly int _rate;
+    private readonly int _channels;
+    private readonly long _bucketFrames;
+    private readonly float[] _minimum;
+    private readonly float[] _maximum;
+    private long _frames;
+    public long Frames => _frames;
+    public WaveformAccumulator(int sampleRate, int channels, long expectedFrames)
+    {
+        if (sampleRate is < 1000 or > 768000 || channels is < 1 or > 64 || expectedFrames < 1 || expectedFrames > (long)sampleRate * 86400 * 365)
+            throw new ArgumentOutOfRangeException(nameof(expectedFrames));
+        _rate = sampleRate; _channels = channels;
+        _bucketFrames = Math.Max(Math.Max(1, sampleRate / 100), (expectedFrames - 1) / WaveformData.MaximumBuckets + 1);
+        var count = (int)((expectedFrames - 1) / _bucketFrames + 1);
+        _minimum = new float[count]; _maximum = new float[count];
+        Array.Fill(_minimum, float.PositiveInfinity); Array.Fill(_maximum, float.NegativeInfinity);
+    }
+    public void Add(ReadOnlySpan<float> interleaved)
+    {
+        if (interleaved.Length % _channels != 0) throw new InvalidDataException("Incomplete PCM frame.");
+        for (var frame = 0; frame < interleaved.Length / _channels; frame++)
+        {
+            var bucket = (int)(_frames / _bucketFrames);
+            if (bucket >= _minimum.Length) throw new InvalidDataException("Decoder exceeded the validated waveform range.");
+            for (var c = 0; c < _channels; c++)
+            {
+                var value = interleaved[frame * _channels + c];
+                if (!float.IsFinite(value) || value is < -16 or > 16) throw new InvalidDataException("Invalid decoded PCM sample.");
+                _minimum[bucket] = Math.Min(_minimum[bucket], value);
+                _maximum[bucket] = Math.Max(_maximum[bucket], value);
+            }
+            _frames++;
+        }
+    }
+    public WaveformData Complete()
+    {
+        if (_frames == 0) throw new InvalidDataException("No PCM samples decoded.");
+        var count = checked((int)((_frames - 1) / _bucketFrames + 1));
+        var result = new WaveformData(_rate, _channels, _bucketFrames, _frames, _minimum[..count], _maximum[..count]);
+        result.Validate(); return result;
+    }
+}
+
+public interface IWaveformService : IAsyncDisposable
+{
+    Task<WaveformData> AnalyzeAsync(string path, IProgress<double>? progress, CancellationToken cancellationToken, bool refresh = false);
+}

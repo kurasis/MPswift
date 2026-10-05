@@ -57,15 +57,45 @@ public sealed class UiSmokeValidation : TraceListener
         await model.CommitSeekAsync(1);
         await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ContextIdle);
         Require(Math.Abs(model.SeekPosition - 1) < 0.01, "Tagged FLAC production seek failed.");
+        await model.WaveformCompletion.WaitAsync(TimeSpan.FromSeconds(30));
+        Require(model.Waveform is { } wave && wave.Minimum.Length == 300 && wave.Minimum.Min() < -0.045 && wave.Maximum.Max() > 0.045, "Real waveform did not reach the view model.");
+        var sourceTabId = model.SelectedPlaylist.Id;
+        var activeEntryId = model.Entries[2].Id;
+        var originalOrder = model.Entries.Select(e => e.Id).ToArray();
+        model.DuplicatePlaylist(); model.RenamePlaylist("Музыка %_ ' saved");
+        var duplicateTabId = model.SelectedPlaylist.Id;
+        var duplicateFirst = model.Entries[0];
+        model.MoveEntries([duplicateFirst], 1);
+        Require(model.Entries[1].Id == duplicateFirst.Id && model.SourcePlaylistId == sourceTabId, "Editing another tab changed the active sequence.");
+        Require(model.Playlists.First(p => p.Id == sourceTabId).Entries.Select(e => e.Id).SequenceEqual(originalOrder), "Reordering another tab mutated source order.");
+        var expectedOrder = model.Entries.Select(e => e.Id).ToArray();
+        model.Search = "no-match"; model.MoveEntries([duplicateFirst], -1);
+        Require(model.Entries.Select(e => e.Id).SequenceEqual(expectedOrder), "Filtered manual reorder was not rejected."); model.Search = "";
+        model.Volume = 23; model.Muted = true;
+        await model.CommitSeekAsync(1);
+        await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ContextIdle);
+        await model.SaveNowAsync();
+        await model.DisposeAsync();
+        model = ((App)Application.Current).CreateModel(Path.Combine(Environment.CurrentDirectory, "artifacts", "smoke", "stage-c-data"));
+        window.DataContext = model;
+        await model.InitializeAsync();
+        await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ContextIdle);
+        await model.WaveformCompletion.WaitAsync(TimeSpan.FromSeconds(30));
+        Require(model.Playlists.Count == 2 && model.SelectedPlaylist.Id == duplicateTabId && model.SourcePlaylistId == sourceTabId, "Playlist selection/source identity was not restored.");
+        Require(model.Entries.Select(e => e.Id).SequenceEqual(expectedOrder) && !model.Entries[0].Enabled, "Stable order or enabled state was lost after reopen.");
+        Require(model.Playlists.First(p => p.Id == sourceTabId).Entries[2].Id == activeEntryId && model.Title == "Fixture — Музыка", "Active item was not restored by stable identity.");
+        Require(Math.Abs(model.SeekPosition - 1) < 0.01 && !model.IsPlaying && model.Volume == 23 && model.Muted, "Session position/gain/mute failed or restoration autoplayed.");
+        Require(model.Waveform is not null, "Cached waveform was not restored.");
         window.UpdateLayout();
         await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ContextIdle);
         Require(_bindingErrors.Count == 0, "WPF binding warnings/errors: " + string.Join("; ", _bindingErrors.Take(8)));
-        var bitmap = new RenderTargetBitmap((int)Math.Ceiling(window.ActualWidth), (int)Math.Ceiling(window.ActualHeight), 96, 96, PixelFormats.Pbgra32);
-        bitmap.Render(window);
+        var client = (FrameworkElement)window.Content;
+        var bitmap = new RenderTargetBitmap((int)Math.Ceiling(client.ActualWidth), (int)Math.Ceiling(client.ActualHeight), 96, 96, PixelFormats.Pbgra32);
+        bitmap.Render(client);
         var encoder = new PngBitmapEncoder();
         encoder.Frames.Add(BitmapFrame.Create(bitmap));
         Directory.CreateDirectory(output);
-        using (var file = File.Create(Path.Combine(output, "stage-b-window.png"))) encoder.Save(file);
+        using (var file = File.Create(Path.Combine(output, "stage-c-window.png"))) encoder.Save(file);
         return new
         {
             Status = "ui-smoke-passed", Environment = System.Runtime.InteropServices.RuntimeInformation.OSDescription,
@@ -73,7 +103,8 @@ public sealed class UiSmokeValidation : TraceListener
             ImportDidNotAutoplay = true, NativePreparation = true, DurationSeconds = model.DurationSeconds,
             SeekPositionSeconds = model.SeekPosition, SearchLeavesSourceUnchanged = true, BindingErrors = _bindingErrors.Count,
             UnicodeMetadata = true, MetadataHandleReleased = true, DarkTheme = true,
-            Screenshot = "stage-b-window.png", WasapiOutput = "not-run", Listening = "not-run"
+            PersistentTabs = 2, StableOrderAndIds = true, EditingOtherTabKeepsSource = true, SessionReopenedWithoutAutoplay = true, SavedVolume = model.Volume, SavedMuted = model.Muted, RealWaveform = true, WaveformBuckets = model.Waveform!.Minimum.Length,
+            Screenshot = "stage-c-window.png", WasapiOutput = "not-run", Listening = "not-run"
         };
     }
     private static void Require(bool condition, string detail) { if (!condition) throw new InvalidOperationException(detail); }

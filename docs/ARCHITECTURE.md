@@ -1,4 +1,4 @@
-# Architecture — Stage B
+# Architecture — Stage C
 
 Two production projects are established. `Player.Core` contains pure C# rules, with no WPF, native, database or dispatcher references. `Player.App` owns WPF presentation and platform services. The core includes offline local-path/segment rules, audio contracts, serialized engine state and sequential playback coordination. Actual drive type/cloud state checks stay in Windows code; lexical validation alone does not prove a file is local or hydrated.
 
@@ -23,3 +23,13 @@ Implemented production threading: short dispatcher updates, serialized native en
 `BassAudioBackend` owns decoder/plugins/source/mixer/shared WASAPI, strongly retains its callback, and quiesces output before freeing resources. The callback only reads float mixer data, applies smoothed linear app gain/mute and signals native errors through atomic fields. Source position uses mixer history adjusted for the WASAPI buffer. No callback allocations, I/O, logging, UI calls or blocking locks. Stage B closes/rebuilds output for track/seek boundaries, so it makes no gapless claim.
 
 `MediaImportService` validates local paths before reads, skips reparse/offline folder recursion and emits bounded batches from one background metadata worker. TagLib failures use real filenames and bounded details; no fake artwork/tags/waveform. `PlayerViewModel` marshals snapshots through the dispatcher with revision rejection; views handle input/layout only. Import does not autoplay. Resource-owned shutdown awaits import and audio disposal.
+
+## Stage C persistence and waveform
+
+SQLite operations run synchronously on one bounded dedicated owner thread; every multi-entry/tab snapshot is a transaction and periodic session-only saves do not rewrite playlists. Foreign keys/WAL/3-second busy timeout are explicit. Schema 1 is the initial persistent schema; incompatible existing/newer databases are preserved and rejected. A per-directory ownership file prevents conflicting app writers. Backup uses SQLite BackupDatabase with live WAL; explicit recovery validates first and preserves main/WAL/SHM originals. Session stores selected tab separately from playback-source tab plus stable active-entry snapshot/position, including detached removed entries. On restore, native Prepare/Seek are allowed and Play is never submitted.
+
+Settings JSON has schema/range validation, debounce, fsynced temporary write and atomic replace with a previous backup. The view model records bounded session checkpoints and awaits final saves before stopping audio. Tab view selection never substitutes the filtered collection for the coordinator source. Tab/row edits preserve stable IDs, with manual reorder rejected under search.
+
+The one waveform worker owns its independent decode-only float stream. Process-wide BASS device/plugins are reference-counted, and each owner selects its thread-local no-sound context. An analyzer cannot free the playback graph. Fixed-size frame chunks aggregate minima/maxima across all channels; signed summation is deliberately avoided. Finest buckets target 100/s and coarsen for long media, bounded at 300,000 buckets (2.4 MB peak payload). No full-file PCM allocation and no playback gain/EQ are applied. Native manifest + canonical path/size/mtime/algorithm identify the completed peaks cache; corruption/oversize/source changes cause regeneration or a visible unavailable state.
+
+A custom WPF control caches one frozen geometry when peaks/size change and clips the played overlay per position. A real slider remains available while analysis is pending or fails. New analysis requests supersede obsolete work; UI generations reject stale progress/results. Cache is disposable and separate from library/settings data.

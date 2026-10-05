@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:r="clr-namespace:Player.App.Resources"
         xmlns:vm="clr-namespace:Player.App.ViewModels"
+        xmlns:c="clr-namespace:Player.App.Controls"
         Style="{StaticResource {x:Type Window}}"
         Title="{Binding ProductName}" Width="840" Height="860" MinWidth="640" MinHeight="520"
         AllowDrop="True" Drop="OnDrop" DragOver="OnDragOver" PreviewKeyDown="OnKeyDown" Closing="OnClosing">
@@ -42,22 +43,44 @@
             <Button Content="{x:Static r:Strings.Next}" Command="{Binding NextCommand}" Margin="4" />
         </StackPanel>
         <Grid Grid.Row="2" Margin="16,0,16,8">
-            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
-            <TextBlock Text="{x:Static r:Strings.NoWaveform}" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" />
-            <Slider x:Name="SeekSlider" Grid.Row="1" Value="{Binding SeekPosition, Mode=TwoWay}" Maximum="{Binding DurationSeconds}" Minimum="0"
+            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="72" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+            <TextBlock Text="{Binding WaveformStatus}" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" />
+            <c:WaveformControl x:Name="WaveformView" Grid.Row="1" Data="{Binding Waveform}" Position="{Binding SeekPosition}" Duration="{Binding DurationSeconds}" CanSeek="{Binding CanSeek}" />
+            <Slider x:Name="SeekSlider" Grid.Row="2" Value="{Binding SeekPosition, Mode=TwoWay}" Maximum="{Binding DurationSeconds}" Minimum="0"
                     IsEnabled="{Binding CanSeek}" SmallChange="5" LargeChange="30" IsMoveToPointEnabled="True"
                     AutomationProperties.Name="{x:Static r:Strings.Seek}" Margin="0,4" PreviewMouseLeftButtonDown="OnSeekStart"
                     PreviewMouseLeftButtonUp="OnSeekEnd" LostMouseCapture="OnSeekCaptureLost" />
-            <DockPanel Grid.Row="2"><TextBlock Text="{Binding Elapsed}" /><TextBlock Text="{Binding DurationText}" HorizontalAlignment="Right" /></DockPanel>
+            <DockPanel Grid.Row="3"><TextBlock Text="{Binding Elapsed}" /><TextBlock Text="{Binding DurationText}" HorizontalAlignment="Right" /></DockPanel>
         </Grid>
-        <Border Grid.Row="3" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1" Padding="16,8">
-            <TextBlock Text="{x:Static r:Strings.DefaultPlaylist}" Foreground="{StaticResource AccentBrush}" FontWeight="SemiBold" />
-        </Border>
+        <DockPanel Grid.Row="3" Background="{StaticResource SurfaceBrush}">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button Content="+" Click="OnCreatePlaylist" ToolTip="{x:Static r:Strings.NewPlaylist}" AutomationProperties.Name="{x:Static r:Strings.NewPlaylist}" Padding="12,4" Margin="2" />
+                <Button x:Name="PlaylistActions" Content="⋯" Click="OnPlaylistActions" ToolTip="{x:Static r:Strings.PlaylistActions}" AutomationProperties.Name="{x:Static r:Strings.PlaylistActions}" Padding="12,4" Margin="2">
+                    <Button.ContextMenu><ContextMenu>
+                        <MenuItem Header="{x:Static r:Strings.RenamePlaylist}" Click="OnRenamePlaylist" />
+                        <MenuItem Header="{x:Static r:Strings.DuplicatePlaylist}" Click="OnDuplicatePlaylist" />
+                        <MenuItem Header="{x:Static r:Strings.DeletePlaylist}" Click="OnDeletePlaylist" />
+                        <MenuItem Header="{x:Static r:Strings.TabLeft}" Click="OnTabLeft" />
+                        <MenuItem Header="{x:Static r:Strings.TabRight}" Click="OnTabRight" />
+                        <Separator />
+                        <MenuItem Header="{x:Static r:Strings.MoveUp}" Click="OnMoveUp" />
+                        <MenuItem Header="{x:Static r:Strings.MoveDown}" Click="OnMoveDown" />
+                        <MenuItem Header="{x:Static r:Strings.RefreshWaveform}" Command="{Binding RefreshWaveformCommand}" />
+                        <MenuItem Header="{x:Static r:Strings.Backup}" Click="OnBackup" />
+                    </ContextMenu></Button.ContextMenu>
+                </Button>
+            </StackPanel>
+            <ListBox ItemsSource="{Binding Playlists}" SelectedItem="{Binding SelectedPlaylist}" BorderThickness="0" Background="{StaticResource SurfaceBrush}" Foreground="{StaticResource TextPrimaryBrush}"
+                     ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Disabled" AutomationProperties.Name="{x:Static r:Strings.Playlists}">
+                <ListBox.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></ListBox.ItemsPanel>
+                <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Name}" MinWidth="70" MaxWidth="200" TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}" Padding="8,6" /></DataTemplate></ListBox.ItemTemplate>
+            </ListBox>
+        </DockPanel>
         <Grid Grid.Row="4">
             <ListBox x:Name="PlaylistList" ItemsSource="{Binding VisibleEntries}" SelectedItem="{Binding SelectedEntry}" SelectionMode="Extended"
                      Background="{StaticResource BackgroundBrush}" Foreground="{StaticResource TextPrimaryBrush}" BorderThickness="0"
                      ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
-                     MouseDoubleClick="OnTrackDoubleClick" HorizontalContentAlignment="Stretch" AutomationProperties.Name="{x:Static r:Strings.DefaultPlaylist}">
+                     MouseDoubleClick="OnTrackDoubleClick" PreviewMouseLeftButtonDown="OnRowDragStart" PreviewMouseMove="OnRowDragMove" HorizontalContentAlignment="Stretch" AutomationProperties.Name="{x:Static r:Strings.DefaultPlaylist}">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" /><Setter Property="Padding" Value="8,4" />
@@ -94,7 +117,7 @@
                 <Button DockPanel.Dock="Right" Content="{x:Static r:Strings.CancelImport}" Command="{Binding CancelImportCommand}" Margin="4,0" Padding="8,2">
                     <Button.Style><Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding IsImporting}" Value="True"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></Button.Style>
                 </Button>
-                <TextBlock Text="{Binding PlaylistStatus}" FontSize="11" /><TextBlock Text="{Binding Message}" FontSize="11" TextWrapping="Wrap" Margin="12,0,0,0" />
+                <TextBlock Text="{Binding PlaylistStatus}" FontSize="11" /><TextBlock Text="{Binding SaveStatus}" FontSize="11" Margin="8,0,0,0" /><TextBlock Text="{Binding Message}" FontSize="11" TextWrapping="Wrap" Margin="12,0,0,0" />
             </DockPanel>
             <Expander Header="{x:Static r:Strings.Details}"><TextBox Text="{Binding Details, Mode=OneWay}" IsReadOnly="True" MaxHeight="100" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" /></Expander>
         </StackPanel>

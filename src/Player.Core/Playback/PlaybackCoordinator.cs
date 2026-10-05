@@ -71,6 +71,21 @@ public sealed class PlaybackCoordinator : IAsyncDisposable
         return success;
     }
 
+    public async Task<bool> RestoreAsync(PlaylistEntry entry, TimeSpan position)
+    {
+        long intent;
+        lock (_gate) { if (_disposed) return false; intent = ++_intent; }
+        if (!await LoadEntryAsync(entry, intent, false, false).ConfigureAwait(false)) return false;
+        Task<bool>? seek;
+        lock (_gate)
+        {
+            if (_disposed || intent != _intent) return false;
+            seek = _player.Snapshot.CanSeek ? _player.SeekAsync(position) : null;
+        }
+        if (seek is not null && !await seek.ConfigureAwait(false)) return false;
+        lock (_gate) return !_disposed && intent == _intent;
+    }
+
     public Task<bool> PauseAsync() => _player.PauseAsync();
     public Task<bool> SeekAsync(TimeSpan position) => _player.SeekAsync(position);
     public Task<bool> SetVolumeAsync(double volume, bool muted) => _player.SetVolumeAsync(volume, muted);

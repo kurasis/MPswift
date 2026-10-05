@@ -24,5 +24,5 @@ try {
         }
     }
     if (Test-Path artifacts/publish/win-x64/docs/spec/reference) { throw 'Development reference must not enter application output.' }
-    Write-Host 'Local Stage B development output created. This is not a portable release or a distribution approval.'
+    Write-Host 'Local Stage C development output created. This is not a portable release or a distribution approval.'
 } finally { Pop-Location }

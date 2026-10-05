@@ -12,7 +12,7 @@ namespace Player.App.Services.Audio;
 public sealed class BassAudioBackend : IAudioBackend
 {
     private readonly WasapiProcedure _render;
-    private readonly NativeDecoderPlugins _plugins;
+    private readonly NativeDecodeContext _context;
     private int _source;
     private int _mixer;
     private bool _wasapi;
@@ -33,10 +33,7 @@ public sealed class BassAudioBackend : IAudioBackend
         _render = Render;
         try
         {
-            NativeLibraryBootstrap.LoadAndVerify();
-            Check(Bass.Init(0), "BASS_Init", AudioErrorCategory.Dependency);
-            try { _plugins = new NativeDecoderPlugins(); }
-            catch { Bass.Free(); throw; }
+            _context = new NativeDecodeContext();
         }
         catch (Exception error) when (error is not AudioBackendException)
         { throw new AudioBackendException(AudioErrorCategory.Dependency, error.Message); }
@@ -54,7 +51,7 @@ public sealed class BassAudioBackend : IAudioBackend
         {
             var error = Error("Open decoder", AudioErrorCategory.Decoder);
             throw new AudioBackendException(error.Category, error.Message +
-                (_plugins.Errors.Count > 0 ? " Unavailable decoders: " + string.Join("; ", _plugins.Errors.Take(4).Select(p => p.Key + "=" + p.Value)) : ""), error.NativeCode);
+                (_context.DecoderErrors.Count > 0 ? " Unavailable decoders: " + string.Join("; ", _context.DecoderErrors.Take(4).Select(p => p.Key + "=" + p.Value)) : ""), error.NativeCode);
         }
         try
         {
@@ -97,6 +94,7 @@ public sealed class BassAudioBackend : IAudioBackend
             _output = new AudioFormatInfo(info.Frequency, info.Channels, "WASAPI shared / float processing");
             _outputChannels = info.Channels;
             ApplyVolume();
+            _callbackGain = Volatile.Read(ref _targetGain);
         }
         catch { CloseOutput(); throw; }
     }
@@ -227,8 +225,7 @@ public sealed class BassAudioBackend : IAudioBackend
     {
         if (_disposed) return;
         CloseSource();
-        _plugins.Dispose();
-        Check(Bass.Free(), "Free BASS", AudioErrorCategory.Dependency);
+        _context.Dispose();
         _disposed = true;
         GC.KeepAlive(_render);
     }
