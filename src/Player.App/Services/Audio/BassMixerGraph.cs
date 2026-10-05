@@ -115,7 +115,7 @@ public sealed class BassMixerGraph : IDisposable
             }
             return true;
         }
-        catch { if (incoming is not null && _next?.Handle != incoming.Handle) Bass.StreamFree(incoming.Handle); throw; }
+        catch { if (_next?.Handle == incoming?.Handle) Free(ref _next); else if (incoming is not null) Bass.StreamFree(incoming.Handle); if (_current is not null && BassMix.ChannelGetMixer(_current.Handle) != 0) BassMix.ChannelSetEnvelope(_current.Handle, MixEnvelope.Volume, [], 0); throw; }
         finally { Unlock(); }
     }
     public bool TransitionDecoded => _next is not null && MixPosition() >= _nextStart;

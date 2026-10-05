@@ -34,6 +34,7 @@ try {
         if ($code -ne 0) { throw "$($check[0]) failed with exit $code. See artifacts/smoke." }
         Write-Host $result
     }
+    Remove-Item (Join-Path $directory 'stage-e-library') -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item (Join-Path $directory 'stage-c-data') -Recurse -Force -ErrorAction SilentlyContinue
     $app = Join-Path $root 'src/Player.App/bin/Release/net10.0-windows/win-x64/Player.App.exe'
     Remove-Item (Join-Path $directory 'ui.json'), (Join-Path $directory 'stage-c-window.png') -ErrorAction SilentlyContinue

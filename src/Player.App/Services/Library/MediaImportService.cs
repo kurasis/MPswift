@@ -19,7 +19,7 @@ public sealed class MediaImportService : IMediaImportService
 {
     private readonly Dictionary<string, MediaTrack> _tracks = new(StringComparer.OrdinalIgnoreCase);
     private static readonly HashSet<string> Extensions = new(StringComparer.OrdinalIgnoreCase)
-        { ".mp3", ".wav", ".aif", ".aiff", ".flac", ".ogg", ".opus", ".m4a", ".aac", ".alac", ".cue" };
+        { ".mp3", ".wav", ".aif", ".aiff", ".flac", ".ogg", ".opus", ".m4a", ".aac", ".alac", ".cue", ".m3u", ".m3u8", ".pls", ".m4b", ".wma", ".ape", ".wv", ".mpc", ".tta", ".dsf", ".dff" };
     private const int MaximumEntries = 10000;
 
     public void RememberTracks(IEnumerable<MediaTrack> tracks)
@@ -41,7 +41,7 @@ public sealed class MediaImportService : IMediaImportService
         void Flush() { if (batch.Count == 0) return; progress.Report(new ImportProgress(batch.ToArray(), processed, errors)); batch.Clear(); }
         try
         {
-            foreach (var source in Enumerate(paths, Error, token))
+            foreach (var source in ExpandDocuments(Enumerate(paths, Error, token), Error, fallbackEncoding, token))
             {
                 token.ThrowIfCancellationRequested();
                 if (processed >= maximumItems) { limit = true; break; }
@@ -63,7 +63,7 @@ public sealed class MediaImportService : IMediaImportService
                             if (exists) BassSmokeSession.ValidateSourcePath(song.Path); else Error("Missing CUE source: " + song.Path);
                             var segment = new TrackSegment(TrackSegment.FromCueFrames(song.StartFrame), song.EndFrame is { } end ? TrackSegment.FromCueFrames(end) : null);
                             var cue = new MediaTrack(CueSheet.TrackId(path, song), song.Path, song.Title, song.Performer, song.Album, segment.Duration, "CUE", exists, segment, path, song.Number);
-                            _tracks[Identity(cue)] = cue; batch.Add(new(Guid.NewGuid(), cue)); processed++; if (batch.Count == 32) Flush();
+                            _tracks[Identity(cue)] = cue; batch.Add(new(Guid.NewGuid(), cue, AddedUtcTicks: DateTime.UtcNow.Ticks)); processed++; if (batch.Count == 32) Flush();
                         }
                         continue;
                     }
@@ -72,29 +72,13 @@ public sealed class MediaImportService : IMediaImportService
                     else Error("File unavailable: " + path);
                     if (!_tracks.TryGetValue(path, out var track))
                     {
-                        track = new MediaTrack(Guid.NewGuid(), path, Path.GetFileNameWithoutExtension(path),
-                            FormatHint: Path.GetExtension(path).TrimStart('.').ToUpperInvariant(), Available: available);
-                        if (available)
-                        {
-                            try
-                            {
-                                using var tags = TagLib.File.Create(path, TagLib.ReadStyle.Average);
-                                track = track with
-                                {
-                                    Title = string.IsNullOrWhiteSpace(tags.Tag.Title) ? track.Title : Bounded(tags.Tag.Title) ?? track.Title,
-                                    Artist = Bounded(string.Join(", ", tags.Tag.Performers)), Album = Bounded(tags.Tag.Album),
-                                    DurationHint = tags.Properties.Duration > TimeSpan.Zero ? tags.Properties.Duration : null,
-                                    ReplayGain = new(tags.Tag.ReplayGainTrackGain is var tg && double.IsFinite(tg) ? tg : null, tags.Tag.ReplayGainAlbumGain is var ag && double.IsFinite(ag) ? ag : null, tags.Tag.ReplayGainTrackPeak is var tp && double.IsFinite(tp) && tp > 0 ? tp : null, tags.Tag.ReplayGainAlbumPeak is var ap && double.IsFinite(ap) && ap > 0 ? ap : null)
-                                };
-                            }
-                            catch (Exception error) when (error is TagLib.CorruptFileException or TagLib.UnsupportedFormatException or IOException or ArgumentException)
-                            { Error("Metadata fallback: " + Path.GetFileName(path) + "; " + error.Message); }
-                        }
+                        track = MediaMetadataReader.Read(path, Guid.NewGuid(), Error);
                         if (_tracks.Count >= MaximumEntries) _tracks.Remove(_tracks.Keys.First());
                         _tracks.Add(path, track);
                     }
+                    track = track with { Available = available };
                     // Duplicate tracks share logical identity, but every playlist occurrence has its own entry ID.
-                    batch.Add(new PlaylistEntry(Guid.NewGuid(), track));
+                    batch.Add(new PlaylistEntry(Guid.NewGuid(), track, AddedUtcTicks: DateTime.UtcNow.Ticks));
                     processed++;
                     if (batch.Count == 32) Flush();
                 }
@@ -106,6 +90,23 @@ public sealed class MediaImportService : IMediaImportService
         return new ImportSummary(processed, errors, details, limit);
     }
 
+    private static IEnumerable<string> ExpandDocuments(IEnumerable<string> sources, Action<string> error, Encoding? fallback, CancellationToken token)
+    {
+        foreach (var source in sources)
+        {
+            token.ThrowIfCancellationRequested();
+            if (!new[] { ".m3u", ".m3u8", ".pls" }.Contains(Path.GetExtension(source).ToLowerInvariant())) { yield return source; continue; }
+            PlaylistDocument? document = null;
+            try
+            {
+                var path = BassSmokeSession.ValidateSourcePath(source); if (new FileInfo(path).Length > 4 * 1024 * 1024) throw new IOException("Playlist exceeds 4 MiB.");
+                document = PlaylistDocument.Parse(CueSheet.Decode(File.ReadAllBytes(path), fallback), path, Path.GetExtension(path).Equals(".pls", StringComparison.OrdinalIgnoreCase));
+                foreach (var diagnostic in document.Diagnostics) error(diagnostic);
+            }
+            catch (Exception e) when (e is IOException or ArgumentException or DecoderFallbackException) { error("Playlist import: " + e.Message + "; choose an explicit legacy encoding for non-Unicode files."); }
+            if (document is not null) foreach (var path in document.Paths) yield return path;
+        }
+    }
     private static string Identity(MediaTrack track) => track.CueDocument is null ? track.Path : track.CueDocument + "|" + track.CueNumber;
     private static string? Bounded(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Length <= 4096 ? value : value[..4096];
 

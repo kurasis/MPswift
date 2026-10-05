@@ -111,6 +111,104 @@
       "isDecoder": true,
       "license": "See upstream companion terms; distribution review pending",
       "distributionApproved": false
+    },
+    {
+      "name": "basswma",
+      "version": "2.4.5.13",
+      "architecture": "x64",
+      "sourceUrl": "https://www.un4seen.com/files/basswma24.zip",
+      "archiveSha256": "75c37dd9dce6df9655e0f2b23d71196b32018e5f4339311b331145c63981c009",
+      "archiveEntry": "x64/basswma.dll",
+      "fileName": "basswma.dll",
+      "sha256": "5ae0e147c76a1a955ff60181b268f5c0406dcfafcc899149c628c7dbe7cb83ba",
+      "requiredCompanionFiles": [
+        "basswma.txt"
+      ],
+      "license": "Proprietary; BASS upstream terms; development only",
+      "distributionApproved": false,
+      "systemDependency": "Windows Media Format modules; optional-component-free/Windows N support not established",
+      "isDecoder": true
+    },
+    {
+      "name": "bassape",
+      "version": "2.4.1.0",
+      "architecture": "x64",
+      "sourceUrl": "https://www.un4seen.com/files/bassape24.zip",
+      "archiveSha256": "39aed2e9ac240253de0eca37d261715b85cc7937504447083e2ed6690256b770",
+      "archiveEntry": "x64/bassape.dll",
+      "fileName": "bassape.dll",
+      "sha256": "3638177a4fec909c85c378ea327feb67d26a3d50011b3f8b7ddac6d2a0d5bb25",
+      "requiredCompanionFiles": [
+        "bassape.txt"
+      ],
+      "license": "Proprietary; BASS upstream terms; development only",
+      "distributionApproved": false,
+      "isDecoder": true
+    },
+    {
+      "name": "basswv",
+      "version": "2.4.7.4",
+      "architecture": "x64",
+      "sourceUrl": "https://www.un4seen.com/files/basswv24.zip",
+      "archiveSha256": "813801639bb140fa8f6baa8aa03aeac47225e1e876fe943367f91c38f79c1eca",
+      "archiveEntry": "x64/basswv.dll",
+      "fileName": "basswv.dll",
+      "sha256": "7021c3b48e1d9085bbf2839860a6c5d816981a7b0405baf6963725ff55ef24c4",
+      "requiredCompanionFiles": [
+        "basswv.txt"
+      ],
+      "license": "Proprietary; BASS upstream terms; development only",
+      "distributionApproved": false,
+      "isDecoder": true
+    },
+    {
+      "name": "bassdsd",
+      "version": "2.4.2.0",
+      "architecture": "x64",
+      "sourceUrl": "https://www.un4seen.com/files/bassdsd24.zip",
+      "archiveSha256": "9e77ef048fa9bed4466a62b61cd5781ceb932fa8beb2e144306dca46ccde445f",
+      "archiveEntry": "x64/bassdsd.dll",
+      "fileName": "bassdsd.dll",
+      "sha256": "2fb0fa095cc04046185ff572689ec0b74baa3124a907e7be3796aabfdb1a266f",
+      "requiredCompanionFiles": [
+        "bassdsd.txt"
+      ],
+      "license": "Proprietary; BASS upstream terms; development only",
+      "distributionApproved": false,
+      "isDecoder": true
+    },
+    {
+      "name": "bass_mpc",
+      "version": "2.4.1.2",
+      "architecture": "x64",
+      "sourceUrl": "https://www.un4seen.com/files/z/2/bass_mpc24.zip",
+      "archiveSha256": "725b50c92ec207ab7af86da78fb7a43adada3674fae593e0779034cf6ab79fde",
+      "archiveEntry": "x64/bass_mpc.dll",
+      "fileName": "bass_mpc.dll",
+      "sha256": "1d967a699e0f3eff690ced938c04a4d3ed2d79e7b0fdf0567186a662bc0a3c46",
+      "requiredCompanionFiles": [
+        "bass_mpc/readme.txt"
+      ],
+      "license": "See upstream accompanying license; development only, distribution review pending",
+      "distributionApproved": false,
+      "isDecoder": true
+    },
+    {
+      "name": "bass_tta",
+      "version": "2.4.0.2",
+      "architecture": "x64",
+      "sourceUrl": "https://www.un4seen.com/files/z/2/bass_tta24.zip",
+      "archiveSha256": "bcac486b6ef085261a1a4ea68d7741353bc38430512db65f9cf06b05814569ba",
+      "archiveEntry": "x64/bass_tta.dll",
+      "fileName": "bass_tta.dll",
+      "sha256": "5e4dc960a39e9d85719e512850b0efeaa49d53e5f390a04f9075e228f8d5ba62",
+      "requiredCompanionFiles": [
+        "bass_tta/lgpl.txt",
+        "bass_tta/readme.txt"
+      ],
+      "license": "See upstream accompanying license; development only, distribution review pending",
+      "distributionApproved": false,
+      "isDecoder": true
     }
   ]
 }

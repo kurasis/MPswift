@@ -17,7 +17,7 @@ public static class DatabaseRecovery
         source.Open();
         using var command = source.CreateCommand();
         command.CommandText = "PRAGMA user_version";
-        if (Convert.ToInt32(command.ExecuteScalar(), System.Globalization.CultureInfo.InvariantCulture) != 1) throw new InvalidDataException("Backup schema is not supported.");
+        if (Convert.ToInt32(command.ExecuteScalar(), System.Globalization.CultureInfo.InvariantCulture) is not (1 or 2)) throw new InvalidDataException("Backup schema is not supported.");
         command.CommandText = "PRAGMA quick_check";
         if ((string?)command.ExecuteScalar() != "ok") throw new InvalidDataException("Backup integrity failed.");
         command.CommandText = "PRAGMA foreign_key_check";

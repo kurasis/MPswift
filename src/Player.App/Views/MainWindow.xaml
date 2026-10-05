@@ -21,7 +21,7 @@
         <Grid Margin="16,16,16,8">
             <Grid.ColumnDefinitions><ColumnDefinition Width="100" /><ColumnDefinition Width="*" /><ColumnDefinition Width="170" /></Grid.ColumnDefinitions>
             <Border Width="88" Height="88" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" HorizontalAlignment="Left">
-                <Grid><Ellipse Width="64" Height="64" Fill="#585858" /><Ellipse Width="16" Height="16" Fill="#333333" /></Grid>
+                <Grid><Image Source="{Binding CoverArt}" Stretch="Uniform" /><Ellipse Width="64" Height="64" Fill="#585858"><Ellipse.Style><Style TargetType="Ellipse"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding CoverArt}" Value="{x:Null}"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></Ellipse.Style></Ellipse><Ellipse Width="16" Height="16" Fill="#333333"><Ellipse.Style><Style TargetType="Ellipse"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding CoverArt}" Value="{x:Null}"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></Ellipse.Style></Ellipse></Grid>
             </Border>
             <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,12,0">
                 <TextBlock x:Name="NowPlayingTitle" Text="{Binding Title}" FontSize="18" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" ToolTip="{Binding Title}" />
@@ -66,6 +66,14 @@
                         <MenuItem Header="{x:Static r:Strings.TabLeft}" Click="OnTabLeft" />
                         <MenuItem Header="{x:Static r:Strings.TabRight}" Click="OnTabRight" />
                         <Separator />
+                        <MenuItem Header="Local music library…" Click="OnLibrary" />
+                        <MenuItem Header="Export playlist as M3U8…" Click="OnExportPlaylist" />
+                        <MenuItem Header="Relink selected missing file…" Click="OnRelink" />
+                        <MenuItem Header="Copy selected path" Click="OnCopyPath" />
+                        <MenuItem Header="Show selected file in Explorer" Click="OnShowFile" />
+                        <MenuItem Header="Selected track properties…" Click="OnProperties" />
+                        <MenuItem Header="Sort full playlist"><MenuItem Header="Title" Tag="Title" Click="OnSort" /><MenuItem Header="Artist" Tag="Artist" Click="OnSort" /><MenuItem Header="Album" Tag="Album" Click="OnSort" /><MenuItem Header="Disc / track" Tag="Track" Click="OnSort" /><MenuItem Header="Duration" Tag="Duration" Click="OnSort" /><MenuItem Header="Path" Tag="Path" Click="OnSort" /><MenuItem Header="Date added" Tag="Date added" Click="OnSort" /></MenuItem>
+                        <Separator />
                         <MenuItem Header="Import document with legacy encoding…" Click="OnLegacyImport" />
                         <MenuItem Header="Play next" Click="OnPlayNext" />
                         <MenuItem Header="Add to queue" Click="OnAddQueue" />
@@ -102,7 +110,7 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:PlaylistRowViewModel}">
                         <Grid>
-                            <Grid.ColumnDefinitions><ColumnDefinition Width="28" /><ColumnDefinition Width="*" /><ColumnDefinition Width="64" /></Grid.ColumnDefinitions>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="28" /><ColumnDefinition Width="*" /><ColumnDefinition Width="90" /><ColumnDefinition Width="64" /></Grid.ColumnDefinitions>
                             <CheckBox IsChecked="{Binding Enabled}" VerticalAlignment="Center" AutomationProperties.Name="{x:Static r:Strings.Enabled}" ToolTip="{x:Static r:Strings.Enabled}" />
                             <StackPanel Grid.Column="1" Margin="0,0,8,0">
                                 <DockPanel>
@@ -113,7 +121,8 @@
                                 </DockPanel>
                                 <TextBlock Text="{Binding Metadata}" Margin="0,6,0,0" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
                             </StackPanel>
-                            <StackPanel Grid.Column="2" HorizontalAlignment="Right"><TextBlock Text="{Binding Duration}" /><TextBlock Text="{Binding Availability}" FontSize="10" Foreground="{StaticResource ErrorBrush}" /></StackPanel>
+                            <ComboBox Grid.Column="2" ItemsSource="{x:Static vm:PlaylistRowViewModel.RatingOptions}" SelectedItem="{Binding Rating, Mode=TwoWay}" VerticalAlignment="Center" ToolTip="Rating (0 = unrated)" AutomationProperties.Name="Rating" />
+                            <StackPanel Grid.Column="3" HorizontalAlignment="Right"><TextBlock Text="{Binding Duration}" /><TextBlock Text="{Binding Availability}" FontSize="10" Foreground="{StaticResource ErrorBrush}" /></StackPanel>
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

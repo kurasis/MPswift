@@ -1,4 +1,7 @@
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Diagnostics;
+using System.Windows.Media;
 using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Threading;
@@ -25,6 +28,25 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     private readonly IPlayerStore _store;
     private readonly SettingsFile _settings;
     private readonly IWaveformService _waveforms;
+    private readonly ILibraryIndexStore? _index;
+    private readonly LibraryScanner? _scanner;
+    private readonly LibraryWatcher _watcher;
+    private readonly ArtworkService _artwork = new();
+    private CancellationTokenSource? _scanCancellation, _artCancellation;
+    private Task _scanTask = Task.CompletedTask, _artTask = Task.CompletedTask, _statisticsTask = Task.CompletedTask;
+    private readonly Dictionary<Guid, int> _pendingRatings = [];
+    private readonly HashSet<Guid> _pendingRoots = [];
+    private readonly ListeningMeter _listening = new();
+    private readonly long _clockOrigin = Stopwatch.GetTimestamp();
+    private bool _applyingRatings;
+    private Guid? _artEntry;
+    public ObservableCollection<LibraryRoot> LibraryRoots { get; } = [];
+    [ObservableProperty] private bool _isScanning;
+    [ObservableProperty] private string _scanStatus = "";
+    [ObservableProperty] private ImageSource? _coverArt;
+    public Task ScanCompletion => _scanTask;
+    public Task ArtworkCompletion => _artTask;
+    public ILibraryIndexStore? LibraryIndex => _index;
     private readonly Dictionary<Guid, PlaylistRowViewModel> _knownRows = [];
     private readonly SemaphoreSlim _saveGate = new(1);
     private CancellationTokenSource? _importCancellation;
@@ -95,6 +117,8 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     {
         _player = player; _coordinator = coordinator; _importer = importer; _dialogs = dialogs; _dispatcher = dispatcher;
         _store = store; _settings = settings; _waveforms = waveforms;
+        _index = store as ILibraryIndexStore; _scanner = _index is null ? null : new(_index);
+        _watcher = new(ids => { if (!_closing && !_dispatcher.HasShutdownStarted) _dispatcher.BeginInvoke(() => ScanRoots(ids)); });
         var tab = new PlaylistTabViewModel(Guid.NewGuid(), "Default"); Playlists.Add(tab); SelectedPlaylist = tab;
         _player.SnapshotChanged += OnSnapshot;
         _coordinator.OrderChanged += OnOrderChanged;
@@ -125,6 +149,11 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         _initialized = true;
         AddFilesCommand.NotifyCanExecuteChanged(); AddFolderCommand.NotifyCanExecuteChanged();
         SaveStatus = Strings.Get("Saved");
+        if (_index is not null)
+        {
+            foreach (var root in await _index.GetRootsAsync()) LibraryRoots.Add(root);
+            await RefreshRatingsAsync(); _watcher.Watch(LibraryRoots);
+        }
     }
     partial void OnSelectedPlaylistChanged(PlaylistTabViewModel value)
     {
@@ -138,7 +167,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     private void AddRow(PlaylistTabViewModel tab, PlaylistEntry entry)
     {
         var row = new PlaylistRowViewModel(entry); row.EligibilityChanged += RowChanged;
-        tab.Entries.Add(row); _knownRows.Add(row.Id, row);
+        row.RatingChanged += RatingChanged; tab.Entries.Add(row); _knownRows.Add(row.Id, row);
     }
     private void RowChanged() => UpdateEntries();
     private void SyncSource()
@@ -149,6 +178,99 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     private void ChooseSource()
     { _sourcePlaylistId = SelectedPlaylist.Id; SyncSource(); }
 
+    public async Task AddLibraryRootAsync(string path)
+    {
+        if (_index is null || LibraryRoots.Count >= 100) return;
+        Services.Audio.LocalFileAccess.ValidateDirectory(path);
+        if (LibraryRoots.Any(r => string.Equals(r.Path, path, StringComparison.OrdinalIgnoreCase))) return;
+        var root = new LibraryRoot(Guid.NewGuid(), path); await _index.PutRootAsync(root); LibraryRoots.Add(root); _watcher.Watch(LibraryRoots); ScanRoots([root.Id]);
+    }
+    public async Task DisableLibraryRootAsync(LibraryRoot root)
+    { if (_index is null) return; var disabled = root with { Enabled = false }; await _index.PutRootAsync(disabled); LibraryRoots[LibraryRoots.IndexOf(root)] = disabled; _watcher.Watch(LibraryRoots); }
+    public void ScanRoots(IEnumerable<Guid>? roots = null)
+    {
+        if (_closing || _scanner is null) return;
+        foreach (var id in roots ?? LibraryRoots.Where(r => r.Enabled).Select(r => r.Id)) _pendingRoots.Add(id);
+        if (!IsScanning) _scanTask = ScanPendingAsync();
+    }
+    public void CancelScan() { _pendingRoots.Clear(); _scanCancellation?.Cancel(); }
+    private async Task ScanPendingAsync()
+    {
+        IsScanning = true; _scanCancellation = new();
+        try
+        {
+            while (_pendingRoots.Count > 0)
+            {
+                var id = _pendingRoots.First(); _pendingRoots.Remove(id); var root = LibraryRoots.FirstOrDefault(r => r.Id == id && r.Enabled); if (root is null) continue;
+                var known = _knownRows.Values.Where(r => r.Entry.Track.Segment is null).Select(r => r.Entry.Track).DistinctBy(t => t.Path, StringComparer.OrdinalIgnoreCase).ToDictionary(t => t.Path, t => t.Id, StringComparer.OrdinalIgnoreCase);
+                var progress = new Progress<ScanProgress>(p => { if (_closing) return; ScanStatus = $"{p.Seen} indexed; {p.Changed} changed; {p.Errors} diagnostics"; if (p.Details.Length > 0) Details = string.Join(Environment.NewLine, p.Details); });
+                await Task.Run(() => _scanner!.ScanAsync(root, known, progress, _scanCancellation.Token));
+            }
+            await ReconcilePlaylistMetadataAsync();
+            if (_coordinator.ActiveEntry?.Track.Path is { } artworkPath) _artTask = LoadArtworkAsync(artworkPath);
+        }
+        catch (OperationCanceledException) { ScanStatus = "Scan canceled; confirmed batches retained."; }
+        catch (Exception e) { ScanStatus = "Scan failed; previous metadata and playlists retained."; Details = e.Message; }
+        finally { IsScanning = false; _scanCancellation.Dispose(); _scanCancellation = null; }
+    }
+    private async Task ReconcilePlaylistMetadataAsync()
+    {
+        if (_index is null) return;
+        var paths = _knownRows.Values.Select(r => r.Path).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+        foreach (var batch in paths.Chunk(64))
+        {
+            foreach (var file in await _index.FindFilesAsync(batch))
+                foreach (var row in _knownRows.Values.Where(r => string.Equals(r.Path, file.Path, StringComparison.OrdinalIgnoreCase)).ToArray())
+                    row.UpdateTrack(row.Entry.Track.Segment is null ? file.Track with { Id = row.Entry.Track.Id, Available = file.Available } : row.Entry.Track with { Available = file.Available });
+        }
+        _importer.RememberTracks(_knownRows.Values.Select(r => r.Entry.Track)); UpdateEntries();
+    }
+    public void AddLibraryTracks(IEnumerable<MediaTrack> tracks)
+    {
+        foreach (var track in tracks.Take(10001)) { if (_knownRows.Count >= 10000) break; AddRow(SelectedPlaylist, new(Guid.NewGuid(), track, AddedUtcTicks: DateTime.UtcNow.Ticks)); }
+        UpdateEntries(); _statisticsTask = ObserveAsync(RefreshRatingsAsync());
+    }
+    private async Task RefreshRatingsAsync()
+    {
+        if (_index is null) return; var stats = await _index.GetStatisticsAsync(_knownRows.Values.Select(r => r.Entry.Track.Id).Distinct().ToArray());
+        _applyingRatings = true; try { foreach (var statistic in stats) foreach (var row in _knownRows.Values.Where(r => r.Entry.Track.Id == statistic.TrackId)) row.Rating = statistic.Rating; } finally { _applyingRatings = false; }
+    }
+    private void RatingChanged(PlaylistRowViewModel row)
+    {
+        if (_applyingRatings || _index is null || _closing) return;
+        _applyingRatings = true; try { foreach (var duplicate in _knownRows.Values.Where(r => r.Entry.Track.Id == row.Entry.Track.Id)) duplicate.Rating = Math.Clamp(row.Rating, 0, 5); } finally { _applyingRatings = false; }
+        _pendingRatings[row.Entry.Track.Id] = Math.Clamp(row.Rating, 0, 5);
+        _statisticsTask = SaveRatingAfterAsync(_statisticsTask, row.Entry.Track.Id, Math.Clamp(row.Rating, 0, 5));
+    }
+    private async Task SaveRatingAfterAsync(Task preceding, Guid track, int rating)
+    { await preceding; await ObserveAsync(_index!.SetRatingAsync(track, rating)); }
+    public void SortPlaylist(string field)
+    {
+        if (!string.IsNullOrEmpty(Search) || IsImporting) { Message = "Clear search before sorting the full playlist."; return; }
+        Func<PlaylistRowViewModel, object?> key = field switch
+        {
+            "Artist" => r => r.Entry.Track.Artist, "Album" => r => r.Entry.Track.Album, "Track" => r => r.Entry.Track.TrackNumber == 0 ? null : r.Entry.Track.DiscNumber * 100000L + r.Entry.Track.TrackNumber,
+            "Duration" => r => r.Entry.Track.DurationHint?.Ticks, "Date added" => r => r.Entry.AddedUtcTicks == 0 ? null : r.Entry.AddedUtcTicks, "Path" => r => r.Path, _ => r => r.Title
+        };
+        var sorted = Entries.OrderBy(r => key(r) is null).ThenBy(key).ToArray();
+        for (var i = 0; i < sorted.Length; i++) Entries.Move(Entries.IndexOf(sorted[i]), i); UpdateEntries();
+    }
+    public async Task ExportPlaylistAsync(string path)
+    {
+        if (!Path.GetExtension(path).Equals(".m3u8", StringComparison.OrdinalIgnoreCase)) throw new InvalidOperationException("Choose an M3U8 document filename; audio files are never overwritten by export.");
+        var text = Player.Core.Media.PlaylistDocument.ExportM3u8(Entries.Select(r => r.Entry), path);
+        await Task.Run(() => { Services.Audio.LocalFileAccess.ValidateDirectory(Path.GetDirectoryName(path)!); var temporary = path + ".tmp-" + Guid.NewGuid().ToString("N"); try { File.WriteAllText(temporary, text, new System.Text.UTF8Encoding(false, true)); File.Move(temporary, path, true); } finally { if (File.Exists(temporary)) File.Delete(temporary); } });
+    }
+    public async Task RelinkAsync(PlaylistRowViewModel row, string path)
+    {
+        path = Services.Audio.BassSmokeSession.ValidateSourcePath(path);
+        // Use an independent real decoder to validate replacement and CUE bounds without disturbing playback.
+        await Task.Run(() => { using var context = new Services.Audio.NativeDecodeContext(); var source = Services.Audio.BassMixerGraph.OpenSource(new(row.Id, path, row.Entry.Track.Segment)); ManagedBass.Bass.StreamFree(source.Handle); });
+        var track = row.Entry.Track with { Path = path, Available = true };
+        if (_index is not null) await _index.RelinkAsync(track.Id, path);
+        foreach (var duplicate in _knownRows.Values.Where(r => r.Entry.Track.Id == track.Id)) duplicate.UpdateTrack(track);
+        _coordinator.RelinkSnapshots(track.Id, path); _importer.RememberTracks([track]); UpdateEntries(); _waveEntry = null; _artEntry = null; ApplySnapshot(_player.Snapshot); await SaveNowAsync();
+    }
     partial void OnRepeatChanged(RepeatMode value) { _coordinator.Repeat = value; ScheduleSave(false); }
     partial void OnShuffleChanged(bool value) { _coordinator.Shuffle = value; ScheduleSave(false); }
     public void Enqueue(IEnumerable<PlaylistRowViewModel> rows, bool next)
@@ -156,7 +278,8 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     public void RemoveQueued(Guid id) => _coordinator.RemoveQueued(id);
     public void MoveQueued(Guid id, int delta) => _coordinator.MoveQueued(id, delta);
     [RelayCommand] private void ClearQueue() => _coordinator.ClearQueue();
-    [RelayCommand] private void ClearHistory() => _coordinator.ClearHistory();
+    [RelayCommand] private void ClearHistory() { _coordinator.ClearHistory(); if (_index is not null) _statisticsTask = ClearListeningAfterAsync(_statisticsTask); }
+    private async Task ClearListeningAfterAsync(Task preceding) { await preceding; await ObserveAsync(_index!.ClearListeningAsync()); }
     private void OnOrderChanged()
     { if (!_closing && !_dispatcher.HasShutdownStarted) _dispatcher.BeginInvoke(() => { RefreshQueue(); ScheduleSave(false); }, DispatcherPriority.Background); }
     private void RefreshQueue() { Queue.Clear(); foreach (var item in _coordinator.Queue) Queue.Add(item); }
@@ -196,7 +319,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         }
         catch (OperationCanceledException) { Message = Strings.Get("ImportCanceled"); }
         catch (Exception error) { Message = Strings.Get("ErrorUnexpected"); Details = error.Message; }
-        finally { IsImporting = false; _importCancellation.Dispose(); _importCancellation = null; }
+        finally { await RefreshRatingsAsync(); IsImporting = false; _importCancellation.Dispose(); _importCancellation = null; }
     }
     [RelayCommand(AllowConcurrentExecutions = true)] private Task PlayEntryAsync(PlaylistRowViewModel? row)
     { if (row is null) return Task.CompletedTask; ChooseSource(); return _coordinator.LoadAsync(row.Id); }
@@ -215,7 +338,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     [RelayCommand] private void RemoveEntries(IEnumerable<PlaylistRowViewModel>? rows)
     {
         foreach (var row in rows?.ToArray() ?? [])
-        { row.EligibilityChanged -= RowChanged; Entries.Remove(row); _knownRows.Remove(row.Id); }
+        { row.EligibilityChanged -= RowChanged; row.RatingChanged -= RatingChanged; Entries.Remove(row); _knownRows.Remove(row.Id); }
         UpdateEntries();
     }
     public void CreatePlaylist(string name)
@@ -237,7 +360,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     {
         if (IsImporting) return;
         var tab = SelectedPlaylist;
-        foreach (var row in tab.Entries) { row.EligibilityChanged -= RowChanged; _knownRows.Remove(row.Id); }
+        foreach (var row in tab.Entries) { row.EligibilityChanged -= RowChanged; row.RatingChanged -= RatingChanged; _knownRows.Remove(row.Id); }
         Playlists.Remove(tab);
         if (Playlists.Count == 0) Playlists.Add(new(Guid.NewGuid(), "Default"));
         SelectedPlaylist = Playlists[0]; UpdateEntries();
@@ -310,6 +433,10 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
                 Waveform = null; WaveformStatus = Strings.Get(snapshot.State == PlaybackState.Loading ? "StateLoading" : "WaveformUnavailable");
             }
             var track = snapshot.EntryId is { } id && _knownRows.TryGetValue(id, out var row) ? row.Entry.Track : _coordinator.ActiveEntry?.Track;
+            if (track is not null && snapshot.Duration is { } decodedDuration && snapshot.State != PlaybackState.Loading && snapshot.EntryId is { } decodedEntry && _knownRows.TryGetValue(decodedEntry, out var decodedRow) && decodedRow.Entry.Track.DurationHint != decodedDuration)
+            { decodedRow.UpdateTrack(track with { DurationHint = decodedDuration }); ScheduleSave(true); }
+            if (track is not null && snapshot.EntryId != _artEntry) { _artEntry = snapshot.EntryId; _artTask = LoadArtworkAsync(track.Path); }
+            if (_index is not null && _listening.Update(snapshot, track?.Id, Stopwatch.GetElapsedTime(_clockOrigin), DateTime.UtcNow) is { } occurrence) _statisticsTask = SaveListeningAfterAsync(_statisticsTask, occurrence);
             if (track is not null) { Title = track.Title; Artist = track.Artist ?? Strings.Get("UnknownArtist"); Album = track.Album ?? ""; }
             Format = snapshot.SourceFormat is { } source ? string.Format(CultureInfo.CurrentCulture, Strings.Get("SourceFormat"), source.Codec, source.SampleRate, source.Channels) : "";
             if (snapshot.SourceFormat?.BitDepth is { } bits) Format += " · " + string.Format(CultureInfo.CurrentCulture, Strings.Get("SourceBitDepth"), bits);
@@ -326,6 +453,14 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         OnPropertyChanged(nameof(CanTransport));
         if (snapshot.State != _previousState || DateTime.UtcNow - _lastSessionSave >= TimeSpan.FromSeconds(10))
         { _previousState = snapshot.State; _lastSessionSave = DateTime.UtcNow; ScheduleSave(false); }
+    }
+    private async Task SaveListeningAfterAsync(Task preceding, ListeningEvent occurrence) { await preceding; await ObserveAsync(_index!.RecordListeningAsync(occurrence)); }
+    private async Task LoadArtworkAsync(string path)
+    {
+        _artCancellation?.Cancel(); _artCancellation?.Dispose(); _artCancellation = new(); var token = _artCancellation.Token; CoverArt = null;
+        try { var image = await _artwork.LoadAsync(path, token); if (!token.IsCancellationRequested && !_closing) CoverArt = image; }
+        catch (OperationCanceledException) { }
+        catch (Exception e) { if (!_closing && !token.IsCancellationRequested) Details = "Artwork fallback: " + e.Message; }
     }
     private async Task LoadWaveformAsync(string path, bool refresh)
     {
@@ -350,7 +485,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         await Task.Run(() => SettingsFile.Export(path + ".settings.json", settings));
     }
     private void UpdateEntries(bool changed = true)
-    { SyncSource(); if (_initialized) ApplySnapshot(_player.Snapshot); HasEntries = Entries.Count > 0; OnPropertyChanged(nameof(CanTransport)); UpdatePlaylistStatus(); if (changed) ScheduleSave(true); }
+    { SyncSource(); VisibleEntries?.Refresh(); if (_initialized) ApplySnapshot(_player.Snapshot); HasEntries = Entries.Count > 0; OnPropertyChanged(nameof(CanTransport)); UpdatePlaylistStatus(); if (changed) ScheduleSave(true); }
     private void UpdatePlaylistStatus()
     { if (VisibleEntries is not null) PlaylistStatus = string.Format(CultureInfo.CurrentCulture, Strings.Get("PlaylistCount"), VisibleEntries.Cast<object>().Count(), Entries.Count); }
     private LibraryState Capture() => new(Playlists.Select(p => p.Capture()).ToArray(),
@@ -378,6 +513,10 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
             var state = Capture(); var version = _libraryVersion;
             var settings = WindowSettings with { Volume = Volume, Muted = Muted };
             await _store.SaveAsync(state, version != _savedLibraryVersion);
+            if (_index is not null)
+            {
+                foreach (var (track, rating) in _pendingRatings.ToArray()) { await _index.SetRatingAsync(track, rating); if (_pendingRatings.GetValueOrDefault(track) == rating) _pendingRatings.Remove(track); }
+            }
             await Task.Run(() => _settings.Save(settings));
             _savedLibraryVersion = version;
             if (_libraryVersion == version) SaveStatus = Strings.Get("Saved");
@@ -394,12 +533,12 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     {
         if (_closing) return;
         _closing = true; _player.SnapshotChanged -= OnSnapshot; _coordinator.OrderChanged -= OnOrderChanged;
-        _importCancellation?.Cancel(); _waveCancellation?.Cancel(); _saveCancellation?.Cancel();
-        await _importTask; await _waveTask; await _saveTask;
+        _scanCancellation?.Cancel(); _artCancellation?.Cancel(); _importCancellation?.Cancel(); _waveCancellation?.Cancel(); _saveCancellation?.Cancel();
+        await _importTask; await _waveTask; await _saveTask; await _scanTask; await _artTask; await _statisticsTask;
         try { if (save) await SaveNowAsync(); }
         catch { _closing = false; _player.SnapshotChanged += OnSnapshot; _coordinator.OrderChanged += OnOrderChanged; throw; }
-        foreach (var row in _knownRows.Values) row.EligibilityChanged -= RowChanged;
-        await _waveforms.DisposeAsync(); await _coordinator.DisposeAsync(); await _store.DisposeAsync();
+        foreach (var row in _knownRows.Values) { row.EligibilityChanged -= RowChanged; row.RatingChanged -= RatingChanged; }
+        _watcher.Dispose(); await _waveforms.DisposeAsync(); await _coordinator.DisposeAsync(); await _store.DisposeAsync();
         _waveCancellation?.Dispose(); _saveCancellation?.Dispose();
     }
 }

@@ -43,3 +43,8 @@ Development-only xUnit 2.9.3, runner 4.0.0 and Microsoft.NET.Test.Sdk 18.10.1 ar
 Generated sine-wave fixtures are dedicated to the public domain under CC0-1.0 by this project; generation provenance and checksum accompany each file. The owner's screenshot is a development design reference only and must not enter application assets or public portable packages.
 
 Before Stage G distribution: record the owner's intended use, applicable native licensing, application source license, all deployed binaries/notices/source obligations, and the exact package hashes. Do not buy a license or publish a release automatically merely because builds succeed.
+
+
+## Stage E development add-ons
+
+Pinned development manifest includes BASSWMA 2.4.5.13 (Windows Media Format modules required), BASSAPE 2.4.1.0, BASSWV 2.4.7.4, BASSDSD 2.4.2.0, BASS_MPC 2.4.1.2 and BASS_TTA 2.4.0.2. Archive/DLL hashes and HTTPS upstream URLs are in `native/manifest.json`; generic MPC/TTA notices are copied into separate addon subdirectories. MPC's upstream readme describes free use/distribution with retained notices; TTA includes LGPL text. Distribution approval remains false for all addons, pending intended-use/license-obligation review. No purchases or public release were made. WMA is not represented as optional-component-free Windows N support; DSD uses float PCM decoding only.

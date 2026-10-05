@@ -19,6 +19,7 @@
     <PackageReference Include="TagLibSharp" />
     <PackageReference Include="Microsoft.Data.Sqlite" />
     <Content Include="../../native/manifest.json" Link="native/manifest.json" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="../../native/win-x64/*.dll;../../native/win-x64/*.txt" Link="native/win-x64/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../../native/win-x64/**/*.txt" Link="native/win-x64/%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../../native/win-x64/*.dll" Link="native/win-x64/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

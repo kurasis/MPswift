@@ -25,6 +25,11 @@ public sealed class PlaybackCoordinator : IAsyncDisposable
     public void RemoveQueued(Guid id) { lock (_gate) _order.Remove(id); Changed(); }
     public void MoveQueued(Guid id, int delta) { lock (_gate) _order.Move(id, delta); Changed(); }
     public void ClearQueue() { lock (_gate) _order.Clear(); Changed(); }
+    public void RelinkSnapshots(Guid trackId, string path)
+    {
+        lock (_gate) { _order.Relink(trackId, path); if (_cursor?.Track.Id == trackId) _cursor = _cursor with { Track = _cursor.Track with { Path = path, Available = true } }; _preparedEntry = null; }
+        Changed();
+    }
     public void ClearHistory() { lock (_gate) _order.ClearHistory(); Changed(); }
     public PlaybackOrderState CaptureOrder() { lock (_gate) return _order.Capture(); }
     public void RestoreOrder(PlaybackOrderState state) { lock (_gate) _order.Restore(state); Changed(); }
@@ -51,6 +56,7 @@ public sealed class PlaybackCoordinator : IAsyncDisposable
             var oldIndex = Array.FindIndex(_entries, e => e.Id == _cursor?.Id);
             if (oldIndex >= 0 && array.All(e => e.Id != _cursor?.Id)) _removedCursorIndex = Math.Min(oldIndex, array.Length);
             _entries = array;
+            if (_cursor is { } active && array.FirstOrDefault(e => e.Id == active.Id) is { } updated) _cursor = updated;
             _order.SetSource(array);
             _preparedEntry = null;
         }

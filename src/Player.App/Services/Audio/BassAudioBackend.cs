@@ -95,7 +95,7 @@ public sealed class BassAudioBackend : IAudioBackend, IAdvancedAudioBackend
         _prepared = request; _repeatOne = repeatOne;
         // A bad prepared decoder must not interrupt the still-playing current item.
         try { _graph?.PrepareNext(request, repeatOne); }
-        catch (AudioBackendException e) when (e.Category is AudioErrorCategory.FileUnavailable or AudioErrorCategory.Decoder) { _prepared = null; }
+        catch (AudioBackendException e) when (e.Category is AudioErrorCategory.FileUnavailable or AudioErrorCategory.Decoder) { _prepared = null; _graph?.PrepareNext(null, false); }
     }
     public void Pause()
     {

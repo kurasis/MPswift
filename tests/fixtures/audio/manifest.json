@@ -283,6 +283,61 @@
       "expectedTitle": "Fixture — Музыка",
       "expectedBassCodec": "ALAC",
       "expectedBitDepth": 16
+    },
+    {
+      "path": "wavpack.wv",
+      "profile": "WavPack lossless",
+      "sampleRate": 48000,
+      "channels": 2,
+      "sourceDurationSeconds": 3,
+      "durationToleranceSeconds": 0.15,
+      "sha256": "6b9666259a90028c3695648597f043cafeab500b55708b3779a9ee5b26c056a3",
+      "provenance": "Generated from owned PCM using ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "license": "CC0-1.0",
+      "encoderArguments": [
+        "-c:a",
+        "wavpack"
+      ],
+      "expectedTitle": "Fixture — Музыка",
+      "expectedBassCodec": "WV"
+    },
+    {
+      "path": "tta.tta",
+      "profile": "TTA lossless",
+      "sampleRate": 48000,
+      "channels": 2,
+      "sourceDurationSeconds": 3,
+      "durationToleranceSeconds": 0.15,
+      "sha256": "899e3012efb1ea5a784938143bed13685bd2fa47a28d5c4a7312955ed08bf595",
+      "provenance": "Generated from owned PCM using ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "license": "CC0-1.0",
+      "encoderArguments": [
+        "-c:a",
+        "tta"
+      ],
+      "expectedTitle": "Fixture — Музыка",
+      "expectedBassCodec": "TTA"
+    },
+    {
+      "path": "audiobook.m4b",
+      "profile": "M4B AAC-LC without DRM",
+      "sampleRate": 48000,
+      "channels": 2,
+      "sourceDurationSeconds": 3,
+      "durationToleranceSeconds": 0.15,
+      "sha256": "f3107688d080c55b22e4dbc42397f955906995fed51776c1947b6457c2823c85",
+      "provenance": "Generated from owned PCM using ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "license": "CC0-1.0",
+      "encoderArguments": [
+        "-c:a",
+        "aac",
+        "-b:a",
+        "192k",
+        "-f",
+        "mp4"
+      ],
+      "expectedTitle": "Fixture — Музыка",
+      "expectedBassCodec": "MP4"
     }
   ]
 }

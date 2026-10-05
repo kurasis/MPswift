@@ -10,13 +10,13 @@ $destination = Join-Path $root 'native/win-x64'
 $cache = Join-Path $root 'artifacts/native-cache'
 New-Item $destination, $cache -ItemType Directory -Force | Out-Null
 foreach ($library in $manifest.libraries) {
-    if ($library.name -notin @('bass', 'bassmix', 'basswasapi', 'bassflac', 'bassopus', 'bassalac', 'bass_aac') -or $library.fileName -ne "$($library.name).dll") {
+    if ($library.name -notin @('bass', 'bassmix', 'basswasapi', 'bassflac', 'bassopus', 'bassalac', 'bass_aac', 'basswma', 'bassape', 'basswv', 'bassdsd', 'bass_mpc', 'bass_tta') -or $library.fileName -ne "$($library.name).dll") {
         throw 'Unexpected native library name.'
     }
     $target = Join-Path $destination $library.fileName
     $valid = (Test-Path $target) -and ((Get-FileHash $target -Algorithm SHA256).Hash -eq $library.sha256)
     foreach ($companion in $library.requiredCompanionFiles) {
-        if ($companion -notin @("$($library.name).txt", 'gpl.txt', 'readme.txt')) { throw 'Unexpected companion name.' }
+        if ($companion -notin @("$($library.name).txt", 'gpl.txt', 'readme.txt', "$($library.name)/readme.txt", "$($library.name)/lgpl.txt")) { throw 'Unexpected companion name.' }
         if (-not (Test-Path (Join-Path $destination $companion))) { $valid = $false }
     }
     if ($valid) { Write-Host "$($library.name): verified retained files"; continue }
@@ -41,8 +41,9 @@ foreach ($library in $manifest.libraries) {
             throw 'Native DLL is not a Windows x64 PE image.'
         }
         foreach ($companion in $library.requiredCompanionFiles) {
-            $entry = $archive.GetEntry($companion)
+            $entry = $archive.GetEntry(($companion -split "/")[-1])
             if ($null -eq $entry) { throw "Missing upstream license/documentation: $companion" }
+            New-Item (Split-Path (Join-Path $destination $companion) -Parent) -ItemType Directory -Force | Out-Null
             [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, (Join-Path $destination $companion), $true)
         }
         Copy-Item $staging $target -Force

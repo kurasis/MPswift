@@ -79,7 +79,7 @@ public sealed class StorageAndWaveformTests : IDisposable
     }
     [Theory]
     [InlineData(0)]
-    [InlineData(2)]
+    [InlineData(3)]
     public async Task UnknownSchemaNeverRecreatesOrDowngradesUserData(int version)
     {
         using (var connection = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = Database, Pooling = false }.ToString()))

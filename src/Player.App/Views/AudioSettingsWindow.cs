@@ -15,6 +15,7 @@ public sealed class AudioSettingsWindow : Window
         var panel = new StackPanel { Margin = new Thickness(16) }; Content = new ScrollViewer { Content = panel };
         var settings = (model.WindowSettings.Processing ?? new()).Validate(); var output = model.WindowSettings.Output ?? new();
         void Label(string text) => panel.Children.Add(new TextBlock { Text = text, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 8, 0, 4) });
+        if (output.DeviceId is { } saved && devices.All(d => d.Id != saved)) devices = devices.Append(new(saved, "Unavailable saved output — select a replacement explicitly", 0, 0)).ToArray();
         Label("Output device (changing output pauses playback)");
         var device = new ComboBox { ItemsSource = devices, DisplayMemberPath = "Name", SelectedItem = devices.FirstOrDefault(d => d.Id == output.DeviceId) ?? devices.FirstOrDefault() }; panel.Children.Add(device);
         var exclusive = new CheckBox { Content = "Exclusive mode — may prevent other apps using this endpoint", IsChecked = output.Exclusive, Margin = new Thickness(0, 10, 0, 0) }; panel.Children.Add(exclusive);

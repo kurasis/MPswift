@@ -8,7 +8,7 @@ using Player.Core.Playback;
 namespace Player.App.Services.Storage;
 
 /// <summary>One bounded dedicated owner, real synchronous SQLite I/O off the dispatcher.</summary>
-public sealed class SqlitePlayerStore : IPlayerStore
+public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
 {
     private readonly BlockingCollection<Action> _work = new(64);
     private readonly TaskCompletionSource _exit = new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -40,7 +40,7 @@ public sealed class SqlitePlayerStore : IPlayerStore
         for (var i = 0; i < playlists.Count; i++)
         {
             using var command = connection.CreateCommand();
-            command.CommandText = "SELECT e.Id, e.Enabled, t.Json FROM PlaylistEntries e JOIN Tracks t ON t.Id=e.TrackId WHERE e.PlaylistId=$id ORDER BY e.EntryOrder";
+            command.CommandText = "SELECT e.Id, e.Enabled, t.Json, e.AddedUtcTicks FROM PlaylistEntries e JOIN Tracks t ON t.Id=e.TrackId WHERE e.PlaylistId=$id ORDER BY e.EntryOrder";
             command.Parameters.AddWithValue("$id", playlists[i].Id.ToString());
             using var reader = command.ExecuteReader();
             var entries = new List<PlaylistEntry>();
@@ -50,7 +50,7 @@ public sealed class SqlitePlayerStore : IPlayerStore
                 var json = reader.GetString(2);
                 if (json.Length > 524288) throw new InvalidDataException("Oversized track metadata.");
                 var track = JsonSerializer.Deserialize<MediaTrack>(json) ?? throw new InvalidDataException("Invalid saved track.");
-                entries.Add(new PlaylistEntry(Guid.Parse(reader.GetString(0)), track, reader.GetBoolean(1)));
+                entries.Add(new PlaylistEntry(Guid.Parse(reader.GetString(0)), track, reader.GetBoolean(1), reader.GetInt64(3)));
             }
             playlists[i] = playlists[i] with { Entries = entries.ToArray() };
         }
@@ -71,6 +71,8 @@ public sealed class SqlitePlayerStore : IPlayerStore
     public Task SaveAsync(LibraryState state, bool playlistsChanged)
     {
         state.Validate();
+        var sessionJson = JsonSerializer.Serialize(state.Session);
+        if (sessionJson.Length > 16 * 1024 * 1024) throw new InvalidDataException("Saved queue/history exceeds the session size limit. Remove some queued items before saving.");
         return Queue(() =>
         {
             var connection = Open();
@@ -80,7 +82,7 @@ public sealed class SqlitePlayerStore : IPlayerStore
                 Execute(connection, transaction, "DELETE FROM PlaylistEntries; DELETE FROM Playlists; DELETE FROM Tracks;");
                 using var tabs = Command(connection, transaction, "INSERT INTO Playlists(Id,Name,TabOrder) VALUES($id,$name,$order)");
                 using var tracks = Command(connection, transaction, "INSERT INTO Tracks(Id,Json) VALUES($id,$json) ON CONFLICT(Id) DO UPDATE SET Json=excluded.Json");
-                using var entries = Command(connection, transaction, "INSERT INTO PlaylistEntries(Id,PlaylistId,TrackId,EntryOrder,Enabled) VALUES($id,$playlist,$track,$order,$enabled)");
+                using var entries = Command(connection, transaction, "INSERT INTO PlaylistEntries(Id,PlaylistId,TrackId,EntryOrder,Enabled,AddedUtcTicks) VALUES($id,$playlist,$track,$order,$enabled,$added)");
                 for (var i = 0; i < state.Playlists.Length; i++)
                 {
                     var tab = state.Playlists[i];
@@ -89,12 +91,12 @@ public sealed class SqlitePlayerStore : IPlayerStore
                     {
                         var entry = tab.Entries[j];
                         Set(tracks, ("$id", entry.Track.Id.ToString()), ("$json", JsonSerializer.Serialize(entry.Track))); tracks.ExecuteNonQuery();
-                        Set(entries, ("$id", entry.Id.ToString()), ("$playlist", tab.Id.ToString()), ("$track", entry.Track.Id.ToString()), ("$order", j), ("$enabled", entry.Enabled)); entries.ExecuteNonQuery();
+                        Set(entries, ("$id", entry.Id.ToString()), ("$playlist", tab.Id.ToString()), ("$track", entry.Track.Id.ToString()), ("$order", j), ("$enabled", entry.Enabled), ("$added", entry.AddedUtcTicks)); entries.ExecuteNonQuery();
                     }
                 }
             }
             using var session = Command(connection, transaction, "INSERT INTO Session(Id,Json) VALUES(1,$json) ON CONFLICT(Id) DO UPDATE SET Json=excluded.Json");
-            session.Parameters.AddWithValue("$json", JsonSerializer.Serialize(state.Session)); session.ExecuteNonQuery();
+            session.Parameters.AddWithValue("$json", sessionJson); session.ExecuteNonQuery();
             transaction.Commit(); return true;
         });
     }
@@ -119,10 +121,17 @@ public sealed class SqlitePlayerStore : IPlayerStore
             connection.Open();
             using var version = connection.CreateCommand(); version.CommandText = "PRAGMA user_version";
             var schema = Convert.ToInt32(version.ExecuteScalar(), System.Globalization.CultureInfo.InvariantCulture);
-            if (schema > 1) throw new NewerDatabaseSchemaException(schema);
+            if (schema > 2) throw new NewerDatabaseSchemaException(schema);
             if (existed && schema == 0) throw new InvalidDataException("Unrecognized database schema. Original database preserved.");
             using var check = connection.CreateCommand(); check.CommandText = "PRAGMA quick_check";
             if ((string?)check.ExecuteScalar() != "ok") throw new InvalidDataException("Database integrity check failed. Original database preserved.");
+            if (existed)
+            {
+                var required = new[] { "Tracks", "Playlists", "PlaylistEntries", "Session" }.Concat(schema == 2 ? new[] { "LibraryRoots", "MediaIndex", "TrackStatistics", "ListeningHistory" } : []).ToArray();
+                using var tables = connection.CreateCommand(); tables.CommandText = "SELECT name FROM sqlite_master WHERE type='table'";
+                using var reader = tables.ExecuteReader(); var names = new HashSet<string>(); while (reader.Read()) names.Add(reader.GetString(0));
+                if (required.Any(name => !names.Contains(name))) throw new InvalidDataException("Database schema tables are incomplete. Original database preserved.");
+            }
             Execute(connection, null, "PRAGMA foreign_keys=ON; PRAGMA busy_timeout=3000; PRAGMA journal_mode=WAL;");
             if (!existed)
             {
@@ -138,6 +147,7 @@ public sealed class SqlitePlayerStore : IPlayerStore
                 using var initial = Command(connection, transaction, "INSERT INTO Playlists VALUES($id,'Default',0)"); initial.Parameters.AddWithValue("$id", Guid.NewGuid().ToString()); initial.ExecuteNonQuery();
                 transaction.Commit();
             }
+            if (schema < 2) AddIndexSchema(connection, existed);
             _connection = connection; _ownership = ownership; return connection;
         }
         catch { connection.Dispose(); ownership.Dispose(); throw; }

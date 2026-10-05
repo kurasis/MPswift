@@ -13,11 +13,11 @@ public sealed record LibraryState(PlaylistState[] Playlists, SessionState Sessio
         if (Playlists.Any(p => p.Id == Guid.Empty || string.IsNullOrWhiteSpace(p.Name) || p.Name.Length > 200) || Playlists.Select(p => p.Id).Distinct().Count() != Playlists.Length)
             throw new InvalidDataException("Invalid playlist identity/name.");
         var entries = Playlists.SelectMany(p => p.Entries).ToArray();
-        if (entries.Any(e => e.Id == Guid.Empty || e.Track.Id == Guid.Empty) || entries.Select(e => e.Id).Distinct().Count() != entries.Length)
+        if (entries.Any(e => e.Id == Guid.Empty || e.Track.Id == Guid.Empty || e.AddedUtcTicks < 0 || e.AddedUtcTicks > DateTime.MaxValue.Ticks) || entries.Select(e => e.Id).Distinct().Count() != entries.Length)
             throw new InvalidDataException("Invalid entry identity.");
         foreach (var track in entries.Select(e => e.Track).Append(Session.ActiveEntry?.Track).Concat(Session.Order?.Queue.Select(q => q.Entry.Track) ?? []).Concat(Session.Order?.History.Select(e => e.Track) ?? []).OfType<MediaTrack>())
         {
-            if (track.Id == Guid.Empty || string.IsNullOrWhiteSpace(track.Path) || track.Path.Length > 32767 || track.Title is null || track.Title.Length > 4096 || track.Artist?.Length > 4096 || track.Album?.Length > 4096 || track.FormatHint?.Length > 4096)
+            if (track.Id == Guid.Empty || string.IsNullOrWhiteSpace(track.Path) || track.Path.Length > 32767 || track.Title is null || track.Title.Length > 4096 || track.Artist?.Length > 4096 || track.Album?.Length > 4096 || track.FormatHint?.Length > 4096 || track.AlbumArtist?.Length > 4096 || track.Genre?.Length > 4096)
                 throw new InvalidDataException("Invalid saved track metadata.");
             Player.Core.Media.LocalMediaPath.Parse(track.Path);
             if (track.CueDocument is { } cue) Player.Core.Media.LocalMediaPath.Parse(cue);

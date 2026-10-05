@@ -2,8 +2,9 @@ namespace Player.Core.Playback;
 
 public sealed record MediaTrack(Guid Id, string Path, string Title, string? Artist = null, string? Album = null,
     TimeSpan? DurationHint = null, string? FormatHint = null, bool Available = true, Player.Core.Media.TrackSegment? Segment = null, string? CueDocument = null, int? CueNumber = null,
-    ReplayGainTags? ReplayGain = null);
-public sealed record PlaylistEntry(Guid Id, MediaTrack Track, bool Enabled = true);
+    ReplayGainTags? ReplayGain = null, string? AlbumArtist = null, string? Genre = null, uint TrackNumber = 0, uint DiscNumber = 0, uint Year = 0,
+    int SampleRateHint = 0, int ChannelsHint = 0, int BitrateHint = 0);
+public sealed record PlaylistEntry(Guid Id, MediaTrack Track, bool Enabled = true, long AddedUtcTicks = 0);
 
 public static class PlaylistSearch
 {

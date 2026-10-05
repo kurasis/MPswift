@@ -84,12 +84,18 @@ public sealed class PlaybackOrder
     public PlaylistEntry? Previous(PlaylistEntry? current, TimeSpan position)
     { return position > TimeSpan.FromSeconds(3) || _historyIndex <= 0 ? current : _history[--_historyIndex]; }
     public PlaylistEntry? Forward() => _historyIndex + 1 < _history.Count ? _history[++_historyIndex] : null;
+    public void Relink(Guid trackId, string path)
+    {
+        PlaylistEntry Update(PlaylistEntry e) => e.Track.Id == trackId ? e with { Track = e.Track with { Path = path, Available = true } } : e;
+        for (var i = 0; i < _queue.Count; i++) _queue[i] = _queue[i] with { Entry = Update(_queue[i].Entry) };
+        for (var i = 0; i < _history.Count; i++) _history[i] = Update(_history[i]);
+    }
     public void ClearHistory() { _history.Clear(); _historyIndex = -1; }
     public PlaybackOrderState Capture() => new(Repeat, Shuffle, Queue, _remaining.ToArray(), _history.ToArray(), _historyIndex, _cursor, _removed);
     public void Restore(PlaybackOrderState state)
     {
         if (!Enum.IsDefined(state.Repeat) || state.Queue.Length > 10000 || state.History.Length > 100 || state.Remaining.Length > 10000 ||
-            state.HistoryIndex < -1 || state.HistoryIndex >= state.History.Length || state.Queue.Select(q => q.Id).Distinct().Count() != state.Queue.Length || state.Remaining.Distinct().Count() != state.Remaining.Length)
+            state.HistoryIndex < -1 || state.HistoryIndex >= state.History.Length || state.Queue.Any(q => q.Id == Guid.Empty || q.Entry.Id == Guid.Empty) || state.Queue.Select(q => q.Id).Distinct().Count() != state.Queue.Length || state.Remaining.Distinct().Count() != state.Remaining.Length)
             throw new InvalidDataException("Invalid playback order state.");
         Repeat = state.Repeat; _shuffle = state.Shuffle; _queue.Clear(); _queue.AddRange(state.Queue);
         _remaining.Clear(); _remaining.AddRange(state.Remaining.Where(id => _source.Any(e => e.Id == id && IsEligible(e))));

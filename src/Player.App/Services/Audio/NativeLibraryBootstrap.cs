@@ -41,7 +41,7 @@ public static class NativeLibraryBootstrap
                 // Validate every file before loading any executable code.
                 foreach (var library in manifest.Libraries)
                 {
-                    if (library.Name is not ("bass" or "bassmix" or "basswasapi" or "bassflac" or "bassopus" or "bassalac" or "bass_aac") || library.FileName != library.Name + ".dll")
+                    if (library.Name is not ("bass" or "bassmix" or "basswasapi" or "bassflac" or "bassopus" or "bassalac" or "bass_aac" or "basswma" or "bassape" or "basswv" or "bassdsd" or "bass_mpc" or "bass_tta") || library.FileName != library.Name + ".dll")
                         throw new InvalidDataException("Unexpected native library.");
                     var path = Path.Combine(AppContext.BaseDirectory, "native", "win-x64", library.FileName);
                     try

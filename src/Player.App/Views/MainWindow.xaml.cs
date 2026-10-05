@@ -136,6 +136,35 @@ public partial class MainWindow : Window
     private void OnMoveDown(object sender, RoutedEventArgs e) => Model.MoveEntries(PlaylistList.SelectedItems.Cast<PlaylistRowViewModel>(), 1);
     private void OnPlaylistActions(object sender, RoutedEventArgs e)
     { PlaylistActions.ContextMenu.DataContext = Model; PlaylistActions.ContextMenu.PlacementTarget = PlaylistActions; PlaylistActions.ContextMenu.IsOpen = true; }
+    private void OnLibrary(object sender, RoutedEventArgs e) => new LibraryWindow(this, Model).Show();
+    private void OnSort(object sender, RoutedEventArgs e) { if (sender is MenuItem { Tag: string field }) Model.SortPlaylist(field); }
+    private async void OnExportPlaylist(object sender, RoutedEventArgs e)
+    {
+        var dialog = new Microsoft.Win32.SaveFileDialog { Filter = "UTF-8 playlist (*.m3u8)|*.m3u8", FileName = "playlist.m3u8" }; if (dialog.ShowDialog(this) != true) return;
+        try { await Model.ExportPlaylistAsync(dialog.FileName); Model.Message = "Playlist exported; source audio was unchanged."; }
+        catch (Exception error) { Model.Message = "Export failed"; Model.Details = error.Message; }
+    }
+    private async void OnRelink(object sender, RoutedEventArgs e)
+    {
+        if (Model.SelectedEntry is not { } row) return;
+        var dialog = new Microsoft.Win32.OpenFileDialog { Title = "Select the replacement local audio source" }; if (dialog.ShowDialog(this) != true) return;
+        try { await Model.RelinkAsync(row, dialog.FileName); }
+        catch (Exception error) { Model.Message = "Relink failed; original entry preserved."; Model.Details = error.Message; }
+    }
+    private void OnCopyPath(object sender, RoutedEventArgs e) { if (Model.SelectedEntry is { } row) Clipboard.SetText(row.Path); }
+    private void OnShowFile(object sender, RoutedEventArgs e)
+    {
+        if (Model.SelectedEntry is not { } row) return;
+        try { var path = Services.Audio.BassSmokeSession.ValidateSourcePath(row.Path); var start = new System.Diagnostics.ProcessStartInfo("explorer.exe") { UseShellExecute = false }; start.ArgumentList.Add("/select,"); start.ArgumentList.Add(path); System.Diagnostics.Process.Start(start); }
+        catch (Exception error) { Model.Details = error.Message; }
+    }
+    private async void OnProperties(object sender, RoutedEventArgs e)
+    {
+        if (Model.SelectedEntry is not { } row) return; var track = row.Entry.Track;
+        Player.Core.Library.TrackStatistics? statistics = null;
+        try { if (Model.LibraryIndex is { } index) statistics = (await index.GetStatisticsAsync([track.Id])).FirstOrDefault(); } catch (Exception error) { Model.Details = error.Message; }
+        MessageBox.Show(this, $"{track.Title}\n{track.Artist}\n{track.Album}\n{track.Path}\n\nMetadata hints (decoder validates on playback):\n{track.SampleRateHint} Hz · {track.ChannelsHint} channels · {track.BitrateHint} kbps\nDisc {track.DiscNumber}, track {track.TrackNumber}, {track.Year}\n{track.Genre}\nCUE: {track.CueDocument ?? "—"}\nRating: {row.Rating}\nCounted plays: {statistics?.PlayCount ?? 0}\nLast played UTC: {(statistics?.LastPlayedUtcTicks is { } last ? new DateTime(last, DateTimeKind.Utc).ToString("u") : "—")}", "Track properties");
+    }
     private async void OnLegacyImport(object sender, RoutedEventArgs e)
     {
         var dialog = new Microsoft.Win32.OpenFileDialog { Filter = "Local documents (*.cue;*.m3u;*.pls)|*.cue;*.m3u;*.pls" };
