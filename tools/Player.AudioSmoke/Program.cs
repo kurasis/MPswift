@@ -49,6 +49,8 @@ try
             DecodeEvidence evidence;
             using (var session = new BassSmokeSession()) evidence = session.Decode(file);
             if (evidence.SampleRate != fixture.GetProperty("sampleRate").GetInt32() || evidence.Channels != fixture.GetProperty("channels").GetInt32() ||
+                evidence.Codec != fixture.GetProperty("expectedBassCodec").GetString() ||
+                (fixture.TryGetProperty("expectedBitDepth", out var bits) && evidence.BitDepth != bits.GetInt32()) ||
                 Math.Abs(evidence.DurationSeconds - fixture.GetProperty("sourceDurationSeconds").GetDouble()) > fixture.GetProperty("durationToleranceSeconds").GetDouble() ||
                 evidence.Peak is < 0.01f or > 0.2f)
                 throw new InvalidDataException("Unexpected decoded fixture facts: " + relative);

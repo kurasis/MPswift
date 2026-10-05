@@ -176,6 +176,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
             }
             Format = snapshot.SourceFormat is { } source ? string.Format(CultureInfo.CurrentCulture, Strings.Get("SourceFormat"),
                 source.Codec, source.SampleRate, source.Channels) : "";
+            if (snapshot.SourceFormat?.BitDepth is { } bits) Format += " · " + string.Format(CultureInfo.CurrentCulture, Strings.Get("SourceBitDepth"), bits);
             if (snapshot.OutputFormat is { } output) Format += " · " + string.Format(CultureInfo.CurrentCulture, Strings.Get("OutputFormat"), output.SampleRate, output.Channels);
             if (snapshot.Error is { } error) { Message = Strings.Get(error.ResourceKey); Details = error.Detail; }
             else if (snapshot.EntryId is not null && !IsImporting) { Message = Strings.Get("SessionTemporary"); Details = ""; }

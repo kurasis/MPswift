@@ -64,7 +64,8 @@ public sealed class BassAudioBackend : IAudioBackend
             _duration = double.IsFinite(seconds) && seconds >= 0 ? TimeSpan.FromSeconds(seconds) : null;
             _position = TimeSpan.Zero;
             return new AudioSourceInfo(_duration,
-                new AudioFormatInfo(info.Frequency, info.Channels, info.ChannelType.ToString(), info.OriginalResolution > 0 ? info.OriginalResolution : null),
+                // BASS marks original float resolution with bit 16; only the low word is bit depth.
+                new AudioFormatInfo(info.Frequency, info.Channels, info.ChannelType.ToString(), (info.OriginalResolution & 0xffff) > 0 ? info.OriginalResolution & 0xffff : null),
                 _duration > TimeSpan.Zero);
         }
         catch { CloseSource(); throw; }

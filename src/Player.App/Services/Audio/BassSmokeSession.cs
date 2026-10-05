@@ -69,7 +69,7 @@ public sealed class BassSmokeSession : IDisposable
         if (Bass.ChannelGetData(_source, buffer, buffer.Length * sizeof(float)) <= 0)
             throw Error("Decode after midpoint seek");
         Check(Bass.ChannelSetPosition(_source, 0), "BASS_ChannelSetPosition(start)");
-        return new DecodeEvidence(info.Frequency, info.Channels, duration, decodedBytes, peak, info.ChannelType.ToString(), info.OriginalResolution);
+        return new DecodeEvidence(info.Frequency, info.Channels, duration, decodedBytes, peak, info.ChannelType.ToString(), info.OriginalResolution & 0xffff);
     }
 
     public OutputEvidence ExerciseSharedOutput()

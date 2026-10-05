@@ -37,22 +37,44 @@ public sealed class PlaybackCoordinator : IAsyncDisposable
         return entry is null ? Task.FromResult(false) : LoadEntryAsync(entry, intent, autoPlay, true);
     }
 
-    public Task<bool> PlayAsync(Guid? selected = null)
+    public async Task<bool> PlayAsync(Guid? selected = null)
     {
-        var snapshot = _player.Snapshot;
-        if (snapshot.EntryId is not null && snapshot.State is PlaybackState.Paused or PlaybackState.Stopped or PlaybackState.DeviceUnavailable)
-            return _player.PlayAsync();
+        Task<bool> play;
+        PlaylistEntry? active;
+        long intent;
         lock (_gate)
         {
-            var entry = _entries.FirstOrDefault(e => e.Id == selected) ?? _entries.FirstOrDefault(e => e.Enabled && e.Track.Available);
-            return entry is null ? Task.FromResult(false) : LoadAsync(entry.Id);
+            if (_disposed) return false;
+            var snapshot = _player.Snapshot;
+            if (snapshot.EntryId is not null &&
+                (snapshot.State is PlaybackState.Paused or PlaybackState.DeviceUnavailable ||
+                 snapshot.State == PlaybackState.Stopped && (selected is null || selected == snapshot.EntryId)))
+            {
+                intent = ++_intent;
+                active = _cursor;
+                play = _player.PlayAsync();
+            }
+            else
+            {
+                var entry = _entries.FirstOrDefault(e => e.Id == selected) ?? _entries.FirstOrDefault(e => e.Enabled && e.Track.Available);
+                play = entry is null ? Task.FromResult(false) : LoadAsync(entry.Id);
+                active = null;
+                intent = _intent;
+            }
         }
+        var success = await play.ConfigureAwait(false);
+        lock (_gate)
+        {
+            if (_disposed || intent != _intent) return false;
+            if (success && active is not null && (_historyIndex < 0 || _history[_historyIndex].Id != active.Id)) Remember(active);
+        }
+        return success;
     }
 
     public Task<bool> PauseAsync() => _player.PauseAsync();
     public Task<bool> SeekAsync(TimeSpan position) => _player.SeekAsync(position);
     public Task<bool> SetVolumeAsync(double volume, bool muted) => _player.SetVolumeAsync(volume, muted);
-    public Task<bool> StopAsync() { lock (_gate) ++_intent; return _player.StopAsync(); }
+    public Task<bool> StopAsync() { lock (_gate) { ++_intent; return _player.StopAsync(); } }
     public Task<bool> NextAsync() { long intent; lock (_gate) intent = ++_intent; return AdvanceAsync(intent); }
 
     public async Task<bool> PreviousAsync()
@@ -83,13 +105,18 @@ public sealed class PlaybackCoordinator : IAsyncDisposable
             if (_disposed || intent != _intent) return false;
             if (success && autoPlay && remember)
             {
-                if (_historyIndex + 1 < _history.Count) _history.RemoveRange(_historyIndex + 1, _history.Count - _historyIndex - 1);
-                _history.Add(entry);
-                if (_history.Count > 100) _history.RemoveAt(0);
-                _historyIndex = _history.Count - 1;
+                Remember(entry);
             }
         }
         return success;
+    }
+
+    private void Remember(PlaylistEntry entry)
+    {
+        if (_historyIndex + 1 < _history.Count) _history.RemoveRange(_historyIndex + 1, _history.Count - _historyIndex - 1);
+        _history.Add(entry);
+        if (_history.Count > 100) _history.RemoveAt(0);
+        _historyIndex = _history.Count - 1;
     }
 
     private async Task<bool> AdvanceAsync(long intent)

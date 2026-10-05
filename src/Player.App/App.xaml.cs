@@ -14,7 +14,7 @@ public partial class App : Application
 {
     private async void OnStartup(object sender, StartupEventArgs e)
     {
-        var smoke = e.Args.Length == 2 && e.Args[0] == "--ui-smoke";
+        var smoke = e.Args.Length == 3 && e.Args[0] == "--ui-smoke";
         using var validation = smoke ? new UiSmokeValidation() : null;
         if (smoke) ShutdownMode = ShutdownMode.OnExplicitShutdown;
         var model = CreateModel();
@@ -32,7 +32,7 @@ public partial class App : Application
             object result;
             try
             {
-                result = await validation!.RunAsync(window, model, Path.GetFullPath(e.Args[1]), output);
+                result = await validation!.RunAsync(window, model, Path.GetFullPath(e.Args[1]), Path.GetFullPath(e.Args[2]), output);
                 await window.CloseForValidationAsync();
             }
             catch (Exception error)

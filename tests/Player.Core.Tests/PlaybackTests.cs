@@ -223,6 +223,68 @@ public sealed class PlaybackTests
     public void SearchIsUnicodeNormalizedCaseInsensitiveAndLiteral(string query) =>
         Assert.True(PlaylistSearch.Matches(new MediaTrack(Guid.NewGuid(), "C:/Музыка/file.wav", "Песня Café %_"), query));
 
+    [Fact]
+    public async Task PreparedThenPlayedEntryIsRecordedInActuallyStartedHistory()
+    {
+        var backend = new TestBackend();
+        var player = new SerializedAudioPlayer(() => backend);
+        await using var coordinator = new PlaybackCoordinator(player);
+        var first = Entry("prepared"); var last = Entry("last");
+        coordinator.SetEntries([first, last]);
+        await coordinator.LoadAsync(first.Id, false);
+        Assert.Empty(backend.PlayedPaths);
+        await coordinator.PlayAsync();
+        await coordinator.LoadAsync(last.Id);
+        Assert.True(await coordinator.PreviousAsync());
+        Assert.Equal(first.Id, player.Snapshot.EntryId);
+    }
+
+    [Fact]
+    public async Task NaturalEndAdvancesFullSourceAndExhaustionStopsWithoutLooping()
+    {
+        var backend = new TestBackend();
+        var player = new SerializedAudioPlayer(() => backend);
+        await using var coordinator = new PlaybackCoordinator(player);
+        var first = Entry("first"); var disabled = Entry("disabled") with { Enabled = false }; var last = Entry("last");
+        coordinator.SetEntries([first, disabled, last]);
+        var startedLast = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var exhausted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        long lastGeneration = -1;
+        player.SnapshotChanged += snapshot =>
+        {
+            if (snapshot.EntryId == last.Id && snapshot.State == PlaybackState.Playing)
+            { Volatile.Write(ref lastGeneration, snapshot.Generation); startedLast.TrySetResult(); }
+            var playedGeneration = Volatile.Read(ref lastGeneration);
+            if (playedGeneration >= 0 && snapshot.Generation > playedGeneration && snapshot.EntryId == last.Id && snapshot.State == PlaybackState.Stopped && !snapshot.Ended)
+                exhausted.TrySetResult();
+        };
+        await coordinator.LoadAsync(first.Id);
+        backend.Ended = true;
+        await startedLast.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        backend.Ended = true;
+        await exhausted.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        Assert.Equal(new[] { "first", "last" }, backend.PlayedPaths);
+        Assert.Equal(PlaybackState.Stopped, player.Snapshot.State);
+        Assert.Equal(TimeSpan.Zero, player.Snapshot.Position);
+    }
+
+    [Fact]
+    public async Task PlayUsesNewSelectionWhenStoppedButResumesPausedSource()
+    {
+        var backend = new TestBackend();
+        var player = new SerializedAudioPlayer(() => backend);
+        await using var coordinator = new PlaybackCoordinator(player);
+        var first = Entry("first"); var second = Entry("second");
+        coordinator.SetEntries([first, second]);
+        await coordinator.LoadAsync(first.Id);
+        await coordinator.PauseAsync();
+        await coordinator.PlayAsync(second.Id);
+        Assert.Equal(first.Id, player.Snapshot.EntryId);
+        await coordinator.StopAsync();
+        await coordinator.PlayAsync(second.Id);
+        Assert.Equal(second.Id, player.Snapshot.EntryId);
+    }
+
     private static AudioRequest Request(string path) => new(Guid.NewGuid(), path);
     private static PlaylistEntry Entry(string path) => new(Guid.NewGuid(), new MediaTrack(Guid.NewGuid(), path, path));
 
@@ -240,6 +302,8 @@ public sealed class PlaybackTests
         public string? Path { get; private set; }
         public (double Volume, bool Muted) Gain { get; private set; }
         private TimeSpan _position;
+        private int _ended;
+        public bool Ended { get => Volatile.Read(ref _ended) != 0; set => Volatile.Write(ref _ended, value ? 1 : 0); }
         private void Call() => Threads.Enqueue(Environment.CurrentManagedThreadId);
         public AudioSourceInfo Open(string path)
         {
@@ -247,6 +311,7 @@ public sealed class PlaybackTests
             if (path == BlockPath) { Entered.TrySetResult(); if (!Release.Wait(TimeSpan.FromSeconds(10))) throw new TimeoutException("Test release gate timed out."); }
             if (path == "bad") throw new AudioBackendException(AudioErrorCategory.Decoder, "Test decode failed.");
             Path = path;
+            Ended = false;
             return new AudioSourceInfo(Duration, new AudioFormatInfo(48000, 2, "test"), true);
         }
         public void Play() { Call(); if (FailOutput) throw new AudioBackendException(AudioErrorCategory.OutputUnavailable, "Test device unavailable."); PlayedPaths.Enqueue(Path!); }
@@ -254,7 +319,7 @@ public sealed class PlaybackTests
         public void Stop() { Call(); _position = TimeSpan.Zero; }
         public void Seek(TimeSpan position) { Call(); _position = position; }
         public void SetVolume(double volume, bool muted) { Call(); Gain = (volume, muted); }
-        public BackendPosition ReadPosition() { Call(); return new BackendPosition(_position, false); }
+        public BackendPosition ReadPosition() { Call(); return new BackendPosition(_position, Ended); }
         public void CloseSource() { Call(); Path = null; _position = TimeSpan.Zero; }
         public void Dispose() { Call(); Disposed = true; Path = null; }
     }

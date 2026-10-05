@@ -36,7 +36,8 @@ try {
     }
     $app = Join-Path $root 'src/Player.App/bin/Release/net10.0-windows/win-x64/Player.App.exe'
     Remove-Item (Join-Path $directory 'ui.json'), (Join-Path $directory 'stage-b-window.png') -ErrorAction SilentlyContinue
-    $process = Start-Process -FilePath $app -ArgumentList @('--ui-smoke', ('"' + $fixture + '"')) -PassThru
+    $taggedFixture = Join-Path $root 'tests/fixtures/audio/flac16.flac'
+    $process = Start-Process -FilePath $app -ArgumentList @('--ui-smoke', ('"' + $fixture + '"'), ('"' + $taggedFixture + '"')) -PassThru
     if (-not $process.WaitForExit(60000)) { $process.Kill(); throw 'WPF UI smoke timed out.' }
     if ($process.ExitCode -ne 0) { throw "WPF UI smoke failed with exit $($process.ExitCode). See artifacts/smoke/ui.json." }
     $ui = Get-Content (Join-Path $directory 'ui.json') -Raw | ConvertFrom-Json

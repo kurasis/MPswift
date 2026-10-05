@@ -63,6 +63,7 @@
     <data name="Mute" xml:space="preserve">
         <value>Mute</value>
     </data>
+    <data name="SourceBitDepth" xml:space="preserve"><value>{0}-bit</value></data>
     <data name="Volume" xml:space="preserve">
         <value>Volume</value>
     </data>
@@ -103,10 +104,10 @@
         <value>Your playlist is empty. Add files or a folder.</value>
     </data>
     <data name="SessionTemporary" xml:space="preserve">
-        <value>Stage B: this playlist is temporary. Persistence and waveform arrive in Stage C.</value>
+        <value>This playlist is cleared when the application closes.</value>
     </data>
     <data name="NoWaveform" xml:space="preserve">
-        <value>Seek timeline · waveform analysis is planned for Stage C</value>
+        <value>Seek timeline</value>
     </data>
     <data name="Imported" xml:space="preserve">
         <value>Added {0} items; {1} warnings.</value>
@@ -183,6 +184,6 @@ Ctrl+Left / Ctrl+Right: Seek 5 seconds
 Ctrl+Up / Ctrl+Down: Volume 5 percentage points
 Esc: Clear search
 
-Stage B keeps a temporary playlist. No session restore or waveform yet. Sources must be local and available offline. No internet requests are made by the application.</value>
+This playlist is cleared when the application closes. Sources must be local and available offline. No internet requests are made by the application.</value>
     </data>
 </root>
