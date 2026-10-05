@@ -42,6 +42,6 @@ The full specification remains the target. Unit tests or cross-builds do not sat
 | AC-035 | P1 | Package audit | D–G | Not implemented / not run | [Roadmap](ROADMAP.md) |
 | AC-036 | P1 | Reference visual review | D–G | Not implemented / not run | [Roadmap](ROADMAP.md) |
 | AC-037 | P1 | P1 format matrix | D–G | Not implemented / not run | [Roadmap](ROADMAP.md) |
-| AC-038 | P1 | Source preservation | D–G | Read-only smoke source handling implemented; Windows execution not run | [Smoke source](../tools/Player.AudioSmoke/Program.cs) |
+| AC-038 | P1 | Source preservation | D–G | Read-only generated WAV smoke/source-preservation passed in Windows CI; full workflow acceptance pending | [Smoke source](../tools/Player.AudioSmoke/Program.cs), [Windows CI](https://github.com/kurasis/MPswift/actions/runs/37344651363) |
 | AC-039 | P1 | Crash/restart | D–G | Not implemented / not run | [Roadmap](ROADMAP.md) |
 | AC-040 | P1 | Diagnostic honesty | D–G | Reporting implemented; full release evidence pending | [Test results](TEST_RESULTS.md) and [checkpoint](IMPLEMENTATION_STATUS.md) |

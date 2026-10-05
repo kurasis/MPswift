@@ -38,7 +38,7 @@ Build/publish issues found during setup are resolved: WPF requires explicit `Sys
 
 ## Windows CI and manual checks
 
-`.github/workflows/build.yml` establishes Linux/Windows Release builds and tests, plus Windows `Smoke.ps1` native load/decode/end/seek/disposal checks. CI execution has not yet been observed in this checkpoint. A configured workflow alone is not passing evidence.
+`.github/workflows/build.yml` establishes Linux/Windows Release builds and tests, plus Windows `Smoke.ps1` native load/decode/end/seek/disposal checks. **Observed: both jobs passed** in [run 37344651363](https://github.com/kurasis/MPswift/actions/runs/37344651363), source commit `0226ea6b10c03f8517b13a3e025fba488d5ecda2`. GitHub Actions API reported completed/success for Linux and Windows jobs, including the Windows native step. The [Windows job](https://github.com/kurasis/MPswift/actions/runs/37344651363/job/111880064076) successfully ran pinned native provisioning, locked Release build/core tests, and `Smoke.ps1` load/decode/seek/end/disposal/source-preservation checks. This is Windows native integration evidence, not Linux cross-build inference. The exact hosted Windows build and native JSON artifacts were not downloaded through the anonymous API; the workflow retains them as evidence artifacts. The hosted runner is not a Windows 11 desktop acceptance machine.
 
 Windows native decode does not need an audio device. Its JSON results are in `artifacts/smoke/probe.json` and `decode.json`; CI retains these and TRX as evidence artifacts. A hardware check is deliberately separate:
 

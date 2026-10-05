@@ -5,7 +5,7 @@ Pinned development native files: BASS **2.4.18.3**, BASSmix **2.4.13**, BASSWASA
 | Format/container | Priority | Candidate from specification | Verification status |
 | --- | --- | --- | --- |
 | MP3 | P0 | BASS | Not implemented / not tested |
-| WAV | P0 | BASS | Generated 48 kHz stereo PCM16 fixture independently validated; native decode/play not run on Linux |
+| WAV | P0 | BASS | Generated 48 kHz stereo PCM16 independently validated; Windows CI load/decode/seek/end/disposal passed; device playback not run |
 | AIFF/AIF | P0 | BASS | Not implemented / not tested |
 | FLAC | P0 | BASSFLAC | Not implemented / not tested |
 | Ogg Vorbis | P0 | BASS | Not implemented / not tested |
@@ -26,4 +26,4 @@ Pinned development native files: BASS **2.4.18.3**, BASSmix **2.4.13**, BASSWASA
 | SACD ISO, archives, exotic game formats | Out of v1.0 | Separate proposal | Excluded from v1.0 |
 | DRM-protected media | Excluded | None | Excluded from v1.0 |
 
-No shared/exclusive audio mode, gapless combination or source profile is currently verified by Windows execution in the cloud host. Windows CI will record native WAV decoding independently of listening/device checks.
+Windows CI [run 37344651363](https://github.com/kurasis/MPswift/actions/runs/37344651363) verified the generated PCM16 WAV decoding path. No audio output mode, other source profile or gapless combination is advertised as verified. The Linux cloud host cannot run Windows native code. Listening/device checks remain separate and not run.
