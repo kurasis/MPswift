@@ -161,9 +161,17 @@ public sealed class SqlitePlayerStore : IPlayerStore
     }
     private void Run()
     {
-        try { foreach (var action in _work.GetConsumingEnumerable()) action(); _connection?.Dispose(); _exit.TrySetResult(); }
-        catch (Exception error) { _exit.TrySetException(error); }
-        finally { _connection?.Dispose(); _ownership?.Dispose(); _work.Dispose(); }
+        Exception? failure = null;
+        try { foreach (var action in _work.GetConsumingEnumerable()) action(); }
+        catch (Exception error) { failure = error; }
+        finally
+        {
+            try { _connection?.Dispose(); } catch (Exception error) { failure = error; }
+            try { _ownership?.Dispose(); } catch (Exception error) { failure = failure is null ? error : new AggregateException(failure, error); }
+            _work.Dispose();
+        }
+        // Reopen is permitted only after both SQLite and the ownership handle are released.
+        if (failure is null) _exit.TrySetResult(); else _exit.TrySetException(failure);
     }
     public ValueTask DisposeAsync()
     { lock (_gate) { if (!_closing) { _closing = true; _work.CompleteAdding(); } } return new(_exit.Task); }

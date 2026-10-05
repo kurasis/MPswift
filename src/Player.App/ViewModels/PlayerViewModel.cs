@@ -354,13 +354,15 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     { try { await operation; } catch (Exception error) { if (!_closing) { Message = Strings.Get("ErrorUnexpected"); Details = error.Message; } } }
     public static string FormatTime(TimeSpan? duration) => duration is not { } value ? "—" : value.TotalHours >= 1
         ? $"{(long)value.TotalHours}:{value.Minutes:00}:{value.Seconds:00}" : $"{(long)value.TotalMinutes}:{value.Seconds:00}";
-    public async ValueTask DisposeAsync()
+    public ValueTask DisposeAsync() => CloseAsync(true);
+    public ValueTask DisposeWithoutSavingAsync() => CloseAsync(false);
+    private async ValueTask CloseAsync(bool save)
     {
         if (_closing) return;
         _closing = true; _player.SnapshotChanged -= OnSnapshot;
         _importCancellation?.Cancel(); _waveCancellation?.Cancel(); _saveCancellation?.Cancel();
         await _importTask; await _waveTask; await _saveTask;
-        try { await SaveNowAsync(); }
+        try { if (save) await SaveNowAsync(); }
         catch { _closing = false; _player.SnapshotChanged += OnSnapshot; throw; }
         foreach (var row in _knownRows.Values) row.EligibilityChanged -= RowChanged;
         await _waveforms.DisposeAsync(); await _coordinator.DisposeAsync(); await _store.DisposeAsync();

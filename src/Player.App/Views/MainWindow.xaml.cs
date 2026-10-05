@@ -102,6 +102,11 @@ public partial class MainWindow : Window
         {
             Model.Message = Strings.Get("ErrorUnexpected"); Model.Details = error.Message;
             _shutdownStarted = false; IsEnabled = true;
+            if (MessageBox.Show(this, Strings.Get("CloseWithoutSaving"), Strings.Get("SaveFailed"), MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+            {
+                try { await Model.DisposeWithoutSavingAsync(); _shutdownComplete = true; Close(); }
+                catch (Exception cleanup) { Model.Details = cleanup.Message; }
+            }
         }
     }
     private void OnRowDragStart(object sender, MouseButtonEventArgs e)

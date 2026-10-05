@@ -55,7 +55,7 @@ public sealed class StorageAndWaveformTests : IDisposable
     {
         await using var store = new SqlitePlayerStore(Database); await store.LoadAsync();
         var original = State(Entry()); await store.SaveAsync(original, true);
-        using (var connection = new SqliteConnection("Data Source=" + Database))
+        using (var connection = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = Database, Pooling = false }.ToString()))
         {
             connection.Open(); using var command = connection.CreateCommand();
             command.CommandText = "CREATE TRIGGER RejectDisabled BEFORE INSERT ON PlaylistEntries WHEN NEW.Enabled=0 BEGIN SELECT RAISE(ABORT,'injected constraint'); END";
@@ -82,7 +82,7 @@ public sealed class StorageAndWaveformTests : IDisposable
     [InlineData(2)]
     public async Task UnknownSchemaNeverRecreatesOrDowngradesUserData(int version)
     {
-        using (var connection = new SqliteConnection("Data Source=" + Database))
+        using (var connection = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = Database, Pooling = false }.ToString()))
         { connection.Open(); using var command = connection.CreateCommand(); command.CommandText = "CREATE TABLE Sentinel(Value TEXT); INSERT INTO Sentinel VALUES('preserve'); PRAGMA user_version=" + version; command.ExecuteNonQuery(); }
         var before = SHA256.HashData(File.ReadAllBytes(Database));
         await using var store = new SqlitePlayerStore(Database);

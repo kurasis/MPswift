@@ -256,4 +256,5 @@ Playlists, order, volume and position are saved locally. Restore never starts pl
     <data name="ReorderFiltered" xml:space="preserve">
         <value>Clear search before changing manual order.</value>
     </data>
+    <data name="CloseWithoutSaving" xml:space="preserve"><value>Changes could not be saved. Close without saving the latest changes?</value></data>
 </root>
