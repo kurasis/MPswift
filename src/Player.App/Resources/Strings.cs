@@ -11,4 +11,24 @@ public static class Strings
     public static string StageTitle => Get(nameof(StageTitle));
     public static string StageDescription => Get(nameof(StageDescription));
     public static string VerifyNative => Get(nameof(VerifyNative));
+    public static string AddFiles => Get(nameof(AddFiles));
+    public static string AddFolder => Get(nameof(AddFolder));
+    public static string Play => Get(nameof(Play));
+    public static string Pause => Get(nameof(Pause));
+    public static string Stop => Get(nameof(Stop));
+    public static string Next => Get(nameof(Next));
+    public static string Previous => Get(nameof(Previous));
+    public static string Mute => Get(nameof(Mute));
+    public static string Volume => Get(nameof(Volume));
+    public static string Seek => Get(nameof(Seek));
+    public static string Search => Get(nameof(Search));
+    public static string ClearSearch => Get(nameof(ClearSearch));
+    public static string DefaultPlaylist => Get(nameof(DefaultPlaylist));
+    public static string Enabled => Get(nameof(Enabled));
+    public static string Remove => Get(nameof(Remove));
+    public static string CancelImport => Get(nameof(CancelImport));
+    public static string Details => Get(nameof(Details));
+    public static string EmptyPlaylist => Get(nameof(EmptyPlaylist));
+    public static string NoWaveform => Get(nameof(NoWaveform));
+    public static string Help => Get(nameof(Help));
 }

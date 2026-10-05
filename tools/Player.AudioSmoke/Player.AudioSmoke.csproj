@@ -3,6 +3,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <PlatformTarget>x64</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/Player.Core/Player.Core.csproj" />
@@ -11,6 +12,9 @@
     <PackageReference Include="ManagedBass.Wasapi" />
     <Compile Include="../../src/Player.App/Services/Audio/NativeLibraryBootstrap.cs" Link="Audio/NativeLibraryBootstrap.cs" />
     <Compile Include="../../src/Player.App/Services/Audio/BassSmokeSession.cs" Link="Audio/BassSmokeSession.cs" />
+    <Compile Include="../../src/Player.App/Services/Audio/BassAudioBackend.cs" Link="Audio/BassAudioBackend.cs" />
+    <Compile Include="../../src/Player.App/Services/Audio/NativeDecoderPlugins.cs" Link="Audio/NativeDecoderPlugins.cs" />
+    <Compile Include="../../src/Player.App/Services/Audio/LocalFileAccess.cs" Link="Audio/LocalFileAccess.cs" />
     <Content Include="../../native/manifest.json" Link="native/manifest.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="../../native/win-x64/*.dll;../../native/win-x64/*.txt" Link="native/win-x64/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>

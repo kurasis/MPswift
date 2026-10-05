@@ -1,12 +1,188 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <root>
-    <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
-    <resheader name="version"><value>2.0</value></resheader>
-    <data name="StageTitle" xml:space="preserve"><value>Stage A — dependency diagnostics</value></data>
-    <data name="StageDescription" xml:space="preserve"><value>This development build checks approved native libraries. Playback is currently exercised by the separate AudioSmoke tool. The player interface is the next milestone.</value></data>
-    <data name="VerifyNative" xml:space="preserve"><value>Verify native libraries</value></data>
-    <data name="InitialStatus" xml:space="preserve"><value>Native libraries have not been checked. No audio starts automatically.</value></data>
-    <data name="Checking" xml:space="preserve"><value>Checking library hashes and native versions…</value></data>
-    <data name="Verified" xml:space="preserve"><value>Native load verified. Output-device and audible playback tests have not run.</value></data>
-    <data name="Failed" xml:space="preserve"><value>Native check failed. Run scripts/Setup-Native.ps1, then retry. Details:</value></data>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>2.0</value>
+    </resheader>
+    <data name="StageTitle" xml:space="preserve">
+        <value>Stage A — dependency diagnostics</value>
+    </data>
+    <data name="StageDescription" xml:space="preserve">
+        <value>This development build checks approved native libraries. Playback is currently exercised by the separate AudioSmoke tool. The player interface is the next milestone.</value>
+    </data>
+    <data name="VerifyNative" xml:space="preserve">
+        <value>Verify native libraries</value>
+    </data>
+    <data name="InitialStatus" xml:space="preserve">
+        <value>Native libraries have not been checked. No audio starts automatically.</value>
+    </data>
+    <data name="Checking" xml:space="preserve">
+        <value>Checking library hashes and native versions…</value>
+    </data>
+    <data name="Verified" xml:space="preserve">
+        <value>Native load verified. Output-device and audible playback tests have not run.</value>
+    </data>
+    <data name="Failed" xml:space="preserve">
+        <value>Native check failed. Run scripts/Setup-Native.ps1, then retry. Details:</value>
+    </data>
+    <data name="AddFiles" xml:space="preserve">
+        <value>Add files</value>
+    </data>
+    <data name="AddFolder" xml:space="preserve">
+        <value>Add folder</value>
+    </data>
+    <data name="AudioFilter" xml:space="preserve">
+        <value>Audio files|*.mp3;*.wav;*.aif;*.aiff;*.flac;*.ogg;*.opus;*.m4a;*.aac;*.alac|All files|*.*</value>
+    </data>
+    <data name="NothingPlaying" xml:space="preserve">
+        <value>Nothing playing</value>
+    </data>
+    <data name="UnknownArtist" xml:space="preserve">
+        <value>Unknown artist</value>
+    </data>
+    <data name="Unavailable" xml:space="preserve">
+        <value>Unavailable</value>
+    </data>
+    <data name="Play" xml:space="preserve">
+        <value>Play</value>
+    </data>
+    <data name="Pause" xml:space="preserve">
+        <value>Pause</value>
+    </data>
+    <data name="Stop" xml:space="preserve">
+        <value>Stop</value>
+    </data>
+    <data name="Next" xml:space="preserve">
+        <value>Next</value>
+    </data>
+    <data name="Previous" xml:space="preserve">
+        <value>Previous</value>
+    </data>
+    <data name="Mute" xml:space="preserve">
+        <value>Mute</value>
+    </data>
+    <data name="Volume" xml:space="preserve">
+        <value>Volume</value>
+    </data>
+    <data name="Seek" xml:space="preserve">
+        <value>Seek position</value>
+    </data>
+    <data name="Search" xml:space="preserve">
+        <value>Search this playlist</value>
+    </data>
+    <data name="ClearSearch" xml:space="preserve">
+        <value>Clear search</value>
+    </data>
+    <data name="DefaultPlaylist" xml:space="preserve">
+        <value>Default</value>
+    </data>
+    <data name="Enabled" xml:space="preserve">
+        <value>Enabled for automatic playback</value>
+    </data>
+    <data name="Remove" xml:space="preserve">
+        <value>Remove from playlist</value>
+    </data>
+    <data name="CancelImport" xml:space="preserve">
+        <value>Cancel import</value>
+    </data>
+    <data name="Details" xml:space="preserve">
+        <value>Technical details</value>
+    </data>
+    <data name="Elapsed" xml:space="preserve">
+        <value>Elapsed</value>
+    </data>
+    <data name="Duration" xml:space="preserve">
+        <value>Duration</value>
+    </data>
+    <data name="EmptyPrompt" xml:space="preserve">
+        <value>Add local audio files or a folder to begin. No audio starts automatically.</value>
+    </data>
+    <data name="EmptyPlaylist" xml:space="preserve">
+        <value>Your playlist is empty. Add files or a folder.</value>
+    </data>
+    <data name="SessionTemporary" xml:space="preserve">
+        <value>Stage B: this playlist is temporary. Persistence and waveform arrive in Stage C.</value>
+    </data>
+    <data name="NoWaveform" xml:space="preserve">
+        <value>Seek timeline · waveform analysis is planned for Stage C</value>
+    </data>
+    <data name="Imported" xml:space="preserve">
+        <value>Added {0} items; {1} warnings.</value>
+    </data>
+    <data name="ImportCanceled" xml:space="preserve">
+        <value>Import canceled. Already added items remain available.</value>
+    </data>
+    <data name="ImportLimit" xml:space="preserve">
+        <value>The 10,000-item import limit was reached.</value>
+    </data>
+    <data name="PlaylistCount" xml:space="preserve">
+        <value>{0} visible / {1} items</value>
+    </data>
+    <data name="SourceFormat" xml:space="preserve">
+        <value>{0} · {1:N0} Hz · {2} channels</value>
+    </data>
+    <data name="OutputFormat" xml:space="preserve">
+        <value>Output: {0:N0} Hz · {1} channels (shared)</value>
+    </data>
+    <data name="ErrorFileUnavailable" xml:space="preserve">
+        <value>This local file is missing, inaccessible or unavailable offline. Choose another file.</value>
+    </data>
+    <data name="ErrorDecoder" xml:space="preserve">
+        <value>This file could not be decoded. It may use an unsupported encoding or be damaged. Try another file; details show the decoder result.</value>
+    </data>
+    <data name="ErrorDependency" xml:space="preserve">
+        <value>An approved audio library is unavailable. Provision the native dependencies and retry.</value>
+    </data>
+    <data name="ErrorOutputUnavailable" xml:space="preserve">
+        <value>Windows default output is unavailable. Check your output device, then press Play to retry.</value>
+    </data>
+    <data name="ErrorUnexpected" xml:space="preserve">
+        <value>The operation failed. See technical details and retry.</value>
+    </data>
+    <data name="ErrorBusy" xml:space="preserve">
+        <value>Too many audio commands are pending. Retry the operation.</value>
+    </data>
+    <data name="StateEmpty" xml:space="preserve">
+        <value>Stopped</value>
+    </data>
+    <data name="StateLoading" xml:space="preserve">
+        <value>Loading…</value>
+    </data>
+    <data name="StateStopped" xml:space="preserve">
+        <value>Stopped</value>
+    </data>
+    <data name="StatePlaying" xml:space="preserve">
+        <value>Playing</value>
+    </data>
+    <data name="StatePaused" xml:space="preserve">
+        <value>Paused</value>
+    </data>
+    <data name="StateSeeking" xml:space="preserve">
+        <value>Seeking…</value>
+    </data>
+    <data name="StateDeviceUnavailable" xml:space="preserve">
+        <value>Output unavailable</value>
+    </data>
+    <data name="StateError" xml:space="preserve">
+        <value>Playback error</value>
+    </data>
+    <data name="Help" xml:space="preserve">
+        <value>Local help</value>
+    </data>
+    <data name="HelpText" xml:space="preserve">
+        <value>Space: Play/Pause (outside text and checkbox controls)
+Ctrl+O: Add files
+Ctrl+Shift+O: Add folder
+Ctrl+F: Search
+Enter: Play selected entry
+Delete: Remove selected entries (source files are preserved)
+Alt+Left / Alt+Right: Previous / Next
+Ctrl+Left / Ctrl+Right: Seek 5 seconds
+Ctrl+Up / Ctrl+Down: Volume 5 percentage points
+Esc: Clear search
+
+Stage B keeps a temporary playlist. No session restore or waveform yet. Sources must be local and available offline. No internet requests are made by the application.</value>
+    </data>
 </root>

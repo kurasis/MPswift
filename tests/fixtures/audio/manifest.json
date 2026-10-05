@@ -1,0 +1,266 @@
+{
+  "schemaVersion": 1,
+  "sourceSha256": "265bfc54a7b0bfc2b75cf63c427873d00b516bbbb9dcaae17346de76cc4757fb",
+  "fixtures": [
+    {
+      "path": "mp3-cbr.mp3",
+      "profile": "MP3 CBR",
+      "codec": "mp3",
+      "sampleRate": 48000,
+      "channels": 2,
+      "sourceDurationSeconds": 3,
+      "durationToleranceSeconds": 0.15,
+      "sha256": "0486fe8948b1d6a3f96552b8fada48593c179e43663475fa1619cbd0310576d7",
+      "provenance": "Generated from Player.AudioSmoke 440 Hz opposite-phase PCM fixture using ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "license": "CC0-1.0",
+      "encoderArguments": [
+        "-c:a",
+        "libmp3lame",
+        "-b:a",
+        "192k"
+      ],
+      "expectedTitle": "Fixture — Музыка"
+    },
+    {
+      "path": "mp3-vbr.mp3",
+      "profile": "MP3 VBR with Xing/LAME",
+      "codec": "mp3",
+      "sampleRate": 48000,
+      "channels": 2,
+      "sourceDurationSeconds": 3,
+      "durationToleranceSeconds": 0.15,
+      "sha256": "f95d3c7358817ce0a63cf3dc9c9e15d2599f873d9d569bb1c89eee1cfa9b8fa2",
+      "provenance": "Generated from Player.AudioSmoke 440 Hz opposite-phase PCM fixture using ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "license": "CC0-1.0",
+      "encoderArguments": [
+        "-c:a",
+        "libmp3lame",
+        "-q:a",
+        "2"
+      ],
+      "expectedTitle": "Fixture — Музыка"
+    },
+    {
+      "path": "pcm16.wav",
+      "profile": "WAV PCM16",
+      "codec": "pcm_s16le",
+      "sampleRate": 48000,
+      "channels": 2,
+      "sourceDurationSeconds": 3,
+      "durationToleranceSeconds": 0.03,
+      "sha256": "6ce636b4dabd3243eeaee64a6716ceb0dafb7eb6dbb64e542ef838dca1ffa887",
+      "provenance": "Generated from Player.AudioSmoke 440 Hz opposite-phase PCM fixture using ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "license": "CC0-1.0",
+      "encoderArguments": [
+        "-c:a",
+        "pcm_s16le"
+      ],
+      "expectedTitle": "Fixture — Музыка"
+    },
+    {
+      "path": "pcm24.wav",
+      "profile": "WAV PCM24",
+      "codec": "pcm_s24le",
+      "sampleRate": 48000,
+      "channels": 2,
+      "sourceDurationSeconds": 3,
+      "durationToleranceSeconds": 0.03,
+      "sha256": "a526ec91a362f2044ea32d121ee76b0ac2ff6aa4962c540da42c28a7375a83c8",
+      "provenance": "Generated from Player.AudioSmoke 440 Hz opposite-phase PCM fixture using ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "license": "CC0-1.0",
+      "encoderArguments": [
+        "-c:a",
+        "pcm_s24le"
+      ],
+      "expectedTitle": "Fixture — Музыка"
+    },
+    {
+      "path": "pcm32.wav",
+      "profile": "WAV PCM32",
+      "codec": "pcm_s32le",
+      "sampleRate": 48000,
+      "channels": 2,
+      "sourceDurationSeconds": 3,
+      "durationToleranceSeconds": 0.03,
+      "sha256": "4a8dcbab17493ebc7ab40409eee078b36dec50e914e94023ed77b256712bb6a6",
+      "provenance": "Generated from Player.AudioSmoke 440 Hz opposite-phase PCM fixture using ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "license": "CC0-1.0",
+      "encoderArguments": [
+        "-c:a",
+        "pcm_s32le"
+      ],
+      "expectedTitle": "Fixture — Музыка"
+    },
+    {
+      "path": "float32.wav",
+      "profile": "WAV float32",
+      "codec": "pcm_f32le",
+      "sampleRate": 48000,
+      "channels": 2,
+      "sourceDurationSeconds": 3,
+      "durationToleranceSeconds": 0.03,
+      "sha256": "06f4dacaf2aaf18226cbba64ff9463a0150151b8c6b335428f601adc3208e39a",
+      "provenance": "Generated from Player.AudioSmoke 440 Hz opposite-phase PCM fixture using ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "license": "CC0-1.0",
+      "encoderArguments": [
+        "-c:a",
+        "pcm_f32le"
+      ],
+      "expectedTitle": "Fixture — Музыка"
+    },
+    {
+      "path": "pcm16.aiff",
+      "profile": "AIFF PCM16",
+      "codec": "pcm_s16be",
+      "sampleRate": 48000,
+      "channels": 2,
+      "sourceDurationSeconds": 3,
+      "durationToleranceSeconds": 0.03,
+      "sha256": "74fefd0a7d00160d0e8bb313e7ada50145d9a68db26b6a59d894f1b7b266b827",
+      "provenance": "Generated from Player.AudioSmoke 440 Hz opposite-phase PCM fixture using ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "license": "CC0-1.0",
+      "encoderArguments": [
+        "-c:a",
+        "pcm_s16be"
+      ],
+      "expectedTitle": "Fixture — Музыка"
+    },
+    {
+      "path": "flac16.flac",
+      "profile": "FLAC 16-bit",
+      "codec": "flac",
+      "sampleRate": 48000,
+      "channels": 2,
+      "sourceDurationSeconds": 3,
+      "durationToleranceSeconds": 0.03,
+      "sha256": "a45e1acf4e46a18e549d00aec80fe9ce53ba1f8fe5aa7ab05a1637f2e712439d",
+      "provenance": "Generated from Player.AudioSmoke 440 Hz opposite-phase PCM fixture using ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "license": "CC0-1.0",
+      "encoderArguments": [
+        "-c:a",
+        "flac",
+        "-sample_fmt",
+        "s16"
+      ],
+      "expectedTitle": "Fixture — Музыка"
+    },
+    {
+      "path": "flac24.flac",
+      "profile": "FLAC 24-bit",
+      "codec": "flac",
+      "sampleRate": 48000,
+      "channels": 2,
+      "sourceDurationSeconds": 3,
+      "durationToleranceSeconds": 0.03,
+      "sha256": "508ab2ea6e5e22d6df2ba17b896a8b5099957f100a54ff9e84147b836900a284",
+      "provenance": "Generated from Player.AudioSmoke 440 Hz opposite-phase PCM fixture using ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "license": "CC0-1.0",
+      "encoderArguments": [
+        "-c:a",
+        "flac",
+        "-sample_fmt",
+        "s32",
+        "-bits_per_raw_sample",
+        "24"
+      ],
+      "expectedTitle": "Fixture — Музыка"
+    },
+    {
+      "path": "vorbis.ogg",
+      "profile": "Ogg Vorbis",
+      "codec": "vorbis",
+      "sampleRate": 48000,
+      "channels": 2,
+      "sourceDurationSeconds": 3,
+      "durationToleranceSeconds": 0.03,
+      "sha256": "c89e006e966c2aa20ad16dfed82ca83e5c7c8138b36e757408bd170421627c93",
+      "provenance": "Generated from Player.AudioSmoke 440 Hz opposite-phase PCM fixture using ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "license": "CC0-1.0",
+      "encoderArguments": [
+        "-c:a",
+        "libvorbis",
+        "-q:a",
+        "4"
+      ],
+      "expectedTitle": "Fixture — Музыка"
+    },
+    {
+      "path": "opus.opus",
+      "profile": "Ogg Opus",
+      "codec": "opus",
+      "sampleRate": 48000,
+      "channels": 2,
+      "sourceDurationSeconds": 3,
+      "durationToleranceSeconds": 0.03,
+      "sha256": "e4c50d3748d2b62d7a9008726346e8a953cb877ee373538ec81bfe3d0896421a",
+      "provenance": "Generated from Player.AudioSmoke 440 Hz opposite-phase PCM fixture using ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "license": "CC0-1.0",
+      "encoderArguments": [
+        "-c:a",
+        "libopus",
+        "-b:a",
+        "128k"
+      ],
+      "expectedTitle": "Fixture — Музыка"
+    },
+    {
+      "path": "aac-lc.aac",
+      "profile": "AAC-LC ADTS",
+      "codec": "aac",
+      "sampleRate": 48000,
+      "channels": 2,
+      "sourceDurationSeconds": 3,
+      "durationToleranceSeconds": 0.15,
+      "sha256": "8a4291d2f0ee031e1218f156e385b4fec13fa3c96da4693547c1406345a1ef39",
+      "provenance": "Generated from Player.AudioSmoke 440 Hz opposite-phase PCM fixture using ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "license": "CC0-1.0",
+      "encoderArguments": [
+        "-c:a",
+        "aac",
+        "-profile:a",
+        "aac_low",
+        "-b:a",
+        "128k"
+      ],
+      "expectedTitle": "Fixture — Музыка"
+    },
+    {
+      "path": "aac-lc.m4a",
+      "profile": "AAC-LC MP4",
+      "codec": "aac",
+      "sampleRate": 48000,
+      "channels": 2,
+      "sourceDurationSeconds": 3,
+      "durationToleranceSeconds": 0.15,
+      "sha256": "2a1942fb07f64ef11eff75b94c46b9e33c6d4fc784be2f5544dd2dc97cc41d18",
+      "provenance": "Generated from Player.AudioSmoke 440 Hz opposite-phase PCM fixture using ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "license": "CC0-1.0",
+      "encoderArguments": [
+        "-c:a",
+        "aac",
+        "-profile:a",
+        "aac_low",
+        "-b:a",
+        "128k"
+      ],
+      "expectedTitle": "Fixture — Музыка"
+    },
+    {
+      "path": "alac.m4a",
+      "profile": "ALAC MP4",
+      "codec": "alac",
+      "sampleRate": 48000,
+      "channels": 2,
+      "sourceDurationSeconds": 3,
+      "durationToleranceSeconds": 0.15,
+      "sha256": "1b947ea4937c837d4e99bda0d0badb2c709df5f41f13a01a3cbec23f94839ef8",
+      "provenance": "Generated from Player.AudioSmoke 440 Hz opposite-phase PCM fixture using ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "license": "CC0-1.0",
+      "encoderArguments": [
+        "-c:a",
+        "alac"
+      ],
+      "expectedTitle": "Fixture — Музыка"
+    }
+  ]
+}

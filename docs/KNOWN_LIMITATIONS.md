@@ -1,11 +1,11 @@
 # Known limitations
 
-- Stage A is the development foundation, not a functional music-player release. The WPF window only checks native dependencies. The actual transport/playlist/waveform UI starts in Stage B/C.
-- The cloud host is Linux x64. WPF launch/bindings, native BASS/WASAPI execution, device behavior, listening, DPI, screen-reader use and offline Windows launch cannot be verified on this host.
-- Windows CI has successfully exercised native loading and PCM WAV decoding without an audio endpoint. Real output must be tested on an interactive Windows machine using `scripts/Smoke.ps1 -Play`; listening and digital capture require separate evidence.
-- No codec/profile is advertised as verified until its actual fixture checks run. Stage A provides a generated PCM WAV fixture, not the complete P0 format suite.
-- `BassSmokeSession` has bounded small-fixture decoding and synchronous ownership. It is not the production background/long-file player and is not wired into user playback controls.
-- The lexical local-path policy rejects remote URLs, UNC/device paths and alternate streams. The Windows harness rejects mapped network drives and offline file attributes before reading source content. Reparse-point destinations, provider-specific hydration and changing filesystem state need expanded production validation in Stage B/E.
-- No database, persisted session, queue, shuffle, CUE parser, waveform, metadata/artwork, EQ, library, Windows integration or Russian product UI exists yet.
-- The generated self-contained output is local development output only. A portable release ZIP, clean-Windows execution evidence, traffic audit, licensing obligations and commercial-use decision remain release gates.
-- Application source licensing has not been selected by the owner. Third-party license conditions remain in force independently of any future application license.
+- Stage B provides a basic in-memory player. Playlists, settings and sessions do not survive restart; SQLite persistence and real waveform are Stage C. The UI explicitly labels waveform as pending and supplies a working seek slider.
+- Windows native/WPF integration is exercised by CI; this Linux host can cross-build but cannot execute it. Windows 11 desktop, real endpoint output, listening, accurate audible position, digital capture, DPI/accessibility, offline and clean-machine acceptance need separate evidence.
+- Default shared WASAPI is the only output mode. Seek/track changes reset its graph; there is no gapless, exclusive selection, hotplug recovery, EQ, ReplayGain or crossfade yet. App gain/mute affects post-mix float PCM and never changes system volume.
+- Fourteen short legal format fixtures cover core profiles, not every P0 variant, channel layout or long file. HE-AAC and corrupt/large real-world profile acceptance remain open. P1 decoder families are future work.
+- No persistent database, explicit queue, repeat/shuffle, CUE parser, waveform, library index, artwork, single-instance/media/tray integration or Russian product UI exists yet.
+- Imports are manual and bounded to 10,000 entries total and per-operation traversal limits. Cancellation preserves already imported entries. Initial folder import is not the incremental library scan planned in Stage E.
+- Source content is opened read-only. URL/UNC/device/ADS paths, mapped network drives and known offline/recall attributes are rejected; parent/file reparse targets are checked and folder recursion skips junctions. Filesystem changes and provider behavior still require Windows acceptance; a path check cannot guarantee against every external race.
+- Native decoder hash/load failures affect that format while retaining base decoders. Core dependency failures stop native preparation and show details without preventing browsing/import.
+- Development publish contains native development dependencies and upstream companions, including the AAC GPL candidate. It is local output, not a cleared public portable package. BASS commercial-use terms, AAC/FAAD2 GPL/commercial path, TagLib LGPL obligations and application source license remain release decisions.

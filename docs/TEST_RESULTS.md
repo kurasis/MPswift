@@ -47,3 +47,11 @@ Windows native decode does not need an audio device. Its JSON results are in `ar
 ```
 
 Record the Windows build, endpoint, JSON report and separate listening result. A successful `output-api-passed` report proves shared output consumption/pause/resume/stop, not audible quality, gapless or accurate audible-position display. WPF diagnostic-button behavior still requires a desktop check even if compilation and the CLI pass.
+
+## Stage B local checks (2026-10-05)
+
+Release cross-build passes with **0 warnings / 0 errors**, and **40 core tests pass, 0 fail, 0 skip**. New tests cover superseded/canceled loads, 300 coalesced changes followed by stop, owner-thread disposal, paused/clamped/unknown-duration seek, independent volume/mute, output failure/retry, explicit bad-file behavior, bounded automatic traversal, actual-played Previous history, removal of the playing entry and literal normalized Unicode search.
+
+All seven official native archives/DLL hashes/PE headers were validated locally. Fourteen real short CC0 fixtures are committed with per-file SHA-256, profile, source duration/tolerances and encoder provenance. `scripts/Generate-FormatFixtures.py` regenerates these into a new development directory using FFmpeg and the owned PCM source; fresh container hashes are recorded. FFmpeg is never an app runtime dependency. Development self-contained publish audits every manifest DLL and upstream companion.
+
+The Windows workflow now executes the fourteen native formats plus actual production load/seek/rapid-prepare/stop/disposal and a real WPF smoke test. UI checks import duplicates without autoplay, native preparation, title/range bindings, stopped seek, search-source independence, binding warnings and screenshot render. These checks are currently **pending CI execution**, not inferred from cross-compilation. Real shared output is opt-in `Smoke.ps1 -Play`; no device listening, capture, gapless, HE-AAC or Windows 11 desktop acceptance has been performed.

@@ -17,6 +17,7 @@ public sealed class BassSmokeSession : IDisposable
     private bool _disposed;
     private long _submittedBytes;
     private int _callbackError;
+    private readonly NativeDecoderPlugins _plugins;
 
     public BassSmokeSession()
     {
@@ -24,6 +25,8 @@ public sealed class BassSmokeSession : IDisposable
         NativeLibraryBootstrap.LoadAndVerify();
         Check(Bass.Init(0), "BASS_Init(no-sound)");
         _bassInitialized = true;
+        try { _plugins = new NativeDecoderPlugins(); }
+        catch { Bass.Free(); throw; }
     }
 
     public DecodeEvidence Decode(string filePath)
@@ -66,7 +69,7 @@ public sealed class BassSmokeSession : IDisposable
         if (Bass.ChannelGetData(_source, buffer, buffer.Length * sizeof(float)) <= 0)
             throw Error("Decode after midpoint seek");
         Check(Bass.ChannelSetPosition(_source, 0), "BASS_ChannelSetPosition(start)");
-        return new DecodeEvidence(info.Frequency, info.Channels, duration, decodedBytes, peak);
+        return new DecodeEvidence(info.Frequency, info.Channels, duration, decodedBytes, peak, info.ChannelType.ToString(), info.OriginalResolution);
     }
 
     public OutputEvidence ExerciseSharedOutput()
@@ -133,6 +136,7 @@ public sealed class BassSmokeSession : IDisposable
         }
         if (_mixer != 0) { Check(Bass.StreamFree(_mixer), "BASS_StreamFree(mixer)"); _mixer = 0; }
         if (_source != 0) { Check(Bass.StreamFree(_source), "BASS_StreamFree(source)"); _source = 0; }
+        _plugins.Dispose();
         if (_bassInitialized) { Check(Bass.Free(), "BASS_Free"); _bassInitialized = false; }
         _disposed = true;
         GC.KeepAlive(_render);
@@ -145,13 +149,7 @@ public sealed class BassSmokeSession : IDisposable
 
     public static string ValidateSourcePath(string filePath)
     {
-        var path = LocalMediaPath.Parse(filePath);
-        var drive = new DriveInfo(Path.GetPathRoot(path.Value)!);
-        if (drive.DriveType == DriveType.Network)
-            throw new IOException("Mapped network drives are unsupported offline sources.");
-        if ((File.GetAttributes(path.Value) & FileAttributes.Offline) != 0)
-            throw new IOException("The source is an unavailable offline/cloud placeholder.");
-        return path.Value;
+        return LocalFileAccess.ValidateFile(filePath);
     }
 
     private static Exception Error(string operation)
@@ -161,5 +159,5 @@ public sealed class BassSmokeSession : IDisposable
     }
 }
 
-public sealed record DecodeEvidence(int SampleRate, int Channels, double DurationSeconds, long DecodedBytes, float Peak);
+public sealed record DecodeEvidence(int SampleRate, int Channels, double DurationSeconds, long DecodedBytes, float Peak, string Codec, int BitDepth);
 public sealed record OutputEvidence(int SampleRate, int Channels, bool Exclusive, long SubmittedBytes);

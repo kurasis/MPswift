@@ -27,8 +27,23 @@ try {
         if ($code -ne 0) { throw "Native $mode failed with exit $code. See artifacts/smoke." }
         Write-Host $result
     }
+    foreach ($check in @(@('--formats', (Join-Path $root 'tests/fixtures/audio'), 'formats'), @('--engine', $fixture, 'engine'))) {
+        $result = & dotnet $tool $check[0] $check[1]
+        $code = $LASTEXITCODE
+        $result | Set-Content (Join-Path $directory "$($check[2]).json") -Encoding utf8
+        if ($code -ne 0) { throw "$($check[0]) failed with exit $code. See artifacts/smoke." }
+        Write-Host $result
+    }
+    $app = Join-Path $root 'src/Player.App/bin/Release/net10.0-windows/win-x64/Player.App.exe'
+    Remove-Item (Join-Path $directory 'ui.json'), (Join-Path $directory 'stage-b-window.png') -ErrorAction SilentlyContinue
+    $process = Start-Process -FilePath $app -ArgumentList @('--ui-smoke', ('"' + $fixture + '"')) -PassThru
+    if (-not $process.WaitForExit(60000)) { $process.Kill(); throw 'WPF UI smoke timed out.' }
+    if ($process.ExitCode -ne 0) { throw "WPF UI smoke failed with exit $($process.ExitCode). See artifacts/smoke/ui.json." }
+    $ui = Get-Content (Join-Path $directory 'ui.json') -Raw | ConvertFrom-Json
+    if ($ui.Status -ne 'ui-smoke-passed') { throw 'WPF UI evidence is not a current successful result.' }
+    Write-Host ($ui | ConvertTo-Json -Depth 5)
     if ($Play) {
-        $result = & dotnet $tool --play $fixture
+        $result = & dotnet $tool --engine-play $fixture
         $code = $LASTEXITCODE
         $result | Set-Content (Join-Path $directory 'output.json') -Encoding utf8
         if ($code -ne 0) { throw "Shared-output smoke failed with exit $code." }

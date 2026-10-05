@@ -5,6 +5,16 @@
     <SolidColorBrush x:Key="TextPrimaryBrush" Color="#ECECEC" />
     <SolidColorBrush x:Key="TextSecondaryBrush" Color="#B0B0B0" />
     <SolidColorBrush x:Key="AccentBrush" Color="#E68A1F" />
+    <SolidColorBrush x:Key="BorderBrush" Color="#3A3A3A" />
+    <SolidColorBrush x:Key="SelectedRowBrush" Color="#805015" />
+    <SolidColorBrush x:Key="AlternateRowBrush" Color="#222222" />
+    <SolidColorBrush x:Key="ErrorBrush" Color="#F08080" />
+    <Style TargetType="TextBox">
+        <Setter Property="Background" Value="{StaticResource BackgroundBrush}" /><Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" /><Setter Property="Padding" Value="6" />
+    </Style>
+    <Style TargetType="CheckBox"><Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" /></Style>
+    <Style TargetType="Expander"><Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" /></Style>
     <Style TargetType="Window">
         <Setter Property="Background" Value="{StaticResource BackgroundBrush}" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />

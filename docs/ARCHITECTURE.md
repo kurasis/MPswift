@@ -13,3 +13,13 @@ The output callback has a strongly retained delegate, performs native decode and
 The fixture generator emits a small PCM16 WAV, known-duration/peak/channel manifest and checksum. Decode checks exercise end-of-file and midpoint seek; output checks exercise source consumption, pause/resume and stop reset. They do not measure the audible timeline or gapless boundaries. Source SHA-256 and an exclusive read-only reopen check preservation and handle release.
 
 Planned production threading: short dispatcher updates, serialized native engine commands, bounded realtime callbacks, bounded metadata/waveform/database workers and generation IDs to reject stale results. Database, cache, settings, playback history and portable storage are not yet implemented. See specification Sections 6–15 for the remaining contracts.
+
+## Stage B production slice
+
+`SerializedAudioPlayer` owns a bounded command queue and dedicated native-context thread. Factory/open/play/pause/seek/dispose run on that owner; no native mutation occurs in WPF handlers. Immutable snapshots carry load generations and publication revisions. Coalesced pending loads/seeks replace obsolete work; stopped/disposed generations cannot autoplay after an older decode completes. A 100 ms engine poll runs only during playback; there is no permanent UI polling timer.
+
+`PlaybackCoordinator` owns full entry order independently of the filtered WPF collection and remembers actually started entries. Track identities may be shared by duplicate occurrences; entry identities never are. Removing a playing row retains active metadata/playback and the next source position. Stage D adds queue/repeat/shuffle and persistent output scheduling.
+
+`BassAudioBackend` owns decoder/plugins/source/mixer/shared WASAPI, strongly retains its callback, and quiesces output before freeing resources. The callback only reads float mixer data, applies smoothed linear app gain/mute and signals native errors through atomic fields. Source position uses mixer history adjusted for the WASAPI buffer. No callback allocations, I/O, logging, UI calls or blocking locks. Stage B closes/rebuilds output for track/seek boundaries, so it makes no gapless claim.
+
+`MediaImportService` validates local paths before reads, skips reparse/offline folder recursion and emits bounded batches from one background metadata worker. TagLib failures use real filenames and bounded details; no fake artwork/tags/waveform. `PlayerViewModel` marshals snapshots through the dispatcher with revision rejection; views handle input/layout only. Import does not autoplay. Resource-owned shutdown awaits import and audio disposal.

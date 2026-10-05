@@ -3,14 +3,15 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using Player.App.Services.Audio;
 using Player.AudioSmoke;
+using Player.Core.Playback;
 
 var json = new JsonSerializerOptions { WriteIndented = true };
 void Report(object result) => Console.WriteLine(JsonSerializer.Serialize(result, json));
 
-if (args.Length == 0 || args[0] is not ("--generate-fixture" or "--probe" or "--decode" or "--play") ||
+if (args.Length == 0 || args[0] is not ("--generate-fixture" or "--probe" or "--decode" or "--play" or "--formats" or "--engine" or "--engine-play") ||
     args.Length != (args[0] == "--probe" ? 1 : 2))
 {
-    Console.Error.WriteLine("Usage: Player.AudioSmoke --generate-fixture <new.wav> | --probe | --decode <local-file> | --play <local-file>");
+    Console.Error.WriteLine("Usage: Player.AudioSmoke --generate-fixture <new.wav> | --probe | --decode <local-file> | --play <local-file> | --formats <fixture-directory> | --engine <local-file> | --engine-play <local-file>");
     return 2;
 }
 
@@ -30,6 +31,78 @@ try
     if (args[0] == "--probe")
     {
         Report(new { Status = "native-load-passed", Versions = versions, Environment = RuntimeInformation.OSDescription });
+        return 0;
+    }
+    if (args[0] == "--formats")
+    {
+        var directory = Path.GetFullPath(args[1]);
+        LocalFileAccess.ValidateDirectory(directory);
+        using var manifest = JsonDocument.Parse(File.ReadAllText(Path.Combine(directory, "manifest.json")));
+        var results = new List<object>();
+        foreach (var fixture in manifest.RootElement.GetProperty("fixtures").EnumerateArray())
+        {
+            var relative = fixture.GetProperty("path").GetString()!;
+            if (Path.GetFileName(relative) != relative) throw new InvalidDataException("Invalid fixture path.");
+            var file = BassSmokeSession.ValidateSourcePath(Path.Combine(directory, relative));
+            var hash = HashFile(file);
+            if (hash != fixture.GetProperty("sha256").GetString()) throw new InvalidDataException("Fixture checksum mismatch: " + relative);
+            DecodeEvidence evidence;
+            using (var session = new BassSmokeSession()) evidence = session.Decode(file);
+            if (evidence.SampleRate != fixture.GetProperty("sampleRate").GetInt32() || evidence.Channels != fixture.GetProperty("channels").GetInt32() ||
+                Math.Abs(evidence.DurationSeconds - fixture.GetProperty("sourceDurationSeconds").GetDouble()) > fixture.GetProperty("durationToleranceSeconds").GetDouble() ||
+                evidence.Peak is < 0.01f or > 0.2f)
+                throw new InvalidDataException("Unexpected decoded fixture facts: " + relative);
+            using (var exclusive = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.None)) { }
+            if (HashFile(file) != hash) throw new InvalidDataException("Fixture source changed.");
+            results.Add(new { File = relative, Profile = fixture.GetProperty("profile").GetString(), Status = "decode-seek-end-dispose-passed", SourceSha256 = hash, Decode = evidence });
+        }
+        if (results.Count == 0) throw new InvalidDataException("No format fixtures executed.");
+        Report(new { Status = "formats-passed", Environment = RuntimeInformation.OSDescription, Count = results.Count, Results = results, DeviceOutput = "not-run" });
+        return 0;
+    }
+    if (args[0] is "--engine" or "--engine-play")
+    {
+        var file = BassSmokeSession.ValidateSourcePath(Path.GetFullPath(args[1]));
+        var beforeHash = HashFile(file);
+        PlaybackSnapshot final;
+        await using (var player = new SerializedAudioPlayer(() => new BassAudioBackend()))
+        {
+            var request = new AudioRequest(Guid.NewGuid(), file);
+            Require(await player.LoadAsync(request, false), "Production engine load failed: " + player.Snapshot.Error?.Detail);
+            Require(player.Snapshot.State == PlaybackState.Stopped && player.Snapshot.CanSeek, "Prepared state invalid.");
+            Require(await player.SeekAsync(TimeSpan.FromSeconds(1)), "Production seek failed.");
+            Require(Math.Abs(player.Snapshot.Position.TotalSeconds - 1) < 0.01, "Prepared seek position invalid.");
+            if (args[0] == "--engine-play")
+            {
+                Require(await player.PlayAsync(), "Production play failed: " + player.Snapshot.Error?.Detail);
+                await Task.Delay(600);
+                Require(player.Snapshot.State == PlaybackState.Playing && player.Snapshot.Position > TimeSpan.FromSeconds(1), "Playback did not advance.");
+                Require(await player.PauseAsync(), "Production pause failed.");
+                var paused = player.Snapshot.Position;
+                await Task.Delay(200);
+                Require(player.Snapshot.State == PlaybackState.Paused && player.Snapshot.Position == paused, "Paused position advanced.");
+                Require(await player.SeekAsync(TimeSpan.FromSeconds(0.5)), "Paused seek failed.");
+                Require(player.Snapshot.State == PlaybackState.Paused, "Seek lost paused state.");
+                Require(await player.SetVolumeAsync(0.25, true), "Production mute command failed.");
+                Require(await player.SetVolumeAsync(0.25, false), "Production unmute command failed.");
+                Require(await player.PlayAsync(), "Production resume failed.");
+                await Task.Delay(350);
+                Require(player.Snapshot.Position > TimeSpan.FromSeconds(0.5), "Resumed playback did not advance.");
+            }
+            else
+            {
+                var replacements = Enumerable.Range(0, 40).Select(_ => player.LoadAsync(new AudioRequest(Guid.NewGuid(), file), false)).ToArray();
+                await Task.WhenAll(replacements);
+                Require(player.Snapshot.State == PlaybackState.Stopped && player.Snapshot.CanSeek, "Rapid preparation lost latest state.");
+            }
+            Require(await player.StopAsync(), "Production stop failed.");
+            Require(player.Snapshot.Position == TimeSpan.Zero && player.Snapshot.State == PlaybackState.Stopped, "Stop did not reset source.");
+            final = player.Snapshot;
+        }
+        using (var exclusive = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.None)) { }
+        Require(beforeHash == HashFile(file), "Production engine changed source.");
+        Report(new { Status = "production-engine-passed", Environment = RuntimeInformation.OSDescription, Snapshot = final,
+            Output = args[0] == "--engine-play" ? "shared-api-tested" : "not-run", SourceHandleReleased = true, SourceUnchanged = true, AudiblePlayback = "not-manually-verified" });
         return 0;
     }
     var path = BassSmokeSession.ValidateSourcePath(Path.GetFullPath(args[1]));
@@ -76,3 +149,4 @@ static string HashFile(string path)
     using var stream = File.OpenRead(path);
     return Convert.ToHexString(SHA256.HashData(stream)).ToLowerInvariant();
 }
+static void Require(bool condition, string message) { if (!condition) throw new InvalidDataException(message); }

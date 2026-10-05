@@ -46,6 +46,71 @@
       ],
       "license": "Proprietary; see upstream license text",
       "distributionApproved": false
+    },
+    {
+      "name": "bassflac",
+      "version": "2.4.6.1",
+      "architecture": "x64",
+      "sourceUrl": "https://www.un4seen.com/files/bassflac24.zip",
+      "archiveSha256": "147280210f62a80e52094e1822e73a16fd3b1a8c9c857c24dcca7dcfcb4ffa14",
+      "archiveEntry": "x64/bassflac.dll",
+      "fileName": "bassflac.dll",
+      "sha256": "09efd682cea33e58ea7a892942d36bde5963218596e6ad68f17807fb57f069cd",
+      "requiredCompanionFiles": [
+        "bassflac.txt"
+      ],
+      "isDecoder": true,
+      "license": "See upstream companion terms; distribution review pending",
+      "distributionApproved": false
+    },
+    {
+      "name": "bassopus",
+      "version": "2.4.3.3",
+      "architecture": "x64",
+      "sourceUrl": "https://www.un4seen.com/files/bassopus24.zip",
+      "archiveSha256": "1fb6e033289ea968ca1fd02dea154a2e5d06bb9c2e33cdeda277e63084d9ad20",
+      "archiveEntry": "x64/bassopus.dll",
+      "fileName": "bassopus.dll",
+      "sha256": "af0e891cc923bd685a1cdde2842838458d0218afa0fdfd919a5e4582b6ab239b",
+      "requiredCompanionFiles": [
+        "bassopus.txt"
+      ],
+      "isDecoder": true,
+      "license": "See upstream companion terms; distribution review pending",
+      "distributionApproved": false
+    },
+    {
+      "name": "bassalac",
+      "version": "2.4.1",
+      "architecture": "x64",
+      "sourceUrl": "https://www.un4seen.com/files/bassalac24.zip",
+      "archiveSha256": "aad9d8fef40bbed022e26eb47e5268b4b61926490a28e6edfe602196f41fa47d",
+      "archiveEntry": "x64/bassalac.dll",
+      "fileName": "bassalac.dll",
+      "sha256": "ee757cdbfa839893c919e8ce90adc30cc1fce418621d3d88e97f8e937009e1e0",
+      "requiredCompanionFiles": [
+        "bassalac.txt"
+      ],
+      "isDecoder": true,
+      "license": "See upstream companion terms; distribution review pending",
+      "distributionApproved": false
+    },
+    {
+      "name": "bass_aac",
+      "version": "2.4.7.2",
+      "architecture": "x64",
+      "sourceUrl": "https://www.un4seen.com/files/z/2/bass_aac24.zip",
+      "archiveSha256": "30439533789e2c6ab6084f81013ce9265b70581289c70e18dfc41023b7f6fde3",
+      "archiveEntry": "x64/bass_aac.dll",
+      "fileName": "bass_aac.dll",
+      "sha256": "c9d9b511d68ccd927d9b4e702fe47b9a9681a550715d6c353e2acfcbbf5737e2",
+      "requiredCompanionFiles": [
+        "gpl.txt",
+        "readme.txt"
+      ],
+      "isDecoder": true,
+      "license": "See upstream companion terms; distribution review pending",
+      "distributionApproved": false
     }
   ]
 }

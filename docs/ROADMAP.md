@@ -12,4 +12,4 @@ The owner's request is to study the specification, divide it into clear stages w
 | F — Windows integration and polish | M5 | Single-instance IPC, media session/keys/tray, English/Russian resources, keyboard/accessibility/DPI and original reference-style visuals. AC-028–030/036. |
 | G — Release verification | M6 | Full automated/manual/digital/audio/stress/performance/offline acceptance, license inventory, clean self-contained portable ZIP/checksums/local help. All P0/P1 gates. |
 
-Implement vertical slices; do not advance an untested feature to verified status. Work on independent code can continue while specific Windows/device checks remain unavailable. Stage A's diagnostics window is intentionally labeled as a development tool, rather than a mock player.
+Implement vertical slices; do not advance an untested feature to verified status. Work on independent code can continue while specific Windows/device checks remain unavailable. Stage B replaces the diagnostic window with working controls; waveform and advanced controls appear only when their implementations are available.

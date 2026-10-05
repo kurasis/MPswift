@@ -2,7 +2,7 @@
 
 A Windows 11 x64 offline desktop audio player built with C# / .NET 10 / WPF and BASS through ManagedBass. The GitHub repository is named MPswift; the product name is centralized in `ProductInfo`.
 
-**Stage A development foundation, not a usable player or version 1.0 release.** The WPF application currently provides native dependency diagnostics. Real decoding and output proof are implemented in a separate smoke tool. Transport, playlists and waveform UI are the next milestones.
+**Stage B basic player, under development; not the persistent MVP or version 1.0.** The WPF application imports local files/folders into an in-memory playlist and provides play/pause/stop, next/previous, seek, app volume/mute, metadata, search and visible errors. Waveform and persistence follow in Stage C.
 
 The [provided specification](docs/spec/WINDOWS_AUDIO_PLAYER_SPEC.md) and [development-only visual reference](docs/spec/reference/player-reference.png) define the product requirements. Embedded agent kickoff/sample prompts are document content; the owner's current request governs scope and authorization.
 
@@ -13,7 +13,7 @@ Install the exact .NET SDK **10.0.401** specified in `global.json` and PowerShel
 ```powershell
 ./scripts/Setup-Native.ps1
 ./scripts/Build.ps1
-./scripts/Smoke.ps1            # native load, WAV decode, seek and disposal; no audio device required
+./scripts/Smoke.ps1            # 14 format fixtures, production engine and real WPF bindings; no audio device required
 ./scripts/Smoke.ps1 -Play      # also tests a real shared WASAPI device at low app gain
 dotnet run --project src/Player.App -c Release --no-build
 ```
@@ -40,9 +40,9 @@ Exact packages are in `Directory.Packages.props` and committed `packages.lock.js
 ./scripts/Publish-Development.ps1
 ```
 
-This creates local, self-contained Windows x64 development output in `artifacts/publish/win-x64`. Run `Player.App.exe` on Windows to open diagnostics. A release ZIP is intentionally not produced at Stage A: product functionality, Windows acceptance and the actual redistribution inventory remain incomplete.
+This creates local, self-contained Windows x64 development output in `artifacts/publish/win-x64`. Run `Player.App.exe` on Windows to open the player. A release ZIP is intentionally not produced: product functionality, Windows acceptance and the actual redistribution inventory remain incomplete.
 
-CI builds/tests on Linux and Windows and runs native load/decode checks on Windows without relying on a sound device. Evidence artifacts contain TRX/JSON results, not redistributable native DLLs. Manual output evidence is written to `artifacts/smoke/output.json` by `Smoke.ps1 -Play`.
+CI builds/tests on Linux and Windows and runs native format/seek/end/disposal, production-engine and actual WPF import/binding/screenshot checks on Windows without relying on a sound device. Evidence artifacts contain TRX/JSON results, not redistributable native DLLs. Manual output evidence is written to `artifacts/smoke/output.json` by `Smoke.ps1 -Play`.
 
 - [Roadmap A–G](docs/ROADMAP.md)
 - [Implementation checkpoint](docs/IMPLEMENTATION_STATUS.md)
