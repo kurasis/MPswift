@@ -1,4 +1,5 @@
 using System.IO;
+using System.Collections.Concurrent;
 using System.Text;
 using Player.App.Services.Audio;
 using Player.Core.Media;
@@ -17,7 +18,7 @@ public interface IMediaImportService
 /// <summary>One cancellable background worker, bounded entries/errors, read-only metadata.</summary>
 public sealed class MediaImportService : IMediaImportService
 {
-    private readonly Dictionary<string, MediaTrack> _tracks = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, MediaTrack> _tracks = new(StringComparer.OrdinalIgnoreCase);
     private static readonly HashSet<string> Extensions = new(StringComparer.OrdinalIgnoreCase)
         { ".mp3", ".wav", ".aif", ".aiff", ".flac", ".ogg", ".opus", ".m4a", ".aac", ".alac", ".cue", ".m3u", ".m3u8", ".pls", ".m4b", ".wma", ".ape", ".wv", ".mpc", ".tta", ".dsf", ".dff" };
     private const int MaximumEntries = 10000;
@@ -53,7 +54,7 @@ public sealed class MediaImportService : IMediaImportService
                         BassSmokeSession.ValidateSourcePath(path);
                         if (new FileInfo(path).Length > 4 * 1024 * 1024) throw new IOException("CUE exceeds 4 MiB.");
                         CueSheet sheet;
-                        try { sheet = CueSheet.Parse(CueSheet.Decode(File.ReadAllBytes(path), fallbackEncoding), path); }
+                        try { sheet = CueSheet.Parse(CueSheet.Decode(ReadDocument(path), fallbackEncoding), path); }
                         catch (System.Text.DecoderFallbackException) { Error("CUE is not valid UTF-8/Unicode. Re-import using the explicit legacy encoding action: " + path); continue; }
                         foreach (var diagnostic in sheet.Diagnostics) Error(diagnostic);
                         foreach (var song in sheet.Songs)
@@ -73,8 +74,8 @@ public sealed class MediaImportService : IMediaImportService
                     if (!_tracks.TryGetValue(path, out var track))
                     {
                         track = MediaMetadataReader.Read(path, Guid.NewGuid(), Error);
-                        if (_tracks.Count >= MaximumEntries) _tracks.Remove(_tracks.Keys.First());
-                        _tracks.Add(path, track);
+                        if (_tracks.Count >= MaximumEntries) _tracks.TryRemove(_tracks.Keys.First(), out _);
+                        track = _tracks.GetOrAdd(path, track);
                     }
                     track = track with { Available = available };
                     // Duplicate tracks share logical identity, but every playlist occurrence has its own entry ID.
@@ -90,6 +91,14 @@ public sealed class MediaImportService : IMediaImportService
         return new ImportSummary(processed, errors, details, limit);
     }
 
+    private static byte[] ReadDocument(string path)
+    {
+        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+        if (stream.Length > 4 * 1024 * 1024) throw new InvalidDataException("Document exceeds 4 MiB.");
+        var bytes = new byte[checked((int)stream.Length)]; stream.ReadExactly(bytes);
+        if (stream.ReadByte() >= 0) throw new InvalidDataException("Document changed while reading; retry after it is saved.");
+        return bytes;
+    }
     private static IEnumerable<string> ExpandDocuments(IEnumerable<string> sources, Action<string> error, Encoding? fallback, CancellationToken token)
     {
         foreach (var source in sources)
@@ -100,7 +109,7 @@ public sealed class MediaImportService : IMediaImportService
             try
             {
                 var path = BassSmokeSession.ValidateSourcePath(source); if (new FileInfo(path).Length > 4 * 1024 * 1024) throw new IOException("Playlist exceeds 4 MiB.");
-                document = PlaylistDocument.Parse(CueSheet.Decode(File.ReadAllBytes(path), fallback), path, Path.GetExtension(path).Equals(".pls", StringComparison.OrdinalIgnoreCase));
+                document = PlaylistDocument.Parse(CueSheet.Decode(ReadDocument(path), fallback), path, Path.GetExtension(path).Equals(".pls", StringComparison.OrdinalIgnoreCase));
                 foreach (var diagnostic in document.Diagnostics) error(diagnostic);
             }
             catch (Exception e) when (e is IOException or ArgumentException or DecoderFallbackException) { error("Playlist import: " + e.Message + "; choose an explicit legacy encoding for non-Unicode files."); }

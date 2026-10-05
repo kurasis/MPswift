@@ -227,6 +227,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     }
     public void AddLibraryTracks(IEnumerable<MediaTrack> tracks)
     {
+        if (IsImporting || _closing) { Message = "Wait for the current import or cancel it first."; return; }
         foreach (var track in tracks.Take(10001)) { if (_knownRows.Count >= 10000) break; AddRow(SelectedPlaylist, new(Guid.NewGuid(), track, AddedUtcTicks: DateTime.UtcNow.Ticks)); }
         UpdateEntries(); _statisticsTask = ObserveAsync(RefreshRatingsAsync());
     }
@@ -307,7 +308,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         var progress = new Progress<ImportProgress>(report =>
         {
             if (_closing || !Playlists.Contains(target)) return;
-            foreach (var entry in report.Entries) AddRow(target, entry);
+            foreach (var entry in report.Entries) { if (_knownRows.Count >= 10000) { _importCancellation?.Cancel(); Message = Strings.Get("ImportLimit"); break; } AddRow(target, entry); }
             UpdateEntries();
         });
         try
@@ -350,6 +351,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     public void RenamePlaylist(string name) { SelectedPlaylist.Name = ValidateName(name); ApplySnapshot(_player.Snapshot); ScheduleSave(true); }
     public void DuplicatePlaylist()
     {
+        if (IsImporting) return;
         if (_knownRows.Count + Entries.Count > 10000 || Playlists.Count >= 100) { Message = Strings.Get("ImportLimit"); return; }
         var source = SelectedPlaylist;
         var tab = new PlaylistTabViewModel(Guid.NewGuid(), ValidateName(source.Name.Length <= 190 ? source.Name + " (copy)" : source.Name[..190] + " (copy)"));

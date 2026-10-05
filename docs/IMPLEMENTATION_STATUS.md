@@ -32,7 +32,7 @@ Previous [Stage C Windows job](https://github.com/kurasis/MPswift/actions/runs/3
 
 ## Resume and commands
 
-- Use existing checkout `/workspace/MPswift`; activate `source /workspace/toolchains/activate.sh`. No new worktree or service is required.
+- Use existing checkout `/workspace/MPswift`; activate `source /workspace/toolchains/activate.sh`. No new worktree or service is required. The cloud startup draft was refreshed for Stage D/E and Stage F continuation; install instructions remain unchanged.
 - `scripts/Build.ps1`: locked restore, Release cross-build and 80 platform-neutral/storage tests.
 - `scripts/Setup-Native.ps1`: verify/provision 13 pinned development DLLs and upstream notices. Generic MPC/TTA notices are kept in separate subdirectories to avoid collisions.
 - `scripts/Publish-Development.ps1`: self-contained local output, manifest hashes and companion audit; no public ZIP/release.
