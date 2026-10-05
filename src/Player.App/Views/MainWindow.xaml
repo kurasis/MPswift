@@ -38,6 +38,8 @@
             </StackPanel>
         </Grid>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8" IsEnabled="{Binding CanTransport}">
+            <CheckBox Content="Shuffle" IsChecked="{Binding Shuffle}" VerticalAlignment="Center" Margin="6" />
+            <ComboBox ItemsSource="{Binding RepeatModes}" SelectedItem="{Binding Repeat}" Width="70" VerticalAlignment="Center" ToolTip="Repeat" AutomationProperties.Name="Repeat" Margin="4" />
             <Button Content="{x:Static r:Strings.Previous}" Command="{Binding PreviousCommand}" Margin="4" />
             <Button Content="{x:Static r:Strings.Stop}" Command="{Binding StopCommand}" Margin="4" />
             <Button x:Name="PlayPauseButton" Content="{Binding PlayPauseLabel}" Command="{Binding PlayPauseCommand}" Margin="4" Padding="24,10" FontSize="16" AutomationProperties.Name="{Binding PlayPauseLabel}" />
@@ -63,6 +65,13 @@
                         <MenuItem Header="{x:Static r:Strings.DeletePlaylist}" Click="OnDeletePlaylist" />
                         <MenuItem Header="{x:Static r:Strings.TabLeft}" Click="OnTabLeft" />
                         <MenuItem Header="{x:Static r:Strings.TabRight}" Click="OnTabRight" />
+                        <Separator />
+                        <MenuItem Header="Import document with legacy encoding…" Click="OnLegacyImport" />
+                        <MenuItem Header="Play next" Click="OnPlayNext" />
+                        <MenuItem Header="Add to queue" Click="OnAddQueue" />
+                        <MenuItem Header="Show queue" Click="OnQueue" />
+                        <MenuItem Header="Clear playback history" Command="{Binding ClearHistoryCommand}" />
+                        <MenuItem Header="Audio output / EQ / ReplayGain" Click="OnAudioSettings" />
                         <Separator />
                         <MenuItem Header="{x:Static r:Strings.MoveUp}" Click="OnMoveUp" />
                         <MenuItem Header="{x:Static r:Strings.MoveDown}" Click="OnMoveDown" />

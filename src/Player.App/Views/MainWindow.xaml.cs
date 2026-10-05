@@ -136,6 +136,27 @@ public partial class MainWindow : Window
     private void OnMoveDown(object sender, RoutedEventArgs e) => Model.MoveEntries(PlaylistList.SelectedItems.Cast<PlaylistRowViewModel>(), 1);
     private void OnPlaylistActions(object sender, RoutedEventArgs e)
     { PlaylistActions.ContextMenu.DataContext = Model; PlaylistActions.ContextMenu.PlacementTarget = PlaylistActions; PlaylistActions.ContextMenu.IsOpen = true; }
+    private async void OnLegacyImport(object sender, RoutedEventArgs e)
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog { Filter = "Local documents (*.cue;*.m3u;*.pls)|*.cue;*.m3u;*.pls" };
+        if (dialog.ShowDialog(this) != true) return;
+        var selection = new Window { Owner = this, Title = "Legacy document encoding", Width = 330, Height = 180, WindowStartupLocation = WindowStartupLocation.CenterOwner };
+        var panel = new StackPanel { Margin = new Thickness(12) }; selection.Content = panel;
+        panel.Children.Add(new TextBlock { Text = "Select an encoding for non-Unicode document bytes.", TextWrapping = TextWrapping.Wrap });
+        var encodings = new ComboBox { ItemsSource = new[] { "Windows-1251 (Cyrillic)", "Windows-1252 (Western)", "CP866 (Cyrillic DOS)" }, SelectedIndex = 0, Margin = new Thickness(0, 12, 0, 12) }; panel.Children.Add(encodings);
+        var button = new Button { Content = "Import" }; button.Click += (_, _) => selection.DialogResult = true; panel.Children.Add(button);
+        if (selection.ShowDialog() != true) return;
+        System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+        await Model.AddPathsAsync([dialog.FileName], System.Text.Encoding.GetEncoding(new[] { 1251, 1252, 866 }[encodings.SelectedIndex], System.Text.EncoderFallback.ExceptionFallback, System.Text.DecoderFallback.ExceptionFallback));
+    }
+    private void OnPlayNext(object sender, RoutedEventArgs e) => Model.Enqueue(Model.Entries.Where(r => PlaylistList.SelectedItems.Contains(r)), true);
+    private void OnAddQueue(object sender, RoutedEventArgs e) => Model.Enqueue(Model.Entries.Where(r => PlaylistList.SelectedItems.Contains(r)), false);
+    private void OnQueue(object sender, RoutedEventArgs e) => new QueueWindow(this, Model).Show();
+    private async void OnAudioSettings(object sender, RoutedEventArgs e)
+    {
+        try { new AudioSettingsWindow(this, Model, await Model.GetDevicesAsync()).ShowDialog(); }
+        catch (Exception error) { Model.Message = "Audio devices unavailable"; Model.Details = error.Message; }
+    }
     private async void OnBackup(object sender, RoutedEventArgs e)
     {
         var dialog = new Microsoft.Win32.SaveFileDialog { Filter = "SQLite backup (*.db)|*.db", FileName = "player-backup-" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".db" };

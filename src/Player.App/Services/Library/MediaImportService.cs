@@ -1,4 +1,5 @@
 using System.IO;
+using System.Text;
 using Player.App.Services.Audio;
 using Player.Core.Media;
 using Player.Core.Playback;
@@ -10,7 +11,7 @@ public sealed record ImportSummary(int Added, int Errors, IReadOnlyList<string> 
 public interface IMediaImportService
 {
     void RememberTracks(IEnumerable<MediaTrack> tracks);
-    Task<ImportSummary> ImportAsync(IEnumerable<string> paths, IProgress<ImportProgress> progress, CancellationToken token, int maximumItems = 10000);
+    Task<ImportSummary> ImportAsync(IEnumerable<string> paths, IProgress<ImportProgress> progress, CancellationToken token, int maximumItems = 10000, Encoding? fallbackEncoding = null);
 }
 
 /// <summary>One cancellable background worker, bounded entries/errors, read-only metadata.</summary>
@@ -18,18 +19,18 @@ public sealed class MediaImportService : IMediaImportService
 {
     private readonly Dictionary<string, MediaTrack> _tracks = new(StringComparer.OrdinalIgnoreCase);
     private static readonly HashSet<string> Extensions = new(StringComparer.OrdinalIgnoreCase)
-        { ".mp3", ".wav", ".aif", ".aiff", ".flac", ".ogg", ".opus", ".m4a", ".aac", ".alac" };
+        { ".mp3", ".wav", ".aif", ".aiff", ".flac", ".ogg", ".opus", ".m4a", ".aac", ".alac", ".cue" };
     private const int MaximumEntries = 10000;
 
     public void RememberTracks(IEnumerable<MediaTrack> tracks)
     {
-        foreach (var track in tracks.Take(MaximumEntries)) _tracks[track.Path] = track;
+        foreach (var track in tracks.Take(MaximumEntries)) _tracks[Identity(track)] = track;
     }
 
-    public Task<ImportSummary> ImportAsync(IEnumerable<string> paths, IProgress<ImportProgress> progress, CancellationToken token, int maximumItems = MaximumEntries) =>
-        Task.Run(() => Import(paths.Take(MaximumEntries + 1).ToArray(), progress, token, Math.Clamp(maximumItems, 0, MaximumEntries)), token);
+    public Task<ImportSummary> ImportAsync(IEnumerable<string> paths, IProgress<ImportProgress> progress, CancellationToken token, int maximumItems = MaximumEntries, Encoding? fallbackEncoding = null) =>
+        Task.Run(() => Import(paths.Take(MaximumEntries + 1).ToArray(), progress, token, Math.Clamp(maximumItems, 0, MaximumEntries), fallbackEncoding), token);
 
-    private ImportSummary Import(string[] paths, IProgress<ImportProgress> progress, CancellationToken token, int maximumItems)
+    private ImportSummary Import(string[] paths, IProgress<ImportProgress> progress, CancellationToken token, int maximumItems, Encoding? fallbackEncoding)
     {
         var batch = new List<PlaylistEntry>(32);
         var details = new List<string>();
@@ -47,6 +48,25 @@ public sealed class MediaImportService : IMediaImportService
                 try
                 {
                     var path = LocalMediaPath.Parse(source).Value;
+                    if (Path.GetExtension(path).Equals(".cue", StringComparison.OrdinalIgnoreCase))
+                    {
+                        BassSmokeSession.ValidateSourcePath(path);
+                        if (new FileInfo(path).Length > 4 * 1024 * 1024) throw new IOException("CUE exceeds 4 MiB.");
+                        CueSheet sheet;
+                        try { sheet = CueSheet.Parse(CueSheet.Decode(File.ReadAllBytes(path), fallbackEncoding), path); }
+                        catch (System.Text.DecoderFallbackException) { Error("CUE is not valid UTF-8/Unicode. Re-import using the explicit legacy encoding action: " + path); continue; }
+                        foreach (var diagnostic in sheet.Diagnostics) Error(diagnostic);
+                        foreach (var song in sheet.Songs)
+                        {
+                            if (processed >= maximumItems) { limit = true; break; }
+                            var exists = File.Exists(song.Path);
+                            if (exists) BassSmokeSession.ValidateSourcePath(song.Path); else Error("Missing CUE source: " + song.Path);
+                            var segment = new TrackSegment(TrackSegment.FromCueFrames(song.StartFrame), song.EndFrame is { } end ? TrackSegment.FromCueFrames(end) : null);
+                            var cue = new MediaTrack(CueSheet.TrackId(path, song), song.Path, song.Title, song.Performer, song.Album, segment.Duration, "CUE", exists, segment, path, song.Number);
+                            _tracks[Identity(cue)] = cue; batch.Add(new(Guid.NewGuid(), cue)); processed++; if (batch.Count == 32) Flush();
+                        }
+                        continue;
+                    }
                     var available = File.Exists(path);
                     if (available) BassSmokeSession.ValidateSourcePath(path);
                     else Error("File unavailable: " + path);
@@ -63,7 +83,8 @@ public sealed class MediaImportService : IMediaImportService
                                 {
                                     Title = string.IsNullOrWhiteSpace(tags.Tag.Title) ? track.Title : Bounded(tags.Tag.Title) ?? track.Title,
                                     Artist = Bounded(string.Join(", ", tags.Tag.Performers)), Album = Bounded(tags.Tag.Album),
-                                    DurationHint = tags.Properties.Duration > TimeSpan.Zero ? tags.Properties.Duration : null
+                                    DurationHint = tags.Properties.Duration > TimeSpan.Zero ? tags.Properties.Duration : null,
+                                    ReplayGain = new(tags.Tag.ReplayGainTrackGain is var tg && double.IsFinite(tg) ? tg : null, tags.Tag.ReplayGainAlbumGain is var ag && double.IsFinite(ag) ? ag : null, tags.Tag.ReplayGainTrackPeak is var tp && double.IsFinite(tp) && tp > 0 ? tp : null, tags.Tag.ReplayGainAlbumPeak is var ap && double.IsFinite(ap) && ap > 0 ? ap : null)
                                 };
                             }
                             catch (Exception error) when (error is TagLib.CorruptFileException or TagLib.UnsupportedFormatException or IOException or ArgumentException)
@@ -85,6 +106,7 @@ public sealed class MediaImportService : IMediaImportService
         return new ImportSummary(processed, errors, details, limit);
     }
 
+    private static string Identity(MediaTrack track) => track.CueDocument is null ? track.Path : track.CueDocument + "|" + track.CueNumber;
     private static string? Bounded(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Length <= 4096 ? value : value[..4096];
 
     private static IEnumerable<string> Enumerate(string[] paths, Action<string> error, CancellationToken token)

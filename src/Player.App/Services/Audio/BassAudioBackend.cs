@@ -1,239 +1,163 @@
 using System.IO;
-using System.Runtime.InteropServices;
 using ManagedBass;
-using ManagedBass.Mix;
 using ManagedBass.Wasapi;
 using Player.Core.Playback;
-using PlaybackStateNative = ManagedBass.PlaybackState;
 
 namespace Player.App.Services.Audio;
 
-/// <summary>Owned exclusively by SerializedAudioPlayer's thread. No UI or database access.</summary>
-public sealed class BassAudioBackend : IAudioBackend
+/// <summary>One engine owner; persistent mixer/output, separately prepared sources and explicit output policy.</summary>
+public sealed class BassAudioBackend : IAudioBackend, IAdvancedAudioBackend
 {
     private readonly WasapiProcedure _render;
     private readonly NativeDecodeContext _context;
-    private int _source;
-    private int _mixer;
-    private bool _wasapi;
-    private bool _running;
-    private bool _disposed;
+    private BassMixerGraph? _graph;
+    private AudioRequest? _request, _prepared;
+    private AudioSourceInfo? _info;
+    private int _preparedHandle;
+    private bool _wasapi, _running, _disposed, _repeatOne;
     private int _callbackError;
     private double _volume = 0.5;
     private bool _muted;
-    private float _targetGain = 0.5f;
-    private float _callbackGain = 0.5f;
-    private int _outputChannels = 2;
+    private AudioProcessingSettings _processing = new();
+    private AudioOutputSettings _settings = new();
+    private string? _actualDevice;
     private TimeSpan _position;
-    private TimeSpan? _duration;
     private AudioFormatInfo? _output;
-
     public BassAudioBackend()
     {
         _render = Render;
-        try
-        {
-            _context = new NativeDecodeContext();
-        }
-        catch (Exception error) when (error is not AudioBackendException)
-        { throw new AudioBackendException(AudioErrorCategory.Dependency, error.Message); }
+        try { _context = new NativeDecodeContext(); }
+        catch (Exception e) when (e is not AudioBackendException) { throw new AudioBackendException(AudioErrorCategory.Dependency, e.Message); }
     }
-
-    public AudioSourceInfo Open(string path)
+    public AudioSourceInfo Open(string path) => Open(new AudioRequest(Guid.NewGuid(), path));
+    public AudioSourceInfo Open(AudioRequest request)
     {
-        ObjectDisposedException.ThrowIf(_disposed, this);
-        CloseSource();
-        try { path = BassSmokeSession.ValidateSourcePath(path); }
-        catch (Exception error) when (error is IOException or UnauthorizedAccessException or ArgumentException)
-        { throw new AudioBackendException(AudioErrorCategory.FileUnavailable, error.Message); }
-        _source = Bass.CreateStream(path, 0, 0, BassFlags.Decode | BassFlags.Float | BassFlags.Prescan);
-        if (_source == 0)
-        {
-            var error = Error("Open decoder", AudioErrorCategory.Decoder);
-            throw new AudioBackendException(error.Category, error.Message +
-                (_context.DecoderErrors.Count > 0 ? " Unavailable decoders: " + string.Join("; ", _context.DecoderErrors.Take(4).Select(p => p.Key + "=" + p.Value)) : ""), error.NativeCode);
-        }
-        try
-        {
-            Check(Bass.ChannelGetInfo(_source, out var info), "Read source info", AudioErrorCategory.Decoder);
-            var bytes = Bass.ChannelGetLength(_source);
-            var seconds = bytes >= 0 ? Bass.ChannelBytes2Seconds(_source, bytes) : -1;
-            _duration = double.IsFinite(seconds) && seconds >= 0 ? TimeSpan.FromSeconds(seconds) : null;
-            _position = TimeSpan.Zero;
-            return new AudioSourceInfo(_duration,
-                // BASS marks original float resolution with bit 16; only the low word is bit depth.
-                new AudioFormatInfo(info.Frequency, info.Channels, info.ChannelType.ToString(), (info.OriginalResolution & 0xffff) > 0 ? info.OriginalResolution & 0xffff : null),
-                _duration > TimeSpan.Zero);
-        }
-        catch { CloseSource(); throw; }
+        ObjectDisposedException.ThrowIf(_disposed, this); CloseSource();
+        var opened = BassMixerGraph.OpenSource(request);
+        _preparedHandle = opened.Handle; _info = opened.Info; _request = request; _position = TimeSpan.Zero;
+        if (_graph is not null) { Bass.StreamFree(_preparedHandle); _preparedHandle = 0; _info = _graph.Load(request); }
+        return _info;
     }
-
     public void Play()
     {
-        if (_source == 0) throw new AudioBackendException(AudioErrorCategory.Decoder, "No source is loaded.");
-        if (_duration is { } duration && _position >= duration) Seek(TimeSpan.Zero);
+        if (_request is null) throw new AudioBackendException(AudioErrorCategory.Decoder, "No source is loaded.");
+        if (_position >= _info?.Duration) Seek(TimeSpan.Zero);
         EnsureOutput();
-        Check(BassWasapi.Start(), "Start shared output", AudioErrorCategory.OutputUnavailable);
-        _running = true;
+        if (_graph?.ActiveEntryId != _request.EntryId) _graph!.Load(_request, _position);
+        if (_prepared is not null) _graph!.PrepareNext(_prepared, _repeatOne);
+        _graph!.SetVolume(_volume, _muted, true);
+        Check(BassWasapi.Start(), "Start output"); _running = true;
     }
-
+    private int FindDevice()
+    {
+        for (var i = 0; BassWasapi.GetDeviceInfo(i, out var info); i++)
+            if (!info.IsInput && !info.IsLoopback && info.IsEnabled && (_settings.DeviceId is null ? info.IsDefault : info.ID == _settings.DeviceId)) return i;
+        throw new AudioBackendException(AudioErrorCategory.OutputUnavailable, "Output device unavailable. Select a device or Windows default; no automatic fallback occurred.");
+    }
     private void EnsureOutput()
     {
-        if (_wasapi) return;
-        Check(BassWasapi.Init(-1, 0, 0, WasapiInitFlags.Shared | WasapiInitFlags.Buffer, 0.1f, 0, _render),
-            "Open Windows default shared WASAPI endpoint", AudioErrorCategory.OutputUnavailable);
-        _wasapi = true;
+        var device = FindDevice(); var deviceInfo = BassWasapi.GetDeviceInfo(device);
+        if (_wasapi && deviceInfo.ID == _actualDevice) return;
+        if (_wasapi) CloseOutput();
+        var rate = _settings.Exclusive ? _info!.Format.SampleRate : deviceInfo.MixFrequency;
+        var channels = _settings.Exclusive ? Math.Min(2, _info!.Format.Channels) : deviceInfo.MixChannels;
+        var flags = (_settings.Exclusive ? WasapiInitFlags.Exclusive : WasapiInitFlags.Shared) | WasapiInitFlags.Buffer;
+        if (BassWasapi.CheckFormat(device, rate, channels, flags) < 0) throw new AudioBackendException(AudioErrorCategory.OutputUnavailable, "Requested output format/mode is unavailable. Exclusive mode was not silently replaced with shared mode.");
+        Check(BassWasapi.Init(device, rate, channels, flags, 0.1f, 0, _render), "Open selected WASAPI endpoint"); _wasapi = true; _actualDevice = deviceInfo.ID;
         try
         {
-            Check(BassWasapi.GetInfo(out var info), "Read endpoint mix format", AudioErrorCategory.OutputUnavailable);
-            _mixer = BassMix.CreateMixerStream(info.Frequency, info.Channels,
-                BassFlags.Decode | BassFlags.Float | BassFlags.MixerNonStop | BassFlags.MixerPositionEx);
-            if (_mixer == 0) throw Error("Create output mixer", AudioErrorCategory.OutputUnavailable);
-            // Float stereo/multichannel resampling/downmix is performed by BASSmix in the endpoint mix format.
-            Check(BassMix.MixerAddChannel(_mixer, _source, BassFlags.MixerChanDownMix), "Attach source", AudioErrorCategory.Decoder);
-            _output = new AudioFormatInfo(info.Frequency, info.Channels, "WASAPI shared / float processing");
-            _outputChannels = info.Channels;
-            ApplyVolume();
-            _callbackGain = Volatile.Read(ref _targetGain);
+            Check(BassWasapi.GetInfo(out var info), "Read negotiated output format");
+            _graph = new(info.Frequency, info.Channels, _processing);
+            if (_preparedHandle != 0) { Check(Bass.StreamFree(_preparedHandle), "Free initial decoder"); _preparedHandle = 0; }
+            if (_request is not null) _graph.Load(_request, _position);
+            _output = new(info.Frequency, info.Channels, (_settings.Exclusive ? "WASAPI exclusive" : "WASAPI shared") + " / float mixer / final saturation protection");
         }
         catch { CloseOutput(); throw; }
     }
-
+    public AudioDevice[] GetDevices()
+    {
+        var devices = new List<AudioDevice> { new(null, "Windows default output", 0, 0) };
+        for (var i = 0; i < 1024 && BassWasapi.GetDeviceInfo(i, out var info); i++)
+            if (info.IsEnabled && !info.IsInput && !info.IsLoopback) devices.Add(new(info.ID, info.Name, info.MixFrequency, info.MixChannels));
+        return devices.ToArray();
+    }
+    public void SetOutput(AudioOutputSettings settings)
+    {
+        if (_settings == settings) return;
+        Pause(); _settings = settings; CloseOutput(); // An explicit Play is needed after changing device/mode.
+    }
+    public void SetProcessing(AudioProcessingSettings settings)
+    { if (_processing == settings) return; _processing = settings.Validate(); _graph?.SetProcessing(_processing); }
+    public void PrepareNext(AudioRequest? request, bool repeatOne)
+    {
+        if (_prepared == request && _repeatOne == repeatOne) return;
+        if (_graph?.TransitionDecoded == true) FlushAtCurrentPosition();
+        _prepared = request; _repeatOne = repeatOne;
+        // A bad prepared decoder must not interrupt the still-playing current item.
+        try { _graph?.PrepareNext(request, repeatOne); }
+        catch (AudioBackendException e) when (e.Category is AudioErrorCategory.FileUnavailable or AudioErrorCategory.Decoder) { _prepared = null; }
+    }
     public void Pause()
     {
         if (!_running) return;
-        try
-        {
-            var position = ReadPosition().Position;
-            if (_running) Check(BassWasapi.Stop(false), "Pause output", AudioErrorCategory.OutputUnavailable);
-            _running = false;
-            _position = position;
-        }
+        try { _position = ReadPosition().Position; Check(BassWasapi.Stop(false), "Pause output"); _running = false; }
         catch { CloseOutput(); throw; }
     }
-
     public void Stop()
     {
-        if (_running) Check(BassWasapi.Stop(true), "Stop output", AudioErrorCategory.OutputUnavailable);
-        else if (_wasapi) CloseOutput(); // Discard retained paused endpoint samples before a new start.
-        _running = false;
-        if (_source == 0) return;
-        Check(_mixer != 0 ? BassMix.ChannelSetPosition(_source, 0) : Bass.ChannelSetPosition(_source, 0),
-            "Reset source", AudioErrorCategory.Decoder);
-        _position = TimeSpan.Zero;
+        if (_wasapi) Check(BassWasapi.Stop(true), "Stop and discard output");
+        _running = false; _position = TimeSpan.Zero; _prepared = null;
+        _graph?.Seek(TimeSpan.Zero);
+        if (_preparedHandle != 0 && _request is not null) Check(Bass.ChannelSetPosition(_preparedHandle, Bass.ChannelSeconds2Bytes(_preparedHandle, _request.Segment?.Start.TotalSeconds ?? 0)), "Reset source");
         Interlocked.Exchange(ref _callbackError, 0);
     }
-
     public void Seek(TimeSpan position)
     {
-        if (_source == 0 || _duration is null) throw new AudioBackendException(AudioErrorCategory.Decoder, "Source is not seekable.");
+        if (_request is null || _info is null) throw new AudioBackendException(AudioErrorCategory.Decoder, "Source is not seekable.");
         var resume = _running;
-        // Flush the old endpoint before touching source/mixer state. Graph callbacks are quiescent here.
-        CloseOutput();
-        var bytes = Bass.ChannelSeconds2Bytes(_source, position.TotalSeconds);
-        Check(Bass.ChannelSetPosition(_source, bytes), "Seek source", AudioErrorCategory.Decoder);
-        _position = position;
-        if (resume) Play();
+        if (_wasapi) Check(BassWasapi.Stop(true), "Flush old endpoint samples"); _running = false; _position = position; _prepared = null;
+        _graph?.Seek(position);
+        if (_preparedHandle != 0) Check(Bass.ChannelSetPosition(_preparedHandle, Bass.ChannelSeconds2Bytes(_preparedHandle, (_request.Segment?.Start.TotalSeconds ?? 0) + position.TotalSeconds)), "Seek prepared source");
+        if (resume) { Check(BassWasapi.Start(), "Resume after seek"); _running = true; }
     }
-
-    public void SetVolume(double volume, bool muted)
-    {
-        _volume = volume;
-        _muted = muted;
-        ApplyVolume();
-    }
-
-    private void ApplyVolume()
-    {
-        // BASS channel volume does not affect a decode-only mixer's ChannelGetData.
-        // Apply master gain to interleaved float PCM in Render, after mixing/resampling.
-        Volatile.Write(ref _targetGain, _muted ? 0 : (float)_volume);
-    }
-
+    private void FlushAtCurrentPosition() => Seek(_position);
+    public void SetVolume(double volume, bool muted) { _volume = volume; _muted = muted; _graph?.SetVolume(volume, muted); }
     public BackendPosition ReadPosition()
     {
-        if (!_running || !_wasapi || _source == 0) return new BackendPosition(_position, false, _output);
+        if (!_running || !_wasapi || _graph is null) return new(_position, false, _output);
         var error = Interlocked.Exchange(ref _callbackError, 0);
         if (error != 0) throw new AudioBackendException(AudioErrorCategory.OutputUnavailable, "WASAPI render callback failed.", error);
-        if (!BassWasapi.IsStarted) throw new AudioBackendException(AudioErrorCategory.OutputUnavailable, "The output endpoint stopped unexpectedly.");
-        var delay = BassWasapi.GetData(nint.Zero, (int)DataFlags.Available);
-        if (delay < 0) throw Error("Read endpoint latency", AudioErrorCategory.OutputUnavailable);
-        var bytes = BassMix.ChannelGetPosition(_source, PositionFlags.Bytes, delay);
-        // Initial endpoint fill can precede position-history availability; retain the last reliable position.
-        if (bytes >= 0)
-        {
-            var seconds = Bass.ChannelBytes2Seconds(_source, bytes);
-            if (double.IsFinite(seconds)) _position = TimeSpan.FromSeconds(Math.Max(0, seconds));
-        }
-        var end = _duration is { } duration && _position >= duration && Bass.ChannelIsActive(_source) == PlaybackStateNative.Stopped;
-        if (end)
-        {
-            Check(BassWasapi.Stop(false), "Pause at natural end", AudioErrorCategory.OutputUnavailable);
-            _running = false;
-            _position = _duration!.Value;
-        }
-        return new BackendPosition(_position, end, _output);
+        if (!BassWasapi.IsStarted) throw new AudioBackendException(AudioErrorCategory.OutputUnavailable, "Output endpoint stopped. Select/retry output; context is retained.");
+        var device = FindDevice();
+        if (BassWasapi.GetDeviceInfo(device).ID != _actualDevice)
+        { PauseForDeviceChange(); throw new AudioBackendException(AudioErrorCategory.OutputUnavailable, "Windows default output changed. Playback is paused; Play reconnects to the new default."); }
+        var latency = BassWasapi.GetData(nint.Zero, (int)DataFlags.Available); if (latency < 0) throw Error("Read output latency");
+        var position = _graph.ReadPosition(latency); _position = position.Position;
+        if (position.Transition is { } transition) { _request = transition; _info = position.TransitionInfo; _prepared = null; }
+        if (position.Ended) { Check(BassWasapi.Stop(false), "Pause at natural end"); _running = false; }
+        return position with { OutputFormat = _output };
     }
-
-    private unsafe int Render(nint buffer, int length, nint user)
+    private void PauseForDeviceChange() { Check(BassWasapi.Stop(true), "Pause for device change"); _running = false; CloseOutput(); }
+    private int Render(nint buffer, int length, nint user)
     {
-        try
-        {
-            var count = Bass.ChannelGetData(_mixer, buffer, length);
-            if (count >= 0)
-            {
-                var samples = new Span<float>(buffer.ToPointer(), count / sizeof(float));
-                var frames = samples.Length / _outputChannels;
-                var target = Volatile.Read(ref _targetGain);
-                var step = frames > 0 ? (target - _callbackGain) / frames : 0;
-                for (var frame = 0; frame < frames; frame++)
-                {
-                    _callbackGain += step;
-                    for (var channel = 0; channel < _outputChannels; channel++) samples[frame * _outputChannels + channel] *= _callbackGain;
-                }
-                _callbackGain = target;
-                return count;
-            }
-            Interlocked.Exchange(ref _callbackError, (int)Bass.LastError);
-        }
+        try { var count = _graph?.Render(buffer, length) ?? 0; if (count >= 0) return count; Interlocked.Exchange(ref _callbackError, (int)Bass.LastError); }
         catch { Interlocked.Exchange(ref _callbackError, -1); }
         return 0;
     }
-
     private void CloseOutput()
     {
-        if (_wasapi)
-        {
-            Check(BassWasapi.Free(), "Quiesce/free WASAPI", AudioErrorCategory.OutputUnavailable);
-            _wasapi = false;
-        }
-        _running = false;
-        if (_mixer != 0) { Check(Bass.StreamFree(_mixer), "Free mixer", AudioErrorCategory.Dependency); _mixer = 0; }
-        _output = null;
+        if (_wasapi) { Check(BassWasapi.Free(), "Quiesce/free WASAPI"); _wasapi = false; }
+        _running = false; _graph?.Dispose(); _graph = null; _output = null; _actualDevice = null;
     }
-
     public void CloseSource()
     {
-        CloseOutput();
-        if (_source != 0) { Check(Bass.StreamFree(_source), "Free decoder", AudioErrorCategory.Dependency); _source = 0; }
-        _position = TimeSpan.Zero;
-        _duration = null;
-        Interlocked.Exchange(ref _callbackError, 0);
+        if (_wasapi) Check(BassWasapi.Stop(true), "Quiesce source replacement"); _running = false;
+        _graph?.Clear();
+        if (_preparedHandle != 0) { Check(Bass.StreamFree(_preparedHandle), "Free prepared source"); _preparedHandle = 0; }
+        _request = null; _prepared = null; _info = null; _position = TimeSpan.Zero; Interlocked.Exchange(ref _callbackError, 0);
     }
-
     public void Dispose()
-    {
-        if (_disposed) return;
-        CloseSource();
-        _context.Dispose();
-        _disposed = true;
-        GC.KeepAlive(_render);
-    }
-
-    private static void Check(bool success, string operation, AudioErrorCategory category) { if (!success) throw Error(operation, category); }
-    private static AudioBackendException Error(string operation, AudioErrorCategory category)
-    {
-        var error = Bass.LastError;
-        return new AudioBackendException(category, $"{operation}: {error} ({(int)error}).", (int)error);
-    }
+    { if (_disposed) return; CloseSource(); CloseOutput(); _context.Dispose(); _disposed = true; GC.KeepAlive(_render); }
+    private static void Check(bool success, string operation) { if (!success) throw Error(operation); }
+    private static AudioBackendException Error(string operation) { var error = Bass.LastError; return new(AudioErrorCategory.OutputUnavailable, $"{operation}: {error} ({(int)error}).", (int)error); }
 }

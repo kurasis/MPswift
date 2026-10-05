@@ -8,6 +8,7 @@ using System.Windows.Threading;
 using Player.App.Resources;
 using Player.App.ViewModels;
 using Player.App.Views;
+using Player.Core.Playback;
 
 namespace Player.App.Services.Windows;
 
@@ -71,6 +72,10 @@ public sealed class UiSmokeValidation : TraceListener
         var expectedOrder = model.Entries.Select(e => e.Id).ToArray();
         model.Search = "no-match"; model.MoveEntries([duplicateFirst], -1);
         Require(model.Entries.Select(e => e.Id).SequenceEqual(expectedOrder), "Filtered manual reorder was not rejected."); model.Search = "";
+        model.Enqueue([model.Entries[0], model.Entries[2]], false); model.Enqueue([model.Entries[1]], true);
+        model.Repeat = RepeatMode.All; model.Shuffle = true;
+        var queuedIds = model.Queue.Select(q => q.Id).ToArray();
+        await model.ConfigureAudioAsync(new(ReplayGain: ReplayGainMode.Album, CrossfadeSeconds: 3), new());
         model.Volume = 23; model.Muted = true;
         await model.CommitSeekAsync(1);
         await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ContextIdle);
@@ -86,6 +91,8 @@ public sealed class UiSmokeValidation : TraceListener
         Require(model.Playlists.First(p => p.Id == sourceTabId).Entries[2].Id == activeEntryId && model.Title == "Fixture — Музыка", "Active item was not restored by stable identity.");
         Require(Math.Abs(model.SeekPosition - 1) < 0.01 && !model.IsPlaying && model.Volume == 23 && model.Muted, "Session position/gain/mute failed or restoration autoplayed.");
         Require(model.Waveform is not null, "Cached waveform was not restored.");
+        Require(model.Queue.Select(q => q.Id).SequenceEqual(queuedIds) && model.Repeat == RepeatMode.All && model.Shuffle, "Queue/repeat/shuffle state was not restored.");
+        Require(model.WindowSettings.Processing is { ReplayGain: ReplayGainMode.Album, CrossfadeSeconds: 3 }, "Audio processing settings were not restored.");
         window.UpdateLayout();
         await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ContextIdle);
         Require(_bindingErrors.Count == 0, "WPF binding warnings/errors: " + string.Join("; ", _bindingErrors.Take(8)));
@@ -104,6 +111,7 @@ public sealed class UiSmokeValidation : TraceListener
             SeekPositionSeconds = model.SeekPosition, SearchLeavesSourceUnchanged = true, BindingErrors = _bindingErrors.Count,
             UnicodeMetadata = true, MetadataHandleReleased = true, DarkTheme = true,
             PersistentTabs = 2, StableOrderAndIds = true, EditingOtherTabKeepsSource = true, SessionReopenedWithoutAutoplay = true, SavedVolume = model.Volume, SavedMuted = model.Muted, RealWaveform = true, WaveformBuckets = model.Waveform!.Minimum.Length,
+            PersistentQueueItems = model.Queue.Count, QueueRepeatShuffleRestore = true, ProcessingSettingsRestore = true,
             Screenshot = "stage-c-window.png", WasapiOutput = "not-run", Listening = "not-run"
         };
     }

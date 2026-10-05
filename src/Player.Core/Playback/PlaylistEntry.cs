@@ -1,7 +1,8 @@
 namespace Player.Core.Playback;
 
 public sealed record MediaTrack(Guid Id, string Path, string Title, string? Artist = null, string? Album = null,
-    TimeSpan? DurationHint = null, string? FormatHint = null, bool Available = true);
+    TimeSpan? DurationHint = null, string? FormatHint = null, bool Available = true, Player.Core.Media.TrackSegment? Segment = null, string? CueDocument = null, int? CueNumber = null,
+    ReplayGainTags? ReplayGain = null);
 public sealed record PlaylistEntry(Guid Id, MediaTrack Track, bool Enabled = true);
 
 public static class PlaylistSearch

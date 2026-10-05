@@ -12,6 +12,7 @@
     <PackageReference Include="ManagedBass.Wasapi" />
     <Compile Include="../../src/Player.App/Services/Audio/NativeLibraryBootstrap.cs" Link="Audio/NativeLibraryBootstrap.cs" />
     <Compile Include="../../src/Player.App/Services/Audio/BassSmokeSession.cs" Link="Audio/BassSmokeSession.cs" />
+    <Compile Include="../../src/Player.App/Services/Audio/BassMixerGraph.cs" Link="Audio/BassMixerGraph.cs" />
     <Compile Include="../../src/Player.App/Services/Audio/BassAudioBackend.cs" Link="Audio/BassAudioBackend.cs" />
     <Compile Include="../../src/Player.App/Services/Audio/NativeDecoderPlugins.cs" Link="Audio/NativeDecoderPlugins.cs" />
     <Compile Include="../../src/Player.App/Services/Audio/LocalFileAccess.cs" Link="Audio/LocalFileAccess.cs" />

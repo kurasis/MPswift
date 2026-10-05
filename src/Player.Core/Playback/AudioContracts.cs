@@ -11,12 +11,12 @@ public sealed class AudioBackendException(AudioErrorCategory category, string de
 }
 
 public sealed record AudioFormatInfo(int SampleRate, int Channels, string Codec, int? BitDepth = null);
-public sealed record AudioRequest(Guid EntryId, string Path);
+public sealed record AudioRequest(Guid EntryId, string Path, Player.Core.Media.TrackSegment? Segment = null, ReplayGainTags? ReplayGain = null);
 public sealed record AudioSourceInfo(TimeSpan? Duration, AudioFormatInfo Format, bool CanSeek);
-public sealed record BackendPosition(TimeSpan Position, bool Ended, AudioFormatInfo? OutputFormat = null);
+public sealed record BackendPosition(TimeSpan Position, bool Ended, AudioFormatInfo? OutputFormat = null, AudioRequest? Transition = null, AudioSourceInfo? TransitionInfo = null);
 public sealed record PlaybackSnapshot(long Generation, long Revision, PlaybackState State, Guid? EntryId,
     TimeSpan Position, TimeSpan? Duration, AudioFormatInfo? SourceFormat, AudioFormatInfo? OutputFormat,
-    bool CanSeek, double Volume, bool Muted, AudioError? Error = null, bool Ended = false)
+    bool CanSeek, double Volume, bool Muted, AudioError? Error = null, bool Ended = false, bool Transitioned = false)
 {
     public static PlaybackSnapshot Empty { get; } = new(0, 0, PlaybackState.Empty, null, TimeSpan.Zero, null, null, null, false, 0.5, false);
 }

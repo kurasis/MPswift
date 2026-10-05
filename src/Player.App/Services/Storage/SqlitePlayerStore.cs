@@ -60,7 +60,7 @@ public sealed class SqlitePlayerStore : IPlayerStore
             command.CommandText = "SELECT Json FROM Session WHERE Id=1";
             if (command.ExecuteScalar() is string json)
             {
-                if (json.Length > 1048576) throw new InvalidDataException("Oversized saved session.");
+                if (json.Length > 16 * 1024 * 1024) throw new InvalidDataException("Oversized saved session.");
                 session = JsonSerializer.Deserialize<SessionState>(json) ?? throw new InvalidDataException("Invalid saved session.");
             }
         }

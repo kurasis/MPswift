@@ -46,5 +46,6 @@ jobs:
             artifacts/test-results/*.trx
             artifacts/smoke/*.json
             artifacts/smoke/*.png
+            artifacts/smoke/stage-d-mixer/*.f32
           if-no-files-found: warn
           retention-days: 14

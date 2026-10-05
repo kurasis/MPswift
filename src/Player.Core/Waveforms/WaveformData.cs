@@ -4,6 +4,23 @@ public sealed record WaveformData(int SampleRate, int Channels, long FramesPerBu
 {
     public const int MaximumBuckets = 300000;
     public double DurationSeconds => (double)TotalFrames / SampleRate;
+    public WaveformData Slice(Player.Core.Media.TrackSegment segment)
+    {
+        Validate();
+        var start = Math.Clamp((long)Math.Round(segment.Start.TotalSeconds * SampleRate), 0, TotalFrames);
+        var end = Math.Clamp((long)Math.Round((segment.End?.TotalSeconds ?? DurationSeconds) * SampleRate), start, TotalFrames);
+        if (end <= start) throw new InvalidDataException("Empty waveform segment.");
+        var frames = end - start; var count = checked((int)((frames - 1) / FramesPerBucket + 1));
+        var min = new float[count]; var max = new float[count];
+        for (var i = 0; i < count; i++)
+        {
+            var first = (start + i * FramesPerBucket) / FramesPerBucket;
+            var last = Math.Min((end - 1) / FramesPerBucket, (start + (i + 1) * FramesPerBucket - 1) / FramesPerBucket);
+            min[i] = float.PositiveInfinity; max[i] = float.NegativeInfinity;
+            for (var j = first; j <= last; j++) { min[i] = Math.Min(min[i], Minimum[j]); max[i] = Math.Max(max[i], Maximum[j]); }
+        }
+        return new(SampleRate, Channels, FramesPerBucket, frames, min, max);
+    }
     public void Validate()
     {
         if (SampleRate is < 1000 or > 768000 || Channels is < 1 or > 64 || FramesPerBucket < 1 || TotalFrames < 1 ||

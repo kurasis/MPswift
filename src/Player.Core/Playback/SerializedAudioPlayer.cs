@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 namespace Player.Core.Playback;
 
 /// <summary>Bounded command queue, dedicated native-context thread, latest-load/seek wins.</summary>
-public sealed class SerializedAudioPlayer : IAudioPlayer
+public sealed class SerializedAudioPlayer : IAudioPlayer, IAdvancedAudioPlayer
 {
     private readonly BlockingCollection<Action> _commands = new(128);
     private readonly object _gate = new();
@@ -23,6 +23,8 @@ public sealed class SerializedAudioPlayer : IAudioPlayer
     private PendingLoad? _pendingLoad;
     private bool _loadQueued;
     private int _overflow;
+    private AudioProcessingSettings _processing = new();
+    private AudioOutputSettings _outputSettings = new();
 
     public SerializedAudioPlayer(Func<IAudioBackend> factory)
     {
@@ -205,7 +207,8 @@ public sealed class SerializedAudioPlayer : IAudioPlayer
         _backend.CloseSource();
         _loadedEntry = null;
         _info = null;
-        var info = _backend.Open(request.Path);
+        if (_backend is IAdvancedAudioBackend configured) { configured.SetProcessing(_processing); configured.SetOutput(_outputSettings); }
+        var info = _backend is IAdvancedAudioBackend advanced ? advanced.Open(request) : _backend.Open(request.Path);
         if (!IsCurrent(generation) || cancellationToken.IsCancellationRequested)
         {
             _backend.CloseSource();
@@ -220,6 +223,38 @@ public sealed class SerializedAudioPlayer : IAudioPlayer
             Duration = info.Duration, SourceFormat = info.Format, CanSeek = info.CanSeek && info.Duration > TimeSpan.Zero,
             Position = TimeSpan.Zero, Error = null, Ended = false });
         return true;
+    }
+
+    public Task<bool> SetProcessingAsync(AudioProcessingSettings settings)
+    {
+        settings = settings.Validate();
+        return Queue(() => { _processing = settings; if (_backend is IAdvancedAudioBackend advanced) advanced.SetProcessing(settings); return true; });
+    }
+    public Task<bool> SetOutputAsync(AudioOutputSettings settings) => Queue(() =>
+    {
+        _outputSettings = settings;
+        if (_backend is IAdvancedAudioBackend advanced) advanced.SetOutput(settings);
+        if (Snapshot.State == PlaybackState.Playing) Publish(Snapshot with { State = PlaybackState.Paused });
+        return true;
+    });
+    public Task<AudioDevice[]> GetDevicesAsync()
+    {
+        var result = new TaskCompletionSource<AudioDevice[]>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var queued = Queue(() => { try { _backend ??= _factory(); result.TrySetResult(_backend is IAdvancedAudioBackend advanced ? advanced.GetDevices() : []); } catch (Exception e) { result.TrySetException(e); } return true; });
+        return CompleteDevicesAsync(queued, result);
+    }
+    private static async Task<AudioDevice[]> CompleteDevicesAsync(Task<bool> queued, TaskCompletionSource<AudioDevice[]> result)
+    { if (!await queued.ConfigureAwait(false)) return []; return await result.Task.ConfigureAwait(false); }
+    public Task<bool> PrepareNextAsync(AudioRequest? request, bool repeatOne = false)
+    {
+        var generation = CurrentGeneration();
+        return Execute(generation, () => { if (_backend is not IAdvancedAudioBackend advanced) return false; advanced.PrepareNext(request, repeatOne); return true; });
+    }
+    private void AdoptTransition(BackendPosition position)
+    {
+        if (position.Transition is not { } request || position.TransitionInfo is not { } info) return;
+        lock (_gate) { _request = request; _loadedEntry = request.EntryId; _info = info; _loadedGeneration = ++_generation; }
+        Publish(Snapshot with { Generation = _loadedGeneration, Transitioned = true, EntryId = request.EntryId, Duration = info.Duration, CanSeek = info.CanSeek, SourceFormat = info.Format, Position = position.Position, Ended = false });
     }
 
     private void Start(long generation)
@@ -270,7 +305,9 @@ public sealed class SerializedAudioPlayer : IAudioPlayer
                 try
                 {
                     var position = _backend.ReadPosition();
-                    Publish(Snapshot with { Generation = generation, Position = position.Position, OutputFormat = position.OutputFormat,
+                    AdoptTransition(position);
+                    generation = _loadedGeneration;
+                    Publish(Snapshot with { Generation = generation, Transitioned = false, Position = position.Position, OutputFormat = position.OutputFormat,
                         State = position.Ended ? PlaybackState.Stopped : PlaybackState.Playing, Ended = position.Ended });
                 }
                 catch (Exception error) { Fail(error, generation); }

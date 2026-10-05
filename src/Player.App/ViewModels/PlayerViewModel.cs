@@ -47,6 +47,10 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     private long _savedLibraryVersion;
     private DateTime _lastSessionSave = DateTime.UtcNow;
     private PlaybackState _previousState;
+    public ObservableCollection<QueueItem> Queue { get; } = [];
+    public RepeatMode[] RepeatModes { get; } = Enum.GetValues<RepeatMode>();
+    [ObservableProperty] private RepeatMode _repeat;
+    [ObservableProperty] private bool _shuffle;
     public ObservableCollection<PlaylistTabViewModel> Playlists { get; } = [];
     public ObservableCollection<PlaylistRowViewModel> Entries => SelectedPlaylist.Entries;
     public System.ComponentModel.ICollectionView VisibleEntries { get; private set; } = null!;
@@ -93,6 +97,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         _store = store; _settings = settings; _waveforms = waveforms;
         var tab = new PlaylistTabViewModel(Guid.NewGuid(), "Default"); Playlists.Add(tab); SelectedPlaylist = tab;
         _player.SnapshotChanged += OnSnapshot;
+        _coordinator.OrderChanged += OnOrderChanged;
         ApplySnapshot(player.Snapshot);
     }
     public async Task InitializeAsync()
@@ -110,6 +115,9 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         SelectedPlaylist = Playlists.FirstOrDefault(p => p.Id == state.Session.SelectedPlaylistId) ?? Playlists[0];
         _sourcePlaylistId = state.Session.SourcePlaylistId;
         SyncSource();
+        if (state.Session.Order is { } order) _coordinator.RestoreOrder(order);
+        Repeat = _coordinator.Repeat; Shuffle = _coordinator.Shuffle; RefreshQueue();
+        if (_player is IAdvancedAudioPlayer advanced) { await advanced.SetProcessingAsync(WindowSettings.Processing ?? new()); await advanced.SetOutputAsync(WindowSettings.Output ?? new()); }
         await _coordinator.SetVolumeAsync(WindowSettings.Volume / 100, WindowSettings.Muted);
         if (state.Session.ActiveEntry is { } active)
             await _coordinator.RestoreAsync(active, TimeSpan.FromTicks(state.Session.PositionTicks));
@@ -141,17 +149,35 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     private void ChooseSource()
     { _sourcePlaylistId = SelectedPlaylist.Id; SyncSource(); }
 
+    partial void OnRepeatChanged(RepeatMode value) { _coordinator.Repeat = value; ScheduleSave(false); }
+    partial void OnShuffleChanged(bool value) { _coordinator.Shuffle = value; ScheduleSave(false); }
+    public void Enqueue(IEnumerable<PlaylistRowViewModel> rows, bool next)
+    { _coordinator.Enqueue(rows.Select(r => r.Entry), next); RefreshQueue(); ScheduleSave(false); }
+    public void RemoveQueued(Guid id) => _coordinator.RemoveQueued(id);
+    public void MoveQueued(Guid id, int delta) => _coordinator.MoveQueued(id, delta);
+    [RelayCommand] private void ClearQueue() => _coordinator.ClearQueue();
+    [RelayCommand] private void ClearHistory() => _coordinator.ClearHistory();
+    private void OnOrderChanged()
+    { if (!_closing && !_dispatcher.HasShutdownStarted) _dispatcher.BeginInvoke(() => { RefreshQueue(); ScheduleSave(false); }, DispatcherPriority.Background); }
+    private void RefreshQueue() { Queue.Clear(); foreach (var item in _coordinator.Queue) Queue.Add(item); }
+    public Task<AudioDevice[]> GetDevicesAsync() => _player is IAdvancedAudioPlayer advanced ? advanced.GetDevicesAsync() : Task.FromResult(Array.Empty<AudioDevice>());
+    public async Task ConfigureAudioAsync(AudioProcessingSettings processing, AudioOutputSettings output)
+    {
+        processing = processing.Validate();
+        if (_player is IAdvancedAudioPlayer advanced) { await advanced.SetProcessingAsync(processing); await advanced.SetOutputAsync(output); }
+        WindowSettings = WindowSettings with { Processing = processing, Output = output }; ScheduleSave(false);
+    }
     [RelayCommand(CanExecute = nameof(CanImport))] private Task AddFilesAsync() => AddPathsAsync(_dialogs.PickFiles());
     [RelayCommand(CanExecute = nameof(CanImport))] private Task AddFolderAsync()
     { var folder = _dialogs.PickFolder(); return folder is null ? Task.CompletedTask : AddPathsAsync([folder]); }
     private bool CanImport() => !IsImporting && !_closing && _initialized;
     [RelayCommand] private void CancelImport() => _importCancellation?.Cancel();
-    public Task AddPathsAsync(IEnumerable<string> paths)
+    public Task AddPathsAsync(IEnumerable<string> paths, System.Text.Encoding? fallbackEncoding = null)
     {
         if (!CanImport()) return Task.CompletedTask;
-        _importTask = ImportAsync(paths.Take(10001).ToArray(), SelectedPlaylist); return _importTask;
+        _importTask = ImportAsync(paths.Take(10001).ToArray(), SelectedPlaylist, fallbackEncoding); return _importTask;
     }
-    private async Task ImportAsync(string[] paths, PlaylistTabViewModel target)
+    private async Task ImportAsync(string[] paths, PlaylistTabViewModel target, System.Text.Encoding? fallbackEncoding)
     {
         if (paths.Length == 0) return;
         IsImporting = true; _importCancellation = new CancellationTokenSource();
@@ -163,7 +189,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         });
         try
         {
-            var result = await _importer.ImportAsync(paths, progress, _importCancellation.Token, 10000 - _knownRows.Count);
+            var result = await _importer.ImportAsync(paths, progress, _importCancellation.Token, 10000 - _knownRows.Count, fallbackEncoding);
             Message = string.Format(CultureInfo.CurrentCulture, Strings.Get("Imported"), result.Added, result.Errors);
             if (result.LimitReached) Message += " " + Strings.Get("ImportLimit");
             Details = string.Join(Environment.NewLine, result.Details);
@@ -310,7 +336,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         try
         {
             var data = await _waveforms.AnalyzeAsync(path, progress, token, refresh);
-            if (!_closing && generation == _waveGeneration) { Waveform = data; WaveformStatus = ""; }
+            if (!_closing && generation == _waveGeneration) { Waveform = _coordinator.ActiveEntry?.Track.Segment is { } segment ? data.Slice(segment) : data; WaveformStatus = ""; }
         }
         catch (OperationCanceledException) { }
         catch (Exception error) { if (!_closing && generation == _waveGeneration) { WaveformStatus = Strings.Get("WaveformUnavailable"); Details = error.Message; } }
@@ -328,7 +354,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     private void UpdatePlaylistStatus()
     { if (VisibleEntries is not null) PlaylistStatus = string.Format(CultureInfo.CurrentCulture, Strings.Get("PlaylistCount"), VisibleEntries.Cast<object>().Count(), Entries.Count); }
     private LibraryState Capture() => new(Playlists.Select(p => p.Capture()).ToArray(),
-        new(SelectedPlaylist.Id, _sourcePlaylistId, _coordinator.ActiveEntry, _player.Snapshot.Position.Ticks));
+        new(SelectedPlaylist.Id, _sourcePlaylistId, _coordinator.ActiveEntry, _player.Snapshot.Position.Ticks, _coordinator.CaptureOrder()));
     private void ScheduleSave(bool libraryChanged)
     {
         if (!_initialized || _closing) return;
@@ -367,11 +393,11 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     private async ValueTask CloseAsync(bool save)
     {
         if (_closing) return;
-        _closing = true; _player.SnapshotChanged -= OnSnapshot;
+        _closing = true; _player.SnapshotChanged -= OnSnapshot; _coordinator.OrderChanged -= OnOrderChanged;
         _importCancellation?.Cancel(); _waveCancellation?.Cancel(); _saveCancellation?.Cancel();
         await _importTask; await _waveTask; await _saveTask;
         try { if (save) await SaveNowAsync(); }
-        catch { _closing = false; _player.SnapshotChanged += OnSnapshot; throw; }
+        catch { _closing = false; _player.SnapshotChanged += OnSnapshot; _coordinator.OrderChanged += OnOrderChanged; throw; }
         foreach (var row in _knownRows.Values) row.EligibilityChanged -= RowChanged;
         await _waveforms.DisposeAsync(); await _coordinator.DisposeAsync(); await _store.DisposeAsync();
         _waveCancellation?.Dispose(); _saveCancellation?.Dispose();

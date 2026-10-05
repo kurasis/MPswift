@@ -8,7 +8,7 @@ using Player.Core.Playback;
 var json = new JsonSerializerOptions { WriteIndented = true };
 void Report(object result) => Console.WriteLine(JsonSerializer.Serialize(result, json));
 
-if (args.Length == 0 || args[0] is not ("--generate-fixture" or "--probe" or "--decode" or "--play" or "--formats" or "--engine" or "--engine-play" or "--waveform") ||
+if (args.Length == 0 || args[0] is not ("--generate-fixture" or "--probe" or "--decode" or "--play" or "--formats" or "--engine" or "--engine-play" or "--waveform" or "--mixer") ||
     args.Length != (args[0] == "--probe" ? 1 : 2))
 {
     Console.Error.WriteLine("Usage: Player.AudioSmoke --generate-fixture <new.wav> | --probe | --decode <local-file> | --play <local-file> | --formats <fixture-directory> | --engine <local-file> | --engine-play <local-file>");
@@ -33,6 +33,7 @@ try
         Report(new { Status = "native-load-passed", Versions = versions, Environment = RuntimeInformation.OSDescription });
         return 0;
     }
+    if (args[0] == "--mixer") { Report(MixerValidation.Run(args[1])); return 0; }
     if (args[0] == "--waveform") { Report(await WaveformValidation.RunAsync(args[1])); return 0; }
     if (args[0] == "--formats")
     {

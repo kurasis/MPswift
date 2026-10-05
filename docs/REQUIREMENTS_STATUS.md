@@ -18,13 +18,13 @@ The full specification remains the target. Unit tests or cross-builds do not sat
 | AC-011 | P0 | Corrupt/unsupported/missing file | B/C | Error paths implemented; core unit tested | Typed visible decoder/file/dependency/output errors; explicit bad-file no autoplay, bounded skip |
 | AC-012 | P0 | Session restore | B/C | Session restore implemented and no-Play domain tested | Source/selected tab, detached active entry, position/gain/mute; actual WPF reopen passed without autoplay |
 | AC-013 | P1 | Large collection | D–G | Not implemented / not run | [Roadmap](ROADMAP.md) |
-| AC-014 | P1 | Queue/repeat/shuffle | D–G | Not implemented / not run | [Roadmap](ROADMAP.md) |
+| AC-014 | P1 | Queue/repeat/shuffle | D–G | Implemented/domain and SQLite tested; Windows pending | Snapshot queue precedence, repeat/manual escape, bag/history restoration |
 | AC-015 | P1 | Remove currently playing entry | D–G | Current-source retention implemented across tabs/deletion | Core removal test; other-tab editing retains coordinator source; actual WPF other-tab/source check passed |
-| AC-016 | P1 | CUE single/multi-file | D–G | Partial domain unit tests; native/UI acceptance not run | [Path tests](../tests/Player.Core.Tests/LocalMediaPathTests.cs), [segment tests](../tests/Player.Core.Tests/TrackSegmentTests.cs) |
-| AC-017 | P1 | Gapless lossless fixture | D–G | Not implemented / not run | [Roadmap](ROADMAP.md) |
+| AC-016 | P1 | CUE single/multi-file | D–G | Parser/import/logical native bounds implemented; Windows pending | Tokenizer, Unicode/explicit legacy, per-source boundaries and cache clipping |
+| AC-017 | P1 | Gapless lossless fixture | D–G | Persistent/scheduled graph implemented; capture pending | Production callback PCM test added; endpoint capture remains open |
 | AC-018 | P1 | Lossy gapless claims | D–G | Not implemented / not run | [Roadmap](ROADMAP.md) |
-| AC-019 | P1 | Crossfade | D–G | Not implemented / not run | [Roadmap](ROADMAP.md) |
-| AC-020 | P1 | EQ and ReplayGain | D–G | Not implemented / not run | [Roadmap](ROADMAP.md) |
+| AC-019 | P1 | Crossfade | D–G | Scheduled equal-power overlap implemented; native check pending | Off default; short/CUE/repeat/seek policy |
+| AC-020 | P1 | EQ and ReplayGain | D–G | PCM measured domain checks pass; native/device acceptance open | EQ/bypass/Nyquist/headroom/final saturation; tag-only gain |
 | AC-021 | P1 | Device changes | D–G | Not implemented / not run | [Roadmap](ROADMAP.md) |
 | AC-022 | P1 | Exclusive mode unavailable | D–G | Not implemented / not run | [Roadmap](ROADMAP.md) |
 | AC-023 | P1 | Metadata/artwork failure | D–G | Read-only metadata/fallback implemented | Filename fallback and bounded technical errors; artwork deferred Stage E |

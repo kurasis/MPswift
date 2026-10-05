@@ -4,7 +4,7 @@ Updated: **2026-10-05**.
 
 ## Current scope
 
-**Stage C / M2 implementation delivered; actual Windows persistence/waveform/WPF checks passed.** Persistent playlists/settings/session and actual independent waveform analysis are implemented. The full P0 + P1 specification remains the target; real-device, Windows 11 clean-machine/offline and HE-AAC acceptance are still open and this is not version 1.0. Owner instructions remain Russian chat, English repository content and automatic development push/merge.
+**Stage D / M3 code implemented; expanded Windows integration checks pending.** Persistent playlists/settings/session and actual independent waveform analysis are implemented. The full P0 + P1 specification remains the target; real-device, Windows 11 clean-machine/offline and HE-AAC acceptance are still open and this is not version 1.0. Owner instructions remain Russian chat, English repository content and automatic development push/merge.
 
 ## Implemented through Stage C
 
@@ -34,6 +34,15 @@ The [Windows job in run 37359855055](https://github.com/kurasis/MPswift/actions/
 - Evidence: ignored `artifacts/test-results/`, `artifacts/smoke/`; exact observed CI results retained under `docs/evidence/` after verification.
 - The cloud `start_skill` draft was saved with Stage C checks and Stage D continuation. The existing complete `install_script` is retained; publishing reusable configuration stays in environment settings.
 
+## Stage D implementation
+
+- Snapshot queue with independent occurrence IDs, play-next batch ordering, reorder/remove/clear window; playlist resumption cursor is independent. Repeat Off/All/One, injected-random shuffle bag, bounded actual-start history and exact queue/bag/history session JSON restoration.
+- Bounded tokenizer-based Unicode/BOM CUE import; explicit legacy encoding action, per-logical-track identity and INDEX 01 bounds with INDEX 00 assigned to the preceding segment. Decoder validates source bounds; source waveform cache is clipped to logical segments.
+- Persistent native mixer and endpoint, one scheduled next decoder, sample-frame scheduled lossless/CUE transitions, equal-power crossfade (off by default, short-track clamp, CUE/repeat-one bypass), incoming-relative timeline and seek cancellation.
+- Endpoint IDs/friendly names, default/shared and explicitly requested exclusive formats. Changes pause; no silent shared fallback. Endpoint/default changes preserve context for explicit resume.
+- 10-band float EQ, preamp, local presets/bypass, 20 ms parameter crossfade, tag-only ReplayGain, conservative positive-EQ headroom and final saturation protection; waveform remains independent.
+- Local locked Release cross-build: 73 tests pass, zero warnings/errors. Expanded real Windows mixer captures and WPF queue/settings reopen checks are committed for execution; endpoint/system gapless, unplug/sleep/exclusive/listening remain unrun and no lossy gapless claim is made.
+
 ## Next work
 
-Stage D / M3 adds explicit queue/repeat/shuffle/history, persistent mixer transitions, measured gapless, CUE segments, devices/exclusive/recovery, EQ/ReplayGain/crossfade/clipping. Keep source preservation and evidence boundaries truthful.
+Continue Stage E / M4 library/file workflows after collecting Stage D CI results. The owner explicitly authorized continuing to the following stage. Previous Stage D roadmap scope adds explicit queue/repeat/shuffle/history, persistent mixer transitions, measured gapless, CUE segments, devices/exclusive/recovery, EQ/ReplayGain/crossfade/clipping. Keep source preservation and evidence boundaries truthful.
