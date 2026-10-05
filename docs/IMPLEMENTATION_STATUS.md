@@ -4,7 +4,7 @@ Updated: **2026-10-05**.
 
 ## Current scope
 
-**Stage C / M2 implementation in progress; Linux validation passed and Windows integration pending.** Persistent playlists/settings/session and actual independent waveform analysis are implemented. The full P0 + P1 specification remains the target; real-device, Windows 11 clean-machine/offline and HE-AAC acceptance are still open and this is not version 1.0. Owner instructions remain Russian chat, English repository content and automatic development push/merge.
+**Stage C / M2 implementation delivered; actual Windows persistence/waveform/WPF checks passed.** Persistent playlists/settings/session and actual independent waveform analysis are implemented. The full P0 + P1 specification remains the target; real-device, Windows 11 clean-machine/offline and HE-AAC acceptance are still open and this is not version 1.0. Owner instructions remain Russian chat, English repository content and automatic development push/merge.
 
 ## Implemented through Stage C
 
@@ -22,7 +22,7 @@ Updated: **2026-10-05**.
 
 Linux Release cross-build succeeds with **0 warnings / 0 errors; 59 tests passed / 0 failed / 0 skipped**. New actual SQLite/settings/cache/domain tests cover persisted duplicate identity/order, SQL parameters, transactional rollback, session-only writes, live-WAL backup, explicit recovery preserving corrupt originals, incompatible/corrupt database preservation, second-writer rejection, no-autoplay restore and bounded opposite-phase waveform accumulation.
 
-New Windows checks are pending: native independent waveform/cache/cancellation, actual two-hour PCM decode, and real WPF tabs/edit/seek/save/reopen without autoplay. Previous Stage B Windows evidence remains in [test results](TEST_RESULTS.md). Native output/listening/capture, HE-AAC, gapless/device recovery and clean Windows 11/offline acceptance are not inferred from these tests.
+The [Windows job in run 37359855055](https://github.com/kurasis/MPswift/actions/runs/37359855055/job/111931430685) passed at source `a38e81eefd78d991a4c96dd4adccc5f6e723801b`: 59 tests, all 14 native codec fixtures, independent waveform/cache/cancellation, actual two-hour decode and WPF tabs/edit/save/reopen/restore without autoplay, with 0 binding warnings. [Exact evidence](evidence/stage-c-windows-persistence-waveform.json) and the artifact screenshot were retrieved and inspected. The matching remote Linux job was still queued at capture; this exact source passed local Linux build/tests/publish, and both OS jobs passed the preceding [run 37358722369](https://github.com/kurasis/MPswift/actions/runs/37358722369). Previous Stage B Windows evidence remains in [test results](TEST_RESULTS.md). Native output/listening/capture, HE-AAC, gapless/device recovery and clean Windows 11/offline acceptance are not inferred from these tests.
 
 ## Resume and commands
 
@@ -32,8 +32,8 @@ New Windows checks are pending: native independent waveform/cache/cancellation, 
 - Windows: `scripts/Smoke.ps1` exercises real formats/engine/WPF without output. `scripts/Smoke.ps1 -Play` adds actual production shared-device API checks, separate from listening.
 - `scripts/Generate-FormatFixtures.py <new-directory>`: development-only FFmpeg encoder regeneration. No FFmpeg runtime dependency in the app; container-version/serial differences are recorded by fresh manifest hashes.
 - Evidence: ignored `artifacts/test-results/`, `artifacts/smoke/`; exact observed CI results retained under `docs/evidence/` after verification.
-- The cloud startup draft will be refreshed for Stage C tooling and Stage D continuation after verification. The existing complete `install_script` is retained; publishing reusable configuration stays in environment settings.
+- The cloud `start_skill` draft was saved with Stage C checks and Stage D continuation. The existing complete `install_script` is retained; publishing reusable configuration stays in environment settings.
 
 ## Next work
 
-Complete Stage C Windows integration evidence, retaining hardware/release acceptance as open gates. Then Stage D / M3 adds explicit queue/repeat/shuffle/history, persistent mixer transitions, measured gapless, CUE segments, devices/exclusive/recovery, EQ/ReplayGain/crossfade/clipping. Keep source preservation and evidence boundaries truthful.
+Stage D / M3 adds explicit queue/repeat/shuffle/history, persistent mixer transitions, measured gapless, CUE segments, devices/exclusive/recovery, EQ/ReplayGain/crossfade/clipping. Keep source preservation and evidence boundaries truthful.

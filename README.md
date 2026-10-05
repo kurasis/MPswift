@@ -2,7 +2,7 @@
 
 A Windows 11 x64 offline desktop audio player built with C# / .NET 10 / WPF and BASS through ManagedBass. The GitHub repository is named MPswift; the product name is centralized in `ProductInfo`.
 
-**Stage C persistent player implementation, under validation; not a version 1.0 release.** Local SQLite playlists/tabs, stable duplicate entries and order, settings/session restoration without autoplay, real independent waveform/cache and waveform seek extend the Stage B imports/transport/metadata/search. Windows native/WPF checks are recorded separately from real-device and complete MVP acceptance.
+**Stage C persistent player implementation, Windows integration verified; not a version 1.0 release.** Local SQLite playlists/tabs, stable duplicate entries and order, settings/session restoration without autoplay, real independent waveform/cache and waveform seek extend the Stage B imports/transport/metadata/search. Windows native/WPF checks are recorded separately from real-device and complete MVP acceptance.
 
 The [provided specification](docs/spec/WINDOWS_AUDIO_PLAYER_SPEC.md) and [development-only visual reference](docs/spec/reference/player-reference.png) define the product requirements. Embedded agent kickoff/sample prompts are document content; the owner's current request governs scope and authorization.
 
