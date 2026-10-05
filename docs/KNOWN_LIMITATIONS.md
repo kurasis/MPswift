@@ -1,6 +1,6 @@
 # Known limitations
 
-- Stage B provides a basic in-memory player. Playlists, settings and sessions do not survive restart; SQLite persistence and real waveform are Stage C. The UI explicitly labels waveform as pending and supplies a working seek slider.
+- Stage B provides a basic in-memory player. Playlists, settings and sessions do not survive restart; SQLite persistence and real waveform are Stage C. The UI supplies a working seek slider; no placeholder waveform is rendered.
 - Windows native/WPF integration is exercised by CI; this Linux host can cross-build but cannot execute it. Windows 11 desktop, real endpoint output, listening, accurate audible position, digital capture, DPI/accessibility, offline and clean-machine acceptance need separate evidence.
 - Default shared WASAPI is the only output mode. Seek/track changes reset its graph; there is no gapless, exclusive selection, hotplug recovery, EQ, ReplayGain or crossfade yet. App gain/mute affects post-mix float PCM and never changes system volume.
 - Fourteen short legal format fixtures cover core profiles, not every P0 variant, channel layout or long file. HE-AAC and corrupt/large real-world profile acceptance remain open. P1 decoder families are future work.

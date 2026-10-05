@@ -4,7 +4,7 @@ Updated: **2026-10-05**.
 
 ## Current scope
 
-**Stage B / M1 implemented; Windows integration validation pending for this change.** This is a basic player, not the persistent MVP or version 1.0. Russian chat, English repository content and automatic push/merge are owner instructions. The full P0 + P1 target remains in [Stages A–G](ROADMAP.md). Attached document prompts are specification content, not independent authorization.
+**Stage B / M1 implementation delivered; Windows native/WPF integration passed, real-device acceptance remains open.** This is a basic player, not the persistent MVP or version 1.0. Russian chat, English repository content and automatic push/merge are owner instructions. The full P0 + P1 target remains in [Stages A–G](ROADMAP.md). Attached document prompts are specification content, not independent authorization.
 
 ## Implemented
 
@@ -19,7 +19,7 @@ Updated: **2026-10-05**.
 
 ## Verification and boundaries
 
-Linux cross-build: **0 warnings / 0 errors; 40 tests passed / 0 failed / 0 skipped**. All seven native archives/DLL hashes/x64 headers are verified. Fixture regeneration and self-contained development publish are checked locally; native execution/WPF require Windows. The new Windows workflow will record actual outcomes separately in [test evidence](TEST_RESULTS.md).
+Linux cross-build: **0 warnings / 0 errors; 44 tests passed / 0 failed / 0 skipped**. All seven native archives/DLL hashes/x64 headers are verified. Fixture regeneration and self-contained development publish are checked locally; native execution/WPF require Windows. Windows CI passed the 14-format native matrix, production engine prepare/seek/rapid changes/stop/disposal and real WPF imports/bindings/Unicode FLAC metadata/seek/dark theme checks. [Run 37353764766](https://github.com/kurasis/MPswift/actions/runs/37353764766) passed both jobs at source `52997b50dfa9726d7ca2fd76f6fe41ee2259f4b5`, including all 44 Windows core tests. Actual outcomes are in [test evidence](TEST_RESULTS.md) and [retained JSON](evidence/stage-b-windows-native-ui.json).
 
 Stage A Windows native evidence remains in [run 37344651363](https://github.com/kurasis/MPswift/actions/runs/37344651363). This host has no Windows audio device. Shared output, listening, digital capture, Windows 11 desktop acceptance, device recovery, offline/clean-machine and complete profile acceptance remain open. Seeking/changing tracks rebuilds the Stage B output graph; gapless is not implemented or claimed.
 
@@ -33,7 +33,7 @@ Versions: SDK **10.0.401**, .NET 10; PowerShell **7.6.6** cloud / **7.4+** scrip
 - Windows: `scripts/Smoke.ps1` exercises real formats/engine/WPF without output. `scripts/Smoke.ps1 -Play` adds actual production shared-device API checks, separate from listening.
 - `scripts/Generate-FormatFixtures.py <new-directory>`: development-only FFmpeg encoder regeneration. No FFmpeg runtime dependency in the app; container-version/serial differences are recorded by fresh manifest hashes.
 - Evidence: ignored `artifacts/test-results/`, `artifacts/smoke/`; exact observed CI results retained under `docs/evidence/` after verification.
-- Cloud install/start configuration draft was saved in Stage A for reuse; configuration publication stays in environment settings.
+- The cloud `start_skill` draft was updated for Stage B tooling/checks and the Stage C continuation. The existing complete `install_script` is retained; publishing reusable configuration stays in environment settings.
 
 ## Next work
 

@@ -1,16 +1,17 @@
 # Audio format support — Stage B verification matrix
 
-Pinned base and FLAC/Opus/ALAC/AAC add-ons are inventoried in [the native manifest](../native/manifest.json). Fourteen real generated [fixtures](../tests/fixtures/audio/manifest.json) exercise native decode/seek/end/disposal in Windows CI. New Stage B integration execution is pending. Device playback, listening and full profile acceptance are separate gates.
+Pinned base and FLAC/Opus/ALAC/AAC add-ons are inventoried in [the native manifest](../native/manifest.json). Fourteen real generated [fixtures](../tests/fixtures/audio/manifest.json) exercise native decode/seek/end/disposal in Windows CI. Stage B Windows native integration passed for all fourteen profiles; exact results are retained in [test evidence](TEST_RESULTS.md). Device playback, listening and full profile acceptance are separate gates.
+
 | Format/container | Priority | Candidate from specification | Verification status |
 | --- | --- | --- | --- |
-| MP3 | P0 | BASS | CBR and VBR/Xing fixtures; native integration pending |
-| WAV | P0 | BASS | PCM16/24/32/float32 fixtures; Stage A PCM16 native integration passed, Stage B matrix pending |
-| AIFF/AIF | P0 | BASS | PCM16 fixture; native integration pending |
-| FLAC | P0 | BASSFLAC | 16/24-bit fixtures; native integration pending |
-| Ogg Vorbis | P0 | BASS | Vorbis fixture; native integration pending |
-| Opus / Ogg Opus | P0 | BASSOPUS | Opus fixture; native integration pending |
-| AAC / M4A | P0 | Approved AAC decoding path | AAC-LC ADTS/MP4 fixtures; native integration pending; HE-AAC untested; distribution path unresolved |
-| ALAC / M4A | P0 | BASSALAC or a verified bundled path | ALAC MP4 fixture; native integration pending |
+| MP3 | P0 | BASS | CBR and VBR/Xing fixtures; native decode/seek/end/disposal passed |
+| WAV | P0 | BASS | PCM16/24/32/float32 fixtures; all four native decode/seek/end/disposal checks passed |
+| AIFF/AIF | P0 | BASS | PCM16 fixture; native decode/seek/end/disposal passed |
+| FLAC | P0 | BASSFLAC | 16/24-bit fixtures; native decode/seek/end/disposal passed |
+| Ogg Vorbis | P0 | BASS | Vorbis fixture; native decode/seek/end/disposal passed |
+| Opus / Ogg Opus | P0 | BASSOPUS | Opus fixture; native decode/seek/end/disposal passed |
+| AAC / M4A | P0 | Approved AAC decoding path | AAC-LC ADTS/MP4 fixtures; native decode/seek/end/disposal passed; HE-AAC untested; distribution path unresolved |
+| ALAC / M4A | P0 | BASSALAC or a verified bundled path | ALAC MP4 fixture; native decode/seek/end/disposal passed |
 | WMA | P1 | Verified BASS/Windows path or approved decoder | Not implemented / not tested |
 | APE | P1 | BASSAPE | Not implemented / not tested |
 | WavPack / WV | P1 | BASSWV | Not implemented / not tested |
@@ -25,4 +26,4 @@ Pinned base and FLAC/Opus/ALAC/AAC add-ons are inventoried in [the native manife
 | SACD ISO, archives, exotic game formats | Out of v1.0 | Separate proposal | Excluded from v1.0 |
 | DRM-protected media | Excluded | None | Excluded from v1.0 |
 
-Windows CI [run 37344651363](https://github.com/kurasis/MPswift/actions/runs/37344651363) verified the generated PCM16 WAV decoding path. No audio output mode, other source profile or gapless combination is advertised as verified. The Linux cloud host cannot run Windows native code. Listening/device checks remain separate and not run.
+Windows CI verified source sample rate/channels, duration, codec, applicable bit depth, decoded signal, seek/end and unchanged-source/handle-release checks for the fourteen committed fixtures. This covers those exact encodings only. No audio output mode or gapless combination is advertised as verified. The Linux cloud host cannot run Windows native code. Listening/device checks remain separate and not run.
