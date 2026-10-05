@@ -257,4 +257,6 @@ Playlists, order, volume and position are saved locally. Restore never starts pl
         <value>Clear search before changing manual order.</value>
     </data>
     <data name="CloseWithoutSaving" xml:space="preserve"><value>Changes could not be saved. Close without saving the latest changes?</value></data>
+    <data name="PlaybackSource" xml:space="preserve"><value>Playback source: {0}</value></data>
+    <data name="DetachedSource" xml:space="preserve"><value>Detached track — its playlist is no longer available.</value></data>
 </root>

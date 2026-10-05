@@ -17,7 +17,7 @@ public sealed record LibraryState(PlaylistState[] Playlists, SessionState Sessio
             throw new InvalidDataException("Invalid entry identity.");
         foreach (var track in entries.Select(e => e.Track).Append(Session.ActiveEntry?.Track).OfType<MediaTrack>())
         {
-            if (track.Id == Guid.Empty || string.IsNullOrWhiteSpace(track.Path) || track.Path.Length > 32767 || track.Title is null || track.Title.Length > 4096 || track.Artist?.Length > 4096 || track.Album?.Length > 4096)
+            if (track.Id == Guid.Empty || string.IsNullOrWhiteSpace(track.Path) || track.Path.Length > 32767 || track.Title is null || track.Title.Length > 4096 || track.Artist?.Length > 4096 || track.Album?.Length > 4096 || track.FormatHint?.Length > 4096)
                 throw new InvalidDataException("Invalid saved track metadata.");
             Player.Core.Media.LocalMediaPath.Parse(track.Path);
         }

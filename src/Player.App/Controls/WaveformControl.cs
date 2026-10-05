@@ -66,7 +66,8 @@ public sealed class WaveformControl : FrameworkElement
     }
     protected override void OnMouseMove(MouseEventArgs e)
     {
-        var seconds = Map(e.GetPosition(this)); ToolTip = TimeSpan.FromSeconds(seconds).ToString(@"hh\:mm\:ss");
+        var seconds = Map(e.GetPosition(this));
+        var time = TimeSpan.FromSeconds(seconds); ToolTip = $"{(long)time.TotalHours}:{time.Minutes:00}:{time.Seconds:00}";
         if (_dragging) { _preview = seconds; PreviewSeek?.Invoke(seconds); InvalidateVisual(); }
     }
     protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)

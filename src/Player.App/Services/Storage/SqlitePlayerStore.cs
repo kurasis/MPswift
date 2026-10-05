@@ -111,7 +111,7 @@ public sealed class SqlitePlayerStore : IPlayerStore
         Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
         FileStream ownership;
         try { ownership = new FileStream(_path + ".owner.lock", FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None); }
-        catch (IOException error) { throw new PlayerStoreInUseException(error); }
+        catch (IOException error) when ((error.HResult & 0xffff) is 32 or 33 || !OperatingSystem.IsWindows() && (error.HResult & 0xffff) == 11) { throw new PlayerStoreInUseException(error); }
         var existed = File.Exists(_path);
         var connection = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = _path, Mode = existed ? SqliteOpenMode.ReadWrite : SqliteOpenMode.ReadWriteCreate, Pooling = false, DefaultTimeout = 3 }.ToString());
         try

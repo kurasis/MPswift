@@ -78,6 +78,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     [ObservableProperty] private WaveformData? _waveform;
     [ObservableProperty] private string _waveformStatus = "";
     [ObservableProperty] private string _saveStatus = "";
+    [ObservableProperty] private string _playbackSource = "";
     public string PlayPauseLabel => IsPlaying ? Strings.Get("Pause") : Strings.Get("Play");
     public bool SeekPreview { get; set; }
     public bool CanTransport => HasEntries || _player.Snapshot.EntryId is not null;
@@ -197,7 +198,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         if (Playlists.Count >= 100) { Message = Strings.Get("TabLimit"); return; }
         var tab = new PlaylistTabViewModel(Guid.NewGuid(), name); Playlists.Add(tab); SelectedPlaylist = tab; UpdateEntries();
     }
-    public void RenamePlaylist(string name) { SelectedPlaylist.Name = ValidateName(name); ScheduleSave(true); }
+    public void RenamePlaylist(string name) { SelectedPlaylist.Name = ValidateName(name); ApplySnapshot(_player.Snapshot); ScheduleSave(true); }
     public void DuplicatePlaylist()
     {
         if (_knownRows.Count + Entries.Count > 10000 || Playlists.Count >= 100) { Message = Strings.Get("ImportLimit"); return; }
@@ -275,6 +276,13 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
             DurationSeconds = Math.Max(0, snapshot.Duration?.TotalSeconds ?? 0); DurationText = FormatTime(snapshot.Duration); Elapsed = FormatTime(snapshot.Position);
             if (!SeekPreview && !_pendingSeek) SeekPosition = Math.Clamp(snapshot.Position.TotalSeconds, 0, DurationSeconds);
             Volume = snapshot.Volume * 100; Muted = snapshot.Muted;
+            var sourceTab = Playlists.FirstOrDefault(p => p.Id == _sourcePlaylistId);
+            PlaybackSource = snapshot.EntryId is null ? "" : sourceTab is null ? Strings.Get("DetachedSource") : string.Format(CultureInfo.CurrentCulture, Strings.Get("PlaybackSource"), sourceTab.Name);
+            if (snapshot.EntryId != _waveEntry && (snapshot.State == PlaybackState.Loading || snapshot.SourceFormat is null))
+            {
+                _waveCancellation?.Cancel(); ++_waveGeneration; _waveEntry = null;
+                Waveform = null; WaveformStatus = Strings.Get(snapshot.State == PlaybackState.Loading ? "StateLoading" : "WaveformUnavailable");
+            }
             var track = snapshot.EntryId is { } id && _knownRows.TryGetValue(id, out var row) ? row.Entry.Track : _coordinator.ActiveEntry?.Track;
             if (track is not null) { Title = track.Title; Artist = track.Artist ?? Strings.Get("UnknownArtist"); Album = track.Album ?? ""; }
             Format = snapshot.SourceFormat is { } source ? string.Format(CultureInfo.CurrentCulture, Strings.Get("SourceFormat"), source.Codec, source.SampleRate, source.Channels) : "";
@@ -285,7 +293,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
             var active = snapshot.EntryId is { } entryId ? _knownRows.GetValueOrDefault(entryId) : null;
             if (!ReferenceEquals(_playingRow, active))
             { if (_playingRow is not null) _playingRow.IsPlaying = false; _playingRow = active; if (active is not null) active.IsPlaying = true; }
-            if (track is not null && snapshot.EntryId != _waveEntry && snapshot.State != PlaybackState.Loading)
+            if (track is not null && snapshot.SourceFormat is not null && snapshot.EntryId != _waveEntry && snapshot.State != PlaybackState.Loading)
             { _waveEntry = snapshot.EntryId; _waveTask = LoadWaveformAsync(track.Path, false); }
         }
         finally { _applyingSnapshot = false; }
@@ -316,7 +324,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         await Task.Run(() => SettingsFile.Export(path + ".settings.json", settings));
     }
     private void UpdateEntries(bool changed = true)
-    { SyncSource(); HasEntries = Entries.Count > 0; OnPropertyChanged(nameof(CanTransport)); UpdatePlaylistStatus(); if (changed) ScheduleSave(true); }
+    { SyncSource(); if (_initialized) ApplySnapshot(_player.Snapshot); HasEntries = Entries.Count > 0; OnPropertyChanged(nameof(CanTransport)); UpdatePlaylistStatus(); if (changed) ScheduleSave(true); }
     private void UpdatePlaylistStatus()
     { if (VisibleEntries is not null) PlaylistStatus = string.Format(CultureInfo.CurrentCulture, Strings.Get("PlaylistCount"), VisibleEntries.Cast<object>().Count(), Entries.Count); }
     private LibraryState Capture() => new(Playlists.Select(p => p.Capture()).ToArray(),
