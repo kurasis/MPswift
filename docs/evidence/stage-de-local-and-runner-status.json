@@ -1,0 +1,67 @@
+{
+  "sourceCommit": "c14b5cbe49667ce94bdbb49cc9b8327194139d8a",
+  "capturedUtc": "2026-10-05T20:00:03.677230+00:00",
+  "localReleaseBuild": {
+    "host": "Linux cloud host",
+    "warnings": 0,
+    "errors": 0,
+    "testCounters": {
+      "total": "80",
+      "executed": "80",
+      "passed": "80",
+      "failed": "0",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    },
+    "trxFilename": "_623c411abf9c_2026-10-05_19_56_59_net10.0.trx"
+  },
+  "localDevelopmentPublish": {
+    "selfContained": true,
+    "target": "win-x64",
+    "auditedNativeLibraries": 13,
+    "nativeRuntimeExecutedOnLinux": false,
+    "publicRelease": false
+  },
+  "actualDatabasePerformanceDataset": {
+    "indexedRows": 100000,
+    "maximumReturnedPageInTest": 100,
+    "source": "passing LibraryWorkflowTests actual SQLite integration test",
+    "WindowsUiPerformanceAcceptance": "not-run"
+  },
+  "preparedFormatFixtures": {
+    "count": 17,
+    "newOwnedProfiles": [
+      "WavPack lossless",
+      "TTA lossless",
+      "M4B AAC-LC"
+    ],
+    "newNativeExecution": "not-run at capture"
+  },
+  "stageDRunnerFailure": {
+    "runUrl": "https://github.com/kurasis/MPswift/actions/runs/37363650027",
+    "sourceCommit": "e2d162f5f896d714a522ac1ada9008b0c880ee1e",
+    "jobsExecutedSteps": 0,
+    "windowsConclusion": "cancelled",
+    "linuxConclusion": "cancelled",
+    "annotation": "The job was not acquired by Runner of type hosted even after multiple attempts"
+  },
+  "newWorkflowAtCapture": null,
+  "remainingAcceptance": [
+    "Current-source Windows native/mixer/WPF execution",
+    "Actual endpoint digital capture and audible playback",
+    "HE-AAC and broader P0/P1 codec profiles",
+    "Windows 11 clean/offline/DPI/accessibility/large-UI acceptance",
+    "Hotplug/sleep/exclusive/full-disk/crash/actual watcher-overflow workflows",
+    "Public redistribution and license clearance"
+  ]
+}
