@@ -28,3 +28,11 @@ Implement vertical slices; do not advance an untested feature to verified status
 
 
 G8/G9 are implemented and the observed Windows cases passed at `0ce6a9b` in [run 37423428788](https://github.com/kurasis/MPswift/actions/runs/37423428788); [exact evidence](evidence/stage-g8-g9-windows.json). G8 covers owned HE-AAC/APE/SV8/hybrid/rates, actual WMA lossless/Pro and >4 GiB RF64. G9 covers actual full disk/read-only fallback/migration interruption/watcher overflow/huge tags. Remaining G10–G13 workflows concern clean Windows 11/offline/accessibility/DPI, actual endpoints/digital/listening, sustained playback/reference resources and licensing/version 1.0. Actual Windows N/power-loss and untested codec combinations remain explicit acceptance prerequisites.
+
+
+| Next slice | Implementation/workflow | Acceptance boundary |
+| --- | --- | --- |
+| G10 — Desktop/offline | Actual accessibility/focus/layout/DPI policy and owned self-contained first-run/restart + positive-controlled PID/descendant ETW runner | Windows 11/no-runtime/standard-user/disconnected prerequisites recorded; physical Narrator/DPI and full desktop baseline remain separate |
+| G11 — Output/digital verification | Shared/exclusive actual WASAPI lifecycle/track changes and bounded loopback boundary capture, with source hashes and error evidence | Probe/no-endpoint is not playback; endpoint/digital/listening/hotplug/sleep require actual devices |
+| G12 — Sustained playback/resources | Two-hour output and 1000 real transitions with reference hardware/resource/CPU observations | Decoder preparation stress is not output soak |
+| G13 — Distribution acceptance | Licensing/source/notices review and approved version 1.0 | Development prereleases do not authorize licensing purchases/stable acceptance |

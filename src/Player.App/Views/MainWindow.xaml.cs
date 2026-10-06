@@ -30,8 +30,29 @@ public partial class MainWindow : Window
         MinWidth = Math.Min(MinWidth, SystemParameters.WorkArea.Width);
         MinHeight = Math.Min(MinHeight, SystemParameters.WorkArea.Height);
         ApplyContrastTheme();
+        DataContextChanged += (_, args) =>
+        {
+            if (args.OldValue is PlayerViewModel previous) previous.PropertyChanged -= OnAccessibleStateChanged;
+            if (args.NewValue is PlayerViewModel current) current.PropertyChanged += OnAccessibleStateChanged;
+        };
         SystemParameters.StaticPropertyChanged += OnSystemSettings;
-        Closed += (_, _) => SystemParameters.StaticPropertyChanged -= OnSystemSettings;
+        Closed += (_, _) =>
+        {
+            SystemParameters.StaticPropertyChanged -= OnSystemSettings;
+            if (DataContext is PlayerViewModel current) current.PropertyChanged -= OnAccessibleStateChanged;
+        };
+    }
+    private void OnAccessibleStateChanged(object? sender, PropertyChangedEventArgs args)
+    {
+        if (args.PropertyName is not (nameof(PlayerViewModel.State) or nameof(PlayerViewModel.Message)) ||
+            !System.Windows.Automation.Peers.AutomationPeer.ListenerExists(System.Windows.Automation.Peers.AutomationEvents.LiveRegionChanged)) return;
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (_shutdownComplete || !ReferenceEquals(sender, DataContext)) return;
+            var text = args.PropertyName == nameof(PlayerViewModel.State) ? PlaybackStateText : StatusMessageText;
+            System.Windows.Automation.Peers.UIElementAutomationPeer.CreatePeerForElement(text)?.RaiseAutomationEvent(
+                System.Windows.Automation.Peers.AutomationEvents.LiveRegionChanged);
+        }, System.Windows.Threading.DispatcherPriority.Background);
     }
     private async void OnTrackDoubleClick(object sender, MouseButtonEventArgs e)
     {

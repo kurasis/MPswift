@@ -22,6 +22,9 @@ try {
         Copy-Item "docs/$document.md" (Join-Path $app "docs/$document.md")
     }
     Copy-Item README.md (Join-Path $app 'README.md')
+    New-Item (Join-Path $app 'acceptance') -ItemType Directory -Force | Out-Null
+    foreach ($script in @('Acceptance-Helpers.ps1','Desktop-Acceptance.ps1')) { Copy-Item (Join-Path $PSScriptRoot $script) (Join-Path $app "acceptance/$script") }
+    Copy-Item docs/DESKTOP_ACCEPTANCE.md (Join-Path $app 'docs/DESKTOP_ACCEPTANCE.md')
     'Explicit portable data location; created only on first normal launch.' | Set-Content (Join-Path $app 'portable.marker') -Encoding utf8
     'DEVELOPMENT BUILD. FULL STAGE G ACCEPTANCE IS INCOMPLETE. See docs/RELEASE_ACCEPTANCE.md and docs/THIRD_PARTY_NOTICES.md.' | Set-Content (Join-Path $app 'DEVELOPMENT-ONLY.txt') -Encoding utf8
     $assets = Get-Content src/Player.App/obj/project.assets.json -Raw | ConvertFrom-Json -AsHashtable

@@ -29,9 +29,27 @@ public partial class App : Application
     public string? InstancePipeName => _instance?.PipeName;
     private async void OnStartup(object sender, StartupEventArgs e)
     {
+        if (e.Args.Length == 4 && e.Args[0] == "--network-report" && File.Exists(Path.Combine(Environment.CurrentDirectory, AcceptanceWorkspace.Marker)))
+        {
+            var owned = false;
+            try
+            {
+                AcceptanceWorkspace.Validate(); owned = true;
+                var contextFile = AcceptanceWorkspace.ReadFile(e.Args[2]);
+                if (new FileInfo(contextFile).Length > 65536) throw new InvalidDataException("Trace context exceeds its bound.");
+                var context = JsonSerializer.Deserialize<Player.Core.Diagnostics.NetworkTraceContext>(File.ReadAllText(contextFile)) ?? throw new InvalidDataException("Trace context is empty.");
+                using var trace = File.OpenRead(AcceptanceWorkspace.ReadFile(e.Args[1]));
+                var result = Player.Core.Diagnostics.NetworkTraceAnalyzer.Analyze(trace, context);
+                AcceptanceWorkspace.WriteReport(e.Args[3], result);
+                Shutdown(result.Status == "no-app-network-events-observed" ? 0 : 1);
+            }
+            catch (Exception error) { if (owned) AcceptanceWorkspace.WriteReport("network-report-failure.json", new { Status = "failed", error.Message }); Shutdown(1); }
+            return;
+        }
         var uiSmoke = e.Args.Length == 3 && e.Args[0] == "--ui-smoke";
+        var desktopAcceptance = e.Args.Length == 2 && e.Args[0] == "--desktop-acceptance" && e.Args[1] is "first" or "restart" && File.Exists(Path.Combine(Environment.CurrentDirectory, AcceptanceWorkspace.Marker));
         var crashSmoke = e.Args.Length == 3 && e.Args[0] == "--crash-smoke" && e.Args[1] is "checkpoint" or "verify" or "migration-checkpoint" or "migration-verify" or "failures" && File.Exists(Path.Combine(Environment.CurrentDirectory, ".player-crash-validation"));
-        var smoke = uiSmoke || crashSmoke;
+        var smoke = uiSmoke || crashSmoke || desktopAcceptance;
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
         OpenRequest? request = null;
         try { if (!smoke) request = OpenRequest.ParseArguments(e.Args, Environment.CurrentDirectory); }
@@ -73,7 +91,11 @@ public partial class App : Application
         using var validation = uiSmoke ? new UiSmokeValidation() : null;
         if (smoke) ShutdownMode = ShutdownMode.OnExplicitShutdown;
         string directory;
-        try { directory = smoke ? StorageLocation.Prepare(Path.Combine(Environment.CurrentDirectory, "artifacts", "smoke", crashSmoke ? "stage-g-crash-data" : "stage-c-data")) : StorageLocation.Resolve(); }
+        try
+        {
+            if (desktopAcceptance) AcceptanceWorkspace.Validate();
+            directory = desktopAcceptance ? StorageLocation.Resolve() : smoke ? StorageLocation.Prepare(Path.Combine(Environment.CurrentDirectory, "artifacts", "smoke", crashSmoke ? "stage-g-crash-data" : "stage-c-data")) : StorageLocation.Resolve();
+        }
         catch (Exception error) { MessageBox.Show(error.Message, Strings.Get("StorageUnavailable")); Shutdown(1); return; }
         var settingsRecovered = false;
         try
@@ -161,7 +183,7 @@ public partial class App : Application
             object result;
             try
             {
-                result = crashSmoke
+                result = desktopAcceptance ? await DesktopAcceptanceValidation.RunOwnedAsync(window, model, e.Args[1]) : crashSmoke
                     ? e.Args[1] == "failures" ? await ResilienceSmokeValidation.RunAsync(Path.GetFullPath(e.Args[2]), output)
                         : e.Args[1] == "migration-verify" ? await MigrationSmokeValidation.VerifyAsync(model, directory) : await CrashSmokeValidation.RunAsync(model, e.Args[1], Path.GetFullPath(e.Args[2]), directory, output)
                     : await validation!.RunAsync(window, model, Path.GetFullPath(e.Args[1]), Path.GetFullPath(e.Args[2]), output);
@@ -174,7 +196,8 @@ public partial class App : Application
                 result = new { Status = "ui-smoke-failed", error.Message, error.StackTrace };
                 try { await model.DisposeAsync(); } catch (Exception cleanup) { result = new { Status = "ui-smoke-failed", error.Message, Cleanup = cleanup.Message }; }
             }
-            File.WriteAllText(Path.Combine(output, crashSmoke ? "crash.json" : "ui.json"), JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));
+            if (desktopAcceptance) AcceptanceWorkspace.WriteReport("desktop-" + e.Args[1] + ".json", result);
+            else File.WriteAllText(Path.Combine(output, crashSmoke ? "crash.json" : "ui.json"), JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));
             Shutdown(resultCode);
         }
         else if (request is not null)
