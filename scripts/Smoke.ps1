@@ -28,11 +28,12 @@ try {
         Write-Host $result
     }
     Remove-Item (Join-Path $directory 'g8-owned-formats') -Recurse -Force -ErrorAction SilentlyContinue
+    $nativeFailures = [Collections.Generic.List[string]]::new()
     foreach ($check in @(@('--formats', (Join-Path $root 'tests/fixtures/audio'), 'formats'), @('--formats', (Join-Path $root 'tests/fixtures/audio-extended'), 'formats-extended'), @('--extended-formats', (Join-Path $directory 'g8-owned-formats'), 'g8-formats'), @('--engine', $fixture, 'engine'), @('--waveform', $fixture, 'waveform'), @('--mixer', $fixture, 'mixer'), @('--stress', $fixture, 'stress'))) {
         $result = & dotnet $tool $check[0] $check[1]
         $code = $LASTEXITCODE
         $result | Set-Content (Join-Path $directory "$($check[2]).json") -Encoding utf8
-        if ($code -ne 0) { throw "$($check[0]) failed with exit $code. See artifacts/smoke." }
+        if ($code -ne 0) { $nativeFailures.Add("$($check[0]) failed with exit $code. See artifacts/smoke/$($check[2]).json.") }
         Write-Host $result
     }
     $app = Join-Path $root 'src/Player.App/bin/Release/net10.0-windows10.0.19041.0/win-x64/Player.App.exe'
@@ -63,4 +64,5 @@ try {
         if ($code -ne 0) { throw "Shared-output smoke failed with exit $code." }
         Write-Host $result
     } else { Write-Host 'Output-device and audible tests NOT RUN. Use -Play on an interactive Windows machine.' }
+    if ($nativeFailures.Count -gt 0) { throw ($nativeFailures -join "`n") }
 } finally { Pop-Location }

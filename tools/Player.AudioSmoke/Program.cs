@@ -55,7 +55,7 @@ try
         return 0;
     }
     if (args[0] == "--stress") { Report(await StressValidation.RunAsync(args[1])); return 0; }
-    if (args[0] == "--extended-formats") { Report(ExtendedFormatValidation.Run(args[1])); return 0; }
+    if (args[0] == "--extended-formats") { var report = ExtendedFormatValidation.Run(args[1]); Report(report); return report.Status == "extended-formats-passed" ? 0 : 1; }
     if (args[0] == "--mixer") { Report(MixerValidation.Run(args[1])); return 0; }
     if (args[0] == "--waveform") { Report(await WaveformValidation.RunAsync(args[1])); return 0; }
     if (args[0] == "--formats")
@@ -97,6 +97,12 @@ try
                 losslessError = ExtendedFormatValidation.ComparePcm(file, referencePath);
                 if (losslessError != 0) throw new InvalidDataException("Lossless fixture PCM differs: " + relative);
                 if (HashFile(file) != hash) throw new InvalidDataException("PCM comparison changed source.");
+            }
+            if (fixture.TryGetProperty("correction", out correction))
+            {
+                var companion = Path.Combine(directory, correction.GetProperty("path").GetString()!);
+                using (new FileStream(companion, FileMode.Open, FileAccess.Read, FileShare.None)) { }
+                if (HashFile(companion) != correction.GetProperty("sha256").GetString()) throw new InvalidDataException("Correction file changed during decoding.");
             }
             results.Add(new { File = relative, Profile = fixture.GetProperty("profile").GetString(), Status = "decode-seek-end-dispose-passed", SourceSha256 = hash, Decode = evidence, LosslessMaximumError = losslessError });
         }

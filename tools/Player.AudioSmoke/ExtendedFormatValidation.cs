@@ -9,6 +9,7 @@ namespace Player.AudioSmoke;
 /// <summary>Owned format checks. No endpoint/device and no whole-file allocation for RF64.</summary>
 public static class ExtendedFormatValidation
 {
+    public sealed record Report(string Status, object WmaLossless, object WmaPro, object LargeRf64, string Windows, string WindowsN, string DeviceOutput);
     public static float ComparePcm(string source, string reference)
     {
         using var context = new NativeDecodeContext();
@@ -33,38 +34,50 @@ public static class ExtendedFormatValidation
         finally { if (first != 0) Bass.StreamFree(first); if (second != 0) Bass.StreamFree(second); }
     }
 
-    public static object Run(string directory)
+    public static Report Run(string directory)
     {
         directory = Path.GetFullPath(directory);
         if (Directory.Exists(directory)) throw new IOException("Extended checks require a new owned directory.");
         Directory.CreateDirectory(directory);
         using var context = new NativeDecodeContext();
-        var lossless = EncodeWma(directory, false);
-        var pro = EncodeWma(directory, true);
-        var rf64 = LargeRf64(directory);
-        return new { Status = "extended-formats-passed", WmaLossless = lossless, WmaPro = pro, LargeRf64 = rf64,
-            Windows = RuntimeInformation.OSDescription, WindowsN = "not-run: hosted Server is not Windows N", DeviceOutput = "not-run" };
+        var failures = 0;
+        object RunCheck(Func<object> check)
+        {
+            try { return check(); }
+            catch (Exception error) { failures++; return new { Status = "failed", error.Message, ErrorType = error.GetType().Name }; }
+        }
+        var lossless = RunCheck(() => EncodeWma(directory, false));
+        var pro = RunCheck(() => EncodeWma(directory, true));
+        var rf64 = RunCheck(() => LargeRf64(directory));
+        return new Report(failures == 0 ? "extended-formats-passed" : "extended-formats-failed", lossless, pro, rf64,
+            RuntimeInformation.OSDescription, "not-run: hosted Server is not Windows N", "not-run");
     }
 
     private static unsafe object EncodeWma(string directory, bool pro)
     {
-        var rate = pro ? 96000 : 48000; var channels = pro ? 6 : 2;
+        var candidates = pro
+            ? new (int Rate, int Channels, uint Flags)[] { (96000, 6, 0x4000u), (48000, 2, 0x4000u), (44100, 2, 0x4000u) }
+            : new (int Rate, int Channels, uint Flags)[] { (48000, 2, 0u), (44100, 2, 0u), (48000, 2, 0x4000u), (44100, 2, 0x4000u), (48000, 2, 0x8000u), (44100, 2, 0x8000u) };
+        var attempts = new List<object>(); var rates = new List<uint>();
+        uint encoder = 0, bitrate = 0; var rate = 0; var channels = 0; var path = "";
+        foreach (var candidate in candidates)
+        {
+            rate = candidate.Rate; channels = candidate.Channels;
+            rates.Clear();
+            var pointer = BASS_WMA_EncodeGetRates((uint)rate, (uint)channels, candidate.Flags | (pro ? 0u : 0x10000u));
+            if (pointer != 0)
+                for (var i = 0; i < 256; i++) { var value = unchecked((uint)Marshal.ReadInt32(pointer, i * 4)); if (value == 0) break; rates.Add(value); }
+            bitrate = pro ? rates.Where(r => r >= 128000).DefaultIfEmpty(0u).Min() : 100u;
+            path = Path.Combine(directory, $"owned-{(pro ? "pro" : "lossless")}-{rate}-{channels}-{candidate.Flags:x}.wma");
+            if (bitrate != 0) encoder = BASS_WMA_EncodeOpenFile((uint)rate, (uint)channels, candidate.Flags | 0x80000000u, bitrate, path);
+            attempts.Add(new { Rate = rate, Channels = channels, Flags = candidate.Flags, Rates = rates.ToArray(), Opened = encoder != 0, Error = encoder == 0 ? Bass.LastError.ToString() : null });
+            if (encoder != 0) break;
+        }
+        Check(encoder != 0, "Required WMA profile could not be encoded: " + System.Text.Json.JsonSerializer.Serialize(attempts));
         var samples = new short[rate * channels * 3];
         for (var frame = 0; frame < rate * 3; frame++)
             for (var channel = 0; channel < channels; channel++)
                 samples[frame * channels + channel] = (short)Math.Round(1638 * Math.Sin(2 * Math.PI * 440 * frame / rate) * (channel % 2 == 0 ? 1 : -1));
-        var path = Path.Combine(directory, pro ? "owned-pro.wma" : "owned-lossless.wma");
-        uint flags = pro ? 0x4000u : 0;
-        var pointer = BASS_WMA_EncodeGetRates((uint)rate, (uint)channels, flags | (pro ? 0u : 0x10000u));
-        Check(pointer != 0, "WMA encoder rates unavailable: " + Bass.LastError);
-        var rates = new List<uint>();
-        for (var i = 0; i < 256; i++) { var value = unchecked((uint)Marshal.ReadInt32(pointer, i * 4)); if (value == 0) break; rates.Add(value); }
-        var bitrate = pro ? rates.Where(r => r >= 192000).DefaultIfEmpty(0u).Min() : 100u;
-        // Some WMF versions omit lossless quality from their rate enumeration.
-        // Actual EncodeOpen(100), ASF 0x0163 and exact decoded PCM are the proof.
-        Check(!pro || bitrate > 0, "Required WMA Pro encoder rate unavailable: " + string.Join(",", rates));
-        var encoder = BASS_WMA_EncodeOpenFile((uint)rate, (uint)channels, flags | 0x80000000u, bitrate, path);
-        Check(encoder != 0, "WMA encode open failed: " + Bass.LastError + "; Pro=" + pro + "; rates=" + string.Join(",", rates));
         try { fixed (short* data = samples) Check(BASS_WMA_EncodeWrite(encoder, (nint)data, (uint)(samples.Length * 2)), "WMA encode write failed."); }
         finally { Check(BASS_WMA_EncodeClose(encoder), "WMA encode close failed."); }
         // Read the ASF Stream Properties WAVEFORMATEX tag independently of the requested encoder flags.
@@ -96,7 +109,7 @@ public static class ExtendedFormatValidation
         }
         using (new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.None)) { }
         Check(bytes.AsSpan().SequenceEqual(File.ReadAllBytes(path)), "WMA fixture changed.");
-        return new { CodecTag = $"0x{codecTag:x4}", EncoderRates = rates, BitrateOrQuality = bitrate, Decode = decode, ExactLosslessMaximumError = pro ? (float?)null : error, SourceUnchanged = true, SourceHandleReleased = true };
+        return new { CodecTag = $"0x{codecTag:x4}", EncoderRates = rates, EncoderAttempts = attempts, BitrateOrQuality = bitrate, Decode = decode, ExactLosslessMaximumError = pro ? (float?)null : error, SourceUnchanged = true, SourceHandleReleased = true };
     }
 
     private static object LargeRf64(string directory)
