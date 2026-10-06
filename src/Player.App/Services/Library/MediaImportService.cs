@@ -50,7 +50,7 @@ public sealed class MediaImportService : IMediaImportService
             string? FindCue(string path)
             {
                 try { return File.Exists(path) ? discovery.Find(path) : null; }
-                catch (Exception error) when (error is IOException or ArgumentException or UnauthorizedAccessException)
+                catch (Exception error) when (error is IOException or InvalidDataException or ArgumentException or UnauthorizedAccessException)
                 { Error("Companion CUE: " + error.Message); return null; }
             }
             foreach (var source in CueImportSelection.Resolve(sources, FindCue))
@@ -94,7 +94,7 @@ public sealed class MediaImportService : IMediaImportService
                     processed++;
                     if (batch.Count == 32) Flush();
                 }
-                catch (Exception error) when (error is ArgumentException or IOException or UnauthorizedAccessException)
+                catch (Exception error) when (error is ArgumentException or InvalidDataException or IOException or UnauthorizedAccessException)
                 { Error(source + ": " + error.Message); }
             }
         }

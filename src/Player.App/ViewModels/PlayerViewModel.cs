@@ -479,7 +479,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
                     if (ReferenceEquals(SelectedPlaylist, target)) SelectedEntry = first;
                     expanded++; UpdateEntries();
                 }
-                catch (Exception error) when (error is IOException or ArgumentException or UnauthorizedAccessException)
+                catch (Exception error) when (error is IOException or InvalidDataException or ArgumentException or UnauthorizedAccessException)
                 { Diagnostic(error.Message); }
             }
             await RefreshRatingsAsync();

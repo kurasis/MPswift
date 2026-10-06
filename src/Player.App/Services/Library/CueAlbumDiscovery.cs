@@ -41,7 +41,7 @@ public sealed class CueAlbumDiscovery(Action<string> diagnostic, CancellationTok
                         if (sheet.Diagnostics.Length != 0) throw new InvalidDataException(string.Join("; ", sheet.Diagnostics.Take(3)));
                         if (sheet.Songs.Length >= 2) loaded.Add((path, sheet));
                     }
-                    catch (Exception error) when (error is IOException or ArgumentException or UnauthorizedAccessException)
+                    catch (Exception error) when (error is IOException or InvalidDataException or ArgumentException or UnauthorizedAccessException)
                     { diagnostic("Companion CUE: " + path + ": " + error.Message + " (use explicit legacy-encoding import for non-Unicode CUE)."); }
                 }
                 sheets = loaded.ToArray();
@@ -73,7 +73,7 @@ public sealed class CueAlbumDiscovery(Action<string> diagnostic, CancellationTok
                 }
                 finally { if (!Bass.StreamFree(source.Handle)) throw new IOException("Could not release the CUE validation decoder."); }
             }
-            catch (Exception error) when (error is AudioBackendException or IOException or ArgumentException or UnauthorizedAccessException)
+            catch (Exception error) when (error is AudioBackendException or IOException or InvalidDataException or ArgumentException or UnauthorizedAccessException)
             { result = null; diagnostic("Companion CUE validation: " + error.Message); }
         }
         _images[image] = result;

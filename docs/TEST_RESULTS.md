@@ -9,6 +9,8 @@ Selected existing whole FLAC rows can be expanded through Selected tracks → Ex
 Local locked Release cross-build: zero warnings/errors, **167 managed tests pass**. Windows smoke adds owned real FLAC/CUE expansion, malformed/ambiguous/out-of-range refusal, folder-pair deduplication, duplicate occurrences, SQLite identities and unchanged-source hashes/exclusive reopen. Real native CUE song durations and PCM reads are checked without output hardware. EN/RU screenshots are retained by the main workflow for this source.
 
 
+First hosted run `37457020558` passed both builds/167 managed tests, then the actual malformed-CUE case exposed that InvalidDataException is outside the IOException catch family. Companion parsing/native-bound checks and staged expansion now handle it explicitly, preserving the original row and reporting the invalid sidecar. The existing negative Windows cases must pass in the corrected main run.
+
 ## Menus, settings and album sections (2026-10-06)
 
 Replaced default WPF context-menu chrome with complete dark root/submenu/separator templates and grouped actions. Added a visible settings shortcut with EN/RU selection, persisted album-heading and close-to-tray preferences and access to output/EQ settings. Language changes explicitly require the next launch. Added folder/album run headings with visible track counts and folder hints, preserving duplicates, order, selected entries and virtualized track containers. [Behavior and design](DESIGN.md).
