@@ -38,8 +38,18 @@ def main():
     for name, profile, aot, bitrate, transport in (
             ('he-aac.m4a', 'HE-AAC SBR MP4', 5, 64000, 0),
             ('he-aac-v2.m4a', 'HE-AAC v2 SBR+PS MP4', 29, 32000, 0)):
+        input_source = source
+        if aot == 29:
+            # Parametric stereo derives its mono core from both channels. Opposite
+            # phase would cancel the signal, obscuring the actual decoder check.
+            input_source = output / 'same-phase.wav'
+            subprocess.run(['ffmpeg','-v','error','-nostdin','-n','-i',str(source),'-af','pan=stereo|c0=c0|c1=c0','-c:a','pcm_s16le',str(input_source)], check=True)
         encode(name, profile, 'AAC' if transport == 2 else 'MP4',
-               [args.fdkaac, '-S', '--no-timestamp', '-p', str(aot), '-b', str(bitrate), '-f', str(transport), '-o', str(output/name), str(source)])
+               [args.fdkaac, '-S', '--no-timestamp', '-p', str(aot), '-b', str(bitrate), '-f', str(transport), '-o', str(output/name), str(input_source)])
+        if aot == 29:
+            fixtures[-1]['preprocessing'] = 'Owned source left channel copied to right, avoiding PS mono-core cancellation'
+            fixtures[-1]['encoderInputSha256'] = hashlib.sha256(input_source.read_bytes()).hexdigest()
+            input_source.unlink()
         facts = json.loads(subprocess.check_output(['ffprobe', '-v', 'error', '-show_streams', '-of', 'json', str(output/name)]))['streams'][0]
         if facts['profile'] != ('HE-AAC' if aot == 5 else 'HE-AACv2'):
             raise RuntimeError('Encoder did not produce the requested HE-AAC profile.')

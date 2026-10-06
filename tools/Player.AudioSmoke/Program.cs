@@ -57,7 +57,7 @@ try
                 (fixture.TryGetProperty("expectedBitDepth", out var bits) && evidence.BitDepth != bits.GetInt32()) ||
                 Math.Abs(evidence.DurationSeconds - fixture.GetProperty("sourceDurationSeconds").GetDouble()) > fixture.GetProperty("durationToleranceSeconds").GetDouble() ||
                 evidence.Peak is < 0.01f or > 0.2f)
-                throw new InvalidDataException("Unexpected decoded fixture facts: " + relative);
+                throw new InvalidDataException("Unexpected decoded fixture facts: " + relative + "; " + JsonSerializer.Serialize(evidence));
             using (var exclusive = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.None)) { }
             if (HashFile(file) != hash) throw new InvalidDataException("Fixture source changed.");
             float? losslessError = null;

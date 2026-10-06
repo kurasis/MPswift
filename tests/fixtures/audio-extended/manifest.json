@@ -24,10 +24,12 @@
       "channels": 2,
       "sourceDurationSeconds": 3,
       "durationToleranceSeconds": 0.2,
-      "sha256": "1bf67876ba49ba521c1d3516aa226eb9c27dc4e85693c342ef3538cdad023fab",
+      "sha256": "354f29e1bf4777243995d45b2bfc8a11524ff9b1d97699b0357b5fbdb14ac9f4",
       "license": "CC0-1.0",
       "provenance": "Owned 440 Hz opposite-phase PCM; pinned development encoders",
       "generator": "Generate-ExtendedFixtures.py",
+      "preprocessing": "Owned source left channel copied to right, avoiding PS mono-core cancellation",
+      "encoderInputSha256": "230031f70056def1db9d1ac1aa10ecce3ec061e9ea3c057856dae0f092be7eb5",
       "independentCodecProfile": "HE-AACv2"
     },
     {
