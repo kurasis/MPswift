@@ -60,9 +60,11 @@ public static class ExtendedFormatValidation
         var rates = new List<uint>();
         for (var i = 0; i < 256; i++) { var value = unchecked((uint)Marshal.ReadInt32(pointer, i * 4)); if (value == 0) break; rates.Add(value); }
         var bitrate = pro ? rates.Where(r => r >= 192000).DefaultIfEmpty(0u).Min() : 100u;
-        Check(pro ? bitrate > 0 : rates.Contains(100), "Required WMA encoder profile unavailable.");
+        // Some WMF versions omit lossless quality from their rate enumeration.
+        // Actual EncodeOpen(100), ASF 0x0163 and exact decoded PCM are the proof.
+        Check(!pro || bitrate > 0, "Required WMA Pro encoder rate unavailable: " + string.Join(",", rates));
         var encoder = BASS_WMA_EncodeOpenFile((uint)rate, (uint)channels, flags | 0x80000000u, bitrate, path);
-        Check(encoder != 0, "WMA encode open failed: " + Bass.LastError);
+        Check(encoder != 0, "WMA encode open failed: " + Bass.LastError + "; Pro=" + pro + "; rates=" + string.Join(",", rates));
         try { fixed (short* data = samples) Check(BASS_WMA_EncodeWrite(encoder, (nint)data, (uint)(samples.Length * 2)), "WMA encode write failed."); }
         finally { Check(BASS_WMA_EncodeClose(encoder), "WMA encode close failed."); }
         // Read the ASF Stream Properties WAVEFORMATEX tag independently of the requested encoder flags.
