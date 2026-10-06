@@ -86,6 +86,12 @@ public partial class App : Application
         var desktopAcceptance = e.Args.Length == 2 && e.Args[0] == "--desktop-acceptance" && e.Args[1] is "first" or "restart" && File.Exists(Path.Combine(Environment.CurrentDirectory, AcceptanceWorkspace.Marker));
         var crashSmoke = e.Args.Length == 3 && e.Args[0] == "--crash-smoke" && e.Args[1] is "checkpoint" or "verify" or "migration-checkpoint" or "migration-verify" or "failures" && File.Exists(Path.Combine(Environment.CurrentDirectory, ".player-crash-validation"));
         var smoke = uiSmoke || crashSmoke || desktopAcceptance;
+        if (smoke) DispatcherUnhandledException += (_, args) =>
+        {
+            ReportStartupFailure(true, args.Exception);
+            args.Handled = true;
+            Shutdown(1);
+        };
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
         OpenRequest? request = null;
         try { if (!smoke) request = OpenRequest.ParseArguments(e.Args, Environment.CurrentDirectory); }
@@ -270,7 +276,7 @@ public partial class App : Application
         if (smoke)
         {
             var output = Path.Combine(Environment.CurrentDirectory, "artifacts", "smoke"); Directory.CreateDirectory(output);
-            File.WriteAllText(Path.Combine(output, "ui.json"), JsonSerializer.Serialize(new { Status = "ui-smoke-failed", error.Message, error.StackTrace }));
+            File.WriteAllText(Path.Combine(output, "ui.json"), JsonSerializer.Serialize(new { Status = "ui-smoke-failed", error.Message, error.StackTrace, Exception = error.ToString() }));
         }
         else MessageBox.Show(Strings.Get("StartupFailure") + "\n\n" + error.Message, Strings.Get("SavedDataUnavailable"), MessageBoxButton.OK, MessageBoxImage.Error);
     }
