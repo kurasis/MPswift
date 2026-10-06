@@ -69,6 +69,7 @@ jobs:
             artifacts/portable/*.sha256
             artifacts/test-results/*.trx
             artifacts/smoke/*.json
+            artifacts/smoke/g12-*-progress.jsonl
             artifacts/smoke/*.png
             artifacts/smoke/stage-d-mixer/*.f32
           if-no-files-found: warn

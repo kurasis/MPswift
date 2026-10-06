@@ -52,12 +52,16 @@ function Start-PlayerAcceptanceProcess {
     $start.EnvironmentVariables['DOTNET_MULTILEVEL_LOOKUP'] = '0'
     $process = [Diagnostics.Process]::Start($start)
     try {
-        if (-not $process.WaitForExit($TimeoutSeconds * 1000)) { $process.Kill(); $process.WaitForExit(); throw 'Owned acceptance apphost timed out.' }
+        $wait = [Diagnostics.Stopwatch]::StartNew()
+        while (-not $process.WaitForExit(1000)) {
+            # Return to the PowerShell pipeline every second so Ctrl+C can interrupt a long soak.
+            if ($wait.Elapsed.TotalSeconds -ge $TimeoutSeconds) { $process.Kill(); $process.WaitForExit(5000) | Out-Null; throw 'Owned acceptance apphost timed out.' }
+        }
         [pscustomobject]@{ ProcessId = $process.Id; ExitCode = $process.ExitCode }
     } finally {
         # A stopped/failed invoking pipeline must not leave this owned acceptance child running.
-        if (-not $process.HasExited) { $process.Kill(); $process.WaitForExit(5000) | Out-Null }
-        $process.Dispose()
+        try { if (-not $process.HasExited) { $process.Kill(); $process.WaitForExit(5000) | Out-Null } }
+        finally { $process.Dispose() }
     }
 }
 function Send-PlayerNetworkControl {

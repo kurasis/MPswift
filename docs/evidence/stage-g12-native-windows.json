@@ -1,0 +1,504 @@
+{
+  "sourceCommit": "9d5c45c6b43da22ce3125a92543f2ba5571f41dc",
+  "runUrl": "https://github.com/kurasis/MPswift/actions/runs/37440634572",
+  "runAttempt": 1,
+  "runStatus": "completed",
+  "runConclusion": "success",
+  "jobs": [
+    {
+      "id": 112193253068,
+      "name": "build (ubuntu-24.04)",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37440634572/job/112193253068",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 112193253532,
+      "name": "build (windows-2022)",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37440634572/job/112193253532",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 112195742766,
+      "name": "Publish separate Windows ZIP prerelease",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37440634572/job/112195742766",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "evidence-windows-2022",
+      "archiveSha256": "926147c638dce79032ff76c935e860e5f1e7e3ce3f050984cf60972137ea07ab",
+      "tests": [
+        {
+          "total": "157",
+          "executed": "157",
+          "passed": "157",
+          "failed": "0",
+          "error": "0",
+          "timeout": "0",
+          "aborted": "0",
+          "inconclusive": "0",
+          "passedButRunAborted": "0",
+          "notRunnable": "0",
+          "notExecuted": "0",
+          "disconnected": "0",
+          "warning": "0",
+          "completed": "0",
+          "inProgress": "0",
+          "pending": "0"
+        }
+      ],
+      "reports": {
+        "portable/integrity-audit.json": {
+          "Status": "candidate-integrity-negative-checks-passed",
+          "SourceCommit": "9d5c45c6b43da22ce3125a92543f2ba5571f41dc",
+          "SourceTreeDirty": false,
+          "Checks": [
+            "changed file",
+            "missing file",
+            "extra file",
+            "empty checksum list"
+          ],
+          "ZipSha256": "936d744628505f0ec1ebc4b49a95dc82749051d62f994a705cf58fb7c2629edc",
+          "RestoredCopyPassed": true
+        },
+        "portable/package-audit.json": {
+          "Status": "local-candidate-packaged",
+          "SourceCommit": "9d5c45c6b43da22ce3125a92543f2ba5571f41dc",
+          "SourceTreeDirty": false,
+          "Zip": "LocalAudioPlayer-dev-9d5c45c6b43d-win-x64.zip",
+          "ZipSha256": "936d744628505f0ec1ebc4b49a95dc82749051d62f994a705cf58fb7c2629edc",
+          "Bytes": 85503457,
+          "Files": 557,
+          "Dependencies": 14,
+          "NativeLibraries": 13,
+          "DistributionApproved": false
+        },
+        "smoke/g12-Mixer-g12-stress.json": {
+          "Status": "g12-native-mixer-passed",
+          "Failure": null,
+          "Mode": "Mixer",
+          "RequestedSoakSeconds": 60,
+          "SourceCommit": "9d5c45c6b43da22ce3125a92543f2ba5571f41dc",
+          "SourceTreeDirty": false,
+          "PackageManifestSha256": "fa6cada7c26eab939d69e49d2f651c8ee596de9dc120cfd25e6b31ecd8db7ac8",
+          "PowerShellVersion": "5.1.20348.5622",
+          "StartedUtc": "2026-10-06T09:11:26.1275114+00:00",
+          "EndedUtc": "2026-10-06T09:12:27.2928901+00:00",
+          "InvalidExternalDotnetRoots": true,
+          "ActualNative": {
+            "Status": "g12-native-mixer-passed",
+            "Mode": "mixer",
+            "Versions": {
+              "bass": "2.4.18.3",
+              "bassmix": "2.4.13.0",
+              "basswasapi": "2.4.4.1"
+            },
+            "SelectedDevice": null,
+            "NegotiatedOutput": null,
+            "StartedUtc": "2026-10-06T09:11:26.5234932+00:00",
+            "EndedUtc": "2026-10-06T09:12:27.1403114+00:00",
+            "RequestedSoakSeconds": 60,
+            "ActualSoakSeconds": 60.0118445,
+            "WarmupChanges": 50,
+            "StressChanges": 1000,
+            "Stress": {
+              "ElapsedSeconds": 0.49301619999999996,
+              "CpuSeconds": 0.578125,
+              "OneCoreCpuPercent": 117.26288101689155,
+              "TotalCpuPercent": 29.31572025422289,
+              "LogicalProcessors": 4,
+              "HandleGrowth": 1,
+              "HandleRange": 1,
+              "PrivateGrowthBytes": 7315456,
+              "PrivateRangeBytes": 7315456,
+              "MaximumWorkingSetBytes": 73314304,
+              "HandlesPerMinute": 55.8599958216564,
+              "PrivateMiBPerMinute": 913.5471274190227,
+              "GrowthGuardPassed": true,
+              "Boundary": "Measured process samples; growth guard and regression slope do not establish an indefinite plateau or reference-PC acceptance"
+            },
+            "StressSamples": [
+              {
+                "Seconds": 0.0003133,
+                "CpuSeconds": 0.4375,
+                "Handles": 378,
+                "PrivateBytes": 23957504,
+                "WorkingSetBytes": 64679936,
+                "Threads": 21
+              },
+              {
+                "Seconds": 0.0570044,
+                "CpuSeconds": 0.484375,
+                "Handles": 379,
+                "PrivateBytes": 23977984,
+                "WorkingSetBytes": 65028096,
+                "Threads": 21
+              },
+              {
+                "Seconds": 0.1032183,
+                "CpuSeconds": 0.53125,
+                "Handles": 379,
+                "PrivateBytes": 24698880,
+                "WorkingSetBytes": 65769472,
+                "Threads": 21
+              },
+              {
+                "Seconds": 0.1482652,
+                "CpuSeconds": 0.578125,
+                "Handles": 379,
+                "PrivateBytes": 25481216,
+                "WorkingSetBytes": 66527232,
+                "Threads": 21
+              },
+              {
+                "Seconds": 0.1938474,
+                "CpuSeconds": 0.625,
+                "Handles": 379,
+                "PrivateBytes": 26316800,
+                "WorkingSetBytes": 67280896,
+                "Threads": 21
+              },
+              {
+                "Seconds": 0.2486092,
+                "CpuSeconds": 0.71875,
+                "Handles": 379,
+                "PrivateBytes": 27475968,
+                "WorkingSetBytes": 69111808,
+                "Threads": 21
+              },
+              {
+                "Seconds": 0.2990119,
+                "CpuSeconds": 0.78125,
+                "Handles": 379,
+                "PrivateBytes": 28200960,
+                "WorkingSetBytes": 69890048,
+                "Threads": 21
+              },
+              {
+                "Seconds": 0.3486185,
+                "CpuSeconds": 0.828125,
+                "Handles": 379,
+                "PrivateBytes": 28995584,
+                "WorkingSetBytes": 70639616,
+                "Threads": 21
+              },
+              {
+                "Seconds": 0.3983594,
+                "CpuSeconds": 0.875,
+                "Handles": 379,
+                "PrivateBytes": 29716480,
+                "WorkingSetBytes": 71397376,
+                "Threads": 21
+              },
+              {
+                "Seconds": 0.4476543,
+                "CpuSeconds": 0.921875,
+                "Handles": 379,
+                "PrivateBytes": 30482432,
+                "WorkingSetBytes": 72278016,
+                "Threads": 21
+              },
+              {
+                "Seconds": 0.4933295,
+                "CpuSeconds": 1.015625,
+                "Handles": 379,
+                "PrivateBytes": 31272960,
+                "WorkingSetBytes": 73314304,
+                "Threads": 21
+              }
+            ],
+            "ChangeP95Milliseconds": 0.521,
+            "SoakTransitions": 20,
+            "Soak": {
+              "ElapsedSeconds": 60.011839699999996,
+              "CpuSeconds": 0.15625,
+              "OneCoreCpuPercent": 0.26036528921808744,
+              "TotalCpuPercent": 0.06509132230452186,
+              "LogicalProcessors": 4,
+              "HandleGrowth": 0,
+              "HandleRange": 3,
+              "PrivateGrowthBytes": 327680,
+              "PrivateRangeBytes": 344064,
+              "MaximumWorkingSetBytes": 74428416,
+              "HandlesPerMinute": -1.503480749197421,
+              "PrivateMiBPerMinute": 0.31098927702663753,
+              "GrowthGuardPassed": true,
+              "Boundary": "Measured process samples; growth guard and regression slope do not establish an indefinite plateau or reference-PC acceptance"
+            },
+            "SoakSamples": [
+              {
+                "Seconds": 6.8e-06,
+                "CpuSeconds": 1.015625,
+                "Handles": 380,
+                "PrivateBytes": 31272960,
+                "WorkingSetBytes": 73424896,
+                "Threads": 21
+              },
+              {
+                "Seconds": 5.0004459,
+                "CpuSeconds": 1.125,
+                "Handles": 377,
+                "PrivateBytes": 31268864,
+                "WorkingSetBytes": 73670656,
+                "Threads": 20
+              },
+              {
+                "Seconds": 10.0002119,
+                "CpuSeconds": 1.125,
+                "Handles": 380,
+                "PrivateBytes": 31387648,
+                "WorkingSetBytes": 73748480,
+                "Threads": 21
+              },
+              {
+                "Seconds": 15.0003781,
+                "CpuSeconds": 1.125,
+                "Handles": 380,
+                "PrivateBytes": 31387648,
+                "WorkingSetBytes": 73797632,
+                "Threads": 21
+              },
+              {
+                "Seconds": 20.0102954,
+                "CpuSeconds": 1.125,
+                "Handles": 380,
+                "PrivateBytes": 31367168,
+                "WorkingSetBytes": 73879552,
+                "Threads": 19
+              },
+              {
+                "Seconds": 25.0092883,
+                "CpuSeconds": 1.125,
+                "Handles": 377,
+                "PrivateBytes": 31350784,
+                "WorkingSetBytes": 73867264,
+                "Threads": 18
+              },
+              {
+                "Seconds": 30.0005331,
+                "CpuSeconds": 1.125,
+                "Handles": 377,
+                "PrivateBytes": 31416320,
+                "WorkingSetBytes": 73912320,
+                "Threads": 18
+              },
+              {
+                "Seconds": 35.0009272,
+                "CpuSeconds": 1.125,
+                "Handles": 380,
+                "PrivateBytes": 31469568,
+                "WorkingSetBytes": 74006528,
+                "Threads": 19
+              },
+              {
+                "Seconds": 40.0109916,
+                "CpuSeconds": 1.125,
+                "Handles": 380,
+                "PrivateBytes": 31531008,
+                "WorkingSetBytes": 74063872,
+                "Threads": 19
+              },
+              {
+                "Seconds": 45.0005236,
+                "CpuSeconds": 1.171875,
+                "Handles": 377,
+                "PrivateBytes": 31547392,
+                "WorkingSetBytes": 74313728,
+                "Threads": 18
+              },
+              {
+                "Seconds": 50.0005983,
+                "CpuSeconds": 1.171875,
+                "Handles": 377,
+                "PrivateBytes": 31547392,
+                "WorkingSetBytes": 74358784,
+                "Threads": 18
+              },
+              {
+                "Seconds": 55.0004587,
+                "CpuSeconds": 1.171875,
+                "Handles": 377,
+                "PrivateBytes": 31612928,
+                "WorkingSetBytes": 74407936,
+                "Threads": 18
+              },
+              {
+                "Seconds": 60.0105048,
+                "CpuSeconds": 1.171875,
+                "Handles": 377,
+                "PrivateBytes": 31551488,
+                "WorkingSetBytes": 74395648,
+                "Threads": 15
+              },
+              {
+                "Seconds": 60.0118465,
+                "CpuSeconds": 1.171875,
+                "Handles": 380,
+                "PrivateBytes": 31600640,
+                "WorkingSetBytes": 74428416,
+                "Threads": 16
+              }
+            ],
+            "RenderedFrames": 7920960,
+            "IncomingPcmMaximumError": 0,
+            "NativePcmPeak": 0.030517578125,
+            "MaximumPacingLatenessSeconds": 0,
+            "Sources": [
+              {
+                "File": "owned stress primary.wav",
+                "Sha256": "3abfc7f6ad9c5526b5b6c4879520e15ce6e5a1bafff07e5c6c4ec84c41965ad2"
+              },
+              {
+                "File": "owned stress secondary.wav",
+                "Sha256": "ef700bf8a43ccaa4d3473a0ee2531d5eccc8679c2714a139c17eb0cb00ade0a6"
+              }
+            ],
+            "SourceHashesAndExclusiveReopen": true,
+            "Failure": null,
+            "TwoHourOutput": "not-run",
+            "CpuMethod": "Process CPU delta / elapsed monotonic wall time / logical processors; also reported as one-core equivalent. No forced GC.",
+            "ProcessScope": "Owned headless self-contained apphost/native production path; WPF window, full library and waveform UI are not exercised",
+            "Output": "not-run: actual native mixer callback PCM, without WASAPI",
+            "ReferenceWindows11Pc": "not-verified",
+            "Listening": "not-run",
+            "FullAc033Acceptance": "not-claimed",
+            "Windows": "Microsoft Windows 10.0.20348"
+          },
+          "Hardware": {
+            "Windows": "Microsoft Windows Server 2022 Datacenter",
+            "Build": "20348",
+            "ProductType": 3,
+            "Cpu": [
+              {
+                "Name": "AMD EPYC 7763 64-Core Processor                ",
+                "NumberOfCores": 2,
+                "NumberOfLogicalProcessors": 4,
+                "MaxClockSpeed": 2445
+              }
+            ],
+            "TotalPhysicalMemoryBytes": 17174360064,
+            "MediaDrivers": []
+          },
+          "ReferencePcAndSsd": "not-verified",
+          "WholePlayerUiLibraryWaveform": "not-run",
+          "ManualListening": "not-run",
+          "EvidenceBoundary": "Mixer is actual native PCM without an endpoint. Shared/Exclusive require real WASAPI. Less than 7200 seconds is a short check, never two-hour output acceptance. Headless telemetry is not full WPF/reference-PC resource acceptance."
+        },
+        "smoke/g12-Shared-g12-stress.json": {
+          "Status": "blocked",
+          "Failure": null,
+          "Mode": "Shared",
+          "RequestedSoakSeconds": 60,
+          "SourceCommit": "9d5c45c6b43da22ce3125a92543f2ba5571f41dc",
+          "SourceTreeDirty": false,
+          "PackageManifestSha256": "fa6cada7c26eab939d69e49d2f651c8ee596de9dc120cfd25e6b31ecd8db7ac8",
+          "PowerShellVersion": "5.1.20348.5622",
+          "StartedUtc": "2026-10-06T09:12:33.0275291+00:00",
+          "EndedUtc": "2026-10-06T09:12:33.5276538+00:00",
+          "InvalidExternalDotnetRoots": true,
+          "ActualNative": {
+            "Status": "blocked",
+            "Mode": "shared",
+            "Reason": "Requested/default real output is unavailable; no simulated endpoint or fallback was used.",
+            "Output": "not-run",
+            "TwoHourOutput": "not-run",
+            "Versions": {
+              "bass": "2.4.18.3",
+              "bassmix": "2.4.13.0",
+              "basswasapi": "2.4.4.1"
+            }
+          },
+          "Hardware": {
+            "Windows": "Microsoft Windows Server 2022 Datacenter",
+            "Build": "20348",
+            "ProductType": 3,
+            "Cpu": [
+              {
+                "Name": "AMD EPYC 7763 64-Core Processor                ",
+                "NumberOfCores": 2,
+                "NumberOfLogicalProcessors": 4,
+                "MaxClockSpeed": 2445
+              }
+            ],
+            "TotalPhysicalMemoryBytes": 17174360064,
+            "MediaDrivers": []
+          },
+          "ReferencePcAndSsd": "not-verified",
+          "WholePlayerUiLibraryWaveform": "not-run",
+          "ManualListening": "not-run",
+          "EvidenceBoundary": "Mixer is actual native PCM without an endpoint. Shared/Exclusive require real WASAPI. Less than 7200 seconds is a short check, never two-hour output acceptance. Headless telemetry is not full WPF/reference-PC resource acceptance."
+        },
+        "smoke/package-smoke.json": {
+          "Status": "packaged-executable-smoke-passed",
+          "SourceCommit": "9d5c45c6b43da22ce3125a92543f2ba5571f41dc",
+          "ZipSha256": "936d744628505f0ec1ebc4b49a95dc82749051d62f994a705cf58fb7c2629edc",
+          "UnicodeExtractionPath": true,
+          "ArbitraryWorkingDirectory": true,
+          "InvalidExternalDotnetRoot": true,
+          "TamperRejected": true,
+          "Windows": "Microsoft Windows NT 10.0.20348.0",
+          "CleanWindows11WithoutSdk": "not-run",
+          "NetworkDisconnected": "not-run",
+          "DeviceOutput": "not-run",
+          "DistributionApproved": false
+        }
+      }
+    },
+    {
+      "name": "evidence-ubuntu-24.04",
+      "archiveSha256": "0e30cd77975c5090ddd509bef24d0c0ea151819be817dc6216ddd33239865f8e",
+      "tests": [
+        {
+          "total": "157",
+          "executed": "157",
+          "passed": "157",
+          "failed": "0",
+          "error": "0",
+          "timeout": "0",
+          "aborted": "0",
+          "inconclusive": "0",
+          "passedButRunAborted": "0",
+          "notRunnable": "0",
+          "notExecuted": "0",
+          "disconnected": "0",
+          "warning": "0",
+          "completed": "0",
+          "inProgress": "0",
+          "pending": "0"
+        }
+      ],
+      "reports": {
+        "portable/integrity-audit.json": {
+          "Status": "candidate-integrity-negative-checks-passed",
+          "SourceCommit": "9d5c45c6b43da22ce3125a92543f2ba5571f41dc",
+          "SourceTreeDirty": false,
+          "Checks": [
+            "changed file",
+            "missing file",
+            "extra file",
+            "empty checksum list"
+          ],
+          "ZipSha256": "df72b1197224ea664bce838861a8ccc3cd535723bc2fff33e44f3f28d684bcc2",
+          "RestoredCopyPassed": true
+        },
+        "portable/package-audit.json": {
+          "Status": "local-candidate-packaged",
+          "SourceCommit": "9d5c45c6b43da22ce3125a92543f2ba5571f41dc",
+          "SourceTreeDirty": false,
+          "Zip": "LocalAudioPlayer-dev-9d5c45c6b43d-win-x64.zip",
+          "ZipSha256": "df72b1197224ea664bce838861a8ccc3cd535723bc2fff33e44f3f28d684bcc2",
+          "Bytes": 85503125,
+          "Files": 557,
+          "Dependencies": 14,
+          "NativeLibraries": 13,
+          "DistributionApproved": false
+        }
+      }
+    }
+  ],
+  "boundary": "Actual production native PCM transitions and 60 real-wall-time seconds on hosted Windows Server 2022, headless extracted apphost, Windows PowerShell 5.1.20348.5622. Not two-hour WASAPI output, full UI/reference-PC resources or listening. Actual unavailable Shared output correctly blocked."
+}

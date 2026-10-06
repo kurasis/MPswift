@@ -98,6 +98,8 @@ try {
                     $file = Join-Path $_.FullName $name
                     if (Test-Path $file) { Copy-Item $file (Join-Path $out "g12-$mode-$name") }
                 }
+                $progress = Join-Path $_.FullName 'g12-progress.jsonl'
+                if (Test-Path $progress) { Copy-Item $progress (Join-Path $out "g12-$mode-progress.jsonl") }
             }
         }
         $g12 = Get-Content (Join-Path $out "g12-$mode-g12-stress.json") -Raw | ConvertFrom-Json
