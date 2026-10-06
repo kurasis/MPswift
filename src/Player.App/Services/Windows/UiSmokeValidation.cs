@@ -87,6 +87,7 @@ public sealed class UiSmokeValidation : TraceListener
         model = ((App)Application.Current).CreateModel(Path.Combine(Environment.CurrentDirectory, "artifacts", "smoke", "stage-c-data"));
         window.DataContext = model;
         await model.InitializeAsync();
+        ((App)Application.Current).RebindMedia(window, model);
         await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ContextIdle);
         await model.WaveformCompletion.WaitAsync(TimeSpan.FromSeconds(30));
         Require(model.Playlists.Count == 2 && model.SelectedPlaylist.Id == duplicateTabId && model.SourcePlaylistId == sourceTabId, "Playlist selection/source identity was not restored.");
@@ -128,6 +129,8 @@ public sealed class UiSmokeValidation : TraceListener
         using (File.Open(indexedSource, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) { }
         await model.SaveNowAsync();
         Require(Hash(fixture) == fixtureHash && Hash(taggedFixture) == taggedHash && Hash(indexedSource) == fixtureHash, "Library/import/rating/relink/artwork workflow changed source bytes.");
+        var integration = await IntegrationSmokeValidation.RunAsync(window, model, fixture);
+        await model.SaveNowAsync();
         window.UpdateLayout();
         await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ContextIdle);
         Require(_bindingErrors.Count == 0, "WPF binding warnings/errors: " + string.Join("; ", _bindingErrors.Take(8)));
@@ -140,6 +143,7 @@ public sealed class UiSmokeValidation : TraceListener
         using (var file = File.Create(Path.Combine(output, "stage-c-window.png"))) encoder.Save(file);
         return new
         {
+            WindowsIntegration = integration,
             Status = "ui-smoke-passed", Environment = System.Runtime.InteropServices.RuntimeInformation.OSDescription,
             ImportedEntries = model.Entries.Count, DistinctEntryIds = true, SharedTrackIdentity = true,
             ImportDidNotAutoplay = true, NativePreparation = true, DurationSeconds = model.DurationSeconds,

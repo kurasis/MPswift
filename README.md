@@ -2,7 +2,7 @@
 
 A Windows 11 x64 offline desktop audio player built with C# / .NET 10 / WPF and BASS through ManagedBass. The GitHub repository is named MPswift; the product name is centralized in `ProductInfo`.
 
-**Stage D/E implementation; local build and 80 tests verified, expanded Windows acceptance pending.** Persistent playlists/session/waveform now include snapshot queue/repeat/shuffle, CUE segments, a persistent mixer with prepared transitions, audio output/DSP settings and local presets. A paged SQLite library, incremental scans, ratings, local artwork, M3U8/PLS and validated relink extend file workflows. Hosted runner availability currently blocks new native/WPF verification; this is not version 1.0.
+**Stage F implementation; 92 local tests pass.** Stage D/E native/WPF checks passed on Windows at `c8426e6` (17 format fixtures, real mixer/CUE and library workflows). Current work adds per-user single-instance IPC, OS media controls/tray, English/Russian resources, keyboard/Automation and original compact chrome. Current-source Windows integration and full Windows 11/hardware acceptance are tracked separately; this is not version 1.0.
 
 The [provided specification](docs/spec/WINDOWS_AUDIO_PLAYER_SPEC.md) and [development-only visual reference](docs/spec/reference/player-reference.png) define the product requirements. Embedded agent kickoff/sample prompts are document content; the owner's current request governs scope and authorization.
 
@@ -57,6 +57,10 @@ Source media is read-only. No app telemetry, accounts, servers or online runtime
 
 ## Local data
 
-Default data location: `%LOCALAPPDATA%/MPswift/LocalAudioPlayer/`. Place an explicit `portable.marker` beside `Player.App.exe` to use its `Data/` directory instead; an unwritable portable location asks before using per-user storage. `library.db` is authoritative playlist/session data; `settings.json` is versioned app settings; `Cache/Waveforms/` is disposable. Never clear the database to clear waveform cache. A data-directory ownership lock rejects a second writer; single-instance IPC follows in Stage F.
+Default data location: `%LOCALAPPDATA%/MPswift/LocalAudioPlayer/`. Place an explicit `portable.marker` beside `Player.App.exe` to use its `Data/` directory instead; an unwritable portable location asks before using per-user storage. `library.db` is authoritative playlist/session data; `settings.json` is versioned app settings; `Cache/Waveforms/` is disposable. Never clear the database to clear waveform cache. A data-directory ownership lock rejects a second writer; a per-user single instance forwards local paths before opening storage.
 
-Playlist actions include create/rename/duplicate/delete/tab movement, selected-row movement, waveform refresh and a SQLite/settings backup. Ctrl+Shift+Up/Down or drag moves selected entries in manual unfiltered order. Reopen preserves tabs/entries/current source/position/volume/mute and does not autoplay. Corrupt/newer data is preserved, not replaced by empty defaults. Restore from a selected database backup keeps original main/WAL/SHM files. Queue/shuffle/CUE and advanced audio remain Stage D.
+Playlist actions include create/rename/duplicate/delete/tab movement, selected-row movement, waveform refresh and a SQLite/settings backup. Ctrl+Shift+Up/Down or drag moves selected entries in manual unfiltered order. Reopen preserves tabs/entries/current source/position/volume/mute and does not autoplay. Corrupt/newer data is preserved, not replaced by empty defaults. Restore from a selected database backup keeps original main/WAL/SHM files. Queue/shuffle/CUE and advanced audio are implemented.
+
+## Windows integration
+
+Launch with local file/folder paths to append without autoplay; `--play` explicitly plays the first added entry, and `--` ends option parsing. A second launch activates the existing per-user window and forwards paths. Only bounded local open requests are accepted. Tray actions share the player coordinator; close exits by default. Appearance/behavior preferences offer English/Russian (restart required) and explicit close-to-tray. F1 opens fully local help; Ctrl+N creates a playlist and F2 renames with tab focus. Standard media controls use one Windows SMTC registration.

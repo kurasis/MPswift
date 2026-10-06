@@ -2,6 +2,10 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using Player.Core.Waveforms;
+using System.Windows.Automation;
+using System.Windows.Automation.Peers;
+using System.Windows.Automation.Provider;
+using Player.App.Resources;
 
 namespace Player.App.Controls;
 
@@ -21,9 +25,8 @@ public sealed class WaveformControl : FrameworkElement
     private StreamGeometry? _geometry;
     private bool _dragging;
     private double _preview;
-    private static readonly Brush Remaining = new SolidColorBrush(Color.FromRgb(0x88, 0x88, 0x88));
-    private static readonly Brush Played = new SolidColorBrush(Color.FromRgb(0xe6, 0x8a, 0x1f));
-    public WaveformControl() { Cursor = Cursors.Hand; Remaining.Freeze(); Played.Freeze(); }
+    public WaveformControl() { Cursor = Cursors.Hand; Focusable = true; }
+    protected override AutomationPeer OnCreateAutomationPeer() => new SeekPeer(this);
     private static void GeometryChanged(DependencyObject owner, DependencyPropertyChangedEventArgs args) => ((WaveformControl)owner)._geometry = null;
     protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo) { _geometry = null; base.OnRenderSizeChanged(sizeInfo); }
     protected override void OnRender(DrawingContext drawing)
@@ -31,11 +34,14 @@ public sealed class WaveformControl : FrameworkElement
         drawing.DrawRectangle(Brushes.Transparent, null, new Rect(RenderSize));
         if (ActualWidth <= 0 || ActualHeight <= 0 || Data is null) return;
         _geometry ??= BuildGeometry(Data);
-        drawing.DrawGeometry(Remaining, null, _geometry);
+        var remaining = SystemParameters.HighContrast ? SystemColors.WindowTextBrush : (Brush?)TryFindResource("WaveformRemainingBrush") ?? Brushes.LightGray;
+        var played = SystemParameters.HighContrast ? SystemColors.HighlightBrush : (Brush?)TryFindResource("AccentBrush") ?? Brushes.Orange;
+        drawing.DrawGeometry(remaining, null, _geometry);
         var fraction = Duration > 0 ? Math.Clamp((_dragging ? _preview : Position) / Duration, 0, 1) : 0;
         drawing.PushClip(new RectangleGeometry(new Rect(0, 0, ActualWidth * fraction, ActualHeight)));
-        drawing.DrawGeometry(Played, null, _geometry); drawing.Pop();
-        drawing.DrawLine(new Pen(Played, 1), new Point(ActualWidth * fraction, 0), new Point(ActualWidth * fraction, ActualHeight));
+        drawing.DrawGeometry(played, null, _geometry); drawing.Pop();
+        drawing.DrawLine(new Pen(played, 1), new Point(ActualWidth * fraction, 0), new Point(ActualWidth * fraction, ActualHeight));
+        if (IsKeyboardFocused) drawing.DrawRectangle(null, new Pen(remaining, 1) { DashStyle = DashStyles.Dot }, new Rect(1, 1, Math.Max(0, ActualWidth - 2), Math.Max(0, ActualHeight - 2)));
     }
     private StreamGeometry BuildGeometry(WaveformData data)
     {
@@ -62,6 +68,7 @@ public sealed class WaveformControl : FrameworkElement
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
     {
         if (!CanSeek || Duration <= 0) return;
+        Focus();
         _dragging = true; CaptureMouse(); _preview = Map(e.GetPosition(this)); PreviewSeek?.Invoke(_preview); InvalidateVisual(); e.Handled = true;
     }
     protected override void OnMouseMove(MouseEventArgs e)
@@ -75,4 +82,33 @@ public sealed class WaveformControl : FrameworkElement
     protected override void OnLostMouseCapture(MouseEventArgs e) { FinishDrag(); base.OnLostMouseCapture(e); }
     private void FinishDrag()
     { if (!_dragging) return; _dragging = false; ReleaseMouseCapture(); CommitSeek?.Invoke(_preview); InvalidateVisual(); }
+    public void SeekFromAutomation(double value)
+    {
+        if (!CanSeek) throw new ElementNotEnabledException();
+        if (!double.IsFinite(value) || value < 0 || value > Duration) throw new ArgumentOutOfRangeException(nameof(value));
+        CommitSeek?.Invoke(value);
+    }
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        if (CanSeek && Keyboard.Modifiers == ModifierKeys.None && e.Key is Key.Left or Key.Right or Key.Home or Key.End)
+        {
+            SeekFromAutomation(e.Key switch { Key.Home => 0, Key.End => Duration, Key.Left => Math.Max(0, Position - 5), _ => Math.Min(Duration, Position + 5) });
+            e.Handled = true;
+        }
+        base.OnKeyDown(e);
+    }
+    private sealed class SeekPeer(WaveformControl owner) : FrameworkElementAutomationPeer(owner), IRangeValueProvider
+    {
+        protected override string GetClassNameCore() => "WaveformSeek";
+        protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.Slider;
+        protected override string GetNameCore() => string.IsNullOrEmpty(base.GetNameCore()) ? Strings.Seek : base.GetNameCore();
+        public override object? GetPattern(PatternInterface patternInterface) => patternInterface == PatternInterface.RangeValue ? this : base.GetPattern(patternInterface);
+        public bool IsReadOnly => !owner.CanSeek;
+        public double LargeChange => 30;
+        public double SmallChange => 5;
+        public double Maximum => owner.Duration;
+        public double Minimum => 0;
+        public double Value => owner.Position;
+        public void SetValue(double value) => owner.Dispatcher.Invoke(() => owner.SeekFromAutomation(value));
+    }
 }

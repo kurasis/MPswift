@@ -1,10 +1,10 @@
 # Implementation checkpoint
 
-Updated: **2026-10-05**.
+Updated: **2026-10-06**.
 
 ## Current scope
 
-**Stage D / M3 and Stage E / M4 implementation added; local verification passes, expanded Windows acceptance is pending.** The owner requested the next stage and automatic continuation to the following stage. Stage D was committed as `e2d162f`; Stage E followed in the same task. The full P0 + P1 specification remains the target. This is not version 1.0. Russian chat, English repository and automatic development commit/push/merge remain authorized.
+**Stage F / M5 implementation added; 92 local tests pass, new Windows integration checks are pending.** Stage D/E Windows native/WPF checks now pass at `c8426e6` in run 37367043601 attempt 2. The owner requested Stage F followed automatically by Stage G. Full P0 + P1 acceptance remains the target; this is not version 1.0. Russian chat, English repository and automatic development commit/push/merge remain authorized.
 
 ## Implemented through Stage E
 
@@ -24,16 +24,24 @@ Updated: **2026-10-05**.
 
 ## Current verification
 
-Locked Linux Release cross-build: **0 warnings / 0 errors; 80 tests passed / 0 failed / 0 skipped**. Tests include actual SQLite migration/backup/index/search/rating/listening integration and a 100,000-record paged dataset, queue/repeat/shuffle/CUE, measured pure-PCM EQ and all previous checks. Local self-contained development publish and all native hashes/companions were audited; no public release was published.
+Locked Linux Release cross-build: **0 warnings / 0 errors; 92 tests passed / 0 failed / 0 skipped**. Tests include actual SQLite migration/backup/index/search/rating/listening integration and a 100,000-record paged dataset, queue/repeat/shuffle/CUE, measured pure-PCM EQ and all previous checks. Local self-contained development publish and all native hashes/companions were audited; no public release was published.
 
-The Stage D [run 37363650027](https://github.com/kurasis/MPswift/actions/runs/37363650027) executed **zero steps**: both jobs were canceled because `The job was not acquired by Runner of type hosted even after multiple attempts`. This is an external runner failure, not a passed suite or evidence of an application test failure. The workflow now uses explicit `windows-2022` / `ubuntu-24.04` labels to try different stable pools. New smoke checks capture actual production mixer callback PCM for split lossless/CUE boundaries, check overlap seek cancellation, and exercise WPF queue/session/library/M3U8/rating/relink/CUE/artwork/source hashes. Their execution remains pending until a runner starts; endpoint/digital output/listening are separate gates.
+The latest Stage D/E [Windows/Linux rerun](https://github.com/kurasis/MPswift/actions/runs/37367043601/attempts/2) passed at `c8426e6`: 80 core tests on each OS, 17 real codecs, actual two-hour waveform, callback PCM lossless/CUE maximum error **0**, overlap seek cancellation and all Stage E WPF/database/import/rating/relink/artwork/source-hash checks. [Retained reports](evidence/stage-de-windows-native-ui.json) identify the exact source and Windows Server 2022 environment. Prior zero-step runs failed hosted runner acquisition. This proves production callback PCM and WPF workflows, not endpoint output/listening or Windows 11 release acceptance.
 
+## Stage F additions
+
+- Per-user global mutex and current-user-only local named pipe. JSON is limited to 64 KiB, 1,000 local paths and 32 queued requests; only append/activate/explicit play is accepted. Concurrent second launches serialize after initialization/import; unknown CLI options, URLs, UNC/device/ADS paths and unknown JSON fields are rejected.
+- Desktop HWND SMTC integration through the pinned Windows SDK projection `10.0.19041.57` and documented minimal interop. A single OS handler dispatches Play/Pause/Stop/Next/Previous to the same coordinator. Title/artist/album/state/local thumbnail are published; no duplicate global key registration. Unavailable Windows integration leaves app controls usable.
+- Tray Show/Hide/Play/Pause/Next/Previous/Exit, bounded Unicode-safe tooltip, explicit persisted close-to-tray (default off), shutdown disposal and no autoplay on forwarding/restoration.
+- Complete paired English/Russian resource sets and localized enum/menu/dialog/primary error text; persisted language selection applies after restart. Technical native/exception details and user metadata remain as supplied.
+- Original vector transport and caption, contained WindowChrome/system commands, work-area-safe saved dimensions/position/maximized state, early PerMonitorV2 initialization, high-contrast system-color resources and visible focus. Correct shortcut input ownership, Ctrl+N/F2, empty-search clear action, accessible waveform RangeValue provider and keyboard seeking.
+- Expanded real WPF smoke launches the actual application in second processes, rejects an oversized request, checks tray state, seek Automation, both startup languages, almost 10k real rows with fewer than 150 realized containers and minimum layout. Actual global media key presses, Narrator and physical 100/150/200% DPI/monitor moves remain manual acceptance.
 Previous [Stage C Windows job](https://github.com/kurasis/MPswift/actions/runs/37359855055/job/111931430685) passed at `a38e81e`: 59 tests, 14 codecs, actual two-hour waveform and WPF persistence. Its matching Linux job later canceled without a runner. This historical result does not verify the new graph/library code. Exact retained evidence remains under `docs/evidence/`.
 
 ## Resume and commands
 
 - Use existing checkout `/workspace/MPswift`; activate `source /workspace/toolchains/activate.sh`. No new worktree or service is required. The cloud startup draft was refreshed for Stage D/E and Stage F continuation; install instructions remain unchanged.
-- `scripts/Build.ps1`: locked restore, Release cross-build and 80 platform-neutral/storage tests.
+- `scripts/Build.ps1`: locked restore, Release cross-build and 92 platform-neutral/storage/IPC validation tests.
 - `scripts/Setup-Native.ps1`: verify/provision 13 pinned development DLLs and upstream notices. Generic MPC/TTA notices are kept in separate subdirectories to avoid collisions.
 - `scripts/Publish-Development.ps1`: self-contained local output, manifest hashes and companion audit; no public ZIP/release.
 - Actual Windows x64: `scripts/Smoke.ps1` runs real format/engine/waveform/mixer/WPF checks without an endpoint. `-Play` adds actual shared-device API checks, separately from listening.
@@ -41,4 +49,4 @@ Previous [Stage C Windows job](https://github.com/kurasis/MPswift/actions/runs/3
 
 ## Next work
 
-First collect/fix the expanded Windows native/WPF run. Stage F then adds single-instance IPC, media controls/tray, English/Russian product resources, keyboard/accessibility/DPI and visual polish. Stage G retains full Windows 11 clean/offline/device/digital/stress/performance/license/release gates. Unverified P0/P1 profiles are release blockers, not removed requirements.
+Collect/fix Stage F Windows integration evidence. Continue Stage G with local candidate packaging, full hash/dependency/help audit, repeatable acceptance procedures and CI evidence. Windows 11 clean/offline/device/digital/stress/performance/license gates remain explicit; unavailable hardware/fixtures/license decisions cannot be reported passed.

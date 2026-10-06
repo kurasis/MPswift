@@ -1,3 +1,4 @@
+using Player.App.Resources;
 using System.Windows;
 using Player.App.Services.Audio;
 using Player.App.ViewModels;
@@ -9,19 +10,72 @@ using Player.App.Services.Storage;
 using Player.App.Services.Waveforms;
 using System.IO;
 using System.Text.Json;
+using System.Globalization;
+using Player.Core.Integration;
 
 namespace Player.App;
 
 public partial class App : Application
 {
+    static App() => System.Windows.Forms.Application.SetHighDpiMode(System.Windows.Forms.HighDpiMode.PerMonitorV2);
+    private SingleInstanceService? _instance;
+    private TrayService? _tray;
+    private MediaSessionService? _media;
+    public bool MediaSessionAvailable => _media is not null;
+    public string? InstancePipeName => _instance?.PipeName;
     private async void OnStartup(object sender, StartupEventArgs e)
     {
         var smoke = e.Args.Length == 3 && e.Args[0] == "--ui-smoke";
+        ShutdownMode = ShutdownMode.OnExplicitShutdown;
+        OpenRequest? request = null;
+        try { if (!smoke) request = OpenRequest.ParseArguments(e.Args, Environment.CurrentDirectory); }
+        catch (Exception error) { MessageBox.Show(Strings.Get("InvalidArguments") + "\n\n" + error.Message, Player.Core.ProductInfo.Name); Shutdown(2); return; }
+        var ready = new TaskCompletionSource<MainWindow>(TaskCreationOptions.RunContinuationsAsynchronously);
+        try
+        {
+            _instance = new SingleInstanceService();
+            if (!_instance.IsPrimary)
+            {
+                if (smoke) throw new InvalidOperationException("UI smoke requires an isolated Windows user session.");
+                await _instance.ForwardAsync(request!); Shutdown(); return;
+            }
+            _instance.StartReceiving(async incoming =>
+            {
+                var active = await ready.Task;
+                await Dispatcher.InvokeAsync(async () =>
+                {
+                    try
+                    {
+                        active.ShowAndActivate();
+                        var current = (PlayerViewModel)active.DataContext;
+                        await current.ImportCompletion;
+                        var before = current.Entries.Select(row => row.Id).ToHashSet();
+                        await current.AddPathsAsync(incoming.Paths);
+                        if (incoming.Play)
+                        {
+                            var added = current.Entries.FirstOrDefault(row => !before.Contains(row.Id));
+                            if (added is not null) await current.PlayEntryCommand.ExecuteAsync(added);
+                            else if (incoming.Paths.Length == 0) await current.HandleMediaAsync("Play");
+                        }
+                    }
+                    catch (Exception error) { var current = (PlayerViewModel)active.DataContext; current.Message = Strings.ErrorUnexpected; current.Details = error.Message; }
+                }).Task.Unwrap();
+            });
+        }
+        catch (Exception error) { MessageBox.Show(Strings.Get("ForwardFailed") + "\n\n" + error.Message, Player.Core.ProductInfo.Name); Shutdown(3); return; }
         using var validation = smoke ? new UiSmokeValidation() : null;
         if (smoke) ShutdownMode = ShutdownMode.OnExplicitShutdown;
         string directory;
         try { directory = smoke ? StorageLocation.Prepare(Path.Combine(Environment.CurrentDirectory, "artifacts", "smoke", "stage-c-data")) : StorageLocation.Resolve(); }
-        catch (Exception error) { MessageBox.Show(error.Message, "Storage unavailable"); Shutdown(1); return; }
+        catch (Exception error) { MessageBox.Show(error.Message, Strings.Get("StorageUnavailable")); Shutdown(1); return; }
+        try
+        {
+            var language = new SettingsFile(directory).Load().Validate().Language;
+            var culture = CultureInfo.GetCultureInfo(language == "ru" ? "ru-RU" : "en-US");
+            CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = culture;
+            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.DefaultThreadCurrentUICulture = culture;
+        }
+        catch (Exception error) { ReportStartupFailure(smoke, error); Shutdown(1); return; }
         PlayerViewModel model;
         try { model = CreateModel(directory); }
         catch (Exception error) { ReportStartupFailure(smoke, error); Shutdown(1); return; }
@@ -35,9 +89,9 @@ public partial class App : Application
         {
             await model.DisposeAsync();
             if (!smoke && error is not (NewerDatabaseSchemaException or PlayerStoreInUseException) &&
-                MessageBox.Show("Saved data could not be read. Original files will be preserved. Restore a database backup?\n\n" + error.Message, "Saved data unavailable", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                MessageBox.Show(Strings.Get("RestorePrompt") + "\n\n" + error.Message, Strings.Get("SavedDataUnavailable"), MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
             {
-                var dialog = new Microsoft.Win32.OpenFileDialog { Filter = "SQLite backup (*.db)|*.db" };
+                var dialog = new Microsoft.Win32.OpenFileDialog { Filter = Strings.Get("BackupFilter") };
                 if (dialog.ShowDialog() == true)
                 {
                     try
@@ -54,7 +108,22 @@ public partial class App : Application
         }
         window.Width = Math.Min(model.WindowSettings.WindowWidth, SystemParameters.WorkArea.Width);
         window.Height = Math.Min(model.WindowSettings.WindowHeight, SystemParameters.WorkArea.Height);
+        // Clamp saved bounds to the available work area; disconnected monitors cannot strand the window.
+        if (!smoke && model.WindowSettings.WindowLeft is { } left && model.WindowSettings.WindowTop is { } top)
+        {
+            window.Left = Math.Clamp(left, SystemParameters.WorkArea.Left, SystemParameters.WorkArea.Right - window.Width);
+            window.Top = Math.Clamp(top, SystemParameters.WorkArea.Top, SystemParameters.WorkArea.Bottom - window.Height);
+        }
         window.Show();
+        if (!smoke && model.WindowSettings.WindowMaximized) window.WindowState = WindowState.Maximized;
+        if (!smoke)
+        {
+            ShutdownMode = ShutdownMode.OnLastWindowClose;
+            _tray = new TrayService(window, model);
+        }
+        try { _media = new MediaSessionService(window, model); }
+        catch (Exception error) { model.Message = Strings.Get("IntegrationUnavailable"); model.Details = error.Message; }
+        if (smoke) ready.TrySetResult(window);
         if (smoke)
         {
             var output = Path.Combine(Environment.CurrentDirectory, "artifacts", "smoke");
@@ -75,7 +144,27 @@ public partial class App : Application
             File.WriteAllText(Path.Combine(output, "ui.json"), JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));
             Shutdown(resultCode);
         }
-        else if (e.Args.Length > 0) await model.AddPathsAsync(e.Args);
+        else if (request is not null)
+        {
+            var existing = model.Entries.Select(row => row.Id).ToHashSet();
+            await model.AddPathsAsync(request.Paths);
+            if (request.Play)
+            {
+                if (request.Paths.Length > 0 && model.Entries.FirstOrDefault(row => !existing.Contains(row.Id)) is { } first) await model.PlayEntryCommand.ExecuteAsync(first);
+                else if (request.Paths.Length == 0) await model.HandleMediaAsync("Play");
+            }
+        }
+        if (!smoke) ready.TrySetResult(window);
+    }
+    public void RebindMedia(MainWindow window, PlayerViewModel model)
+    {
+        _media?.Dispose(); _media = null;
+        try { _media = new MediaSessionService(window, model); } catch (Exception error) { model.Details = error.Message; }
+    }
+    public bool MediaMetadataMatches(PlayerViewModel model) => _media?.MetadataMatches(model) == true;
+    protected override void OnExit(ExitEventArgs e)
+    {
+        _media?.Dispose(); _tray?.Dispose(); _instance?.Dispose(); base.OnExit(e);
     }
     private static void ReportStartupFailure(bool smoke, Exception error)
     {
@@ -84,7 +173,7 @@ public partial class App : Application
             var output = Path.Combine(Environment.CurrentDirectory, "artifacts", "smoke"); Directory.CreateDirectory(output);
             File.WriteAllText(Path.Combine(output, "ui.json"), JsonSerializer.Serialize(new { Status = "ui-smoke-failed", error.Message, error.StackTrace }));
         }
-        else MessageBox.Show("Saved data could not be read. Original files have been preserved.\n\n" + error.Message, "Saved data unavailable", MessageBoxButton.OK, MessageBoxImage.Error);
+        else MessageBox.Show(Strings.Get("StartupFailure") + "\n\n" + error.Message, Strings.Get("SavedDataUnavailable"), MessageBoxButton.OK, MessageBoxImage.Error);
     }
     public PlayerViewModel CreateModel(string directory)
     {

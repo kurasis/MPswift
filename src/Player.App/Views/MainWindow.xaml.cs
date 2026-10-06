@@ -15,6 +15,7 @@ public partial class MainWindow : Window
     private PlaylistRowViewModel[] _dragRows = [];
     private bool _shutdownComplete;
     private bool _shutdownStarted;
+    private bool _exitRequested;
     private PlayerViewModel Model => (PlayerViewModel)DataContext;
     public MainWindow()
     {
@@ -23,6 +24,11 @@ public partial class MainWindow : Window
         WaveformView.CommitSeek += async seconds => { Model.SeekPreview = false; await Model.CommitSeekAsync(seconds); };
         Width = Math.Min(Width, SystemParameters.WorkArea.Width);
         Height = Math.Min(Height, SystemParameters.WorkArea.Height);
+        MinWidth = Math.Min(MinWidth, SystemParameters.WorkArea.Width);
+        MinHeight = Math.Min(MinHeight, SystemParameters.WorkArea.Height);
+        ApplyContrastTheme();
+        SystemParameters.StaticPropertyChanged += OnSystemSettings;
+        Closed += (_, _) => SystemParameters.StaticPropertyChanged -= OnSystemSettings;
     }
     private async void OnTrackDoubleClick(object sender, MouseButtonEventArgs e)
     {
@@ -65,12 +71,14 @@ public partial class MainWindow : Window
     }
     private async void OnKeyDown(object sender, KeyEventArgs e)
     {
+        if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.N) { OnCreatePlaylist(sender, e); e.Handled = true; return; }
+        if (Keyboard.Modifiers == ModifierKeys.None && e.Key == Key.F2 && PlaylistTabs.IsKeyboardFocusWithin) { OnRenamePlaylist(sender, e); e.Handled = true; return; }
         if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.F) { SearchBox.Focus(); SearchBox.SelectAll(); e.Handled = true; return; }
         if (e.Key == Key.Escape) { Model.ClearSearchCommand.Execute(null); e.Handled = true; return; }
         if (e.Key == Key.F1) { OnHelp(sender, e); e.Handled = true; return; }
+        if (OwnsInput(e.OriginalSource as DependencyObject)) return;
         if (PlaylistList.IsKeyboardFocusWithin && Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift) && e.Key is Key.Up or Key.Down)
         { Model.MoveEntries(PlaylistList.SelectedItems.Cast<PlaylistRowViewModel>(), e.Key == Key.Up ? -1 : 1); e.Handled = true; return; }
-        if (OwnsInput(e.OriginalSource as DependencyObject)) return;
         if (Keyboard.Modifiers == ModifierKeys.None && e.Key == Key.Space) { await Model.PlayPauseCommand.ExecuteAsync(null); e.Handled = true; }
         else if (PlaylistList.IsKeyboardFocusWithin && e.Key == Key.Enter) { await Model.PlayEntryCommand.ExecuteAsync(Model.SelectedEntry); e.Handled = true; }
         else if (PlaylistList.IsKeyboardFocusWithin && e.Key == Key.Delete) { OnRemove(sender, e); e.Handled = true; }
@@ -82,7 +90,7 @@ public partial class MainWindow : Window
     {
         while (element is not null)
         {
-            if (element is TextBoxBase or PasswordBox or ButtonBase or Slider) return true;
+            if (element is TextBoxBase or PasswordBox or ButtonBase or Slider or ComboBox or MenuItem) return true;
             element = element is System.Windows.Media.Visual or System.Windows.Media.Media3D.Visual3D
                 ? System.Windows.Media.VisualTreeHelper.GetParent(element)
                 : (element as FrameworkContentElement)?.Parent ?? LogicalTreeHelper.GetParent(element);
@@ -93,10 +101,12 @@ public partial class MainWindow : Window
     {
         if (_shutdownComplete) return;
         e.Cancel = true;
+        if (Model.WindowSettings.CloseToTray && !_exitRequested) { Hide(); return; }
         if (_shutdownStarted) return;
         _shutdownStarted = true;
         IsEnabled = false;
-        Model.WindowSettings = Model.WindowSettings with { WindowWidth = RestoreBounds.Width, WindowHeight = RestoreBounds.Height };
+        Model.WindowSettings = Model.WindowSettings with { WindowWidth = RestoreBounds.Width, WindowHeight = RestoreBounds.Height,
+            WindowLeft = RestoreBounds.Left, WindowTop = RestoreBounds.Top, WindowMaximized = WindowState == WindowState.Maximized };
         try { await Model.DisposeAsync(); _shutdownComplete = true; Close(); }
         catch (Exception error)
         {
@@ -108,6 +118,19 @@ public partial class MainWindow : Window
                 catch (Exception cleanup) { Model.Details = cleanup.Message; }
             }
         }
+    }
+    public void ShowAndActivate() { Show(); if (WindowState == WindowState.Minimized) WindowState = WindowState.Normal; Activate(); }
+    public void ExitApplication() { _exitRequested = true; Close(); }
+    private void OnPreferences(object sender, RoutedEventArgs e) => new PreferencesWindow(this, Model).ShowDialog();
+    private void OnMinimize(object sender, RoutedEventArgs e) => SystemCommands.MinimizeWindow(this);
+    private void OnMaximize(object sender, RoutedEventArgs e) { if (WindowState == WindowState.Maximized) SystemCommands.RestoreWindow(this); else SystemCommands.MaximizeWindow(this); }
+    private void OnCloseWindow(object sender, RoutedEventArgs e) => Close();
+    private void OnSystemMenu(object sender, MouseButtonEventArgs e) { if (e.ChangedButton == MouseButton.Right) SystemCommands.ShowSystemMenu(this, PointToScreen(e.GetPosition(this))); }
+    private void OnSystemSettings(object? sender, PropertyChangedEventArgs e) { if (e.PropertyName == nameof(SystemParameters.HighContrast)) Dispatcher.BeginInvoke(ApplyContrastTheme); }
+    private void ApplyContrastTheme()
+    {
+        Resources.MergedDictionaries.Clear();
+        if (SystemParameters.HighContrast) Resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri("/Player.App;component/Themes/HighContrast.xaml", UriKind.Relative) });
     }
     private void OnRowDragStart(object sender, MouseButtonEventArgs e)
     {
@@ -140,16 +163,16 @@ public partial class MainWindow : Window
     private void OnSort(object sender, RoutedEventArgs e) { if (sender is MenuItem { Tag: string field }) Model.SortPlaylist(field); }
     private async void OnExportPlaylist(object sender, RoutedEventArgs e)
     {
-        var dialog = new Microsoft.Win32.SaveFileDialog { Filter = "UTF-8 playlist (*.m3u8)|*.m3u8", FileName = "playlist.m3u8" }; if (dialog.ShowDialog(this) != true) return;
-        try { await Model.ExportPlaylistAsync(dialog.FileName); Model.Message = "Playlist exported; source audio was unchanged."; }
-        catch (Exception error) { Model.Message = "Export failed"; Model.Details = error.Message; }
+        var dialog = new Microsoft.Win32.SaveFileDialog { Filter = Strings.Get("PlaylistFilter"), FileName = "playlist.m3u8" }; if (dialog.ShowDialog(this) != true) return;
+        try { await Model.ExportPlaylistAsync(dialog.FileName); Model.Message = Strings.Get("Exported"); }
+        catch (Exception error) { Model.Message = Strings.Get("ExportFailed"); Model.Details = error.Message; }
     }
     private async void OnRelink(object sender, RoutedEventArgs e)
     {
         if (Model.SelectedEntry is not { } row) return;
-        var dialog = new Microsoft.Win32.OpenFileDialog { Title = "Select the replacement local audio source" }; if (dialog.ShowDialog(this) != true) return;
+        var dialog = new Microsoft.Win32.OpenFileDialog { Title = Strings.Get("ReplacementSource") }; if (dialog.ShowDialog(this) != true) return;
         try { await Model.RelinkAsync(row, dialog.FileName); }
-        catch (Exception error) { Model.Message = "Relink failed; original entry preserved."; Model.Details = error.Message; }
+        catch (Exception error) { Model.Message = Strings.Get("RelinkFailed"); Model.Details = error.Message; }
     }
     private void OnCopyPath(object sender, RoutedEventArgs e) { if (Model.SelectedEntry is { } row) Clipboard.SetText(row.Path); }
     private void OnShowFile(object sender, RoutedEventArgs e)
@@ -163,17 +186,18 @@ public partial class MainWindow : Window
         if (Model.SelectedEntry is not { } row) return; var track = row.Entry.Track;
         Player.Core.Library.TrackStatistics? statistics = null;
         try { if (Model.LibraryIndex is { } index) statistics = (await index.GetStatisticsAsync([track.Id])).FirstOrDefault(); } catch (Exception error) { Model.Details = error.Message; }
-        MessageBox.Show(this, $"{track.Title}\n{track.Artist}\n{track.Album}\n{track.Path}\n\nMetadata hints (decoder validates on playback):\n{track.SampleRateHint} Hz · {track.ChannelsHint} channels · {track.BitrateHint} kbps\nDisc {track.DiscNumber}, track {track.TrackNumber}, {track.Year}\n{track.Genre}\nCUE: {track.CueDocument ?? "—"}\nRating: {row.Rating}\nCounted plays: {statistics?.PlayCount ?? 0}\nLast played UTC: {(statistics?.LastPlayedUtcTicks is { } last ? new DateTime(last, DateTimeKind.Utc).ToString("u") : "—")}", "Track properties");
+        var played = statistics?.LastPlayedUtcTicks is { } last ? new DateTime(last, DateTimeKind.Utc).ToLocalTime().ToString("g", System.Globalization.CultureInfo.CurrentCulture) : "—";
+        MessageBox.Show(this, $"{track.Title}\n{track.Artist}\n{track.Album}\n{track.Path}\n\n{Strings.Get("MetadataHints")}:\n{track.SampleRateHint} {Strings.Get("HzUnit")} · {track.ChannelsHint} {Strings.Get("ChannelsUnit")} · {track.BitrateHint} {Strings.Get("KbpsUnit")}\n{Strings.Get("DiscLabel")} {track.DiscNumber}, {Strings.Get("TrackLabel")} {track.TrackNumber}, {track.Year}\n{track.Genre}\nCUE: {track.CueDocument ?? "—"}\n{Strings.Rating}: {row.Rating}\n{Strings.Get("CountedPlays")}: {statistics?.PlayCount ?? 0}\n{Strings.Get("LastPlayed")}: {played}", Strings.Get("TrackProperties"));
     }
     private async void OnLegacyImport(object sender, RoutedEventArgs e)
     {
-        var dialog = new Microsoft.Win32.OpenFileDialog { Filter = "Local documents (*.cue;*.m3u;*.pls)|*.cue;*.m3u;*.pls" };
+        var dialog = new Microsoft.Win32.OpenFileDialog { Filter = Strings.Get("DocumentFilter") };
         if (dialog.ShowDialog(this) != true) return;
-        var selection = new Window { Owner = this, Title = "Legacy document encoding", Width = 330, Height = 180, WindowStartupLocation = WindowStartupLocation.CenterOwner };
+        var selection = new Window { Owner = this, Title = Strings.Get("LegacyEncoding"), Width = 330, Height = 180, WindowStartupLocation = WindowStartupLocation.CenterOwner };
         var panel = new StackPanel { Margin = new Thickness(12) }; selection.Content = panel;
-        panel.Children.Add(new TextBlock { Text = "Select an encoding for non-Unicode document bytes.", TextWrapping = TextWrapping.Wrap });
-        var encodings = new ComboBox { ItemsSource = new[] { "Windows-1251 (Cyrillic)", "Windows-1252 (Western)", "CP866 (Cyrillic DOS)" }, SelectedIndex = 0, Margin = new Thickness(0, 12, 0, 12) }; panel.Children.Add(encodings);
-        var button = new Button { Content = "Import" }; button.Click += (_, _) => selection.DialogResult = true; panel.Children.Add(button);
+        panel.Children.Add(new TextBlock { Text = Strings.Get("SelectEncoding"), TextWrapping = TextWrapping.Wrap });
+        var encodings = new ComboBox { ItemsSource = new[] { Strings.Get("Encoding1251"), Strings.Get("Encoding1252"), Strings.Get("Encoding866") }, SelectedIndex = 0, Margin = new Thickness(0, 12, 0, 12) }; panel.Children.Add(encodings);
+        var button = new Button { Content = Strings.Get("Import") }; button.Click += (_, _) => selection.DialogResult = true; panel.Children.Add(button);
         if (selection.ShowDialog() != true) return;
         System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
         await Model.AddPathsAsync([dialog.FileName], System.Text.Encoding.GetEncoding(new[] { 1251, 1252, 866 }[encodings.SelectedIndex], System.Text.EncoderFallback.ExceptionFallback, System.Text.DecoderFallback.ExceptionFallback));
@@ -184,11 +208,11 @@ public partial class MainWindow : Window
     private async void OnAudioSettings(object sender, RoutedEventArgs e)
     {
         try { new AudioSettingsWindow(this, Model, await Model.GetDevicesAsync()).ShowDialog(); }
-        catch (Exception error) { Model.Message = "Audio devices unavailable"; Model.Details = error.Message; }
+        catch (Exception error) { Model.Message = Strings.Get("DevicesUnavailable"); Model.Details = error.Message; }
     }
     private async void OnBackup(object sender, RoutedEventArgs e)
     {
-        var dialog = new Microsoft.Win32.SaveFileDialog { Filter = "SQLite backup (*.db)|*.db", FileName = "player-backup-" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".db" };
+        var dialog = new Microsoft.Win32.SaveFileDialog { Filter = Strings.Get("BackupFilter"), FileName = "player-backup-" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".db" };
         if (dialog.ShowDialog(this) != true) return;
         try { Services.Audio.LocalFileAccess.ValidateDirectory(System.IO.Path.GetDirectoryName(dialog.FileName)!); await Model.BackupAsync(dialog.FileName); Model.Message = Strings.Get("BackupSaved"); }
         catch (Exception error) { Model.Message = Strings.Get("SaveFailed"); Model.Details = error.Message; }

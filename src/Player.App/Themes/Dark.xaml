@@ -9,21 +9,25 @@
     <SolidColorBrush x:Key="SelectedRowBrush" Color="#805015" />
     <SolidColorBrush x:Key="AlternateRowBrush" Color="#222222" />
     <SolidColorBrush x:Key="ErrorBrush" Color="#F08080" />
-    <Style TargetType="TextBox">
-        <Setter Property="Background" Value="{StaticResource BackgroundBrush}" /><Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
-        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" /><Setter Property="Padding" Value="6" />
+    <SolidColorBrush x:Key="WaveformRemainingBrush" Color="#D0D0D0" />
+    <Style x:Key="KeyboardFocus" TargetType="Control"><Setter Property="Template"><Setter.Value><ControlTemplate><Rectangle Margin="2" Stroke="{DynamicResource TextPrimaryBrush}" StrokeThickness="1" StrokeDashArray="2,2" /></ControlTemplate></Setter.Value></Setter></Style>
+    <Style TargetType="Control"><Setter Property="FocusVisualStyle" Value="{StaticResource KeyboardFocus}" /></Style>
+    <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type Control}}">
+        <Setter Property="Background" Value="{DynamicResource BackgroundBrush}" /><Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" /><Setter Property="Padding" Value="6" />
     </Style>
-    <Style TargetType="CheckBox"><Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" /></Style>
-    <Style TargetType="Expander"><Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" /></Style>
+    <Style TargetType="CheckBox"><Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" /></Style>
+    <Style TargetType="Expander"><Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" /></Style>
     <Style TargetType="Window">
-        <Setter Property="Background" Value="{StaticResource BackgroundBrush}" />
-        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="Background" Value="{DynamicResource BackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
         <Setter Property="FontFamily" Value="Segoe UI" />
         <Setter Property="FontSize" Value="14" />
     </Style>
-    <Style TargetType="Button">
+    <Style TargetType="Button" BasedOn="{StaticResource {x:Type Control}}">
         <Setter Property="Padding" Value="16,8" />
-        <Setter Property="Background" Value="{StaticResource AccentBrush}" />
-        <Setter Property="Foreground" Value="#151515" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
     </Style>
 </ResourceDictionary>

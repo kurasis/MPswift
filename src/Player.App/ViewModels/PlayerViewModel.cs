@@ -108,7 +108,20 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     public string PlayPauseLabel => IsPlaying ? Strings.Get("Pause") : Strings.Get("Play");
     public bool SeekPreview { get; set; }
     public bool CanTransport => HasEntries || _player.Snapshot.EntryId is not null;
+    public bool HasVisibleEntries => VisibleEntries is not null && !VisibleEntries.IsEmpty;
     public bool CanReorder => string.IsNullOrEmpty(Search) && !IsImporting;
+    public Task ImportCompletion => _importTask;
+    public PlaybackSnapshot Snapshot => _player.Snapshot;
+    public Task HandleMediaAsync(string button)
+    {
+        if (_closing) return Task.CompletedTask;
+        return button switch
+        {
+            "Play" => _player.Snapshot.State == PlaybackState.Playing ? Task.CompletedTask : PlayPauseAsync(),
+            "Pause" => _coordinator.PauseAsync(), "Stop" => _coordinator.StopAsync(),
+            "Next" => _coordinator.NextAsync(), "Previous" => _coordinator.PreviousAsync(), _ => Task.CompletedTask
+        };
+    }
     public Task WaveformCompletion => _waveTask;
     public Guid? SourcePlaylistId => _sourcePlaylistId;
 
@@ -119,7 +132,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         _store = store; _settings = settings; _waveforms = waveforms;
         _index = store as ILibraryIndexStore; _scanner = _index is null ? null : new(_index);
         _watcher = new(ids => { if (!_closing && !_dispatcher.HasShutdownStarted) _dispatcher.BeginInvoke(() => ScanRoots(ids)); });
-        var tab = new PlaylistTabViewModel(Guid.NewGuid(), "Default"); Playlists.Add(tab); SelectedPlaylist = tab;
+        var tab = new PlaylistTabViewModel(Guid.NewGuid(), Strings.Get("DefaultPlaylist")); Playlists.Add(tab); SelectedPlaylist = tab;
         _player.SnapshotChanged += OnSnapshot;
         _coordinator.OrderChanged += OnOrderChanged;
         ApplySnapshot(player.Snapshot);
@@ -203,14 +216,14 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
             {
                 var id = _pendingRoots.First(); _pendingRoots.Remove(id); var root = LibraryRoots.FirstOrDefault(r => r.Id == id && r.Enabled); if (root is null) continue;
                 var known = _knownRows.Values.Where(r => r.Entry.Track.Segment is null).Select(r => r.Entry.Track).DistinctBy(t => t.Path, StringComparer.OrdinalIgnoreCase).ToDictionary(t => t.Path, t => t.Id, StringComparer.OrdinalIgnoreCase);
-                var progress = new Progress<ScanProgress>(p => { if (_closing) return; ScanStatus = $"{p.Seen} indexed; {p.Changed} changed; {p.Errors} diagnostics"; if (p.Details.Length > 0) Details = string.Join(Environment.NewLine, p.Details); });
+                var progress = new Progress<ScanProgress>(p => { if (_closing) return; ScanStatus = string.Format(CultureInfo.CurrentCulture, Strings.Get("ScanProgress"), p.Seen, p.Changed, p.Errors); if (p.Details.Length > 0) Details = string.Join(Environment.NewLine, p.Details); });
                 await Task.Run(() => _scanner!.ScanAsync(root, known, progress, _scanCancellation.Token));
             }
             await ReconcilePlaylistMetadataAsync();
             if (_coordinator.ActiveEntry?.Track.Path is { } artworkPath) _artTask = LoadArtworkAsync(artworkPath);
         }
-        catch (OperationCanceledException) { ScanStatus = "Scan canceled; confirmed batches retained."; }
-        catch (Exception e) { ScanStatus = "Scan failed; previous metadata and playlists retained."; Details = e.Message; }
+        catch (OperationCanceledException) { ScanStatus = Strings.Get("ScanCanceled"); }
+        catch (Exception e) { ScanStatus = Strings.Get("ScanFailed"); Details = e.Message; }
         finally { IsScanning = false; _scanCancellation.Dispose(); _scanCancellation = null; }
     }
     private async Task ReconcilePlaylistMetadataAsync()
@@ -227,7 +240,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     }
     public void AddLibraryTracks(IEnumerable<MediaTrack> tracks)
     {
-        if (IsImporting || _closing) { Message = "Wait for the current import or cancel it first."; return; }
+        if (IsImporting || _closing) { Message = Strings.Get("WaitImport"); return; }
         foreach (var track in tracks.Take(10001)) { if (_knownRows.Count >= 10000) break; AddRow(SelectedPlaylist, new(Guid.NewGuid(), track, AddedUtcTicks: DateTime.UtcNow.Ticks)); }
         UpdateEntries(); _statisticsTask = ObserveAsync(RefreshRatingsAsync());
     }
@@ -247,7 +260,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     { await preceding; await ObserveAsync(_index!.SetRatingAsync(track, rating)); }
     public void SortPlaylist(string field)
     {
-        if (!string.IsNullOrEmpty(Search) || IsImporting) { Message = "Clear search before sorting the full playlist."; return; }
+        if (!string.IsNullOrEmpty(Search) || IsImporting) { Message = Strings.Get("ClearBeforeSort"); return; }
         Func<PlaylistRowViewModel, object?> key = field switch
         {
             "Artist" => r => r.Entry.Track.Artist, "Album" => r => r.Entry.Track.Album, "Track" => r => r.Entry.Track.TrackNumber == 0 ? null : r.Entry.Track.DiscNumber * 100000L + r.Entry.Track.TrackNumber,
@@ -354,7 +367,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         if (IsImporting) return;
         if (_knownRows.Count + Entries.Count > 10000 || Playlists.Count >= 100) { Message = Strings.Get("ImportLimit"); return; }
         var source = SelectedPlaylist;
-        var tab = new PlaylistTabViewModel(Guid.NewGuid(), ValidateName(source.Name.Length <= 190 ? source.Name + " (copy)" : source.Name[..190] + " (copy)"));
+        var tab = new PlaylistTabViewModel(Guid.NewGuid(), ValidateName(source.Name.Length <= 190 ? source.Name + Strings.Get("CopySuffix") : source.Name[..190] + Strings.Get("CopySuffix")));
         foreach (var row in source.Entries) AddRow(tab, row.Entry with { Id = Guid.NewGuid() });
         Playlists.Add(tab); SelectedPlaylist = tab; UpdateEntries();
     }
@@ -364,7 +377,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         var tab = SelectedPlaylist;
         foreach (var row in tab.Entries) { row.EligibilityChanged -= RowChanged; row.RatingChanged -= RatingChanged; _knownRows.Remove(row.Id); }
         Playlists.Remove(tab);
-        if (Playlists.Count == 0) Playlists.Add(new(Guid.NewGuid(), "Default"));
+        if (Playlists.Count == 0) Playlists.Add(new(Guid.NewGuid(), Strings.Get("DefaultPlaylist")));
         SelectedPlaylist = Playlists[0]; UpdateEntries();
     }
     public void MoveTab(int delta)
@@ -462,7 +475,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         _artCancellation?.Cancel(); _artCancellation?.Dispose(); _artCancellation = new(); var token = _artCancellation.Token; CoverArt = null;
         try { var image = await _artwork.LoadAsync(path, token); if (!token.IsCancellationRequested && !_closing) CoverArt = image; }
         catch (OperationCanceledException) { }
-        catch (Exception e) { if (!_closing && !token.IsCancellationRequested) Details = "Artwork fallback: " + e.Message; }
+        catch (Exception e) { if (!_closing && !token.IsCancellationRequested) Details = e.Message; }
     }
     private async Task LoadWaveformAsync(string path, bool refresh)
     {
@@ -489,7 +502,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     private void UpdateEntries(bool changed = true)
     { SyncSource(); VisibleEntries?.Refresh(); if (_initialized) ApplySnapshot(_player.Snapshot); HasEntries = Entries.Count > 0; OnPropertyChanged(nameof(CanTransport)); UpdatePlaylistStatus(); if (changed) ScheduleSave(true); }
     private void UpdatePlaylistStatus()
-    { if (VisibleEntries is not null) PlaylistStatus = string.Format(CultureInfo.CurrentCulture, Strings.Get("PlaylistCount"), VisibleEntries.Cast<object>().Count(), Entries.Count); }
+    { OnPropertyChanged(nameof(HasVisibleEntries)); if (VisibleEntries is not null) PlaylistStatus = string.Format(CultureInfo.CurrentCulture, Strings.Get("PlaylistCount"), VisibleEntries.Cast<object>().Count(), Entries.Count); }
     private LibraryState Capture() => new(Playlists.Select(p => p.Capture()).ToArray(),
         new(SelectedPlaylist.Id, _sourcePlaylistId, _coordinator.ActiveEntry, _player.Snapshot.Position.Ticks, _coordinator.CaptureOrder()));
     private void ScheduleSave(bool libraryChanged)

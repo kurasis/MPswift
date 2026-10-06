@@ -1,0 +1,11 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<SolidColorBrush x:Key="BackgroundBrush" Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}" />
+<SolidColorBrush x:Key="SurfaceBrush" Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}" />
+<SolidColorBrush x:Key="AlternateRowBrush" Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}" />
+<SolidColorBrush x:Key="TextPrimaryBrush" Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}" />
+<SolidColorBrush x:Key="TextSecondaryBrush" Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}" />
+<SolidColorBrush x:Key="AccentBrush" Color="{DynamicResource {x:Static SystemColors.HighlightColorKey}}" />
+<SolidColorBrush x:Key="BorderBrush" Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}" />
+<SolidColorBrush x:Key="SelectedRowBrush" Color="{DynamicResource {x:Static SystemColors.HighlightColorKey}}" />
+<SolidColorBrush x:Key="ErrorBrush" Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}" />
+</ResourceDictionary>

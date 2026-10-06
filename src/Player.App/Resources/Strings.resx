@@ -5,258 +5,616 @@
     <resheader name="version">
         <value>2.0</value>
     </resheader>
-    <data name="StageTitle" xml:space="preserve">
-        <value>Stage A — dependency diagnostics</value>
+    <data xml:space="preserve" name="StageTitle">
+        <value>Development diagnostics</value>
     </data>
-    <data name="StageDescription" xml:space="preserve">
-        <value>This development build checks approved native libraries. Playback is currently exercised by the separate AudioSmoke tool. The player interface is the next milestone.</value>
+    <data xml:space="preserve" name="StageDescription">
+        <value>Local development build. See local help for capabilities and limitations.</value>
     </data>
-    <data name="VerifyNative" xml:space="preserve">
+    <data xml:space="preserve" name="VerifyNative">
         <value>Verify native libraries</value>
     </data>
-    <data name="InitialStatus" xml:space="preserve">
+    <data xml:space="preserve" name="InitialStatus">
         <value>Native libraries have not been checked. No audio starts automatically.</value>
     </data>
-    <data name="Checking" xml:space="preserve">
+    <data xml:space="preserve" name="Checking">
         <value>Checking library hashes and native versions…</value>
     </data>
-    <data name="Verified" xml:space="preserve">
+    <data xml:space="preserve" name="Verified">
         <value>Native load verified. Output-device and audible playback tests have not run.</value>
     </data>
-    <data name="Failed" xml:space="preserve">
-        <value>Native check failed. Run scripts/Setup-Native.ps1, then retry. Details:</value>
+    <data xml:space="preserve" name="Failed">
+        <value>Native check failed. See local diagnostics.</value>
     </data>
-    <data name="AddFiles" xml:space="preserve">
+    <data xml:space="preserve" name="AddFiles">
         <value>Add files</value>
     </data>
-    <data name="AddFolder" xml:space="preserve">
+    <data xml:space="preserve" name="AddFolder">
         <value>Add folder</value>
     </data>
-    <data name="AudioFilter" xml:space="preserve">
-        <value>Audio files|*.mp3;*.wav;*.aif;*.aiff;*.flac;*.ogg;*.opus;*.m4a;*.aac;*.alac|All files|*.*</value>
+    <data xml:space="preserve" name="AudioFilter">
+        <value>Local audio and playlists|*.mp3;*.wav;*.aif;*.aiff;*.flac;*.ogg;*.opus;*.m4a;*.m4b;*.aac;*.alac;*.wv;*.tta;*.ape;*.mpc;*.dsf;*.dff;*.wma;*.cue;*.m3u;*.m3u8;*.pls|All files|*.*</value>
     </data>
-    <data name="NothingPlaying" xml:space="preserve">
+    <data xml:space="preserve" name="NothingPlaying">
         <value>Nothing playing</value>
     </data>
-    <data name="UnknownArtist" xml:space="preserve">
+    <data xml:space="preserve" name="UnknownArtist">
         <value>Unknown artist</value>
     </data>
-    <data name="Unavailable" xml:space="preserve">
+    <data xml:space="preserve" name="Unavailable">
         <value>Unavailable</value>
     </data>
-    <data name="Play" xml:space="preserve">
+    <data xml:space="preserve" name="Play">
         <value>Play</value>
     </data>
-    <data name="Pause" xml:space="preserve">
+    <data xml:space="preserve" name="Pause">
         <value>Pause</value>
     </data>
-    <data name="Stop" xml:space="preserve">
+    <data xml:space="preserve" name="Stop">
         <value>Stop</value>
     </data>
-    <data name="Next" xml:space="preserve">
+    <data xml:space="preserve" name="Next">
         <value>Next</value>
     </data>
-    <data name="Previous" xml:space="preserve">
+    <data xml:space="preserve" name="Previous">
         <value>Previous</value>
     </data>
-    <data name="Mute" xml:space="preserve">
+    <data xml:space="preserve" name="Mute">
         <value>Mute</value>
     </data>
-    <data name="SourceBitDepth" xml:space="preserve">
+    <data xml:space="preserve" name="SourceBitDepth">
         <value>{0}-bit</value>
     </data>
-    <data name="Volume" xml:space="preserve">
+    <data xml:space="preserve" name="Volume">
         <value>Volume</value>
     </data>
-    <data name="Seek" xml:space="preserve">
+    <data xml:space="preserve" name="Seek">
         <value>Seek position</value>
     </data>
-    <data name="Search" xml:space="preserve">
-        <value>Search this playlist</value>
+    <data xml:space="preserve" name="Search">
+        <value>Search this playlist (Ctrl+F)</value>
     </data>
-    <data name="ClearSearch" xml:space="preserve">
+    <data xml:space="preserve" name="ClearSearch">
         <value>Clear search</value>
     </data>
-    <data name="DefaultPlaylist" xml:space="preserve">
+    <data xml:space="preserve" name="DefaultPlaylist">
         <value>Default</value>
     </data>
-    <data name="Enabled" xml:space="preserve">
+    <data xml:space="preserve" name="Enabled">
         <value>Enabled for automatic playback</value>
     </data>
-    <data name="Remove" xml:space="preserve">
+    <data xml:space="preserve" name="Remove">
         <value>Remove from playlist</value>
     </data>
-    <data name="CancelImport" xml:space="preserve">
+    <data xml:space="preserve" name="CancelImport">
         <value>Cancel import</value>
     </data>
-    <data name="Details" xml:space="preserve">
+    <data xml:space="preserve" name="Details">
         <value>Technical details</value>
     </data>
-    <data name="Elapsed" xml:space="preserve">
+    <data xml:space="preserve" name="Elapsed">
         <value>Elapsed</value>
     </data>
-    <data name="Duration" xml:space="preserve">
+    <data xml:space="preserve" name="Duration">
         <value>Duration</value>
     </data>
-    <data name="EmptyPrompt" xml:space="preserve">
+    <data xml:space="preserve" name="EmptyPrompt">
         <value>Add local audio files or a folder to begin. No audio starts automatically.</value>
     </data>
-    <data name="EmptyPlaylist" xml:space="preserve">
+    <data xml:space="preserve" name="EmptyPlaylist">
         <value>Your playlist is empty. Add files or a folder.</value>
     </data>
-    <data name="SessionTemporary" xml:space="preserve">
-        <value>This playlist is cleared when the application closes.</value>
+    <data xml:space="preserve" name="SessionTemporary">
+        <value>Session changes are saved locally.</value>
     </data>
-    <data name="NoWaveform" xml:space="preserve">
+    <data xml:space="preserve" name="NoWaveform">
         <value>Seek timeline</value>
     </data>
-    <data name="Imported" xml:space="preserve">
+    <data xml:space="preserve" name="Imported">
         <value>Added {0} items; {1} warnings.</value>
     </data>
-    <data name="ImportCanceled" xml:space="preserve">
+    <data xml:space="preserve" name="ImportCanceled">
         <value>Import canceled. Already added items remain available.</value>
     </data>
-    <data name="ImportLimit" xml:space="preserve">
+    <data xml:space="preserve" name="ImportLimit">
         <value>The 10,000-item import limit was reached.</value>
     </data>
-    <data name="PlaylistCount" xml:space="preserve">
+    <data xml:space="preserve" name="PlaylistCount">
         <value>{0} visible / {1} items</value>
     </data>
-    <data name="SourceFormat" xml:space="preserve">
+    <data xml:space="preserve" name="SourceFormat">
         <value>{0} · {1:N0} Hz · {2} channels</value>
     </data>
-    <data name="OutputFormat" xml:space="preserve">
-        <value>Output: {0:N0} Hz · {1} channels (shared)</value>
+    <data xml:space="preserve" name="OutputFormat">
+        <value>Output: {0:N0} Hz · {1} channels</value>
     </data>
-    <data name="ErrorFileUnavailable" xml:space="preserve">
+    <data xml:space="preserve" name="ErrorFileUnavailable">
         <value>This local file is missing, inaccessible or unavailable offline. Choose another file.</value>
     </data>
-    <data name="ErrorDecoder" xml:space="preserve">
-        <value>This file could not be decoded. It may use an unsupported encoding or be damaged. Try another file; details show the decoder result.</value>
+    <data xml:space="preserve" name="ErrorDecoder">
+        <value>This file could not be decoded. Try another file; details show the decoder result.</value>
     </data>
-    <data name="ErrorDependency" xml:space="preserve">
-        <value>An approved audio library is unavailable. Provision the native dependencies and retry.</value>
+    <data xml:space="preserve" name="ErrorDependency">
+        <value>An approved audio library is unavailable. Restore the application files and retry.</value>
     </data>
-    <data name="ErrorOutputUnavailable" xml:space="preserve">
-        <value>Windows default output is unavailable. Check your output device, then press Play to retry.</value>
+    <data xml:space="preserve" name="ErrorOutputUnavailable">
+        <value>Audio output is unavailable. Check the selected device, then press Play to retry.</value>
     </data>
-    <data name="ErrorUnexpected" xml:space="preserve">
+    <data xml:space="preserve" name="ErrorUnexpected">
         <value>The operation failed. See technical details and retry.</value>
     </data>
-    <data name="ErrorBusy" xml:space="preserve">
+    <data xml:space="preserve" name="ErrorBusy">
         <value>Too many audio commands are pending. Retry the operation.</value>
     </data>
-    <data name="StateEmpty" xml:space="preserve">
+    <data xml:space="preserve" name="StateEmpty">
         <value>Stopped</value>
     </data>
-    <data name="StateLoading" xml:space="preserve">
+    <data xml:space="preserve" name="StateLoading">
         <value>Loading…</value>
     </data>
-    <data name="StateStopped" xml:space="preserve">
+    <data xml:space="preserve" name="StateStopped">
         <value>Stopped</value>
     </data>
-    <data name="StatePlaying" xml:space="preserve">
+    <data xml:space="preserve" name="StatePlaying">
         <value>Playing</value>
     </data>
-    <data name="StatePaused" xml:space="preserve">
+    <data xml:space="preserve" name="StatePaused">
         <value>Paused</value>
     </data>
-    <data name="StateSeeking" xml:space="preserve">
+    <data xml:space="preserve" name="StateSeeking">
         <value>Seeking…</value>
     </data>
-    <data name="StateDeviceUnavailable" xml:space="preserve">
+    <data xml:space="preserve" name="StateDeviceUnavailable">
         <value>Output unavailable</value>
     </data>
-    <data name="StateError" xml:space="preserve">
+    <data xml:space="preserve" name="StateError">
         <value>Playback error</value>
     </data>
-    <data name="Help" xml:space="preserve">
-        <value>Local help</value>
+    <data xml:space="preserve" name="Help">
+        <value>Local help / About (F1)</value>
     </data>
-    <data name="HelpText" xml:space="preserve">
-        <value>Space: Play/Pause (outside text and checkbox controls)
-Ctrl+O: Add files
-Ctrl+Shift+O: Add folder
-Ctrl+F: Search
-Enter: Play selected entry
-Delete: Remove selected entries (source files are preserved)
+    <data xml:space="preserve" name="HelpText">
+        <value>Space: Play/Pause outside controls that own Space
+Ctrl+O / Ctrl+Shift+O: Add files / folder
+Ctrl+F: Search; Esc: Clear search
+Enter / Delete / Ctrl+A: Play / remove / select visible rows (playlist focus)
 Alt+Left / Alt+Right: Previous / Next
 Ctrl+Left / Ctrl+Right: Seek 5 seconds
-Ctrl+Up / Ctrl+Down: Volume 5 percentage points
-Esc: Clear search
+Ctrl+Up / Ctrl+Down: App volume 5 percentage points
+Ctrl+N: New playlist; F2: Rename (tab focus)
+Ctrl+Shift+Up/Down: Reorder rows after clearing search
+F1: Local help
 
-Playlists, order, volume and position are saved locally. Restore never starts playback. Ctrl+Shift+Up/Down moves selected rows; clear search first. Playlist actions include a database backup and waveform refresh. Sources must be local and available offline. No internet requests are made by the application.</value>
+Command line: local file/folder paths append without autoplay; --play explicitly starts the first added item. -- ends option parsing. A second launch activates the existing per-user instance. No arguments never start audio.
+
+Tray: Show/Hide, Play/Pause, Next, Previous, Exit. Closing exits by default; close-to-tray is an explicit preference. Language changes apply after restart.
+
+Sources remain unchanged. Ratings, history, library, queue and settings are stored locally. Restore never starts audio. Only local, available offline files are accepted. No application network requests. BASS and add-on distribution terms remain a release gate; this is a development build.</value>
     </data>
-    <data name="PlaylistName" xml:space="preserve">
+    <data xml:space="preserve" name="PlaylistName">
         <value>Playlist name</value>
     </data>
-    <data name="SaveName" xml:space="preserve">
+    <data xml:space="preserve" name="SaveName">
         <value>Save</value>
     </data>
-    <data name="NewPlaylist" xml:space="preserve">
+    <data xml:space="preserve" name="NewPlaylist">
         <value>New playlist</value>
     </data>
-    <data name="PlaylistActions" xml:space="preserve">
+    <data xml:space="preserve" name="PlaylistActions">
         <value>Playlist actions</value>
     </data>
-    <data name="Playlists" xml:space="preserve">
+    <data xml:space="preserve" name="Playlists">
         <value>Playlists</value>
     </data>
-    <data name="RenamePlaylist" xml:space="preserve">
+    <data xml:space="preserve" name="RenamePlaylist">
         <value>Rename playlist…</value>
     </data>
-    <data name="DuplicatePlaylist" xml:space="preserve">
+    <data xml:space="preserve" name="DuplicatePlaylist">
         <value>Duplicate playlist</value>
     </data>
-    <data name="DeletePlaylist" xml:space="preserve">
+    <data xml:space="preserve" name="DeletePlaylist">
         <value>Delete playlist</value>
     </data>
-    <data name="TabLeft" xml:space="preserve">
+    <data xml:space="preserve" name="TabLeft">
         <value>Move tab left</value>
     </data>
-    <data name="TabRight" xml:space="preserve">
+    <data xml:space="preserve" name="TabRight">
         <value>Move tab right</value>
     </data>
-    <data name="MoveUp" xml:space="preserve">
+    <data xml:space="preserve" name="MoveUp">
         <value>Move selected entries up</value>
     </data>
-    <data name="MoveDown" xml:space="preserve">
+    <data xml:space="preserve" name="MoveDown">
         <value>Move selected entries down</value>
     </data>
-    <data name="RefreshWaveform" xml:space="preserve">
+    <data xml:space="preserve" name="RefreshWaveform">
         <value>Refresh waveform</value>
     </data>
-    <data name="Backup" xml:space="preserve">
+    <data xml:space="preserve" name="Backup">
         <value>Back up playlists and session…</value>
     </data>
-    <data name="BackupSaved" xml:space="preserve">
+    <data xml:space="preserve" name="BackupSaved">
         <value>Database backup saved.</value>
     </data>
-    <data name="Saved" xml:space="preserve">
+    <data xml:space="preserve" name="Saved">
         <value>Saved</value>
     </data>
-    <data name="Saving" xml:space="preserve">
+    <data xml:space="preserve" name="Saving">
         <value>Saving…</value>
     </data>
-    <data name="SaveFailed" xml:space="preserve">
+    <data xml:space="preserve" name="SaveFailed">
         <value>Changes could not be saved. Retry before closing.</value>
     </data>
-    <data name="WaveformLoading" xml:space="preserve">
+    <data xml:space="preserve" name="WaveformLoading">
         <value>Analyzing waveform…</value>
     </data>
-    <data name="WaveformProgress" xml:space="preserve">
+    <data xml:space="preserve" name="WaveformProgress">
         <value>Analyzing waveform… {0:P0}</value>
     </data>
-    <data name="WaveformUnavailable" xml:space="preserve">
+    <data xml:space="preserve" name="WaveformUnavailable">
         <value>Waveform unavailable — use the seek slider.</value>
     </data>
-    <data name="TabLimit" xml:space="preserve">
+    <data xml:space="preserve" name="TabLimit">
         <value>Up to 100 playlists are supported.</value>
     </data>
-    <data name="ReorderFiltered" xml:space="preserve">
+    <data xml:space="preserve" name="ReorderFiltered">
         <value>Clear search before changing manual order.</value>
     </data>
-    <data name="CloseWithoutSaving" xml:space="preserve"><value>Changes could not be saved. Close without saving the latest changes?</value></data>
-    <data name="PlaybackSource" xml:space="preserve"><value>Playback source: {0}</value></data>
-    <data name="DetachedSource" xml:space="preserve"><value>Detached track — its playlist is no longer available.</value></data>
+    <data xml:space="preserve" name="CloseWithoutSaving">
+        <value>Changes could not be saved. Close without saving the latest changes?</value>
+    </data>
+    <data xml:space="preserve" name="PlaybackSource">
+        <value>Playback source: {0}</value>
+    </data>
+    <data xml:space="preserve" name="DetachedSource">
+        <value>Detached track — its playlist is no longer available.</value>
+    </data>
+    <data xml:space="preserve" name="EmptySearch">
+        <value>No matching tracks. Clear search to show the playlist.</value>
+    </data>
+    <data xml:space="preserve" name="Shuffle">
+        <value>Shuffle</value>
+    </data>
+    <data xml:space="preserve" name="Repeat">
+        <value>Repeat</value>
+    </data>
+    <data xml:space="preserve" name="RepeatOff">
+        <value>Off</value>
+    </data>
+    <data xml:space="preserve" name="RepeatAll">
+        <value>All</value>
+    </data>
+    <data xml:space="preserve" name="RepeatOne">
+        <value>One</value>
+    </data>
+    <data xml:space="preserve" name="Library">
+        <value>Local music library…</value>
+    </data>
+    <data xml:space="preserve" name="ExportPlaylist">
+        <value>Export playlist as M3U8…</value>
+    </data>
+    <data xml:space="preserve" name="Relink">
+        <value>Relink selected file…</value>
+    </data>
+    <data xml:space="preserve" name="CopyPath">
+        <value>Copy selected path</value>
+    </data>
+    <data xml:space="preserve" name="ShowFile">
+        <value>Show selected file in Explorer</value>
+    </data>
+    <data xml:space="preserve" name="Properties">
+        <value>Selected track properties…</value>
+    </data>
+    <data xml:space="preserve" name="SortPlaylist">
+        <value>Sort full playlist</value>
+    </data>
+    <data xml:space="preserve" name="SortTitle">
+        <value>Title</value>
+    </data>
+    <data xml:space="preserve" name="SortArtist">
+        <value>Artist</value>
+    </data>
+    <data xml:space="preserve" name="SortAlbum">
+        <value>Album</value>
+    </data>
+    <data xml:space="preserve" name="SortTrack">
+        <value>Disc / track</value>
+    </data>
+    <data xml:space="preserve" name="SortDuration">
+        <value>Duration</value>
+    </data>
+    <data xml:space="preserve" name="SortPath">
+        <value>Path</value>
+    </data>
+    <data xml:space="preserve" name="SortAdded">
+        <value>Date added</value>
+    </data>
+    <data xml:space="preserve" name="LegacyImport">
+        <value>Import document with legacy encoding…</value>
+    </data>
+    <data xml:space="preserve" name="PlayNext">
+        <value>Play next</value>
+    </data>
+    <data xml:space="preserve" name="AddQueue">
+        <value>Add to queue</value>
+    </data>
+    <data xml:space="preserve" name="ShowQueue">
+        <value>Show queue</value>
+    </data>
+    <data xml:space="preserve" name="ClearHistory">
+        <value>Clear playback history</value>
+    </data>
+    <data xml:space="preserve" name="AudioSettings">
+        <value>Audio output / EQ / ReplayGain</value>
+    </data>
+    <data xml:space="preserve" name="Rating">
+        <value>Rating</value>
+    </data>
+    <data xml:space="preserve" name="RatingHelp">
+        <value>Rating (0 = unrated)</value>
+    </data>
+    <data xml:space="preserve" name="Exported">
+        <value>Playlist exported; source audio was unchanged.</value>
+    </data>
+    <data xml:space="preserve" name="ExportFailed">
+        <value>Export failed</value>
+    </data>
+    <data xml:space="preserve" name="ReplacementSource">
+        <value>Select the replacement local audio source</value>
+    </data>
+    <data xml:space="preserve" name="RelinkFailed">
+        <value>Relink failed; original entry preserved.</value>
+    </data>
+    <data xml:space="preserve" name="TrackProperties">
+        <value>Track properties</value>
+    </data>
+    <data xml:space="preserve" name="MetadataHints">
+        <value>Metadata hints (decoder validates on playback)</value>
+    </data>
+    <data xml:space="preserve" name="CountedPlays">
+        <value>Counted plays</value>
+    </data>
+    <data xml:space="preserve" name="LastPlayed">
+        <value>Last played</value>
+    </data>
+    <data xml:space="preserve" name="LegacyEncoding">
+        <value>Legacy document encoding</value>
+    </data>
+    <data xml:space="preserve" name="SelectEncoding">
+        <value>Select an encoding for non-Unicode document bytes.</value>
+    </data>
+    <data xml:space="preserve" name="Encoding1251">
+        <value>Windows-1251 (Cyrillic)</value>
+    </data>
+    <data xml:space="preserve" name="Encoding1252">
+        <value>Windows-1252 (Western)</value>
+    </data>
+    <data xml:space="preserve" name="Encoding866">
+        <value>CP866 (Cyrillic DOS)</value>
+    </data>
+    <data xml:space="preserve" name="Import">
+        <value>Import</value>
+    </data>
+    <data xml:space="preserve" name="DevicesUnavailable">
+        <value>Audio devices unavailable</value>
+    </data>
+    <data xml:space="preserve" name="LibraryTitle">
+        <value>Local music library</value>
+    </data>
+    <data xml:space="preserve" name="AddRoot">
+        <value>Add root</value>
+    </data>
+    <data xml:space="preserve" name="RefreshRoots">
+        <value>Refresh roots</value>
+    </data>
+    <data xml:space="preserve" name="CancelScan">
+        <value>Cancel scan</value>
+    </data>
+    <data xml:space="preserve" name="AddSelected">
+        <value>Add selected to playlist</value>
+    </data>
+    <data xml:space="preserve" name="PreviousPage">
+        <value>Previous page</value>
+    </data>
+    <data xml:space="preserve" name="NextPage">
+        <value>Next page</value>
+    </data>
+    <data xml:space="preserve" name="LibrarySearch">
+        <value>Literal Unicode library search</value>
+    </data>
+    <data xml:space="preserve" name="DisableRoot">
+        <value>Disable selected root</value>
+    </data>
+    <data xml:space="preserve" name="LibraryPage">
+        <value>{0} results · {1}–{2}. {3}</value>
+    </data>
+    <data xml:space="preserve" name="ScanProgress">
+        <value>{0} indexed; {1} changed; {2} diagnostics</value>
+    </data>
+    <data xml:space="preserve" name="ScanCanceled">
+        <value>Scan canceled; confirmed batches retained.</value>
+    </data>
+    <data xml:space="preserve" name="ScanFailed">
+        <value>Scan failed; previous metadata and playlists retained.</value>
+    </data>
+    <data xml:space="preserve" name="WaitImport">
+        <value>Wait for the current import or cancel it first.</value>
+    </data>
+    <data xml:space="preserve" name="ClearBeforeSort">
+        <value>Clear search before sorting the full playlist.</value>
+    </data>
+    <data xml:space="preserve" name="QueueTitle">
+        <value>Play queue</value>
+    </data>
+    <data xml:space="preserve" name="QueueMoveUp">
+        <value>Move up</value>
+    </data>
+    <data xml:space="preserve" name="QueueMoveDown">
+        <value>Move down</value>
+    </data>
+    <data xml:space="preserve" name="QueueRemove">
+        <value>Remove</value>
+    </data>
+    <data xml:space="preserve" name="ClearQueue">
+        <value>Clear queue</value>
+    </data>
+    <data xml:space="preserve" name="QueueDescription">
+        <value>Queued snapshots play first. Clearing this list keeps the current song playing.</value>
+    </data>
+    <data xml:space="preserve" name="AudioTitle">
+        <value>Audio output and processing</value>
+    </data>
+    <data xml:space="preserve" name="SavedOutputUnavailable">
+        <value>Unavailable saved output — select a replacement explicitly</value>
+    </data>
+    <data xml:space="preserve" name="OutputDevice">
+        <value>Output device (changing output pauses playback)</value>
+    </data>
+    <data xml:space="preserve" name="ExclusiveMode">
+        <value>Exclusive mode — may prevent other apps using this endpoint</value>
+    </data>
+    <data xml:space="preserve" name="ExclusivePolicy">
+        <value>Unavailable exclusive formats report an error. Shared mode is never selected silently.</value>
+    </data>
+    <data xml:space="preserve" name="ReplayGainHelp">
+        <value>ReplayGain (tags only; missing tags mean 0 dB)</value>
+    </data>
+    <data xml:space="preserve" name="GainOff">
+        <value>Off</value>
+    </data>
+    <data xml:space="preserve" name="GainTrack">
+        <value>Track</value>
+    </data>
+    <data xml:space="preserve" name="GainAlbum">
+        <value>Album</value>
+    </data>
+    <data xml:space="preserve" name="EnableEq">
+        <value>Enable equalizer</value>
+    </data>
+    <data xml:space="preserve" name="GainDb">
+        <value>Gain in dB</value>
+    </data>
+    <data xml:space="preserve" name="EqPolicy">
+        <value>Bands above output Nyquist are bypassed. Positive EQ adds headroom; final overrange samples are saturated.</value>
+    </data>
+    <data xml:space="preserve" name="Preamp">
+        <value>Preamp (dB)</value>
+    </data>
+    <data xml:space="preserve" name="CrossfadeHelp">
+        <value>Equal-power crossfade (seconds; 0 = off). Continuous CUE and repeat-one bypass overlap.</value>
+    </data>
+    <data xml:space="preserve" name="Flat">
+        <value>Flat</value>
+    </data>
+    <data xml:space="preserve" name="SavePreset">
+        <value>Save preset</value>
+    </data>
+    <data xml:space="preserve" name="LoadPreset">
+        <value>Load preset</value>
+    </data>
+    <data xml:space="preserve" name="PresetSaveFailed">
+        <value>Preset could not be saved</value>
+    </data>
+    <data xml:space="preserve" name="PresetLoadFailed">
+        <value>Preset could not be loaded</value>
+    </data>
+    <data xml:space="preserve" name="Apply">
+        <value>Apply</value>
+    </data>
+    <data xml:space="preserve" name="Cancel">
+        <value>Cancel</value>
+    </data>
+    <data xml:space="preserve" name="Preferences">
+        <value>Appearance and behavior…</value>
+    </data>
+    <data xml:space="preserve" name="PreferencesTitle">
+        <value>Appearance and behavior</value>
+    </data>
+    <data xml:space="preserve" name="Language">
+        <value>Language (applies after restart)</value>
+    </data>
+    <data xml:space="preserve" name="CloseToTray">
+        <value>Close to tray instead of exiting</value>
+    </data>
+    <data xml:space="preserve" name="CloseTrayHelp">
+        <value>Closing exits by default. Enable this setting to hide the window; use Exit in the tray to finish playback.</value>
+    </data>
+    <data xml:space="preserve" name="RestartLanguage">
+        <value>Language saved. Restart the application to apply it everywhere.</value>
+    </data>
+    <data xml:space="preserve" name="ShowHide">
+        <value>Show / Hide</value>
+    </data>
+    <data xml:space="preserve" name="Exit">
+        <value>Exit</value>
+    </data>
+    <data xml:space="preserve" name="IntegrationUnavailable">
+        <value>Windows media integration is unavailable. App controls remain usable.</value>
+    </data>
+    <data xml:space="preserve" name="StorageUnavailable">
+        <value>Storage unavailable</value>
+    </data>
+    <data xml:space="preserve" name="SavedDataUnavailable">
+        <value>Saved data unavailable</value>
+    </data>
+    <data xml:space="preserve" name="RestorePrompt">
+        <value>Saved data could not be read. Original files will be preserved. Restore a database backup?</value>
+    </data>
+    <data xml:space="preserve" name="StartupFailure">
+        <value>Saved data could not be read. Original files have been preserved.</value>
+    </data>
+    <data xml:space="preserve" name="InvalidArguments">
+        <value>Unsupported command line. Use local paths, --play, or -- before paths. See local help.</value>
+    </data>
+    <data xml:space="preserve" name="ForwardFailed">
+        <value>Could not contact the running instance. Wait for it to finish starting and retry.</value>
+    </data>
+    <data xml:space="preserve" name="Minimize">
+        <value>Minimize</value>
+    </data>
+    <data xml:space="preserve" name="Maximize">
+        <value>Maximize / Restore</value>
+    </data>
+    <data xml:space="preserve" name="Close">
+        <value>Close</value>
+    </data>
+    <data xml:space="preserve" name="Artwork">
+        <value>Album artwork</value>
+    </data>
+    <data xml:space="preserve" name="EmptySearchClear">
+        <value>Clear search</value>
+    </data>
+    <data xml:space="preserve" name="PlaylistFilter">
+        <value>UTF-8 playlist (*.m3u8)|*.m3u8</value>
+    </data>
+    <data xml:space="preserve" name="PresetFilter">
+        <value>Local EQ preset (*.json)|*.json</value>
+    </data>
+    <data xml:space="preserve" name="DocumentFilter">
+        <value>Local documents (*.cue;*.m3u;*.pls)|*.cue;*.m3u;*.pls</value>
+    </data>
+    <data xml:space="preserve" name="BackupFilter">
+        <value>SQLite backup (*.db)|*.db</value>
+    </data>
+    <data xml:space="preserve" name="CopySuffix">
+        <value> (copy)</value>
+    </data>
+    <data xml:space="preserve" name="HzUnit">
+        <value>Hz</value>
+    </data>
+    <data xml:space="preserve" name="ChannelsUnit">
+        <value>channels</value>
+    </data>
+    <data xml:space="preserve" name="KbpsUnit">
+        <value>kbps</value>
+    </data>
+    <data xml:space="preserve" name="DiscLabel">
+        <value>Disc</value>
+    </data>
+    <data xml:space="preserve" name="TrackLabel">
+        <value>Track</value>
+    </data>
+    <data xml:space="preserve" name="DefaultOutput">
+        <value>Windows default output</value>
+    </data>
 </root>

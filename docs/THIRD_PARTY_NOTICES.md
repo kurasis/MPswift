@@ -48,3 +48,7 @@ Before Stage G distribution: record the owner's intended use, applicable native 
 ## Stage E development add-ons
 
 Pinned development manifest includes BASSWMA 2.4.5.13 (Windows Media Format modules required), BASSAPE 2.4.1.0, BASSWV 2.4.7.4, BASSDSD 2.4.2.0, BASS_MPC 2.4.1.2 and BASS_TTA 2.4.0.2. Archive/DLL hashes and HTTPS upstream URLs are in `native/manifest.json`; generic MPC/TTA notices are copied into separate addon subdirectories. MPC's upstream readme describes free use/distribution with retained notices; TTA includes LGPL text. Distribution approval remains false for all addons, pending intended-use/license-obligation review. No purchases or public release were made. WMA is not represented as optional-component-free Windows N support; DSD uses float PCM decoding only.
+
+## Stage F Windows SDK projection
+
+The WPF target is `net10.0-windows10.0.19041.0`, with `WindowsSdkPackageVersion` pinned to **10.0.19041.57**. SDK restore provides Microsoft.Windows.SDK.NET and WinRT.Runtime for OS SMTC projection (SDK/CsWinRT notices must accompany a distribution). Minimal documented `ISystemMediaTransportControlsInterop` binds an HWND; it is not a custom media-key/codec implementation. WPF/Windows Forms are framework references from the pinned .NET Windows runtime; Forms is used only for the native tray icon. No new online runtime service was introduced.

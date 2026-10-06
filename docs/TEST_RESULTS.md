@@ -107,3 +107,9 @@ Expanded WPF smoke commits real owned-file root scan/delete/reappearance with re
 Final local review also replaced the import identity cache with a concurrent dictionary so watcher reconciliation can remember tracks during an import without a dictionary race, guards combined playlist capacity while batches arrive, and reads playlist/CUE documents through a bounded file handle with growth detection. The final exact code was rebuilt and locally published with 80 passing tests and 13 audited DLLs/companions.
 
 [Machine-readable local results and hosted-runner status](evidence/stage-de-local-and-runner-status.json) retain the final code commit, actual 80-test counters, dataset size, publish audit and explicitly unrun gates.
+
+## Stage D/E Windows confirmation and Stage F local checks (2026-10-06)
+
+Run [37367043601 attempt 2](https://github.com/kurasis/MPswift/actions/runs/37367043601/attempts/2), source `c8426e6`: Linux and Windows successful, 80 tests each, 17 native format fixtures, actual mixer callback split/CUE error 0, real WPF queue/session/library/M3U8/rating/relink/CUE/artwork/source preservation. Full JSON is retained in [evidence](evidence/stage-de-windows-native-ui.json). Windows Server 2022 hosted CI is not Windows 11/device/listening acceptance.
+
+Stage F locked local Release cross-build: 0 warnings/errors, 92 passed / 0 failed / 0 skipped. New tests cover CLI Unicode/literal options, explicit play, unsupported options/remote/device/ADS rejection, strict/versioned/bounded IPC and backward-compatible language/tray settings. New Windows IPC/tray/SMTC/Automation/virtualization/English-Russian smoke is prepared, not yet reported passed. No endpoint or screen reader is available in Linux.

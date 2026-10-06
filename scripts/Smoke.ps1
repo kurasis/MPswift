@@ -1,6 +1,6 @@
 #requires -Version 7.4
 [CmdletBinding()]
-param([switch]$Play)
+param([switch]$Play, [switch]$SkipBuild)
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 if (-not $IsWindows -or [System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture -ne 'X64') {
@@ -10,7 +10,7 @@ $root = Split-Path $PSScriptRoot -Parent
 Push-Location $root
 try {
     & "$PSScriptRoot/Setup-Native.ps1"
-    & "$PSScriptRoot/Build.ps1"
+    if (-not $SkipBuild) { & "$PSScriptRoot/Build.ps1" }
     $directory = Join-Path $root 'artifacts/smoke'
     New-Item $directory -ItemType Directory -Force | Out-Null
     $fixture = Join-Path $directory "generated tone Музыка 🎵.wav"
@@ -34,17 +34,23 @@ try {
         if ($code -ne 0) { throw "$($check[0]) failed with exit $code. See artifacts/smoke." }
         Write-Host $result
     }
-    Remove-Item (Join-Path $directory 'stage-e-library') -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item (Join-Path $directory 'stage-c-data') -Recurse -Force -ErrorAction SilentlyContinue
-    $app = Join-Path $root 'src/Player.App/bin/Release/net10.0-windows/win-x64/Player.App.exe'
-    Remove-Item (Join-Path $directory 'ui.json'), (Join-Path $directory 'stage-c-window.png') -ErrorAction SilentlyContinue
+    $app = Join-Path $root 'src/Player.App/bin/Release/net10.0-windows10.0.19041.0/win-x64/Player.App.exe'
     $taggedFixture = Join-Path $root 'tests/fixtures/audio/flac16.flac'
-    $process = Start-Process -FilePath $app -ArgumentList @('--ui-smoke', ('"' + $fixture + '"'), ('"' + $taggedFixture + '"')) -PassThru
-    if (-not $process.WaitForExit(120000)) { $process.Kill(); throw 'WPF UI smoke timed out.' }
-    if ($process.ExitCode -ne 0) { throw "WPF UI smoke failed with exit $($process.ExitCode). See artifacts/smoke/ui.json." }
-    $ui = Get-Content (Join-Path $directory 'ui.json') -Raw | ConvertFrom-Json
-    if ($ui.Status -ne 'ui-smoke-passed') { throw 'WPF UI evidence is not a current successful result.' }
-    Write-Host ($ui | ConvertTo-Json -Depth 5)
+    foreach ($language in @('en', 'ru')) {
+        Remove-Item (Join-Path $directory 'stage-e-library') -Recurse -Force -ErrorAction SilentlyContinue
+        Remove-Item (Join-Path $directory 'stage-c-data') -Recurse -Force -ErrorAction SilentlyContinue
+        New-Item (Join-Path $directory 'stage-c-data') -ItemType Directory -Force | Out-Null
+        @{ SchemaVersion = 1; Language = $language } | ConvertTo-Json | Set-Content (Join-Path $directory 'stage-c-data/settings.json') -Encoding utf8
+        Remove-Item (Join-Path $directory 'ui.json'), (Join-Path $directory 'stage-c-window.png') -ErrorAction SilentlyContinue
+        $process = Start-Process -FilePath $app -ArgumentList @('--ui-smoke', ('"' + $fixture + '"'), ('"' + $taggedFixture + '"')) -PassThru
+        if (-not $process.WaitForExit(120000)) { $process.Kill(); throw "WPF $language UI smoke timed out." }
+        if ($process.ExitCode -ne 0) { throw "WPF $language UI smoke failed with exit $($process.ExitCode). See artifacts/smoke/ui.json." }
+        $ui = Get-Content (Join-Path $directory 'ui.json') -Raw | ConvertFrom-Json
+        if ($ui.Status -ne 'ui-smoke-passed') { throw 'WPF UI evidence is not a current successful result.' }
+        Copy-Item (Join-Path $directory 'ui.json') (Join-Path $directory "ui-$language.json")
+        Copy-Item (Join-Path $directory 'stage-c-window.png') (Join-Path $directory "stage-f-window-$language.png")
+        Write-Host ($ui | ConvertTo-Json -Depth 5)
+    }
     if ($Play) {
         $result = & dotnet $tool --engine-play $fixture
         $code = $LASTEXITCODE

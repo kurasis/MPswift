@@ -37,13 +37,17 @@ public interface IPlayerStore : IAsyncDisposable
 }
 
 public sealed record PlayerSettings(int SchemaVersion = 1, double Volume = 50, bool Muted = false,
-    int WaveformCacheMiB = 512, double WindowWidth = 840, double WindowHeight = 860, AudioProcessingSettings? Processing = null, AudioOutputSettings? Output = null)
+    int WaveformCacheMiB = 512, double WindowWidth = 840, double WindowHeight = 860, AudioProcessingSettings? Processing = null, AudioOutputSettings? Output = null,
+    string Language = "en", bool CloseToTray = false, double? WindowLeft = null, double? WindowTop = null, bool WindowMaximized = false)
 {
     public PlayerSettings Validate()
     {
         if (SchemaVersion != 1) throw new InvalidDataException("Unsupported settings schema. Original settings were preserved.");
         return this with
         {
+            Language = Language is "en" or "ru" ? Language : "en",
+            WindowLeft = WindowLeft is { } left && double.IsFinite(left) && Math.Abs(left) <= 32768 ? left : null,
+            WindowTop = WindowTop is { } top && double.IsFinite(top) && Math.Abs(top) <= 32768 ? top : null,
             Processing = (Processing ?? new()).Validate(),
             Output = Output ?? new(),
             Volume = double.IsFinite(Volume) ? Math.Clamp(Volume, 0, 100) : 50,

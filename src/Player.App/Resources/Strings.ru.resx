@@ -1,0 +1,620 @@
+<root>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>2.0</value>
+    </resheader>
+    <data xml:space="preserve" name="StageTitle">
+        <value>Диагностика разработки</value>
+    </data>
+    <data xml:space="preserve" name="StageDescription">
+        <value>Локальная сборка для разработки. Возможности и ограничения описаны в локальной справке.</value>
+    </data>
+    <data xml:space="preserve" name="VerifyNative">
+        <value>Проверить аудиобиблиотеки</value>
+    </data>
+    <data xml:space="preserve" name="InitialStatus">
+        <value>Аудиобиблиотеки ещё не проверены. Автовоспроизведение отключено.</value>
+    </data>
+    <data xml:space="preserve" name="Checking">
+        <value>Проверка контрольных сумм и версий библиотек…</value>
+    </data>
+    <data xml:space="preserve" name="Verified">
+        <value>Загрузка библиотек проверена. Проверки устройства вывода и прослушивания не выполнены.</value>
+    </data>
+    <data xml:space="preserve" name="Failed">
+        <value>Ошибка проверки аудиобиблиотек. См. локальную диагностику.</value>
+    </data>
+    <data xml:space="preserve" name="AddFiles">
+        <value>Добавить файлы</value>
+    </data>
+    <data xml:space="preserve" name="AddFolder">
+        <value>Добавить папку</value>
+    </data>
+    <data xml:space="preserve" name="NothingPlaying">
+        <value>Ничего не воспроизводится</value>
+    </data>
+    <data xml:space="preserve" name="UnknownArtist">
+        <value>Неизвестный исполнитель</value>
+    </data>
+    <data xml:space="preserve" name="Unavailable">
+        <value>Недоступен</value>
+    </data>
+    <data xml:space="preserve" name="Play">
+        <value>Воспроизвести</value>
+    </data>
+    <data xml:space="preserve" name="Pause">
+        <value>Пауза</value>
+    </data>
+    <data xml:space="preserve" name="Stop">
+        <value>Стоп</value>
+    </data>
+    <data xml:space="preserve" name="Next">
+        <value>Следующий</value>
+    </data>
+    <data xml:space="preserve" name="Previous">
+        <value>Предыдущий</value>
+    </data>
+    <data xml:space="preserve" name="Mute">
+        <value>Без звука</value>
+    </data>
+    <data xml:space="preserve" name="Volume">
+        <value>Громкость</value>
+    </data>
+    <data xml:space="preserve" name="Seek">
+        <value>Позиция воспроизведения</value>
+    </data>
+    <data xml:space="preserve" name="Search">
+        <value>Поиск в плейлисте (Ctrl+F)</value>
+    </data>
+    <data xml:space="preserve" name="ClearSearch">
+        <value>Очистить поиск</value>
+    </data>
+    <data xml:space="preserve" name="DefaultPlaylist">
+        <value>Основной</value>
+    </data>
+    <data xml:space="preserve" name="Enabled">
+        <value>Включён для автоматического воспроизведения</value>
+    </data>
+    <data xml:space="preserve" name="Remove">
+        <value>Убрать из плейлиста</value>
+    </data>
+    <data xml:space="preserve" name="CancelImport">
+        <value>Отменить импорт</value>
+    </data>
+    <data xml:space="preserve" name="Details">
+        <value>Технические сведения</value>
+    </data>
+    <data xml:space="preserve" name="Elapsed">
+        <value>Прошло</value>
+    </data>
+    <data xml:space="preserve" name="Duration">
+        <value>Длительность</value>
+    </data>
+    <data xml:space="preserve" name="EmptyPrompt">
+        <value>Добавьте локальные аудиофайлы или папку. Автовоспроизведение отключено.</value>
+    </data>
+    <data xml:space="preserve" name="EmptyPlaylist">
+        <value>Плейлист пуст. Добавьте файлы или папку.</value>
+    </data>
+    <data xml:space="preserve" name="EmptySearch">
+        <value>Совпадений нет. Очистите поиск, чтобы показать плейлист.</value>
+    </data>
+    <data xml:space="preserve" name="SessionTemporary">
+        <value>Изменения сеанса сохраняются локально.</value>
+    </data>
+    <data xml:space="preserve" name="NoWaveform">
+        <value>Шкала воспроизведения</value>
+    </data>
+    <data xml:space="preserve" name="Imported">
+        <value>Добавлено: {0}; предупреждений: {1}.</value>
+    </data>
+    <data xml:space="preserve" name="ImportCanceled">
+        <value>Импорт отменён. Уже добавленные записи сохранены.</value>
+    </data>
+    <data xml:space="preserve" name="ImportLimit">
+        <value>Достигнут лимит в 10 000 записей.</value>
+    </data>
+    <data xml:space="preserve" name="PlaylistCount">
+        <value>Показано: {0} / записей: {1}</value>
+    </data>
+    <data xml:space="preserve" name="SourceFormat">
+        <value>{0} · {1:N0} Гц · каналов: {2}</value>
+    </data>
+    <data xml:space="preserve" name="SourceBitDepth">
+        <value>{0} бит</value>
+    </data>
+    <data xml:space="preserve" name="OutputFormat">
+        <value>Вывод: {0:N0} Гц · каналов: {1}</value>
+    </data>
+    <data xml:space="preserve" name="ErrorFileUnavailable">
+        <value>Файл отсутствует, недоступен или требует подключения к сети. Выберите другой файл.</value>
+    </data>
+    <data xml:space="preserve" name="ErrorDecoder">
+        <value>Не удалось декодировать файл. Попробуйте другой; результат декодера указан в технических сведениях.</value>
+    </data>
+    <data xml:space="preserve" name="ErrorDependency">
+        <value>Аудиобиблиотека недоступна. Восстановите файлы приложения и повторите попытку.</value>
+    </data>
+    <data xml:space="preserve" name="ErrorOutputUnavailable">
+        <value>Аудиовывод недоступен. Проверьте выбранное устройство и нажмите «Воспроизвести».</value>
+    </data>
+    <data xml:space="preserve" name="ErrorUnexpected">
+        <value>Операция не выполнена. См. технические сведения и повторите попытку.</value>
+    </data>
+    <data xml:space="preserve" name="ErrorBusy">
+        <value>Слишком много ожидающих аудиокоманд. Повторите попытку.</value>
+    </data>
+    <data xml:space="preserve" name="StateEmpty">
+        <value>Остановлено</value>
+    </data>
+    <data xml:space="preserve" name="StateLoading">
+        <value>Загрузка…</value>
+    </data>
+    <data xml:space="preserve" name="StateStopped">
+        <value>Остановлено</value>
+    </data>
+    <data xml:space="preserve" name="StatePlaying">
+        <value>Воспроизведение</value>
+    </data>
+    <data xml:space="preserve" name="StatePaused">
+        <value>Пауза</value>
+    </data>
+    <data xml:space="preserve" name="StateSeeking">
+        <value>Перемотка…</value>
+    </data>
+    <data xml:space="preserve" name="StateDeviceUnavailable">
+        <value>Вывод недоступен</value>
+    </data>
+    <data xml:space="preserve" name="StateError">
+        <value>Ошибка воспроизведения</value>
+    </data>
+    <data xml:space="preserve" name="Help">
+        <value>Локальная справка / О программе (F1)</value>
+    </data>
+    <data xml:space="preserve" name="PlaylistName">
+        <value>Название плейлиста</value>
+    </data>
+    <data xml:space="preserve" name="SaveName">
+        <value>Сохранить</value>
+    </data>
+    <data xml:space="preserve" name="NewPlaylist">
+        <value>Новый плейлист</value>
+    </data>
+    <data xml:space="preserve" name="PlaylistActions">
+        <value>Действия с плейлистом</value>
+    </data>
+    <data xml:space="preserve" name="Playlists">
+        <value>Плейлисты</value>
+    </data>
+    <data xml:space="preserve" name="RenamePlaylist">
+        <value>Переименовать плейлист…</value>
+    </data>
+    <data xml:space="preserve" name="DuplicatePlaylist">
+        <value>Создать копию плейлиста</value>
+    </data>
+    <data xml:space="preserve" name="DeletePlaylist">
+        <value>Удалить плейлист</value>
+    </data>
+    <data xml:space="preserve" name="TabLeft">
+        <value>Переместить вкладку влево</value>
+    </data>
+    <data xml:space="preserve" name="TabRight">
+        <value>Переместить вкладку вправо</value>
+    </data>
+    <data xml:space="preserve" name="MoveUp">
+        <value>Переместить выбранные записи вверх</value>
+    </data>
+    <data xml:space="preserve" name="MoveDown">
+        <value>Переместить выбранные записи вниз</value>
+    </data>
+    <data xml:space="preserve" name="RefreshWaveform">
+        <value>Обновить волну</value>
+    </data>
+    <data xml:space="preserve" name="Backup">
+        <value>Создать резервную копию…</value>
+    </data>
+    <data xml:space="preserve" name="BackupSaved">
+        <value>Резервная копия сохранена.</value>
+    </data>
+    <data xml:space="preserve" name="Saved">
+        <value>Сохранено</value>
+    </data>
+    <data xml:space="preserve" name="Saving">
+        <value>Сохранение…</value>
+    </data>
+    <data xml:space="preserve" name="SaveFailed">
+        <value>Не удалось сохранить изменения. Повторите попытку перед закрытием.</value>
+    </data>
+    <data xml:space="preserve" name="WaveformLoading">
+        <value>Анализ волны…</value>
+    </data>
+    <data xml:space="preserve" name="WaveformProgress">
+        <value>Анализ волны… {0:P0}</value>
+    </data>
+    <data xml:space="preserve" name="WaveformUnavailable">
+        <value>Волна недоступна — используйте ползунок позиции.</value>
+    </data>
+    <data xml:space="preserve" name="TabLimit">
+        <value>Можно создать до 100 плейлистов.</value>
+    </data>
+    <data xml:space="preserve" name="ReorderFiltered">
+        <value>Очистите поиск перед изменением порядка записей.</value>
+    </data>
+    <data xml:space="preserve" name="CloseWithoutSaving">
+        <value>Не удалось сохранить изменения. Закрыть без сохранения последних изменений?</value>
+    </data>
+    <data xml:space="preserve" name="PlaybackSource">
+        <value>Источник воспроизведения: {0}</value>
+    </data>
+    <data xml:space="preserve" name="DetachedSource">
+        <value>Отдельный трек — его плейлист больше недоступен.</value>
+    </data>
+    <data xml:space="preserve" name="Shuffle">
+        <value>Случайный порядок</value>
+    </data>
+    <data xml:space="preserve" name="Repeat">
+        <value>Повтор</value>
+    </data>
+    <data xml:space="preserve" name="RepeatOff">
+        <value>Выкл.</value>
+    </data>
+    <data xml:space="preserve" name="RepeatAll">
+        <value>Все</value>
+    </data>
+    <data xml:space="preserve" name="RepeatOne">
+        <value>Один</value>
+    </data>
+    <data xml:space="preserve" name="Library">
+        <value>Локальная медиатека…</value>
+    </data>
+    <data xml:space="preserve" name="ExportPlaylist">
+        <value>Экспортировать плейлист в M3U8…</value>
+    </data>
+    <data xml:space="preserve" name="Relink">
+        <value>Заменить путь к выбранному файлу…</value>
+    </data>
+    <data xml:space="preserve" name="CopyPath">
+        <value>Копировать выбранный путь</value>
+    </data>
+    <data xml:space="preserve" name="ShowFile">
+        <value>Показать выбранный файл в Проводнике</value>
+    </data>
+    <data xml:space="preserve" name="Properties">
+        <value>Свойства выбранного трека…</value>
+    </data>
+    <data xml:space="preserve" name="SortPlaylist">
+        <value>Сортировать весь плейлист</value>
+    </data>
+    <data xml:space="preserve" name="SortTitle">
+        <value>Название</value>
+    </data>
+    <data xml:space="preserve" name="SortArtist">
+        <value>Исполнитель</value>
+    </data>
+    <data xml:space="preserve" name="SortAlbum">
+        <value>Альбом</value>
+    </data>
+    <data xml:space="preserve" name="SortTrack">
+        <value>Диск / трек</value>
+    </data>
+    <data xml:space="preserve" name="SortDuration">
+        <value>Длительность</value>
+    </data>
+    <data xml:space="preserve" name="SortPath">
+        <value>Путь</value>
+    </data>
+    <data xml:space="preserve" name="SortAdded">
+        <value>Дата добавления</value>
+    </data>
+    <data xml:space="preserve" name="LegacyImport">
+        <value>Импортировать документ в старой кодировке…</value>
+    </data>
+    <data xml:space="preserve" name="PlayNext">
+        <value>Воспроизвести следующим</value>
+    </data>
+    <data xml:space="preserve" name="AddQueue">
+        <value>Добавить в очередь</value>
+    </data>
+    <data xml:space="preserve" name="ShowQueue">
+        <value>Показать очередь</value>
+    </data>
+    <data xml:space="preserve" name="ClearHistory">
+        <value>Очистить историю воспроизведения</value>
+    </data>
+    <data xml:space="preserve" name="AudioSettings">
+        <value>Аудиовывод / Эквалайзер / ReplayGain</value>
+    </data>
+    <data xml:space="preserve" name="Rating">
+        <value>Оценка</value>
+    </data>
+    <data xml:space="preserve" name="RatingHelp">
+        <value>Оценка (0 = без оценки)</value>
+    </data>
+    <data xml:space="preserve" name="Exported">
+        <value>Плейлист экспортирован; исходные аудиофайлы не изменены.</value>
+    </data>
+    <data xml:space="preserve" name="ExportFailed">
+        <value>Ошибка экспорта</value>
+    </data>
+    <data xml:space="preserve" name="ReplacementSource">
+        <value>Выберите новый локальный аудиофайл</value>
+    </data>
+    <data xml:space="preserve" name="RelinkFailed">
+        <value>Ошибка замены пути; исходная запись сохранена.</value>
+    </data>
+    <data xml:space="preserve" name="TrackProperties">
+        <value>Свойства трека</value>
+    </data>
+    <data xml:space="preserve" name="MetadataHints">
+        <value>Метаданные (проверяются декодером при воспроизведении)</value>
+    </data>
+    <data xml:space="preserve" name="CountedPlays">
+        <value>Засчитано воспроизведений</value>
+    </data>
+    <data xml:space="preserve" name="LastPlayed">
+        <value>Последнее воспроизведение</value>
+    </data>
+    <data xml:space="preserve" name="LegacyEncoding">
+        <value>Кодировка документа</value>
+    </data>
+    <data xml:space="preserve" name="SelectEncoding">
+        <value>Выберите кодировку документа без Unicode.</value>
+    </data>
+    <data xml:space="preserve" name="Encoding1251">
+        <value>Windows-1251 (кириллица)</value>
+    </data>
+    <data xml:space="preserve" name="Encoding1252">
+        <value>Windows-1252 (западная)</value>
+    </data>
+    <data xml:space="preserve" name="Encoding866">
+        <value>CP866 (кириллица DOS)</value>
+    </data>
+    <data xml:space="preserve" name="Import">
+        <value>Импортировать</value>
+    </data>
+    <data xml:space="preserve" name="DevicesUnavailable">
+        <value>Аудиоустройства недоступны</value>
+    </data>
+    <data xml:space="preserve" name="LibraryTitle">
+        <value>Локальная медиатека</value>
+    </data>
+    <data xml:space="preserve" name="AddRoot">
+        <value>Добавить папку</value>
+    </data>
+    <data xml:space="preserve" name="RefreshRoots">
+        <value>Обновить папки</value>
+    </data>
+    <data xml:space="preserve" name="CancelScan">
+        <value>Отменить сканирование</value>
+    </data>
+    <data xml:space="preserve" name="AddSelected">
+        <value>Добавить выбранное в плейлист</value>
+    </data>
+    <data xml:space="preserve" name="PreviousPage">
+        <value>Предыдущая страница</value>
+    </data>
+    <data xml:space="preserve" name="NextPage">
+        <value>Следующая страница</value>
+    </data>
+    <data xml:space="preserve" name="LibrarySearch">
+        <value>Поиск в медиатеке без шаблонов</value>
+    </data>
+    <data xml:space="preserve" name="DisableRoot">
+        <value>Отключить выбранную папку</value>
+    </data>
+    <data xml:space="preserve" name="LibraryPage">
+        <value>Найдено: {0} · {1}–{2}. {3}</value>
+    </data>
+    <data xml:space="preserve" name="ScanProgress">
+        <value>Проиндексировано: {0}; изменено: {1}; сообщений: {2}</value>
+    </data>
+    <data xml:space="preserve" name="ScanCanceled">
+        <value>Сканирование отменено; записанные данные сохранены.</value>
+    </data>
+    <data xml:space="preserve" name="ScanFailed">
+        <value>Ошибка сканирования; метаданные и плейлисты сохранены.</value>
+    </data>
+    <data xml:space="preserve" name="WaitImport">
+        <value>Дождитесь завершения импорта или отмените его.</value>
+    </data>
+    <data xml:space="preserve" name="ClearBeforeSort">
+        <value>Очистите поиск перед сортировкой всего плейлиста.</value>
+    </data>
+    <data xml:space="preserve" name="QueueTitle">
+        <value>Очередь воспроизведения</value>
+    </data>
+    <data xml:space="preserve" name="QueueMoveUp">
+        <value>Вверх</value>
+    </data>
+    <data xml:space="preserve" name="QueueMoveDown">
+        <value>Вниз</value>
+    </data>
+    <data xml:space="preserve" name="QueueRemove">
+        <value>Убрать</value>
+    </data>
+    <data xml:space="preserve" name="ClearQueue">
+        <value>Очистить очередь</value>
+    </data>
+    <data xml:space="preserve" name="QueueDescription">
+        <value>Записи из очереди воспроизводятся первыми. Очистка очереди не останавливает текущий трек.</value>
+    </data>
+    <data xml:space="preserve" name="AudioTitle">
+        <value>Аудиовывод и обработка</value>
+    </data>
+    <data xml:space="preserve" name="SavedOutputUnavailable">
+        <value>Сохранённое устройство недоступно — выберите замену</value>
+    </data>
+    <data xml:space="preserve" name="OutputDevice">
+        <value>Устройство вывода (изменение приостанавливает воспроизведение)</value>
+    </data>
+    <data xml:space="preserve" name="ExclusiveMode">
+        <value>Монопольный режим — может блокировать звук других приложений</value>
+    </data>
+    <data xml:space="preserve" name="ExclusivePolicy">
+        <value>Если монопольный формат недоступен, появится ошибка. Общий режим автоматически не включается.</value>
+    </data>
+    <data xml:space="preserve" name="ReplayGainHelp">
+        <value>ReplayGain (только теги; без тегов — 0 дБ)</value>
+    </data>
+    <data xml:space="preserve" name="GainOff">
+        <value>Выкл.</value>
+    </data>
+    <data xml:space="preserve" name="GainTrack">
+        <value>Трек</value>
+    </data>
+    <data xml:space="preserve" name="GainAlbum">
+        <value>Альбом</value>
+    </data>
+    <data xml:space="preserve" name="EnableEq">
+        <value>Включить эквалайзер</value>
+    </data>
+    <data xml:space="preserve" name="GainDb">
+        <value>Усиление в дБ</value>
+    </data>
+    <data xml:space="preserve" name="EqPolicy">
+        <value>Полосы выше частоты Найквиста отключаются. Усиление компенсируется запасом; выход за диапазон ограничивается.</value>
+    </data>
+    <data xml:space="preserve" name="Preamp">
+        <value>Предусиление (дБ)</value>
+    </data>
+    <data xml:space="preserve" name="CrossfadeHelp">
+        <value>Кроссфейд (секунды; 0 = выкл.). Непрерывные CUE и повтор одного трека воспроизводятся без наложения.</value>
+    </data>
+    <data xml:space="preserve" name="Flat">
+        <value>Сброс полос</value>
+    </data>
+    <data xml:space="preserve" name="SavePreset">
+        <value>Сохранить настройку</value>
+    </data>
+    <data xml:space="preserve" name="LoadPreset">
+        <value>Загрузить настройку</value>
+    </data>
+    <data xml:space="preserve" name="PresetSaveFailed">
+        <value>Не удалось сохранить настройку</value>
+    </data>
+    <data xml:space="preserve" name="PresetLoadFailed">
+        <value>Не удалось загрузить настройку</value>
+    </data>
+    <data xml:space="preserve" name="Apply">
+        <value>Применить</value>
+    </data>
+    <data xml:space="preserve" name="Cancel">
+        <value>Отмена</value>
+    </data>
+    <data xml:space="preserve" name="Preferences">
+        <value>Внешний вид и поведение…</value>
+    </data>
+    <data xml:space="preserve" name="PreferencesTitle">
+        <value>Внешний вид и поведение</value>
+    </data>
+    <data xml:space="preserve" name="Language">
+        <value>Язык (после перезапуска)</value>
+    </data>
+    <data xml:space="preserve" name="CloseToTray">
+        <value>Сворачивать в трей при закрытии</value>
+    </data>
+    <data xml:space="preserve" name="CloseTrayHelp">
+        <value>По умолчанию закрытие завершает работу. Эта настройка скрывает окно; для завершения выберите «Выход» в трее.</value>
+    </data>
+    <data xml:space="preserve" name="RestartLanguage">
+        <value>Язык сохранён. Перезапустите приложение, чтобы применить его везде.</value>
+    </data>
+    <data xml:space="preserve" name="ShowHide">
+        <value>Показать / Скрыть</value>
+    </data>
+    <data xml:space="preserve" name="Exit">
+        <value>Выход</value>
+    </data>
+    <data xml:space="preserve" name="IntegrationUnavailable">
+        <value>Управление через Windows недоступно. Кнопки приложения продолжают работать.</value>
+    </data>
+    <data xml:space="preserve" name="StorageUnavailable">
+        <value>Хранилище недоступно</value>
+    </data>
+    <data xml:space="preserve" name="SavedDataUnavailable">
+        <value>Сохранённые данные недоступны</value>
+    </data>
+    <data xml:space="preserve" name="RestorePrompt">
+        <value>Не удалось прочитать сохранённые данные. Исходные файлы будут сохранены. Восстановить резервную копию?</value>
+    </data>
+    <data xml:space="preserve" name="StartupFailure">
+        <value>Не удалось прочитать сохранённые данные. Исходные файлы сохранены.</value>
+    </data>
+    <data xml:space="preserve" name="InvalidArguments">
+        <value>Неподдерживаемые аргументы. Укажите локальные пути, --play или -- перед путями. См. локальную справку.</value>
+    </data>
+    <data xml:space="preserve" name="ForwardFailed">
+        <value>Не удалось связаться с работающим экземпляром. Дождитесь его запуска и повторите попытку.</value>
+    </data>
+    <data xml:space="preserve" name="Minimize">
+        <value>Свернуть</value>
+    </data>
+    <data xml:space="preserve" name="Maximize">
+        <value>Развернуть / Восстановить</value>
+    </data>
+    <data xml:space="preserve" name="Close">
+        <value>Закрыть</value>
+    </data>
+    <data xml:space="preserve" name="Artwork">
+        <value>Обложка альбома</value>
+    </data>
+    <data xml:space="preserve" name="EmptySearchClear">
+        <value>Очистить поиск</value>
+    </data>
+    <data xml:space="preserve" name="AudioFilter">
+        <value>Локальное аудио и плейлисты|*.mp3;*.wav;*.aif;*.aiff;*.flac;*.ogg;*.opus;*.m4a;*.m4b;*.aac;*.alac;*.wv;*.tta;*.ape;*.mpc;*.dsf;*.dff;*.wma;*.cue;*.m3u;*.m3u8;*.pls|Все файлы|*.*</value>
+    </data>
+    <data xml:space="preserve" name="PlaylistFilter">
+        <value>Плейлист UTF-8 (*.m3u8)|*.m3u8</value>
+    </data>
+    <data xml:space="preserve" name="PresetFilter">
+        <value>Настройка эквалайзера (*.json)|*.json</value>
+    </data>
+    <data xml:space="preserve" name="DocumentFilter">
+        <value>Локальные документы (*.cue;*.m3u;*.pls)|*.cue;*.m3u;*.pls</value>
+    </data>
+    <data xml:space="preserve" name="BackupFilter">
+        <value>Резервная копия SQLite (*.db)|*.db</value>
+    </data>
+    <data xml:space="preserve" name="HelpText">
+        <value>Пробел: воспроизведение/пауза вне элементов, использующих пробел
+Ctrl+O / Ctrl+Shift+O: добавить файлы / папку
+Ctrl+F: поиск; Esc: очистить поиск
+Enter / Delete / Ctrl+A: воспроизвести / убрать / выбрать видимые записи (в плейлисте)
+Alt+Left / Alt+Right: предыдущий / следующий
+Ctrl+Left / Ctrl+Right: перемотка на 5 секунд
+Ctrl+Up / Ctrl+Down: громкость приложения на 5 процентов
+Ctrl+N: новый плейлист; F2: переименовать (фокус на вкладках)
+Ctrl+Shift+Up/Down: изменить порядок после очистки поиска
+F1: локальная справка
+
+Командная строка: локальные пути добавляются без автовоспроизведения; --play явно запускает первый добавленный трек. -- завершает разбор опций. Второй запуск активирует текущий экземпляр пользователя. Запуск без аргументов не включает звук.
+
+Трей: показать/скрыть, воспроизвести/пауза, следующий, предыдущий, выход. Закрытие завершает работу по умолчанию; закрытие в трей включается отдельно. Смена языка применяется после перезапуска.
+
+Исходные файлы не изменяются. Оценки, история, медиатека, очередь и настройки хранятся локально. Восстановление не включает звук. Принимаются только локальные доступные без сети файлы. Приложение не обращается к сети. Условия распространения BASS и декодеров ещё подлежат проверке; это сборка для разработки.</value>
+    </data>
+    <data xml:space="preserve" name="CopySuffix">
+        <value> (копия)</value>
+    </data>
+    <data xml:space="preserve" name="HzUnit">
+        <value>Гц</value>
+    </data>
+    <data xml:space="preserve" name="ChannelsUnit">
+        <value>каналов</value>
+    </data>
+    <data xml:space="preserve" name="KbpsUnit">
+        <value>кбит/с</value>
+    </data>
+    <data xml:space="preserve" name="DiscLabel">
+        <value>Диск</value>
+    </data>
+    <data xml:space="preserve" name="TrackLabel">
+        <value>Трек</value>
+    </data>
+    <data xml:space="preserve" name="DefaultOutput">
+        <value>Устройство Windows по умолчанию</value>
+    </data>
+</root>
