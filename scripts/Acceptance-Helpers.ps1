@@ -72,7 +72,9 @@ function Start-PlayerNetworkTrace {
     param($Workspace)
     $name = 'PlayerAcceptance-' + $Workspace.Token
     $etl = Join-Path $Workspace.Root 'network.etl'
-    $result = & logman.exe start $name -o $etl -f bin -max 64 -bs 128 -nb 16 128 -p '{7dd42a49-5329-4832-8dfd-43d979153a88}' 0xffffffffffffffff 5 -p '{22fb2cd6-0e7b-422b-a0c7-2fad1fd0e716}' 0x10 5 -ets 2>&1
+    $providers = Join-Path $Workspace.Root 'network-providers.txt'
+    @('"{7dd42a49-5329-4832-8dfd-43d979153a88}" 0xffffffffffffffff 5', '"{22fb2cd6-0e7b-422b-a0c7-2fad1fd0e716}" 0x10 5') | Set-Content $providers -Encoding ascii
+    $result = & logman.exe start $name -o $etl -f bin -max 64 -bs 128 -nb 16 128 -pf $providers -ets 2>&1
     if ($LASTEXITCODE -ne 0) { throw ('Owned ETW session could not start (often elevation is required): ' + ($result -join ' ')) }
     [pscustomobject]@{ Name = $name; Etl = $etl }
 }

@@ -29,6 +29,23 @@ public partial class App : Application
     public string? InstancePipeName => _instance?.PipeName;
     private async void OnStartup(object sender, StartupEventArgs e)
     {
+        if (e.Args.Length is 2 or 3 && e.Args[0] == "--audio-acceptance" && e.Args[1] is "probe" or "shared" or "exclusive" or "digital" &&
+            File.Exists(Path.Combine(Environment.CurrentDirectory, AcceptanceWorkspace.Marker)))
+        {
+            ShutdownMode = ShutdownMode.OnExplicitShutdown; var owned = false;
+            try
+            {
+                var root = AcceptanceWorkspace.Validate(); owned = true;
+                using var instance = new SingleInstanceService();
+                if (!instance.IsPrimary) throw new InvalidOperationException("Audio acceptance requires the other player instance to be closed; no unrelated process was terminated.");
+                var report = await Task.Run(() => AudioAcceptanceValidation.Run(root, e.Args[1], e.Args.Length == 3 ? e.Args[2] : null));
+                AcceptanceWorkspace.WriteReport("audio-" + e.Args[1] + ".json", report);
+                var status = JsonSerializer.SerializeToElement(report).GetProperty("Status").GetString();
+                Shutdown(status is "g11-device-probe-complete" or "g11-output-passed" ? 0 : status == "blocked" ? 3 : 1);
+            }
+            catch (Exception error) { if (owned) AcceptanceWorkspace.WriteReport("audio-failure.json", new { Status = "failed", error.Message }); Shutdown(1); }
+            return;
+        }
         if (e.Args.Length == 4 && e.Args[0] == "--network-report" && File.Exists(Path.Combine(Environment.CurrentDirectory, AcceptanceWorkspace.Marker)))
         {
             var owned = false;

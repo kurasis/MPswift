@@ -44,13 +44,27 @@ try {
     Copy-Item (Join-Path $evidence 'ui.json') (Join-Path $out 'packaged-ui.json')
     Copy-Item (Join-Path $evidence 'stage-c-window.png') (Join-Path $out 'packaged-window-ru.png')
     foreach ($language in @('en','ru')) {
-        $desktop = & "$PSScriptRoot/Desktop-Acceptance.ps1" -CandidateDirectory $app -OutputDirectory $owned -Language $language
+        $before = @(Get-ChildItem $owned -Directory -Filter 'player-acceptance-*' | ForEach-Object Name)
+        try { $desktop = & "$PSScriptRoot/Desktop-Acceptance.ps1" -CandidateDirectory $app -OutputDirectory $owned -Language $language }
+        finally {
+            Get-ChildItem $owned -Directory -Filter 'player-acceptance-*' | Where-Object Name -notin $before | ForEach-Object {
+                foreach ($name in @('g10-desktop.json','desktop-first.json','desktop-restart.json','network-report-first.json','network-report-restart.json','network-report-failure.json')) {
+                    $file = Join-Path $_.FullName $name
+                    if (Test-Path $file) { Copy-Item $file (Join-Path $out "g10-$language-$name") }
+                }
+                $startup = Join-Path $_.FullName 'artifacts/smoke/ui.json'
+                if (Test-Path $startup) { Copy-Item $startup (Join-Path $out "g10-$language-startup.json") }
+            }
+        }
         $g10 = Get-Content $desktop.Report -Raw | ConvertFrom-Json
         if ($g10.Status -ne 'g10-owned-desktop-workflow-passed' -or $g10.Network.first.Status -ne 'no-app-network-events-observed' -or
             $g10.Network.restart.Status -ne 'no-app-network-events-observed' -or -not $g10.ActualApphostRestart.ActualProcessRestart) { throw 'G10 desktop/ETW evidence failed or is incomplete.' }
         Copy-Item $desktop.Report (Join-Path $out "g10-desktop-$language.json")
         Get-ChildItem $desktop.Workspace -Filter 'g10-*.png' | ForEach-Object { Copy-Item $_.FullName (Join-Path $out $_.Name) }
     }
+    $audio = & "$PSScriptRoot/Audio-Acceptance.ps1" -CandidateDirectory $app -OutputDirectory $owned -Mode Probe
+    if ($audio.Status -ne 'g11-device-probe-complete') { throw 'Actual native device enumeration did not complete.' }
+    Copy-Item $audio.Report (Join-Path $out 'g11-device-probe.json')
     [ordered]@{ Status = 'packaged-executable-smoke-passed'; SourceCommit = $audit.SourceCommit; ZipSha256 = $audit.ZipSha256; UnicodeExtractionPath = $true; ArbitraryWorkingDirectory = $true; InvalidExternalDotnetRoot = $true; TamperRejected = $rejected; Windows = [Environment]::OSVersion.VersionString; CleanWindows11WithoutSdk = 'not-run'; NetworkDisconnected = 'not-run'; DeviceOutput = 'not-run'; DistributionApproved = $false } | ConvertTo-Json | Set-Content (Join-Path $out 'package-smoke.json') -Encoding utf8
 } finally {
     if (Test-Path $owned) { Remove-Item $owned -Recurse -Force }

@@ -1,0 +1,20 @@
+# G11 actual endpoint and digital acceptance
+
+Run the scripts included in a verified development ZIP on interactive Windows x64. Windows PowerShell 5.1 is sufficient; no SDK is needed. Close this user's normal player first. The runner copies only the hashed candidate inventory into a new owned token directory and invokes its self-contained apphost with invalid external .NET roots. Existing music, portable Data, other apps, services, device settings and Windows master volume are not modified.
+
+```powershell
+& .\acceptance\Audio-Acceptance.ps1 -CandidateDirectory . -Mode Probe
+& .\acceptance\Audio-Acceptance.ps1 -CandidateDirectory . -Mode Shared
+& .\acceptance\Audio-Acceptance.ps1 -CandidateDirectory . -Mode Exclusive
+& .\acceptance\Audio-Acceptance.ps1 -CandidateDirectory . -Mode Digital
+```
+
+Optional `-DeviceId` selects the exact native ID observed in Probe; otherwise the actual default enabled output is used. `-OutputDirectory` controls the parent of the fresh workspace. Probe enumerates actual WASAPI devices and versions; it does not prove playback. Missing requested output, matching loopback or a supported stereo digital mix profile is reported as blocked, never replaced by a fake endpoint or a silent shared fallback. Unsupported exclusive rates must return the typed output-unavailable error. An initial unsupported exclusive format may fail the run and remains evidence to assess against that device's supported formats.
+
+Shared/Exclusive play owned low-amplitude WAV tones through the production backend. Keep a comfortable system listening level before running. They test advancing playback, pause/seek/resume, app gain/mute, twenty running replacements, paused replacement, repeated Stop, source-rate change, explicit unavailable-endpoint refusal and explicit retry. Observed Windows master gain/mute must remain unchanged; concurrent external volume changes invalidate this observation. Source hashes and exclusive file reopening are checked after backend disposal. Reports include actual native versions, negotiated formats, device identity, installed media driver versions, failures and native codes. Exclusive source-rate changes now reopen the output when the source frequency/channel layout changes.
+
+Digital uses a separate native owner thread and a bounded 12-second float32 loopback buffer for the selected endpoint. It plays a deterministic owned stereo PCM signal through two contiguous 2-second CUE segments at the endpoint's actual shared mix rate. After native capture quiesces, `loopback.f32` contains the actual captured samples with SHA-256/byte count. Positive correlation identifies source alignment and gain; independent windows before/after the boundary detect inserted/dropped frames; both channels' 100 ms boundary error is measured. Thresholds are correlation >=0.995, zero pre/post lag, normalized RMS <=0.001 and relative peak error <=0.01. Silence, truncation, interference, capture overflow or mismatching reference cannot pass. Managed analyzer tests are separate from real loopback evidence.
+
+Keep raw loopback captures local: they can include other Windows/app audio. The runner neither suppresses nor fabricates that audio; interference invalidates the comparison. The JSON report remains in the printed workspace even if validation fails. Retain source commit/package manifest/capture hashes, device/driver details and the actual result together. Hosted CI runs Probe only; zero hosted outputs leaves live playback/capture open.
+
+Complete G11 acceptance still requires real shared/exclusive runs, hardware unplug/default-switch/sleep and explicit recovery, codec/lossless boundaries and lossy-gapless limitations, crossfade/EQ/ReplayGain/clipping captures, and a human listening record (device, driver, format, actions and audible outcome). This CUE/WAV boundary profile cannot close those other gates. Two-hour real output/resource measurements belong to G12. A successful automated output run cannot claim manual listening or version 1.0 acceptance.

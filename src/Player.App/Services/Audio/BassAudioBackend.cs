@@ -70,7 +70,7 @@ public sealed class BassAudioBackend : IAudioBackend, IAdvancedAudioBackend
     private void EnsureOutput()
     {
         var device = FindDevice(); var deviceInfo = BassWasapi.GetDeviceInfo(device);
-        if (_wasapi && deviceInfo.ID == _actualDevice) return;
+        if (_wasapi && _settings.CanReuse(deviceInfo.ID, _actualDevice, _output, _info!.Format)) return;
         if (_wasapi) CloseOutput();
         var rate = _settings.Exclusive ? _info!.Format.SampleRate : deviceInfo.MixFrequency;
         var channels = _settings.Exclusive ? Math.Min(2, _info!.Format.Channels) : deviceInfo.MixChannels;

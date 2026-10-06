@@ -90,7 +90,12 @@ public sealed class PcmProcessor
 }
 
 public sealed record AudioDevice(string? Id, string Name, int SampleRate, int Channels);
-public sealed record AudioOutputSettings(string? DeviceId = null, bool Exclusive = false);
+public sealed record AudioOutputSettings(string? DeviceId = null, bool Exclusive = false)
+{
+    public bool CanReuse(string selectedDeviceId, string? actualDeviceId, AudioFormatInfo? actual, AudioFormatInfo source) =>
+        actual is not null && actualDeviceId == selectedDeviceId &&
+        (!Exclusive || actual.SampleRate == source.SampleRate && actual.Channels == Math.Min(2, source.Channels));
+}
 public interface IAdvancedAudioPlayer
 {
     Task<bool> SetProcessingAsync(AudioProcessingSettings settings);
