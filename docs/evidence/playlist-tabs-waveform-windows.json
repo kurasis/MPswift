@@ -1,0 +1,304 @@
+{
+  "sourceCommit": "d97f35939559e9b67f2a33573fcfc183af93bd7b",
+  "runUrl": "https://github.com/kurasis/MPswift/actions/runs/37474035323",
+  "runAttempt": 1,
+  "runConclusion": "success",
+  "jobs": [
+    {
+      "id": 112304669065,
+      "name": "build (ubuntu-24.04)",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37474035323/job/112304669065",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 112304669388,
+      "name": "build (windows-2022)",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37474035323/job/112304669388",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 112307908783,
+      "name": "Publish separate Windows ZIP prerelease",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37474035323/job/112307908783",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "productVersion": "0.2.59-dev.1",
+  "tests": {
+    "evidence-ubuntu-24.04": [
+      {
+        "total": "184",
+        "executed": "184",
+        "passed": "184",
+        "failed": "0",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      }
+    ],
+    "evidence-windows-2022": [
+      {
+        "total": "184",
+        "executed": "184",
+        "passed": "184",
+        "failed": "0",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      }
+    ]
+  },
+  "windowsUi": {
+    "ui-en.json": {
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaylistTabs": {
+        "Status": "playlist-tabs-passed",
+        "ClickedTabManagement": true,
+        "KeyboardContextRoute": true,
+        "LocalizedPopup": true,
+        "DuplicateAndDeleteTarget": true,
+        "MenuMovement": true,
+        "BeforeAndAfterDrop": true,
+        "SelfAndForeignAndOutsideDrops": true,
+        "SQLiteOrder": true,
+        "SelectionPreservedOnMove": true,
+        "PlaybackAndQueuePreserved": true,
+        "SoftwareRoutedWpfEvents": true
+      },
+      "WaveformEnvelope": {
+        "Status": "waveform-envelope-passed",
+        "ActualNativePcm": true,
+        "OppositePhasePreserved": true,
+        "PeakExtremaPreserved": true,
+        "RmsMaximumError": 2.9780732657691544e-08,
+        "RmsMinimum": 0.08341985,
+        "RmsMaximum": 0.6428508,
+        "WeightedDisplayVariation": true,
+        "CachedGeometryAtTwoWidths": true,
+        "SeekUnchanged": true,
+        "SourceUnchanged": true,
+        "PlaybackPreserved": true,
+        "OldCacheAutomaticallyRegenerated": true
+      }
+    },
+    "ui-ru.json": {
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaylistTabs": {
+        "Status": "playlist-tabs-passed",
+        "ClickedTabManagement": true,
+        "KeyboardContextRoute": true,
+        "LocalizedPopup": true,
+        "DuplicateAndDeleteTarget": true,
+        "MenuMovement": true,
+        "BeforeAndAfterDrop": true,
+        "SelfAndForeignAndOutsideDrops": true,
+        "SQLiteOrder": true,
+        "SelectionPreservedOnMove": true,
+        "PlaybackAndQueuePreserved": true,
+        "SoftwareRoutedWpfEvents": true
+      },
+      "WaveformEnvelope": {
+        "Status": "waveform-envelope-passed",
+        "ActualNativePcm": true,
+        "OppositePhasePreserved": true,
+        "PeakExtremaPreserved": true,
+        "RmsMaximumError": 2.9780732657691544e-08,
+        "RmsMinimum": 0.08341985,
+        "RmsMaximum": 0.6428508,
+        "WeightedDisplayVariation": true,
+        "CachedGeometryAtTwoWidths": true,
+        "SeekUnchanged": true,
+        "SourceUnchanged": true,
+        "PlaybackPreserved": true,
+        "OldCacheAutomaticallyRegenerated": true
+      }
+    },
+    "packaged-ui.json": {
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaylistTabs": {
+        "Status": "playlist-tabs-passed",
+        "ClickedTabManagement": true,
+        "KeyboardContextRoute": true,
+        "LocalizedPopup": true,
+        "DuplicateAndDeleteTarget": true,
+        "MenuMovement": true,
+        "BeforeAndAfterDrop": true,
+        "SelfAndForeignAndOutsideDrops": true,
+        "SQLiteOrder": true,
+        "SelectionPreservedOnMove": true,
+        "PlaybackAndQueuePreserved": true,
+        "SoftwareRoutedWpfEvents": true
+      },
+      "WaveformEnvelope": {
+        "Status": "waveform-envelope-passed",
+        "ActualNativePcm": true,
+        "OppositePhasePreserved": true,
+        "PeakExtremaPreserved": true,
+        "RmsMaximumError": 2.9780732657691544e-08,
+        "RmsMinimum": 0.08341985,
+        "RmsMaximum": 0.6428508,
+        "WeightedDisplayVariation": true,
+        "CachedGeometryAtTwoWidths": true,
+        "SeekUnchanged": true,
+        "SourceUnchanged": true,
+        "PlaybackPreserved": true,
+        "OldCacheAutomaticallyRegenerated": true
+      }
+    }
+  },
+  "screenshots": [
+    {
+      "path": "smoke/playlist-tab-menu-en.png",
+      "sha256": "974d8292261fc3d7b23cc138229f384b10c4bbb5e1a708ad6539232af2a5c886"
+    },
+    {
+      "path": "smoke/waveform-envelope-ru.png",
+      "sha256": "222e4e14c86fe05b4482f34dfadcef45731e92de84621f07cc1bc2c834fa9564"
+    },
+    {
+      "path": "smoke/waveform-envelope-en.png",
+      "sha256": "222e4e14c86fe05b4482f34dfadcef45731e92de84621f07cc1bc2c834fa9564"
+    },
+    {
+      "path": "smoke/playlist-tab-menu-ru.png",
+      "sha256": "bd23fd33e342baf8af14a5d7694c4a31ca53ba4e6d274ced64bc97e5682e9c68"
+    }
+  ],
+  "windowsArtifactSha256": "3fcaa8be8ae7982814c924dd1e522444ab49a67f6a5ea8df32b67c1bbae7a90f",
+  "packageSmoke": {
+    "Status": "packaged-executable-smoke-passed",
+    "SourceCommit": "d97f35939559e9b67f2a33573fcfc183af93bd7b",
+    "ZipSha256": "9f242bfcf0fd6c45648fb4b01141d945b76e46e6a440787d26633b1563f9331d",
+    "UnicodeExtractionPath": true,
+    "ArbitraryWorkingDirectory": true,
+    "InvalidExternalDotnetRoot": true,
+    "TamperRejected": true,
+    "Windows": "Microsoft Windows NT 10.0.20348.0",
+    "CleanWindows11WithoutSdk": "not-run",
+    "NetworkDisconnected": "not-run",
+    "DeviceOutput": "not-run",
+    "DistributionApproved": false
+  },
+  "publishedDownload": {
+    "status": "published-download-verified",
+    "sourceCommit": "d97f35939559e9b67f2a33573fcfc183af93bd7b",
+    "runUrl": "https://github.com/kurasis/MPswift/actions/runs/37474035323",
+    "releaseUrl": "https://github.com/kurasis/MPswift/releases/tag/build-37474035323-attempt-1",
+    "zipUrl": "https://github.com/kurasis/MPswift/releases/download/build-37474035323-attempt-1/MPswift-0.2.59-dev.1-d97f35939559-win-x64.zip",
+    "bytes": 85702552,
+    "sha256": "9f242bfcf0fd6c45648fb4b01141d945b76e46e6a440787d26633b1563f9331d",
+    "evidence": {
+      "evidence-ubuntu-24.04": {
+        "tests": [
+          {
+            "total": "184",
+            "executed": "184",
+            "passed": "184",
+            "failed": "0",
+            "error": "0",
+            "timeout": "0",
+            "aborted": "0",
+            "inconclusive": "0",
+            "passedButRunAborted": "0",
+            "notRunnable": "0",
+            "notExecuted": "0",
+            "disconnected": "0",
+            "warning": "0",
+            "completed": "0",
+            "inProgress": "0",
+            "pending": "0"
+          }
+        ],
+        "reports": {}
+      },
+      "evidence-windows-2022": {
+        "tests": [
+          {
+            "total": "184",
+            "executed": "184",
+            "passed": "184",
+            "failed": "0",
+            "error": "0",
+            "timeout": "0",
+            "aborted": "0",
+            "inconclusive": "0",
+            "passedButRunAborted": "0",
+            "notRunnable": "0",
+            "notExecuted": "0",
+            "disconnected": "0",
+            "warning": "0",
+            "completed": "0",
+            "inProgress": "0",
+            "pending": "0"
+          }
+        ],
+        "reports": {
+          "smoke/crash-restart.json": {
+            "Status": "crash-restart-model-passed",
+            "CommittedPlaylistIdentityOrderAndFlags": true,
+            "ActiveSourceAndPosition": true,
+            "QueueRepeatShuffle": true,
+            "Ratings": true,
+            "VolumeMute": true,
+            "NativePreparation": true,
+            "NoAutoplay": true,
+            "SqliteIntegrityAndReferences": true,
+            "UncommittedValidationTransactionRolledBack": true,
+            "SourceUnchanged": true,
+            "PositionToleranceSeconds": 0.05,
+            "DevicePlayback": "not-run",
+            "KillDuringMigrationOrPowerLoss": "not-run",
+            "Windows": "Microsoft Windows NT 10.0.20348.0",
+            "ForcedWpfTermination": true,
+            "KilledExitCode": -1,
+            "Method": "Actual apphost killed after a production checkpoint, while a diagnostic SQLite write transaction was open; actual WPF/native restart validates the last committed state.",
+            "SourceCommit": "d97f35939559e9b67f2a33573fcfc183af93bd7b"
+          },
+          "smoke/package-smoke.json": {
+            "Status": "packaged-executable-smoke-passed",
+            "SourceCommit": "d97f35939559e9b67f2a33573fcfc183af93bd7b",
+            "ZipSha256": "9f242bfcf0fd6c45648fb4b01141d945b76e46e6a440787d26633b1563f9331d",
+            "UnicodeExtractionPath": true,
+            "ArbitraryWorkingDirectory": true,
+            "InvalidExternalDotnetRoot": true,
+            "TamperRejected": true,
+            "Windows": "Microsoft Windows NT 10.0.20348.0",
+            "CleanWindows11WithoutSdk": "not-run",
+            "NetworkDisconnected": "not-run",
+            "DeviceOutput": "not-run",
+            "DistributionApproved": false
+          }
+        }
+      }
+    },
+    "completeInventoryVerified": {
+      "files": 558,
+      "nativeX64Libraries": 13,
+      "compiledVersionsMatchManifest": true
+    }
+  }
+}
