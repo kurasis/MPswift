@@ -40,7 +40,7 @@ public interface IPlayerStore : IAsyncDisposable
 
 public sealed record PlayerSettings(int SchemaVersion = 1, double Volume = 50, bool Muted = false,
     int WaveformCacheMiB = 512, double WindowWidth = 840, double WindowHeight = 860, AudioProcessingSettings? Processing = null, AudioOutputSettings? Output = null,
-    string Language = "en", bool CloseToTray = false, double? WindowLeft = null, double? WindowTop = null, bool WindowMaximized = false, bool ShowAlbumSections = true)
+    string Language = "en", bool CloseToTray = false, double? WindowLeft = null, double? WindowTop = null, bool WindowMaximized = false, bool ShowAlbumSections = true, int CueCodePage = 1251)
 {
     public PlayerSettings Validate()
     {
@@ -48,6 +48,7 @@ public sealed record PlayerSettings(int SchemaVersion = 1, double Volume = 50, b
         return this with
         {
             Language = Language is "en" or "ru" ? Language : "en",
+            CueCodePage = CueCodePage is 0 or 1251 or 1252 or 866 ? CueCodePage : 1251,
             WindowLeft = WindowLeft is { } left && double.IsFinite(left) && Math.Abs(left) <= 32768 ? left : null,
             WindowTop = WindowTop is { } top && double.IsFinite(top) && Math.Abs(top) <= 32768 ? top : null,
             Processing = (Processing ?? new()).Validate(),

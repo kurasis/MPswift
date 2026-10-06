@@ -28,5 +28,5 @@ try {
     [IO.File]::WriteAllText($sums, ''); Require-Rejection 'empty checksum list'; $checks += 'empty checksum list'
     [IO.File]::WriteAllBytes($sums, $originalSums)
     & "$PSScriptRoot/Verify-Candidate.ps1" -Directory $app
-    [ordered]@{ Status = 'candidate-integrity-negative-checks-passed'; SourceCommit = $audit.SourceCommit; SourceTreeDirty = $audit.SourceTreeDirty; Checks = $checks; ZipSha256 = $audit.ZipSha256; RestoredCopyPassed = $true } | ConvertTo-Json | Set-Content (Join-Path $root 'artifacts/portable/integrity-audit.json') -Encoding utf8
+    [ordered]@{ Status = 'candidate-integrity-negative-checks-passed'; ProductVersion = $audit.ProductVersion; SourceCommit = $audit.SourceCommit; SourceTreeDirty = $audit.SourceTreeDirty; Checks = $checks; ZipSha256 = $audit.ZipSha256; RestoredCopyPassed = $true } | ConvertTo-Json | Set-Content (Join-Path $root 'artifacts/portable/integrity-audit.json') -Encoding utf8
 } finally { if (Test-Path $owned) { Remove-Item $owned -Recurse -Force } }

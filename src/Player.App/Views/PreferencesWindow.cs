@@ -12,6 +12,7 @@ public sealed class PreferencesWindow : Window
     internal ComboBox LanguageBox { get; }
     internal CheckBox AlbumSectionsBox { get; }
     internal CheckBox CloseToTrayBox { get; }
+    internal ComboBox CueEncodingBox { get; }
     internal Button ApplyButton { get; }
     internal Task ApplyCompletion { get; private set; } = Task.CompletedTask;
 
@@ -43,6 +44,12 @@ public sealed class PreferencesWindow : Window
         Section(Strings.PlaylistSection);
         AlbumSectionsBox = new CheckBox { Content = Strings.ShowAlbumSections, IsChecked = model.WindowSettings.ShowAlbumSections }; panel.Children.Add(AlbumSectionsBox);
         Hint(Strings.AlbumSectionsHelp);
+        panel.Children.Add(new TextBlock { Text = Strings.Get("CueEncoding"), Margin = new Thickness(0, 10, 0, 7) });
+        var cueCodePages = new[] { 1251, 1252, 866, 0 };
+        CueEncodingBox = new ComboBox { ItemsSource = new[] { Strings.Get("Encoding1251"), Strings.Get("Encoding1252"), Strings.Get("Encoding866"), "UTF-8 / Unicode" },
+            SelectedIndex = Array.IndexOf(cueCodePages, model.WindowSettings.CueCodePage), MinHeight = 32 };
+        AutomationProperties.SetName(CueEncodingBox, Strings.Get("CueEncoding")); panel.Children.Add(CueEncodingBox);
+        Hint(Strings.Get("CueEncodingHelp"));
         Section(Strings.BehaviorSection);
         CloseToTrayBox = new CheckBox { Content = Strings.CloseToTray, IsChecked = model.WindowSettings.CloseToTray }; panel.Children.Add(CloseToTrayBox);
         Hint(Strings.CloseTrayHelp);
@@ -65,9 +72,12 @@ public sealed class PreferencesWindow : Window
             ApplyButton.IsEnabled = false;
             try
             {
-                model.WindowSettings = previous with { Language = LanguageBox.SelectedIndex == 1 ? "ru" : "en", CloseToTray = CloseToTrayBox.IsChecked == true, ShowAlbumSections = AlbumSectionsBox.IsChecked == true };
+                model.WindowSettings = previous with { Language = LanguageBox.SelectedIndex == 1 ? "ru" : "en", CloseToTray = CloseToTrayBox.IsChecked == true,
+                    ShowAlbumSections = AlbumSectionsBox.IsChecked == true, CueCodePage = cueCodePages[Math.Clamp(CueEncodingBox.SelectedIndex, 0, cueCodePages.Length - 1)] };
                 await model.SaveNowAsync();
-                model.Message = model.WindowSettings.Language != Strings.Culture.TwoLetterISOLanguageName ? Strings.RestartLanguage : Strings.PreferencesSaved;
+                Strings.SetLanguage(model.WindowSettings.Language);
+                model.RefreshLanguage();
+                model.Message = Strings.PreferencesSaved;
                 Close();
             }
             catch (Exception error)

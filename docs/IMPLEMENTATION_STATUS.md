@@ -1,5 +1,15 @@
 # Implementation checkpoint
 
+## Live language, consistent icons, versioned builds and CUE compatibility (2026-10-06)
+
+Settings Apply now changes EN/RU labels, template labels, detached menus, accessible names, repeat labels, tray actions and model headings immediately while preserving the same window, selection, search and playback instance. Help and modeless queue/library static labels follow language changes. Action icons share an 18-DIP vector canvas and stroke weight instead of mixed Unicode/font metrics. The title bar exposes the compiled product version.
+
+All projects derive informational/file versions from the workflow run number and attempt (`0.2.<number>-dev.<attempt>`); package ZIP names, manifests/audits and prerelease titles include that version. Publisher rejects a mismatched workflow version. Inventory verification compares app/core binary metadata to the manifest. Local unnumbered builds use `0.2.0-dev.0`.
+
+Single-image CUE association now handles a missing WAV/APE or renamed FILE: same reference stem, then CUE stem, then the sole same-folder FLAC; existing referenced files and multi-file sheets are preserved. Ambiguous sheets/images and invalid native-duration bounds retain the original FLAC. The saved legacy-document preference explicitly selects Windows-1251 by default, with Windows-1252/DOS-866/Unicode-only alternatives; Unicode is always decoded first. Last-song duration is derived from the independent native decoder. Source bytes stay unchanged. This supersedes the initial exact-FILE-only companion behavior below.
+
+Locked local cross-build and managed checks are recorded in TEST_RESULTS. Windows native/WPF and packaged executable evidence must pass on this source before publication.
+
 ## Whole FLAC images with companion CUE (2026-10-06)
 
 Added bounded, operation-local discovery of unambiguous same-directory CUE sheets referencing a single FLAC image. Automatic association requires at least two songs, no parser diagnostics, and indices within the actual duration from an independently owned native decoder. No endpoint is opened. Folder/combined FLAC+CUE imports prefer the explicitly selected CUE without adding the whole image again; repeated explicitly supplied images still create repeated album occurrences. Multi-file CUE remains available through explicit CUE import. No encoding, missing FILE name, silence-based boundary or embedded FLAC chapter guessing is introduced.

@@ -46,6 +46,8 @@ internal static class CustomizationValidation
         Check(UIElementAutomationPeer.CreatePeerForElement(settingsButton)!.GetName() == Strings.Settings, "Settings shortcut has no localized accessible name.");
         var before = model.WindowSettings;
         var snapshot = model.Snapshot;
+        var search = ((TextBox)window.FindName("SearchBox")).Text;
+        var selection = model.SelectedEntry;
         var dialog = new PreferencesWindow(window, model);
         try
         {
@@ -64,21 +66,42 @@ internal static class CustomizationValidation
             var saved = new Storage.SettingsFile(((App)Application.Current).DataDirectory).Load();
             Check(saved.Language != before.Language && saved.ShowAlbumSections != before.ShowAlbumSections && saved.CloseToTray != before.CloseToTray,
                 "Settings Apply did not persist language/grouping/close behavior.");
-            Check(!dialog.IsVisible && model.Message == Strings.RestartLanguage && Strings.Culture.TwoLetterISOLanguageName == language,
-                "Language change did not retain the current interface with explicit restart guidance.");
+            await Idle();
+            Check(!dialog.IsVisible && model.Message == Strings.PreferencesSaved && Strings.Culture.TwoLetterISOLanguageName != language,
+                "Language did not change immediately after Apply.");
+            Check(UIElementAutomationPeer.CreatePeerForElement(settingsButton)!.GetName() == Strings.Settings &&
+                Equals(menu.Items.OfType<MenuItem>().Last().Header, Strings.Settings) &&
+                UIElementAutomationPeer.CreatePeerForElement((TextBox)window.FindName("SearchBox"))!.GetName() == Strings.Search,
+                "Live language change left stale labels in the window, accessible names or detached menu.");
+            Check(((TextBox)window.FindName("SearchBox")).Text == search && ReferenceEquals(model.SelectedEntry, selection), "Live localization changed search/selection.");
+            Check(((TextBlock)window.FindName("BuildVersionText")).Text == Player.Core.ProductInfo.Version && Player.Core.ProductInfo.Version != "0.1.0",
+                "Visible version differs from compiled product metadata.");
+            var icons = Descendants(window).OfType<Controls.AppIcon>().Where(icon => icon.IsVisible).ToArray();
+            Check(icons.Length >= 10 && icons.All(icon => icon.ActualWidth == 18 && icon.ActualHeight == 18), "Action icons have inconsistent rendered bounds.");
+            CustomizationValidation.Render((FrameworkElement)window.Content, output, "live-language-" + Strings.Culture.TwoLetterISOLanguageName + ".png");
             Check(model.Snapshot.EntryId == snapshot.EntryId && model.Snapshot.State == snapshot.State, "Settings changed the active playback identity/state.");
         }
         finally
         {
             if (dialog.IsVisible) dialog.Close();
             model.WindowSettings = before; await model.SaveNowAsync();
+            Strings.SetLanguage(before.Language); model.RefreshLanguage(); await Idle();
         }
         var canceled = new PreferencesWindow(window, model);
         canceled.Show(); canceled.AlbumSectionsBox.IsChecked = !before.ShowAlbumSections; canceled.Close();
         Check(model.WindowSettings.ShowAlbumSections == before.ShowAlbumSections, "Cancel applied a draft preference.");
         return new { Status = "customization-passed", CompactMenu = true, KeyboardSubmenu = true, NestedAction = true,
             LocalizedSettingsShortcut = true, SettingsPersisted = true, DraftCancel = true, PlaybackPreserved = true,
-            LanguageChange = "persisted; applies at the next app launch" };
+            LanguageChange = "immediate; persisted across restarts", UniformVectorIcons = true, VisibleBuildVersion = Player.Core.ProductInfo.Version };
+    }
+
+    private static IEnumerable<DependencyObject> Descendants(DependencyObject root)
+    {
+        for (var i = 0; i < VisualTreeHelper.GetChildrenCount(root); i++)
+        {
+            var child = VisualTreeHelper.GetChild(root, i); yield return child;
+            foreach (var descendant in Descendants(child)) yield return descendant;
+        }
     }
 
     internal static void Render(FrameworkElement visual, string output, string name)

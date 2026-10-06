@@ -65,16 +65,18 @@ public sealed class MediaImportService : IMediaImportService
                         BassSmokeSession.ValidateSourcePath(path);
                         if (new FileInfo(path).Length > 4 * 1024 * 1024) throw new IOException("CUE exceeds 4 MiB.");
                         CueSheet sheet;
-                        try { sheet = CueAlbumDiscovery.Read(path, fallbackEncoding); }
+                        try { sheet = CueAlbumDiscovery.ReadAssociated(path, fallbackEncoding); }
                         catch (System.Text.DecoderFallbackException) { Error("CUE is not valid UTF-8/Unicode. Re-import using the explicit legacy encoding action: " + path); continue; }
                         foreach (var diagnostic in sheet.Diagnostics) Error(diagnostic);
+                        var imageDuration = CueAlbumDiscovery.ValidateImageDuration(sheet);
                         foreach (var song in sheet.Songs)
                         {
                             if (processed >= maximumItems) { limit = true; break; }
                             var exists = File.Exists(song.Path);
                             if (exists) BassSmokeSession.ValidateSourcePath(song.Path); else Error("Missing CUE source: " + song.Path);
                             var segment = new TrackSegment(TrackSegment.FromCueFrames(song.StartFrame), song.EndFrame is { } end ? TrackSegment.FromCueFrames(end) : null);
-                            var cue = new MediaTrack(CueSheet.TrackId(path, song), song.Path, song.Title, song.Performer, song.Album, segment.Duration, "CUE", exists, segment, path, song.Number);
+                            var durationHint = segment.Duration ?? (imageDuration is { } full ? full - segment.Start : (TimeSpan?)null);
+                            var cue = new MediaTrack(CueSheet.TrackId(path, song), song.Path, song.Title, song.Performer, song.Album, durationHint, "CUE", exists, segment, path, song.Number);
                             _tracks[Identity(cue)] = cue; batch.Add(new(Guid.NewGuid(), cue, AddedUtcTicks: DateTime.UtcNow.Ticks)); processed++; if (batch.Count == 32) Flush();
                         }
                         continue;
@@ -94,7 +96,7 @@ public sealed class MediaImportService : IMediaImportService
                     processed++;
                     if (batch.Count == 32) Flush();
                 }
-                catch (Exception error) when (error is ArgumentException or InvalidDataException or IOException or UnauthorizedAccessException)
+                catch (Exception error) when (error is AudioBackendException or ArgumentException or InvalidDataException or IOException or UnauthorizedAccessException)
                 { Error(source + ": " + error.Message); }
             }
         }

@@ -81,7 +81,7 @@
     <Style x:Key="AccentButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
         <Setter Property="Background" Value="{DynamicResource AccentBrush}" /><Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" /><Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" /><Setter Property="FontWeight" Value="SemiBold" />
     </Style>
-    <Style x:Key="IconButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}"><Setter Property="Width" Value="34" /><Setter Property="Height" Value="34" /><Setter Property="Padding" Value="0" /><Setter Property="FontSize" Value="16" /></Style>
+    <Style x:Key="IconButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}"><Setter Property="Width" Value="34" /><Setter Property="Height" Value="34" /><Setter Property="Padding" Value="0" /></Style>
     <Style TargetType="ToolTip"><Setter Property="Background" Value="{DynamicResource SurfaceBrush}" /><Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" /><Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" /><Setter Property="Padding" Value="10,6" /></Style>
     <Style TargetType="ContextMenu">
         <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />

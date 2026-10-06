@@ -27,6 +27,14 @@ foreach ($line in Get-Content (Join-Path $directory 'SHA256SUMS.txt')) {
     if ((Get-FileHash (Join-Path $directory $relative) -Algorithm SHA256).Hash.ToLowerInvariant() -ne $hash) { throw "Checksum mismatch: $relative" }
 }
 if ($checksums.Count -ne $expected.Count + 1) { throw 'Incomplete checksum list.' }
+if ($manifest.PSObject.Properties.Name -contains 'productVersion') {
+    if ($manifest.productVersion -notmatch '^0\.2\.([0-9]+)-dev\.([0-9]+)$') { throw 'Invalid candidate product version.' }
+    $fileVersion = "0.2.$($Matches[1]).$($Matches[2])"
+    foreach ($assembly in @('MPswift.dll','Player.Core.dll')) {
+        $info = [Diagnostics.FileVersionInfo]::GetVersionInfo((Join-Path $directory $assembly))
+        if ($info.ProductVersion.Split('+')[0] -ne $manifest.productVersion -or $info.FileVersion -ne $fileVersion) { throw "Compiled version differs from candidate manifest: $assembly" }
+    }
+}
 foreach ($required in @('MPswift.exe','coreclr.dll','PresentationFramework.dll','e_sqlite3.dll','ru/MPswift.resources.dll','native/manifest.json','portable.marker','docs/USER_HELP.md','docs/USER_HELP.ru.md','dependency-inventory.json','DEVELOPMENT-ONLY.txt')) {
     if (-not $expected.ContainsKey($required)) { throw "Required candidate file absent: $required" }
 }

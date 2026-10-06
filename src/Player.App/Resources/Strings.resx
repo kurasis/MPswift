@@ -187,7 +187,7 @@ F1: Local help
 
 Command line: local file/folder paths append without autoplay; --play explicitly starts the first added item. -- ends option parsing. A second launch activates the existing per-user instance. No arguments never start audio.
 
-Tray: Show/Hide, Play/Pause, Next, Previous, Exit. Closing exits by default; close-to-tray is an explicit preference. Language changes apply after restart.
+Tray: Show/Hide, Play/Pause, Next, Previous, Exit. Closing exits by default; close-to-tray is an explicit preference. Language changes apply immediately after Apply.
 
 Sources remain unchanged. Ratings, history, library, queue and settings are stored locally. Restore never starts audio. Only local, available offline files are accepted. No application network requests. BASS and add-on distribution terms remain a release gate; this is a development build.
 
@@ -533,7 +533,7 @@ Backup creates a complete local ZIP of database and settings. Restore backup val
         <value>Appearance and behavior</value>
     </data>
     <data xml:space="preserve" name="Language">
-        <value>Language (applies after restart)</value>
+        <value>Language</value>
     </data>
     <data xml:space="preserve" name="CloseToTray">
         <value>Close to tray instead of exiting</value>
@@ -655,4 +655,6 @@ Backup creates a complete local ZIP of database and settings. Restore backup val
     <data xml:space="preserve" name="SelectFlacImage"><value>Select a whole FLAC image in the playlist first.</value></data>
     <data xml:space="preserve" name="NoMatchingCue"><value>No unambiguous valid CUE for this FLAC. The original entry was kept. Check the FILE name inside the CUE or import the CUE explicitly (legacy encoding if needed).</value></data>
     <data xml:space="preserve" name="CueImagesExpanded"><value>Expanded {0} FLAC images into songs. Audio files were not changed.</value></data>
+    <data xml:space="preserve" name="CueEncoding"><value>Legacy CUE / playlist encoding</value></data>
+    <data xml:space="preserve" name="CueEncodingHelp"><value>Unicode is read first. For older documents, use the selected encoding. Windows-1251 is the default for Cyrillic albums.</value></data>
 </root>

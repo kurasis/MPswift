@@ -7,5 +7,12 @@
     <Deterministic>true</Deterministic>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <BuildSequence Condition="'$(BuildSequence)' == '' and '$(GITHUB_RUN_NUMBER)' != ''">$(GITHUB_RUN_NUMBER)</BuildSequence>
+    <BuildSequence Condition="'$(BuildSequence)' == ''">0</BuildSequence>
+    <BuildAttempt Condition="'$(BuildAttempt)' == '' and '$(GITHUB_RUN_ATTEMPT)' != ''">$(GITHUB_RUN_ATTEMPT)</BuildAttempt>
+    <BuildAttempt Condition="'$(BuildAttempt)' == ''">0</BuildAttempt>
+    <Version>0.2.$(BuildSequence)-dev.$(BuildAttempt)</Version>
+    <AssemblyVersion>0.2.0.0</AssemblyVersion>
+    <FileVersion>0.2.$(BuildSequence).$(BuildAttempt)</FileVersion>
   </PropertyGroup>
 </Project>

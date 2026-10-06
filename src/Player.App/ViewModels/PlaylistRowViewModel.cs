@@ -27,6 +27,7 @@ public partial class PlaylistRowViewModel : ObservableObject
     public string Metadata => string.Join(" · ", new[] { entry.Track.Artist, entry.Track.Album, entry.Track.FormatHint }.Where(v => !string.IsNullOrEmpty(v)));
     public string Duration => PlayerViewModel.FormatTime(entry.Track.DurationHint);
     public string Availability => entry.Track.Available ? "" : Strings.Get("Unavailable");
+    public void RefreshLanguage() { OnPropertyChanged(nameof(SectionInfo)); OnPropertyChanged(nameof(Availability)); }
     [ObservableProperty] private bool _enabled;
     [ObservableProperty] private int _rating;
     public event Action<PlaylistRowViewModel>? RatingChanged;

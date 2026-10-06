@@ -37,7 +37,7 @@ public sealed class CueAlbumDiscovery(Action<string> diagnostic, CancellationTok
                         if (length > 4 * 1024 * 1024 || length > 16 * 1024 * 1024 - _readBytes)
                             throw new InvalidDataException("Companion CUE discovery budget exceeded; import the desired CUE explicitly.");
                         _readBytes += length;
-                        var sheet = Read(path, fallback);
+                        var sheet = ReadAssociated(path, fallback);
                         if (sheet.Diagnostics.Length != 0) throw new InvalidDataException(string.Join("; ", sheet.Diagnostics.Take(3)));
                         if (sheet.Songs.Length >= 2) loaded.Add((path, sheet));
                     }
@@ -57,21 +57,8 @@ public sealed class CueAlbumDiscovery(Action<string> diagnostic, CancellationTok
             {
                 // Validate all cue times against one independently owned native decoder.
                 // This never opens an output device or touches the active playback graph.
-                using var native = new NativeDecodeContext();
-                var source = BassMixerGraph.OpenSource(new(Guid.NewGuid(), image));
-                try
-                {
-                    var duration = source.Info.Duration!.Value;
-                    foreach (var song in candidates[0].Sheet.Songs)
-                    {
-                        var start = TrackSegment.FromCueFrames(song.StartFrame);
-                        var end = song.EndFrame is { } frame ? TrackSegment.FromCueFrames(frame) : duration;
-                        if (start >= duration || end <= start || end.TotalSeconds > duration.TotalSeconds + 1.0 / source.Info.Format.SampleRate)
-                            throw new InvalidDataException("CUE indices exceed the decoded FLAC duration.");
-                    }
-                    result = candidates[0].Path;
-                }
-                finally { if (!Bass.StreamFree(source.Handle)) throw new IOException("Could not release the CUE validation decoder."); }
+                ValidateImageDuration(candidates[0].Sheet);
+                result = candidates[0].Path;
             }
             catch (Exception error) when (error is AudioBackendException or IOException or InvalidDataException or ArgumentException or UnauthorizedAccessException)
             { result = null; diagnostic("Companion CUE validation: " + error.Message); }
@@ -88,5 +75,40 @@ public sealed class CueAlbumDiscovery(Action<string> diagnostic, CancellationTok
         var bytes = new byte[checked((int)stream.Length)]; stream.ReadExactly(bytes);
         if (stream.ReadByte() >= 0) throw new InvalidDataException("CUE changed during import.");
         return CueSheet.Parse(CueSheet.Decode(bytes, fallback), path);
+    }
+
+    public static CueSheet ReadAssociated(string path, Encoding? fallback = null)
+    {
+        var sheet = Read(path, fallback);
+        if (sheet.Songs.Length < 2 || sheet.Diagnostics.Length != 0 || sheet.Songs.Any(song => !string.Equals(song.Path, sheet.Songs[0].Path, StringComparison.OrdinalIgnoreCase)) ||
+            File.Exists(sheet.Songs[0].Path)) return sheet;
+        var directory = Path.GetDirectoryName(path)!; LocalFileAccess.ValidateDirectory(directory);
+        var files = Directory.EnumerateFiles(directory).Take(10001).ToArray();
+        if (files.Length > 10000) throw new InvalidDataException("Companion folder exceeds the file enumeration limit.");
+        var images = files.Where(file => file.EndsWith(".flac", StringComparison.OrdinalIgnoreCase)).Take(65).ToArray();
+        return images.Length > 64 ? sheet : CueImageAssociation.Resolve(sheet, path, images, File.Exists);
+    }
+
+    public static TimeSpan? ValidateImageDuration(CueSheet sheet)
+    {
+        if (sheet.Songs.Length == 0 || sheet.Diagnostics.Length != 0) return null;
+        var image = sheet.Songs[0].Path;
+        if (!image.EndsWith(".flac", StringComparison.OrdinalIgnoreCase) || !File.Exists(image) ||
+            sheet.Songs.Any(song => !string.Equals(song.Path, image, StringComparison.OrdinalIgnoreCase))) return null;
+        using var native = new NativeDecodeContext();
+        var source = BassMixerGraph.OpenSource(new(Guid.NewGuid(), image));
+        try
+        {
+            var duration = source.Info.Duration!.Value;
+            foreach (var song in sheet.Songs)
+            {
+                var start = TrackSegment.FromCueFrames(song.StartFrame);
+                var end = song.EndFrame is { } frame ? TrackSegment.FromCueFrames(frame) : duration;
+                if (start >= duration || end <= start || end.TotalSeconds > duration.TotalSeconds + 1.0 / source.Info.Format.SampleRate)
+                    throw new InvalidDataException("CUE indices exceed the decoded FLAC duration.");
+            }
+            return duration;
+        }
+        finally { if (!Bass.StreamFree(source.Handle)) throw new IOException("Could not release the CUE validation decoder."); }
     }
 }

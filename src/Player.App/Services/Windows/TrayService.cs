@@ -18,7 +18,7 @@ public sealed class TrayService : IDisposable
     public TrayService(MainWindow window, PlayerViewModel model)
     {
         _window = window; _model = model;
-        void Item(string key, Action action) => _menu.Items.Add(Strings.Get(key), null, (_, _) => window.Dispatcher.BeginInvoke(action));
+        void Item(string key, Action action) => _menu.Items.Add(Strings.Get(key), null, (_, _) => window.Dispatcher.BeginInvoke(action)).Tag = key;
         Item("ShowHide", () => { if (window.IsVisible) window.Hide(); else window.ShowAndActivate(); });
         _play = _menu.Items.Add(model.PlayPauseLabel, null, async (_, _) => await RunAsync(model.PlayPauseCommand.ExecuteAsync(null)));
         Item("Next", () => _ = RunAsync(model.NextCommand.ExecuteAsync(null)));
@@ -32,12 +32,13 @@ public sealed class TrayService : IDisposable
         model.PropertyChanged += Changed; Update();
     }
     private async Task RunAsync(Task task) { try { await task; } catch (Exception error) { _model.Message = Strings.ErrorUnexpected; _model.Details = error.Message; } }
-    private void Changed(object? sender, PropertyChangedEventArgs args) { if (args.PropertyName is nameof(PlayerViewModel.Title) or nameof(PlayerViewModel.IsPlaying)) Update(); }
+    private void Changed(object? sender, PropertyChangedEventArgs args) { if (args.PropertyName is nameof(PlayerViewModel.Title) or nameof(PlayerViewModel.PlayPauseLabel)) Update(); }
     private void Update()
     {
         var text = _model.ProductName + " — " + _model.Title;
         var length = Math.Min(text.Length, 63); if (length < text.Length && char.IsHighSurrogate(text[length - 1])) length--;
         _icon.Text = text[..length]; _play.Text = _model.PlayPauseLabel;
+        foreach (Forms.ToolStripItem item in _menu.Items) if (item.Tag is string key) item.Text = Strings.Get(key);
     }
     public void Dispose() { _model.PropertyChanged -= Changed; _icon.Visible = false; _icon.Dispose(); _artwork.Dispose(); _menu.Dispose(); }
 }

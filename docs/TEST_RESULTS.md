@@ -1,5 +1,11 @@
 # Test evidence — Stages A–G
 
+## Live localization, icon geometry, build metadata and legacy CUE follow-up (2026-10-06)
+
+Local locked Release build: zero warnings/errors and **175 managed tests pass**. New association tests cover missing WAV/APE, renamed FLAC, exact/CUE stem priority, ambiguous images, existing reference preservation, multi-file/malformed/outside-folder refusal, stable song identities, strict Unicode precedence and configured Windows-1251 decoding/settings compatibility.
+
+Windows smoke now requires immediate EN/RU switching in the same window, detached menu/automation label updates, unchanged selection/search/playback, 18-DIP rendered action icon bounds and visible compiled version. Real FLAC smoke adds uppercase extensions, renamed image with missing WAV FILE and Windows-1251 Russian song titles, in-place/folder/explicit CUE imports, final-song duration and invalid folder-bound fallback. Packaged inventory checks verify compiled app/core versions. These Windows checks are pending this source's main CI; prior CUE run 37458146451 passed its narrower Unicode/exact-FILE checks.
+
 ## Whole FLAC images with companion CUE (2026-10-06)
 
 Added bounded, operation-local discovery of unambiguous same-directory CUE sheets referencing a single FLAC image. Automatic association requires at least two songs, no parser diagnostics, and indices within the actual duration from an independently owned native decoder. No endpoint is opened. Folder/combined FLAC+CUE imports prefer the explicitly selected CUE without adding the whole image again; repeated explicitly supplied images still create repeated album occurrences. Multi-file CUE remains available through explicit CUE import. No encoding, missing FILE name, silence-based boundary or embedded FLAC chapter guessing is introduced.

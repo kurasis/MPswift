@@ -6,10 +6,15 @@ namespace Player.App.Resources;
 public static class Strings
 {
     private static readonly ResourceManager Manager = new("Player.App.Resources.Strings", typeof(Strings).Assembly);
-    // Dispatcher/IPC continuations can carry the sender's ambient culture. Product language
-    // is selected once at startup and must not follow that per-operation execution context.
+    // Product language must not follow an IPC sender's ambient execution context.
     public static CultureInfo Culture { get; private set; } = CultureInfo.GetCultureInfo("en-US");
-    public static void SetLanguage(string language) => Culture = CultureInfo.GetCultureInfo(language == "ru" ? "ru-RU" : "en-US");
+    public static void SetLanguage(string language)
+    {
+        Culture = CultureInfo.GetCultureInfo(language == "ru" ? "ru-RU" : "en-US");
+        CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = Culture;
+        CultureInfo.DefaultThreadCurrentCulture = CultureInfo.DefaultThreadCurrentUICulture = Culture;
+        LocalizedStrings.Instance.Refresh();
+    }
     public static string Get(string key) => Manager.GetString(key, Culture)
         ?? throw new MissingManifestResourceException($"Missing resource: {key}");
     public static string ExpandCueImage => Get(nameof(ExpandCueImage));

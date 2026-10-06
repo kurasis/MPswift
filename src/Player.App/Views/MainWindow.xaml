@@ -24,17 +24,17 @@
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0" Background="{DynamicResource SurfaceBrush}" MouseDown="OnSystemMenu">
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                <Button x:Name="SettingsButton" Content="&#xE713;" FontFamily="Segoe MDL2 Assets" Click="OnPreferences" ToolTip="{x:Static r:Strings.Settings}" AutomationProperties.Name="{x:Static r:Strings.Settings}" shell:WindowChrome.IsHitTestVisibleInChrome="True" Padding="14,2" Background="Transparent" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,8,0" />
-                <Button Content="—" Click="OnMinimize" ToolTip="{x:Static r:Strings.Minimize}" AutomationProperties.Name="{x:Static r:Strings.Minimize}" shell:WindowChrome.IsHitTestVisibleInChrome="True" Padding="14,2" Background="Transparent" Foreground="{DynamicResource TextPrimaryBrush}" />
-                <Button Content="□" Click="OnMaximize" ToolTip="{x:Static r:Strings.Maximize}" AutomationProperties.Name="{x:Static r:Strings.Maximize}" shell:WindowChrome.IsHitTestVisibleInChrome="True" Padding="14,2" Background="Transparent" Foreground="{DynamicResource TextPrimaryBrush}" />
-                <Button Content="×" Click="OnCloseWindow" ToolTip="{x:Static r:Strings.Close}" AutomationProperties.Name="{x:Static r:Strings.Close}" shell:WindowChrome.IsHitTestVisibleInChrome="True" Padding="14,2" Background="Transparent" Foreground="{DynamicResource TextPrimaryBrush}" />
+                <Button x:Name="SettingsButton"  Click="OnPreferences" ToolTip="{r:Loc Settings}" AutomationProperties.Name="{r:Loc Settings}" shell:WindowChrome.IsHitTestVisibleInChrome="True" Background="Transparent" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,8,0" Style="{StaticResource IconButton}"><c:AppIcon Kind="Settings" /></Button>
+                <Button  Click="OnMinimize" ToolTip="{r:Loc Minimize}" AutomationProperties.Name="{r:Loc Minimize}" shell:WindowChrome.IsHitTestVisibleInChrome="True" Background="Transparent" Foreground="{DynamicResource TextPrimaryBrush}" Style="{StaticResource IconButton}"><c:AppIcon Kind="Minimize" /></Button>
+                <Button  Click="OnMaximize" ToolTip="{r:Loc Maximize}" AutomationProperties.Name="{r:Loc Maximize}" shell:WindowChrome.IsHitTestVisibleInChrome="True" Background="Transparent" Foreground="{DynamicResource TextPrimaryBrush}" Style="{StaticResource IconButton}"><c:AppIcon Kind="Maximize" /></Button>
+                <Button  Click="OnCloseWindow" ToolTip="{r:Loc Close}" AutomationProperties.Name="{r:Loc Close}" shell:WindowChrome.IsHitTestVisibleInChrome="True" Background="Transparent" Foreground="{DynamicResource TextPrimaryBrush}" Style="{StaticResource IconButton}"><c:AppIcon Kind="Close" /></Button>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="12,0" VerticalAlignment="Center"><Image Source="/MPswift;component/Assets/MPswift.png" Width="20" Height="20" Margin="0,0,9,0" /><TextBlock Text="{Binding ProductName}" FontSize="13" FontWeight="SemiBold" /></StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="12,0" VerticalAlignment="Center"><Image Source="/MPswift;component/Assets/MPswift.png" Width="18" Height="18" Margin="0,0,9,0" /><TextBlock Text="{Binding ProductName}" FontSize="13" FontWeight="SemiBold" /><TextBlock x:Name="BuildVersionText" Text="{Binding ProductVersion}" Margin="8,0,0,0" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" /></StackPanel>
         </DockPanel>
         <Border Grid.Row="1" Margin="16,12,16,4" Background="{DynamicResource SurfaceBrush}" CornerRadius="12" Padding="12"><Grid>
             <Grid.ColumnDefinitions><ColumnDefinition Width="100" /><ColumnDefinition Width="*" /><ColumnDefinition Width="170" /></Grid.ColumnDefinitions>
             <Border CornerRadius="9" Width="88" Height="88" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" HorizontalAlignment="Left">
-                <Grid><Image AutomationProperties.Name="{x:Static r:Strings.Artwork}" Source="{Binding CoverArt}" Stretch="Uniform" />
+                <Grid><Image AutomationProperties.Name="{r:Loc Artwork}" Source="{Binding CoverArt}" Stretch="Uniform" />
                     <Image Source="/MPswift;component/Assets/MPswift.png" Width="58" Height="58" Opacity="0.8"><Image.Style><Style TargetType="Image"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding CoverArt}" Value="{x:Null}"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></Image.Style></Image>
                 </Grid>
             </Border>
@@ -47,76 +47,76 @@
             </StackPanel>
             <StackPanel Grid.Column="2" VerticalAlignment="Center">
                 <TextBlock x:Name="PlaybackStateText" AutomationProperties.LiveSetting="Polite" Text="{Binding State}" HorizontalAlignment="Right" Foreground="{DynamicResource AccentBrush}" />
-                <TextBlock Text="{x:Static r:Strings.Volume}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Margin="0,8,0,0" />
-                <Slider x:Name="VolumeSlider" Value="{Binding Volume, Mode=TwoWay}" Minimum="0" Maximum="100" TickFrequency="5" SmallChange="5" AutomationProperties.Name="{x:Static r:Strings.Volume}" />
-                <CheckBox x:Name="MuteBox" Content="{x:Static r:Strings.Mute}" IsChecked="{Binding Muted}" />
+                <TextBlock Text="{r:Loc Volume}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Margin="0,8,0,0" />
+                <Slider x:Name="VolumeSlider" Value="{Binding Volume, Mode=TwoWay}" Minimum="0" Maximum="100" TickFrequency="5" SmallChange="5" AutomationProperties.Name="{r:Loc Volume}" />
+                <CheckBox x:Name="MuteBox" Content="{r:Loc Mute}" IsChecked="{Binding Muted}" />
             </StackPanel>
         </Grid></Border>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,6" IsEnabled="{Binding CanTransport}">
-            <CheckBox Content="{x:Static r:Strings.Shuffle}" IsChecked="{Binding Shuffle}" VerticalAlignment="Center" Margin="6" />
-            <ComboBox x:Name="RepeatBox" ItemsSource="{Binding RepeatModes}" SelectedItem="{Binding Repeat}" Width="82" VerticalAlignment="Center" ToolTip="{x:Static r:Strings.Repeat}" AutomationProperties.Name="{x:Static r:Strings.Repeat}" Margin="4"><ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Converter={StaticResource EnumLabel}}" /></DataTemplate></ComboBox.ItemTemplate></ComboBox>
-            <Button Command="{Binding PreviousCommand}" Margin="4" Padding="10" ToolTip="{x:Static r:Strings.Previous}" AutomationProperties.Name="{x:Static r:Strings.Previous}"><Path Data="M0,0 L0,12 M12,0 L3,6 12,12 Z" Width="12" Height="12" Fill="{DynamicResource TextPrimaryBrush}" Stroke="{DynamicResource TextPrimaryBrush}" /></Button>
-            <Button Command="{Binding StopCommand}" Margin="4" Padding="10" ToolTip="{x:Static r:Strings.Stop}" AutomationProperties.Name="{x:Static r:Strings.Stop}"><Path Data="M0,0 L12,0 12,12 0,12 Z" Width="12" Height="12" Fill="{DynamicResource TextPrimaryBrush}" Stroke="{DynamicResource TextPrimaryBrush}" /></Button>
+            <CheckBox Content="{r:Loc Shuffle}" IsChecked="{Binding Shuffle}" VerticalAlignment="Center" Margin="6" />
+            <ComboBox x:Name="RepeatBox" ItemsSource="{Binding RepeatModes}" SelectedItem="{Binding Repeat}" Width="82" VerticalAlignment="Center" ToolTip="{r:Loc Repeat}" AutomationProperties.Name="{r:Loc Repeat}" Margin="4"><ComboBox.ItemTemplate><DataTemplate><TextBlock><TextBlock.Text><MultiBinding Converter="{StaticResource EnumLabel}"><Binding /><Binding Path="Culture" Source="{x:Static r:LocalizedStrings.Instance}" /></MultiBinding></TextBlock.Text></TextBlock></DataTemplate></ComboBox.ItemTemplate></ComboBox>
+            <Button Command="{Binding PreviousCommand}" Margin="4" Style="{StaticResource IconButton}" ToolTip="{r:Loc Previous}" AutomationProperties.Name="{r:Loc Previous}"><c:AppIcon Kind="Previous" /></Button>
+            <Button Command="{Binding StopCommand}" Margin="4" Style="{StaticResource IconButton}" ToolTip="{r:Loc Stop}" AutomationProperties.Name="{r:Loc Stop}"><c:AppIcon Kind="Stop" /></Button>
             <Button x:Name="PlayPauseButton" Style="{StaticResource AccentButton}" Command="{Binding PlayPauseCommand}" Margin="8,0" Width="48" Height="42" Padding="0" ToolTip="{Binding PlayPauseLabel}" AutomationProperties.Name="{Binding PlayPauseLabel}">
-                <Path Width="14" Height="16" Stretch="Uniform" Fill="{DynamicResource AccentTextBrush}"><Path.Style><Style TargetType="Path"><Setter Property="Data" Value="M0,0 L0,16 14,8 Z" /><Style.Triggers><DataTrigger Binding="{Binding IsPlaying}" Value="True"><Setter Property="Data" Value="M0,0 L5,0 5,16 0,16 Z M9,0 L14,0 14,16 9,16 Z" /></DataTrigger></Style.Triggers></Style></Path.Style></Path>
+                <c:AppIcon Foreground="{DynamicResource AccentTextBrush}"><c:AppIcon.Style><Style TargetType="c:AppIcon"><Setter Property="Kind" Value="Play" /><Style.Triggers><DataTrigger Binding="{Binding IsPlaying}" Value="True"><Setter Property="Kind" Value="Pause" /></DataTrigger></Style.Triggers></Style></c:AppIcon.Style></c:AppIcon>
             </Button>
-            <Button Command="{Binding NextCommand}" Margin="4" Padding="10" ToolTip="{x:Static r:Strings.Next}" AutomationProperties.Name="{x:Static r:Strings.Next}"><Path Data="M12,0 L12,12 M0,0 L9,6 0,12 Z" Width="12" Height="12" Fill="{DynamicResource TextPrimaryBrush}" Stroke="{DynamicResource TextPrimaryBrush}" /></Button>
+            <Button Command="{Binding NextCommand}" Margin="4" Style="{StaticResource IconButton}" ToolTip="{r:Loc Next}" AutomationProperties.Name="{r:Loc Next}"><c:AppIcon Kind="Next" /></Button>
         </StackPanel>
         <Grid Grid.Row="3" Margin="16,0,16,8">
             <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="44" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
             <TextBlock Text="{Binding WaveformStatus}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
-            <c:WaveformControl x:Name="WaveformView" Grid.Row="1" Focusable="True" AutomationProperties.Name="{x:Static r:Strings.Seek}" Data="{Binding Waveform}" Position="{Binding SeekPosition}" Duration="{Binding DurationSeconds}" CanSeek="{Binding CanSeek}" />
+            <c:WaveformControl x:Name="WaveformView" Grid.Row="1" Focusable="True" AutomationProperties.Name="{r:Loc Seek}" Data="{Binding Waveform}" Position="{Binding SeekPosition}" Duration="{Binding DurationSeconds}" CanSeek="{Binding CanSeek}" />
             <Slider x:Name="SeekSlider" Grid.Row="2" Value="{Binding SeekPosition, Mode=TwoWay}" Maximum="{Binding DurationSeconds}" Minimum="0"
                     IsEnabled="{Binding CanSeek}" SmallChange="5" LargeChange="30" IsMoveToPointEnabled="True"
-                    AutomationProperties.Name="{x:Static r:Strings.Seek}" Margin="0,4" PreviewMouseLeftButtonDown="OnSeekStart"
+                    AutomationProperties.Name="{r:Loc Seek}" Margin="0,4" PreviewMouseLeftButtonDown="OnSeekStart"
                     PreviewMouseLeftButtonUp="OnSeekEnd" LostMouseCapture="OnSeekCaptureLost" />
             <DockPanel Grid.Row="3" TextElement.FontSize="11" TextElement.Foreground="{DynamicResource TextSecondaryBrush}"><TextBlock Text="{Binding Elapsed}" /><TextBlock Text="{Binding DurationText}" HorizontalAlignment="Right" /></DockPanel>
         </Grid>
-        <DockPanel x:Name="PlaylistTabStrip" Grid.Row="4" Margin="16,4,16,0" Background="{DynamicResource BackgroundBrush}" ToolTip="{x:Static r:Strings.FolderDropHint}">
+        <DockPanel x:Name="PlaylistTabStrip" Grid.Row="4" Margin="16,4,16,0" Background="{DynamicResource BackgroundBrush}" ToolTip="{r:Loc FolderDropHint}">
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                <Button Content="+" Click="OnCreatePlaylist" ToolTip="{x:Static r:Strings.NewPlaylist}" AutomationProperties.Name="{x:Static r:Strings.NewPlaylist}" Padding="12,4" Margin="2" />
-                <Button x:Name="PlaylistActions" Content="⋯" Click="OnPlaylistActions" ToolTip="{x:Static r:Strings.PlaylistActions}" AutomationProperties.Name="{x:Static r:Strings.PlaylistActions}" Padding="12,4" Margin="2">
+                <Button  Click="OnCreatePlaylist" ToolTip="{r:Loc NewPlaylist}" AutomationProperties.Name="{r:Loc NewPlaylist}" Margin="2" Style="{StaticResource IconButton}"><c:AppIcon Kind="Add" /></Button>
+                <Button x:Name="PlaylistActions"  Click="OnPlaylistActions" ToolTip="{r:Loc PlaylistActions}" AutomationProperties.Name="{r:Loc PlaylistActions}" Margin="2" Style="{StaticResource IconButton}"><c:AppIcon Kind="More" />
                     <Button.ContextMenu><ContextMenu>
-                        <MenuItem Header="{x:Static r:Strings.PlaylistMenu}">
-                        <MenuItem Header="{x:Static r:Strings.RenamePlaylist}" Click="OnRenamePlaylist" />
-                        <MenuItem Header="{x:Static r:Strings.DuplicatePlaylist}" Click="OnDuplicatePlaylist" />
-                        <MenuItem Header="{x:Static r:Strings.TabLeft}" Click="OnTabLeft" />
-                        <MenuItem Header="{x:Static r:Strings.TabRight}" Click="OnTabRight" />
-                        <MenuItem Header="{x:Static r:Strings.DeletePlaylist}" Click="OnDeletePlaylist" />
+                        <MenuItem Header="{r:Loc PlaylistMenu}">
+                        <MenuItem Header="{r:Loc RenamePlaylist}" Click="OnRenamePlaylist" />
+                        <MenuItem Header="{r:Loc DuplicatePlaylist}" Click="OnDuplicatePlaylist" />
+                        <MenuItem Header="{r:Loc TabLeft}" Click="OnTabLeft" />
+                        <MenuItem Header="{r:Loc TabRight}" Click="OnTabRight" />
+                        <MenuItem Header="{r:Loc DeletePlaylist}" Click="OnDeletePlaylist" />
                         </MenuItem>
-                        <MenuItem Header="{x:Static r:Strings.SortPlaylist}"><MenuItem Header="{x:Static r:Strings.SortTitle}" Tag="Title" Click="OnSort" /><MenuItem Header="{x:Static r:Strings.SortArtist}" Tag="Artist" Click="OnSort" /><MenuItem Header="{x:Static r:Strings.SortAlbum}" Tag="Album" Click="OnSort" /><MenuItem Header="{x:Static r:Strings.SortTrack}" Tag="Track" Click="OnSort" /><MenuItem Header="{x:Static r:Strings.SortDuration}" Tag="Duration" Click="OnSort" /><MenuItem Header="{x:Static r:Strings.SortPath}" Tag="Path" Click="OnSort" /><MenuItem Header="{x:Static r:Strings.SortAdded}" Tag="Date added" Click="OnSort" /></MenuItem>
-                        <MenuItem Header="{x:Static r:Strings.SelectedTracksMenu}">
-                        <MenuItem Header="{x:Static r:Strings.ExpandCueImage}" Click="OnExpandCueImage" />
-                        <MenuItem Header="{x:Static r:Strings.PlayNext}" Click="OnPlayNext" />
-                        <MenuItem Header="{x:Static r:Strings.AddQueue}" Click="OnAddQueue" />
-                        <MenuItem Header="{x:Static r:Strings.MoveUp}" Click="OnMoveUp" />
-                        <MenuItem Header="{x:Static r:Strings.MoveDown}" Click="OnMoveDown" />
+                        <MenuItem Header="{r:Loc SortPlaylist}"><MenuItem Header="{r:Loc SortTitle}" Tag="Title" Click="OnSort" /><MenuItem Header="{r:Loc SortArtist}" Tag="Artist" Click="OnSort" /><MenuItem Header="{r:Loc SortAlbum}" Tag="Album" Click="OnSort" /><MenuItem Header="{r:Loc SortTrack}" Tag="Track" Click="OnSort" /><MenuItem Header="{r:Loc SortDuration}" Tag="Duration" Click="OnSort" /><MenuItem Header="{r:Loc SortPath}" Tag="Path" Click="OnSort" /><MenuItem Header="{r:Loc SortAdded}" Tag="Date added" Click="OnSort" /></MenuItem>
+                        <MenuItem Header="{r:Loc SelectedTracksMenu}">
+                        <MenuItem Header="{r:Loc ExpandCueImage}" Click="OnExpandCueImage" />
+                        <MenuItem Header="{r:Loc PlayNext}" Click="OnPlayNext" />
+                        <MenuItem Header="{r:Loc AddQueue}" Click="OnAddQueue" />
+                        <MenuItem Header="{r:Loc MoveUp}" Click="OnMoveUp" />
+                        <MenuItem Header="{r:Loc MoveDown}" Click="OnMoveDown" />
                         <Separator />
-                        <MenuItem Header="{x:Static r:Strings.CopyPath}" Click="OnCopyPath" />
-                        <MenuItem Header="{x:Static r:Strings.ShowFile}" Click="OnShowFile" />
-                        <MenuItem Header="{x:Static r:Strings.Properties}" Click="OnProperties" />
-                        <MenuItem Header="{x:Static r:Strings.Relink}" Click="OnRelink" />
+                        <MenuItem Header="{r:Loc CopyPath}" Click="OnCopyPath" />
+                        <MenuItem Header="{r:Loc ShowFile}" Click="OnShowFile" />
+                        <MenuItem Header="{r:Loc Properties}" Click="OnProperties" />
+                        <MenuItem Header="{r:Loc Relink}" Click="OnRelink" />
                         </MenuItem>
-                        <MenuItem Header="{x:Static r:Strings.QueueMenu}">
-                            <MenuItem Header="{x:Static r:Strings.ShowQueue}" Click="OnQueue" />
-                            <MenuItem Header="{x:Static r:Strings.ClearHistory}" Command="{Binding ClearHistoryCommand}" />
+                        <MenuItem Header="{r:Loc QueueMenu}">
+                            <MenuItem Header="{r:Loc ShowQueue}" Click="OnQueue" />
+                            <MenuItem Header="{r:Loc ClearHistory}" Command="{Binding ClearHistoryCommand}" />
                         </MenuItem>
                         <Separator />
-                        <MenuItem Header="{x:Static r:Strings.Library}" Click="OnLibrary" />
-                        <MenuItem Header="{x:Static r:Strings.FilesMenu}">
-                        <MenuItem Header="{x:Static r:Strings.ExportPlaylist}" Click="OnExportPlaylist" />
-                        <MenuItem Header="{x:Static r:Strings.LegacyImport}" Click="OnLegacyImport" />
-                        <MenuItem Header="{x:Static r:Strings.Backup}" Click="OnBackup" />
-                        <MenuItem Header="{x:Static r:Strings.RestoreBackup}" Click="OnRestoreBackup" />
+                        <MenuItem Header="{r:Loc Library}" Click="OnLibrary" />
+                        <MenuItem Header="{r:Loc FilesMenu}">
+                        <MenuItem Header="{r:Loc ExportPlaylist}" Click="OnExportPlaylist" />
+                        <MenuItem Header="{r:Loc LegacyImport}" Click="OnLegacyImport" />
+                        <MenuItem Header="{r:Loc Backup}" Click="OnBackup" />
+                        <MenuItem Header="{r:Loc RestoreBackup}" Click="OnRestoreBackup" />
                         </MenuItem>
-                        <MenuItem Header="{x:Static r:Strings.RefreshWaveform}" Command="{Binding RefreshWaveformCommand}" />
+                        <MenuItem Header="{r:Loc RefreshWaveform}" Command="{Binding RefreshWaveformCommand}" />
                         <Separator />
-                        <MenuItem Header="{x:Static r:Strings.Settings}" Click="OnPreferences" />
+                        <MenuItem Header="{r:Loc Settings}" Click="OnPreferences" />
                     </ContextMenu></Button.ContextMenu>
                 </Button>
             </StackPanel>
             <ListBox x:Name="PlaylistTabs" ItemsSource="{Binding Playlists}" SelectedItem="{Binding SelectedPlaylist}" BorderThickness="0" Background="{DynamicResource BackgroundBrush}" Foreground="{DynamicResource TextPrimaryBrush}"
-                     ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Disabled" AutomationProperties.Name="{x:Static r:Strings.Playlists}">
+                     ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Disabled" AutomationProperties.Name="{r:Loc Playlists}">
                 <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem">
                     <Setter Property="AutomationProperties.Name" Value="{Binding Name}" />
                     <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
@@ -151,52 +151,52 @@
                     <DataTemplate DataType="{x:Type vm:PlaylistRowViewModel}">
                         <Grid>
                             <Grid.ColumnDefinitions><ColumnDefinition Width="28" /><ColumnDefinition Width="*" /><ColumnDefinition Width="66" /><ColumnDefinition Width="64" /></Grid.ColumnDefinitions>
-                            <CheckBox IsChecked="{Binding Enabled}" VerticalAlignment="Center" AutomationProperties.Name="{x:Static r:Strings.Enabled}" ToolTip="{x:Static r:Strings.Enabled}" />
+                            <CheckBox IsChecked="{Binding Enabled}" VerticalAlignment="Center" AutomationProperties.Name="{r:Loc Enabled}" ToolTip="{r:Loc Enabled}" />
                             <StackPanel Grid.Column="1" Margin="0,0,8,0">
                                 <DockPanel>
-                                    <TextBlock Text="▶ " Foreground="{DynamicResource AccentBrush}">
-                                        <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding IsPlaying}" Value="True"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></TextBlock.Style>
-                                    </TextBlock>
+                                    <c:AppIcon Kind="Play" Margin="0,0,6,0" Foreground="{DynamicResource AccentBrush}">
+                                        <c:AppIcon.Style><Style TargetType="c:AppIcon"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding IsPlaying}" Value="True"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></c:AppIcon.Style>
+                                    </c:AppIcon>
                                     <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Path}" />
                                 </DockPanel>
                                 <TextBlock Text="{Binding Metadata}" Margin="0,4,0,0" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
                             </StackPanel>
-                            <ComboBox Grid.Column="2" ItemsSource="{x:Static vm:PlaylistRowViewModel.RatingOptions}" SelectedItem="{Binding Rating, Mode=TwoWay}" VerticalAlignment="Center" ToolTip="{x:Static r:Strings.RatingHelp}" AutomationProperties.Name="{x:Static r:Strings.Rating}" />
+                            <ComboBox Grid.Column="2" ItemsSource="{x:Static vm:PlaylistRowViewModel.RatingOptions}" SelectedItem="{Binding Rating, Mode=TwoWay}" VerticalAlignment="Center" ToolTip="{r:Loc RatingHelp}" AutomationProperties.Name="{r:Loc Rating}" />
                             <StackPanel Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" TextElement.Foreground="{DynamicResource TextSecondaryBrush}" TextElement.FontSize="12"><TextBlock Text="{Binding Duration}" /><TextBlock Text="{Binding Availability}" FontSize="10" Foreground="{DynamicResource ErrorBrush}" /></StackPanel>
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <TextBlock Text="{x:Static r:Strings.EmptyPlaylist}" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="360" Margin="16" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
+            <TextBlock Text="{r:Loc EmptyPlaylist}" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="360" Margin="16" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
                 <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding HasEntries}" Value="False"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></TextBlock.Style>
             </TextBlock>
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                 <StackPanel.Style><Style TargetType="StackPanel"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><MultiDataTrigger><MultiDataTrigger.Conditions><Condition Binding="{Binding HasEntries}" Value="True" /><Condition Binding="{Binding HasVisibleEntries}" Value="False" /></MultiDataTrigger.Conditions><Setter Property="Visibility" Value="Visible" /></MultiDataTrigger></Style.Triggers></Style></StackPanel.Style>
-                <TextBlock Text="{x:Static r:Strings.EmptySearch}" TextWrapping="Wrap" Margin="8" />
-                <Button Content="{x:Static r:Strings.ClearSearch}" Command="{Binding ClearSearchCommand}" HorizontalAlignment="Center" />
+                <TextBlock Text="{r:Loc EmptySearch}" TextWrapping="Wrap" Margin="8" />
+                <Button Content="{r:Loc ClearSearch}" Command="{Binding ClearSearchCommand}" HorizontalAlignment="Center" />
             </StackPanel>
         </Grid>
         <StackPanel Grid.Row="6" Margin="16,4">
             <DockPanel>
-                <Button DockPanel.Dock="Right" Content="{x:Static r:Strings.CancelImport}" Command="{Binding CancelImportCommand}" Margin="4,0" Padding="8,2">
+                <Button DockPanel.Dock="Right" Content="{r:Loc CancelImport}" Command="{Binding CancelImportCommand}" Margin="4,0" Padding="8,2">
                     <Button.Style><Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding IsImporting}" Value="True"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></Button.Style>
                 </Button>
                 <TextBlock Text="{Binding PlaylistStatus}" FontSize="11" /><TextBlock Text="{Binding SaveStatus}" FontSize="11" Margin="8,0,0,0" /><TextBlock x:Name="StatusMessageText" AutomationProperties.LiveSetting="Polite" Text="{Binding Message}" FontSize="11" TextWrapping="Wrap" Margin="12,0,0,0" />
             </DockPanel>
-            <Expander Header="{x:Static r:Strings.Details}"><Expander.Style><Style TargetType="Expander" BasedOn="{StaticResource {x:Type Expander}}"><Style.Triggers><DataTrigger Binding="{Binding Details}" Value=""><Setter Property="Visibility" Value="Collapsed" /></DataTrigger><DataTrigger Binding="{Binding Details}" Value="{x:Null}"><Setter Property="Visibility" Value="Collapsed" /></DataTrigger></Style.Triggers></Style></Expander.Style><TextBox Text="{Binding Details, Mode=OneWay}" IsReadOnly="True" MaxHeight="100" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" /></Expander>
+            <Expander Header="{r:Loc Details}"><Expander.Style><Style TargetType="Expander" BasedOn="{StaticResource {x:Type Expander}}"><Style.Triggers><DataTrigger Binding="{Binding Details}" Value=""><Setter Property="Visibility" Value="Collapsed" /></DataTrigger><DataTrigger Binding="{Binding Details}" Value="{x:Null}"><Setter Property="Visibility" Value="Collapsed" /></DataTrigger></Style.Triggers></Style></Expander.Style><TextBox Text="{Binding Details, Mode=OneWay}" IsReadOnly="True" MaxHeight="100" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" /></Expander>
         </StackPanel>
         <DockPanel Grid.Row="7" Background="{DynamicResource BackgroundBrush}" LastChildFill="True" Margin="8,4,8,8">
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="4">
-                <Button Content="{x:Static r:Strings.AddFiles}" Padding="8,6" Command="{Binding AddFilesCommand}" Margin="2" />
-                <Button Content="{x:Static r:Strings.AddFolder}" Command="{Binding AddFolderCommand}" Padding="8,6" Margin="2" />
-                <Button Content="&#xE74D;" FontFamily="Segoe MDL2 Assets" Style="{StaticResource IconButton}" ToolTip="{x:Static r:Strings.Remove}" AutomationProperties.Name="{x:Static r:Strings.Remove}" Click="OnRemove" Margin="2" />
-                <Button Content="?" Style="{StaticResource IconButton}" ToolTip="{x:Static r:Strings.Help}" AutomationProperties.Name="{x:Static r:Strings.Help}" Click="OnHelp" Margin="2" />
+                <Button Content="{r:Loc AddFiles}" Padding="8,6" Command="{Binding AddFilesCommand}" Margin="2" />
+                <Button Content="{r:Loc AddFolder}" Command="{Binding AddFolderCommand}" Padding="8,6" Margin="2" />
+                <Button  Style="{StaticResource IconButton}" ToolTip="{r:Loc Remove}" AutomationProperties.Name="{r:Loc Remove}" Click="OnRemove" Margin="2" ><c:AppIcon Kind="Delete" /></Button>
+                <Button  Style="{StaticResource IconButton}" ToolTip="{r:Loc Help}" AutomationProperties.Name="{r:Loc Help}" Click="OnHelp" Margin="2" ><c:AppIcon Kind="Help" /></Button>
             </StackPanel>
             <Grid Margin="8,4">
                 <TextBox x:Name="SearchBox" Text="{Binding Search, UpdateSourceTrigger=PropertyChanged, Delay=200}" Margin="0" MinWidth="100" Padding="30,7,8,7" VerticalContentAlignment="Center"
-                     ToolTip="{x:Static r:Strings.Search}" AutomationProperties.Name="{x:Static r:Strings.Search}" />
-                <TextBlock Text="&#xE721;" FontFamily="Segoe MDL2 Assets" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" IsHitTestVisible="False" />
-                <TextBlock Text="{x:Static r:Strings.Search}" Margin="31,0,8,0" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" IsHitTestVisible="False" TextTrimming="CharacterEllipsis"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value=""><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock>
+                     ToolTip="{r:Loc Search}" AutomationProperties.Name="{r:Loc Search}" />
+                <c:AppIcon Kind="Search" Margin="8,0,0,0" HorizontalAlignment="Left" Foreground="{DynamicResource TextSecondaryBrush}" />
+                <TextBlock Text="{r:Loc Search}" Margin="31,0,8,0" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" IsHitTestVisible="False" TextTrimming="CharacterEllipsis"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value=""><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock>
             </Grid>
         </DockPanel>
     </Grid>

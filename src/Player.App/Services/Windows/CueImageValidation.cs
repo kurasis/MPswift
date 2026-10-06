@@ -24,6 +24,7 @@ internal static class CueImageValidation
         var hash = Hash(image);
         var original = model.SelectedPlaylist; var snapshot = model.Snapshot;
         var initialTabs = model.Playlists.Select(p => p.Id).ToHashSet();
+        var settings = model.WindowSettings;
         try
         {
             model.CreatePlaylist("Owned existing FLAC image");
@@ -82,14 +83,44 @@ internal static class CueImageValidation
             Check(model.Entries.Count == 6 && model.Entries.Select(e => e.Id).Distinct().Count() == 6, "Deliberately repeated FLAC images were collapsed.");
             Check(Hash(image) == hash && Hash(cue) == cueHash, "CUE expansion changed source bytes.");
             using (File.Open(image, FileMode.Open, FileAccess.Read, FileShare.None)) { }
+            // A common ripped album retains FILE "...wav" after lossless conversion and renaming.
+            var legacyDirectory = Path.Combine(directory, "Legacy album"); Directory.CreateDirectory(legacyDirectory);
+            var renamed = Path.Combine(legacyDirectory, "New album name.FLAC"); File.Copy(flacFixture, renamed);
+            var legacyCue = Path.Combine(legacyDirectory, "Ripped album.CUE");
+            model.CreatePlaylist("Owned legacy image");
+            await model.AddPathsAsync([renamed]); await Idle();
+            var legacyWhole = model.Entries.Single();
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            File.WriteAllBytes(legacyCue, Encoding.GetEncoding(1251).GetBytes(document.Replace("Альбом.flac", "Old album name.wav")));
+            var renamedHash = Hash(renamed); var legacyHash = Hash(legacyCue);
+            model.WindowSettings = model.WindowSettings with { CueCodePage = 1251 };
+            await model.ExpandCueImagesAsync([legacyWhole]); await Idle();
+            Check(model.Entries.Count == 3 && model.Entries.All(row => row.Entry.Track.Path == renamed && row.Entry.Track.Available && row.Entry.Track.DurationHint == TimeSpan.FromSeconds(1)) &&
+                model.Entries.Select(row => row.Title).SequenceEqual(new[] { "Первая", "Вторая", "Третья" }),
+                "Legacy CUE / missing WAV / renamed uppercase FLAC did not expand with complete song durations.");
+            model.CreatePlaylist("Owned legacy folder pair");
+            await model.AddPathsAsync([legacyDirectory]); await Idle();
+            Check(model.Entries.Count == 3 && model.Entries.All(row => row.Entry.Track.Segment is not null && row.Entry.Track.Path == renamed),
+                "Legacy folder import added unavailable WAV songs or a duplicate whole FLAC.");
+            model.CreatePlaylist("Owned explicit legacy cue");
+            await model.AddPathsAsync([legacyCue]); await Idle();
+            Check(model.Entries.Count == 3 && model.Entries.All(row => row.Entry.Track.Available && row.Entry.Track.Path == renamed), "Explicit legacy CUE did not resolve its missing FILE reference.");
+            model.CreatePlaylist("Owned invalid folder bounds");
+            File.WriteAllText(legacyCue, document.Replace("Альбом.flac", "Old album name.wav").Replace("00:02:00", "00:04:00"), new UTF8Encoding(false));
+            await model.AddPathsAsync([legacyDirectory]); await Idle();
+            Check(model.Entries.Count == 1 && model.Entries[0].Entry.Track.Segment is null && model.Entries[0].Path == renamed,
+                "Folder bounds validation lost the whole FLAC fallback or imported invalid song ranges.");
+            File.WriteAllBytes(legacyCue, Encoding.GetEncoding(1251).GetBytes(document.Replace("Альбом.flac", "Old album name.wav")));
+            Check(Hash(renamed) == renamedHash && Hash(legacyCue) == legacyHash, "Legacy association changed source bytes.");
             return new { Status = "cue-image-passed", InPlaceExpansion = true, WholeImageFallback = true, AmbiguityRefused = true, OutOfRangeRefused = true,
                 FolderPairWithoutDuplicate = true, DeliberateDuplicateImages = true, StableLogicalIdentity = true, PersistedOccurrences = true,
-                SourceUnchanged = true, SourceHandleReleased = true, NativeSongDurations = sourceDurations, NoAutoplay = true };
+                SourceUnchanged = true, SourceHandleReleased = true, NativeSongDurations = sourceDurations, NoAutoplay = true,
+                MissingWavReference = true, RenamedImage = true, UppercaseExtensions = true, Windows1251Titles = true, LastSongDuration = true, InvalidFolderBoundsFallback = true };
         }
         finally
         {
             foreach (var tab in model.Playlists.Where(p => !initialTabs.Contains(p.Id)).ToArray()) { model.SelectedPlaylist = tab; model.DeletePlaylist(); }
-            model.SelectedPlaylist = original; await model.SaveNowAsync();
+            model.SelectedPlaylist = original; model.WindowSettings = settings; await model.SaveNowAsync();
             Directory.Delete(directory, true);
         }
         async Task Idle() { await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ContextIdle); }

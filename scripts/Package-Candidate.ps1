@@ -74,12 +74,14 @@ try {
     $source = (& git rev-parse HEAD).Trim()
     if ($LASTEXITCODE -ne 0) { throw 'Source commit unavailable.' }
     $dirty = @(& git status --porcelain).Count -ne 0
+    $version = (& dotnet msbuild src/Player.App/Player.App.csproj -getProperty:Version).Trim()
+    if ($LASTEXITCODE -ne 0 -or $version -notmatch '^0\.2\.[0-9]+-dev\.[0-9]+$') { throw 'Build version unavailable or invalid.' }
     $files = @(Get-ChildItem $app -Recurse -File | Sort-Object FullName | ForEach-Object {
         $relative = [IO.Path]::GetRelativePath($app, $_.FullName).Replace('\','/')
         if ($relative -match '(^|/)(Data|Cache|Logs|reference|test-results|\.git)(/|$)|\.(db(-wal|-shm)?|peaks|jsonl|wav|flac|mp3|pdb)$') { throw "Private/development input found in candidate: $relative" }
         [ordered]@{ path = $relative; bytes = $_.Length; sha256 = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() }
     })
-    $manifest = [ordered]@{ schemaVersion = 1; product = 'MPswift'; platform = 'win-x64'; sourceCommit = $source; sourceTreeDirty = $dirty; sdk = (& dotnet --version).Trim(); distributionApproved = $false; evidenceLevel = 'local development candidate; Windows 11 clean/offline/hardware/license gates remain'; files = $files }
+    $manifest = [ordered]@{ schemaVersion = 1; product = 'MPswift'; productVersion = $version; platform = 'win-x64'; sourceCommit = $source; sourceTreeDirty = $dirty; sdk = (& dotnet --version).Trim(); distributionApproved = $false; evidenceLevel = 'local development candidate; Windows 11 clean/offline/hardware/license gates remain'; files = $files }
     $manifest | ConvertTo-Json -Depth 6 | Set-Content (Join-Path $app 'package-manifest.json') -Encoding utf8
     $sums = @($files | ForEach-Object { $_.sha256 + '  ' + $_.path })
     $sums += (Get-FileHash (Join-Path $app 'package-manifest.json') -Algorithm SHA256).Hash.ToLowerInvariant() + '  package-manifest.json'
@@ -87,13 +89,13 @@ try {
     & "$PSScriptRoot/Verify-Candidate.ps1" -Directory $app
     $output = Join-Path $root 'artifacts/portable'
     New-Item $output -ItemType Directory -Force | Out-Null
-    $name = 'MPswift-dev-' + $source.Substring(0,12) + $(if ($dirty) { '-dirty' } else { '' }) + '-win-x64.zip'
+    $name = 'MPswift-' + $version + '-' + $source.Substring(0,12) + $(if ($dirty) { '-dirty' } else { '' }) + '-win-x64.zip'
     $zip = Join-Path $output $name
     if (Test-Path $zip) { Remove-Item $zip }
     [IO.Compression.ZipFile]::CreateFromDirectory($app, $zip, [IO.Compression.CompressionLevel]::Optimal, $true)
     $hash = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
     ($hash + '  ' + $name) | Set-Content ($zip + '.sha256') -Encoding utf8
-    [ordered]@{ Status = 'local-candidate-packaged'; SourceCommit = $source; SourceTreeDirty = $dirty; Zip = $name; ZipSha256 = $hash; Bytes = (Get-Item $zip).Length; Files = $files.Count; Dependencies = $inventory.Count; NativeLibraries = $native.libraries.Count; DistributionApproved = $false } | ConvertTo-Json | Set-Content (Join-Path $output 'package-audit.json') -Encoding utf8
+    [ordered]@{ Status = 'local-candidate-packaged'; ProductVersion = $version; SourceCommit = $source; SourceTreeDirty = $dirty; Zip = $name; ZipSha256 = $hash; Bytes = (Get-Item $zip).Length; Files = $files.Count; Dependencies = $inventory.Count; NativeLibraries = $native.libraries.Count; DistributionApproved = $false } | ConvertTo-Json | Set-Content (Join-Path $output 'package-audit.json') -Encoding utf8
     Write-Host "Local development candidate: $zip"
     Write-Host 'Full Stage G acceptance remains open. Packaging itself does not upload; successful main CI publishes a separate development prerelease.'
 } finally {

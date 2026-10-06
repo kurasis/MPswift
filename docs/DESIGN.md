@@ -25,3 +25,7 @@ Context menus use explicit dark templates for root/submenu surfaces, highlights 
 Album headings are annotations on the first row of each contiguous visible folder/album run. Album tags take precedence over folder names; the last two folder components and visible run count clarify disc subfolders, with the full source folder in a tooltip. They do not sort, merge duplicate occurrences, change playback order or introduce selectable fake tracks. Filtering, tab changes, imports, sorting and row moves recompute boundaries. Standard recycling virtualization remains enabled. Existing settings default to headings on; the preference persists through normal settings and backup serialization without a schema bump.
 
 Validation includes real folder-drop/render/filter/toggle/order checks, menu popup and submenu images/keyboard navigation/action execution, actual settings Apply persistence and Cancel behavior in EN/RU, plus the existing nearly-10k-row virtualization checks. New pure tests cover nested discs, same-name folders, interleaved album runs, missing tags, filtered boundaries and old-settings compatibility.
+
+## Consistent action icons and live language
+
+Main-window actions, window controls, search and playing-row indicator use the same 18-DIP vector component, with 1.5-DIP strokes for outline symbols. Button targets remain sized for their role; cover art is a separate artwork surface. EN/RU bindings refresh in place after Settings Apply, including virtualized templates and detached menus. Compiled build version is visible next to the product name.
