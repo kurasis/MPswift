@@ -15,7 +15,7 @@ public static class MigrationSmokeValidation
     {
         var path = Path.Combine(directory, "library.db");
         if (File.Exists(path)) throw new IOException("Migration validation requires a new owned database.");
-        var tab = Guid.NewGuid(); var track = new MediaTrack(Guid.NewGuid(), fixture, "Owned migration signal");
+        var tab = Guid.NewGuid(); var track = new MediaTrack(Guid.NewGuid(), fixture, "Owned migration signal", DurationHint: TimeSpan.FromSeconds(3));
         var first = new PlaylistEntry(Guid.NewGuid(), track); var second = new PlaylistEntry(Guid.NewGuid(), track, false);
         var state = new LibraryState([new(tab, "Schema one Музыка", [first, second])], new(tab, tab, first, TimeSpan.FromSeconds(0.5).Ticks));
         await using (var store = new SqlitePlayerStore(path)) { await store.LoadAsync(); await store.SaveAsync(state, true); }
@@ -47,7 +47,9 @@ public static class MigrationSmokeValidation
     public static async Task<object> VerifyAsync(PlayerViewModel model, string directory)
     {
         var expected = JsonSerializer.Deserialize<LibraryState>(File.ReadAllText(Path.Combine(directory, "migration-expected.json")))!;
-        Check(JsonSerializer.Serialize(model.Playlists.Select(p => p.Capture()).ToArray()) == JsonSerializer.Serialize(expected.Playlists), "Migration changed committed identities/order/duplicates/flags.");
+        var actualPlaylists = JsonSerializer.Serialize(model.Playlists.Select(p => p.Capture()).ToArray());
+        var expectedPlaylists = JsonSerializer.Serialize(expected.Playlists);
+        Check(actualPlaylists == expectedPlaylists, "Migration changed committed identities/order/duplicates/flags. Expected=" + expectedPlaylists + "; Actual=" + actualPlaylists);
         Check(model.Snapshot.EntryId == expected.Session.ActiveEntry!.Id && model.CanSeek && !model.IsPlaying && Math.Abs(model.SeekPosition - 0.5) < 0.05, "Migration restart failed native preparation/position/no-autoplay.");
         var backups = Directory.GetFiles(directory, "library.db.pre-schema2-*.db");
         Check(backups.Length >= 2, "Each real migration attempt did not retain its schema-one backup.");

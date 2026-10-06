@@ -78,6 +78,17 @@ public static class ResilienceSmokeValidation
         File.WriteAllBytes(malformed, [.. "fLaC"u8, 0x84, 0xff, 0xff, 0xff]);
         diagnostics.Clear(); var fallback = MediaMetadataReader.Read(malformed, Guid.NewGuid(), diagnostics.Add);
         Check(fallback.Title == "truncated" && diagnostics.Count == 1 && await new ArtworkService().LoadAsync(malformed, CancellationToken.None) is null, "Truncated tag did not remain isolated.");
+        var compressed = Path.Combine(directory, "unsupported-compressed-tag.wav"); File.Copy(fixture, compressed);
+        using (var file = new FileStream(compressed, FileMode.Open, FileAccess.ReadWrite))
+        using (var writer = new BinaryWriter(file))
+        {
+            file.Position = file.Length; writer.Write("id3 "u8); writer.Write(30u);
+            writer.Write("ID3"u8); writer.Write(new byte[] { 3, 0, 0, 0, 0, 0, 20 });
+            writer.Write("TIT2"u8); writer.Write(new byte[] { 0, 0, 0, 10, 0, 0x80, 0x7f, 0xff, 0xff, 0xff, 0, 0, 0, 0, 0, 0 });
+            file.Position = 4; writer.Write(checked((uint)(file.Length - 8))); file.Flush(true);
+        }
+        var compressedHash = Hash(compressed); diagnostics.Clear(); var compressedTrack = MediaMetadataReader.Read(compressed, Guid.NewGuid(), diagnostics.Add);
+        Check(compressedTrack.Title.Length <= 4096 && await new ArtworkService().LoadAsync(compressed, CancellationToken.None) is null && compressedHash == Hash(compressed), "Unsupported compressed ID3 frame escaped metadata isolation.");
         var valid = Path.Combine(directory, "valid.wav"); File.Copy(fixture, valid);
         diagnostics.Clear(); var next = MediaMetadataReader.Read(valid, Guid.NewGuid(), diagnostics.Add);
         Check(next.DurationHint is { TotalSeconds: > 0 } && diagnostics.Count == 0, "Metadata worker failed to recover after a bad file.");
@@ -85,7 +96,7 @@ public static class ResilienceSmokeValidation
         var taggedHash = Hash(valid); diagnostics.Clear(); next = MediaMetadataReader.Read(valid, Guid.NewGuid(), diagnostics.Add);
         Check(next.Title.Length == 4096 && diagnostics.Count == 0 && taggedHash == Hash(valid), "Large valid title was not bounded without source edits.");
         return new { ActualOversizedRiffTagBytes = MetadataReadGuard.MaximumMetadataBytes + 2, FallbackAndArtworkIsolation = true, NativeAudioDecodeUnaffected = true,
-            TruncatedFlacRejected = true, ValidTitleInputCharacters = 100000, BoundedTitleCharacters = next.Title.Length, SubsequentValidMetadata = true, SourceUnchanged = true, SourceHandlesReleased = true, Decode = decode };
+            TruncatedFlacRejected = true, UnsupportedCompressedFrameIsolated = true, ValidTitleInputCharacters = 100000, BoundedTitleCharacters = next.Title.Length, SubsequentValidMetadata = true, SourceUnchanged = true, SourceHandlesReleased = true, Decode = decode };
     }
     private static async Task<object> WatcherAsync(string fixture, string owned)
     {
