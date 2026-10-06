@@ -165,6 +165,7 @@ public partial class App : Application
                     ? e.Args[1] == "failures" ? await ResilienceSmokeValidation.RunAsync(Path.GetFullPath(e.Args[2]), output)
                         : e.Args[1] == "migration-verify" ? await MigrationSmokeValidation.VerifyAsync(model, directory) : await CrashSmokeValidation.RunAsync(model, e.Args[1], Path.GetFullPath(e.Args[2]), directory, output)
                     : await validation!.RunAsync(window, model, Path.GetFullPath(e.Args[1]), Path.GetFullPath(e.Args[2]), output);
+                if (result is ResilienceSmokeValidation.Report { Status: not "g9-resilience-passed" }) resultCode = 1;
                 await window.CloseForValidationAsync();
             }
             catch (Exception error)

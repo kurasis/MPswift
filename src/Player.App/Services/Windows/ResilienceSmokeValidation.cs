@@ -17,18 +17,24 @@ namespace Player.App.Services.Windows;
 public static class ResilienceSmokeValidation
 {
     private sealed record OwnedVolume(string Directory, string Token);
-    public static async Task<object> RunAsync(string fixture, string output)
+    public sealed record Report(string Status, object ReadOnlyPortable, object Metadata, object WatcherOverflow, object FullDisk, string PowerLoss, string Windows);
+    public static async Task<Report> RunAsync(string fixture, string output)
     {
         var owned = Path.Combine(output, "g9-owned"); Directory.CreateDirectory(owned);
-        var portable = ReadOnlyPortable(owned);
-        var tags = await MetadataAsync(fixture, owned);
-        var watcher = await WatcherAsync(fixture, owned);
+        var failures = 0;
+        async Task<object> RunCheck(Func<Task<object>> check)
+        {
+            try { return await check(); }
+            catch (Exception error) { failures++; return new { Status = "failed", error.Message, error.StackTrace, ErrorType = error.GetType().Name }; }
+        }
+        var portable = await RunCheck(() => Task.FromResult(ReadOnlyPortable(owned)));
+        var tags = await RunCheck(() => MetadataAsync(fixture, owned));
+        var watcher = await RunCheck(() => WatcherAsync(fixture, owned));
         var marker = JsonSerializer.Deserialize<OwnedVolume>(File.ReadAllText(Path.Combine(Environment.CurrentDirectory, ".player-owned-volume")))!;
         Check(Path.GetPathRoot(marker.Directory) == marker.Directory && File.ReadAllText(Path.Combine(marker.Directory, ".player-volume-token")) == marker.Token,
             "Full-disk checks require the parent-created owned volume marker.");
-        var disk = await FullDiskAsync(marker.Directory, fixture);
-        return new { Status = "g9-resilience-passed", ReadOnlyPortable = portable, Metadata = tags, WatcherOverflow = watcher, FullDisk = disk,
-            PowerLoss = "not-run", Windows = Environment.OSVersion.VersionString };
+        var disk = await RunCheck(() => FullDiskAsync(marker.Directory, fixture));
+        return new Report(failures == 0 ? "g9-resilience-passed" : "g9-resilience-failed", portable, tags, watcher, disk, "not-run", Environment.OSVersion.VersionString);
     }
     private static object ReadOnlyPortable(string owned)
     {
