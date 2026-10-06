@@ -204,4 +204,5 @@ public static class Strings
     public static string PresetFilter => Get("PresetFilter");
     public static string DocumentFilter => Get("DocumentFilter");
     public static string BackupFilter => Get("BackupFilter");
+    public static string RestoreBackup => Get("RestoreBackup");
 }

@@ -15,15 +15,7 @@ public static class DatabaseRecovery
         using var ownership = new FileStream(destination + ".owner.lock", FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
         using var source = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = backup, Mode = SqliteOpenMode.ReadOnly, Pooling = false }.ToString());
         source.Open();
-        using var command = source.CreateCommand();
-        command.CommandText = "PRAGMA user_version";
-        if (Convert.ToInt32(command.ExecuteScalar(), System.Globalization.CultureInfo.InvariantCulture) is not (1 or 2)) throw new InvalidDataException("Backup schema is not supported.");
-        command.CommandText = "PRAGMA quick_check";
-        if ((string?)command.ExecuteScalar() != "ok") throw new InvalidDataException("Backup integrity failed.");
-        command.CommandText = "PRAGMA foreign_key_check";
-        using (var reader = command.ExecuteReader()) if (reader.Read()) throw new InvalidDataException("Backup has invalid references.");
-        command.CommandText = "SELECT COUNT(*) FROM Playlists";
-        if (Convert.ToInt64(command.ExecuteScalar(), System.Globalization.CultureInfo.InvariantCulture) is < 1 or > 100) throw new InvalidDataException("Backup has invalid playlist dimensions.");
+        Validate(source);
         var temporary = destination + ".restore-" + Guid.NewGuid().ToString("N");
         var preserved = destination + ".preserved-" + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + "-" + Guid.NewGuid().ToString("N");
         var moved = new List<(string Original, string Preserved)>();
@@ -41,5 +33,17 @@ public static class DatabaseRecovery
             throw;
         }
         finally { if (File.Exists(temporary)) File.Delete(temporary); }
+    }
+    internal static void Validate(SqliteConnection source)
+    {
+        using var command = source.CreateCommand();
+        command.CommandText = "PRAGMA user_version";
+        if (Convert.ToInt32(command.ExecuteScalar(), System.Globalization.CultureInfo.InvariantCulture) is not (1 or 2)) throw new InvalidDataException("Backup schema is not supported.");
+        command.CommandText = "PRAGMA quick_check";
+        if ((string?)command.ExecuteScalar() != "ok") throw new InvalidDataException("Backup integrity failed.");
+        command.CommandText = "PRAGMA foreign_key_check";
+        using (var reader = command.ExecuteReader()) if (reader.Read()) throw new InvalidDataException("Backup has invalid references.");
+        command.CommandText = "SELECT COUNT(*) FROM Playlists";
+        if (Convert.ToInt64(command.ExecuteScalar(), System.Globalization.CultureInfo.InvariantCulture) is < 1 or > 100) throw new InvalidDataException("Backup has invalid playlist dimensions.");
     }
 }

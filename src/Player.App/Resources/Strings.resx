@@ -189,7 +189,9 @@ Command line: local file/folder paths append without autoplay; --play explicitly
 
 Tray: Show/Hide, Play/Pause, Next, Previous, Exit. Closing exits by default; close-to-tray is an explicit preference. Language changes apply after restart.
 
-Sources remain unchanged. Ratings, history, library, queue and settings are stored locally. Restore never starts audio. Only local, available offline files are accepted. No application network requests. BASS and add-on distribution terms remain a release gate; this is a development build.</value>
+Sources remain unchanged. Ratings, history, library, queue and settings are stored locally. Restore never starts audio. Only local, available offline files are accepted. No application network requests. BASS and add-on distribution terms remain a release gate; this is a development build.
+
+Backup creates a complete local ZIP of database and settings. Restore backup validates it, retains current files and never autoplays. Music/cache/logs are excluded; legacy .db restore changes only the database. Restart for a restored language change.</value>
     </data>
     <data xml:space="preserve" name="PlaylistName">
         <value>Playlist name</value>
@@ -594,7 +596,7 @@ Sources remain unchanged. Ratings, history, library, queue and settings are stor
         <value>Local documents (*.cue;*.m3u;*.pls)|*.cue;*.m3u;*.pls</value>
     </data>
     <data xml:space="preserve" name="BackupFilter">
-        <value>SQLite backup (*.db)|*.db</value>
+        <value>Complete backup (*.zip)|*.zip|Legacy database backup (*.db)|*.db</value>
     </data>
     <data xml:space="preserve" name="CopySuffix">
         <value> (copy)</value>
@@ -631,4 +633,7 @@ Sources remain unchanged. Ratings, history, library, queue and settings are stor
     </data>
     <data xml:space="preserve" name="RestoreSettingsPrompt"><value>Saved settings are damaged or missing. Restore the previous valid copy? The damaged original will be preserved. Choosing No exits without changing your data.</value></data>
     <data xml:space="preserve" name="SettingsRestored"><value>Previous settings restored. Any existing damaged original was preserved.</value></data>
+    <data xml:space="preserve" name="RestoreBackup"><value>Restore backup…</value></data>
+    <data xml:space="preserve" name="RestoreBackupPrompt"><value>Restore playlists, queue, library, ratings, history and settings from this backup? Playback will stop. Current database and settings files will be retained separately. A legacy .db backup restores the database only.</value></data>
+    <data xml:space="preserve" name="BackupRestored"><value>Backup restored without autoplay. Restart the application if the backup uses another language.</value></data>
 </root>

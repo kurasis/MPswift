@@ -52,6 +52,7 @@ public partial class App : Application
                 {
                     try
                     {
+                        await active.RestoreCompletion;
                         active.ShowAndActivate();
                         var current = (PlayerViewModel)active.DataContext;
                         await current.ImportCompletion;
@@ -117,7 +118,8 @@ public partial class App : Application
                     try
                     {
                         var backup = LocalFileAccess.ValidateFile(dialog.FileName);
-                        await Task.Run(() => DatabaseRecovery.Restore(Path.Combine(directory, "library.db"), backup));
+                        if (Path.GetExtension(backup).Equals(".zip", StringComparison.OrdinalIgnoreCase)) await BackupBundle.RestoreAsync(directory, backup);
+                        else await Task.Run(() => DatabaseRecovery.Restore(Path.Combine(directory, "library.db"), backup));
                         model = CreateModel(directory); WatchDiagnostics(model); window.DataContext = model; await model.InitializeAsync();
                     }
                     catch (Exception restoreError) { ReportStartupFailure(false, restoreError); Shutdown(1); return; }
@@ -183,6 +185,13 @@ public partial class App : Application
     {
         WatchDiagnostics(model); _media?.Dispose(); _media = null;
         try { _media = new MediaSessionService(window, model); } catch (Exception error) { model.Details = error.Message; }
+        if (_tray is not null || _restoreTray) { _tray?.Dispose(); _tray = new TrayService(window, model); _restoreTray = false; }
+    }
+    private bool _restoreTray;
+    public void SuspendMedia()
+    {
+        _media?.Dispose(); _media = null;
+        _restoreTray = _tray is not null; _tray?.Dispose(); _tray = null;
     }
     public bool MediaMetadataMatches(PlayerViewModel model) => _media?.MetadataMatches(model) == true;
     protected override void OnExit(ExitEventArgs e)

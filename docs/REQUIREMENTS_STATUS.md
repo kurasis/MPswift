@@ -45,3 +45,8 @@ The full specification remains the target. Unit tests or cross-builds do not sat
 | AC-038 | P1 | Source preservation | D–G | Codec/independent/long-wave source hash and handle checks passed | Read-only file/hash/handle checks include independent and long-wave paths in Windows CI |
 | AC-039 | P1 | Crash/restart | D–G | Actual Windows WPF process termination/restart and rollback passed; full crash acceptance partial | Run 37415275489: native restart, no autoplay, IDs/queue/ratings/settings and live validation transaction rollback passed; migration/power-loss remain open |
 | AC-040 | P1 | Diagnostic honesty | D–G | Reporting implemented; full release evidence pending | [Test results](TEST_RESULTS.md) and [checkpoint](IMPLEMENTATION_STATUS.md) |
+
+
+## G4–G7 block: local results, Windows checks pending
+
+Locked Release cross-build passes 115 tests, zero warnings/errors. Complete ZIP backup/restore has 13 real SQLite/file cases (live WAL, IDs/session/index/ratings/settings, retained originals, invalid entries/checksums/schema/foreign keys, no overwrite, ownership and occupied-path rejection). The expanded Windows harness exercises complete restore through WPF and invalid-restore recovery, real ACL/file-lock failures and artwork limits, 100k production query/page/render timings and nearly 10k playlist scroll timings. These Windows results are not yet observed. Four owned RF64/WMA/DSF/DFF fixtures extend the matrix to 21; actual new native results are pending. Full Windows 11/device/offline/full-disk/profile/licensing acceptance remains open.

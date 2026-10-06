@@ -9,6 +9,9 @@ using Player.App.Resources;
 using Player.App.ViewModels;
 using Player.App.Views;
 using Player.Core.Playback;
+using Player.App.Services.Storage;
+using System.Text.Json;
+using System.IO.Compression;
 
 namespace Player.App.Services.Windows;
 
@@ -129,6 +132,34 @@ public sealed class UiSmokeValidation : TraceListener
         using (File.Open(indexedSource, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) { }
         await model.SaveNowAsync();
         Require(Hash(fixture) == fixtureHash && Hash(taggedFixture) == taggedHash && Hash(indexedSource) == fixtureHash, "Library/import/rating/relink/artwork workflow changed source bytes.");
+        var completeBackup = Path.Combine(output, "complete-" + Guid.NewGuid().ToString("N") + ".zip");
+        await model.BackupAsync(completeBackup);
+        var expectedState = JsonSerializer.Serialize(await ((SqlitePlayerStore)model.LibraryIndex!).LoadAsync());
+        var expectedSettings = JsonSerializer.Serialize(new SettingsFile(((App)Application.Current).DataDirectory).Load());
+        var expectedName = model.SelectedPlaylist.Name; model.RenamePlaylist("Changed after backup"); model.Volume = 81; model.Muted = false;
+        await model.SaveNowAsync(); await window.RestoreBackupAsync(completeBackup); model = (PlayerViewModel)window.DataContext;
+        await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ContextIdle);
+        await model.WaveformCompletion.WaitAsync(TimeSpan.FromSeconds(30)); await model.ArtworkCompletion.WaitAsync(TimeSpan.FromSeconds(30));
+        Require(JsonSerializer.Serialize(await ((SqlitePlayerStore)model.LibraryIndex!).LoadAsync()) == expectedState &&
+            JsonSerializer.Serialize(new SettingsFile(((App)Application.Current).DataDirectory).Load()) == expectedSettings &&
+            model.SelectedPlaylist.Name == expectedName && model.Volume == 23 && model.Muted && !model.IsPlaying && Math.Abs(model.SeekPosition - .5) < .01,
+            "Complete UI backup restore lost saved database/settings/session or autoplayed.");
+        Require((await model.LibraryIndex!.GetStatisticsAsync([indexedTrackId]))[0].Rating == 5 && (await model.LibraryIndex.SearchAsync("Музыка")).Total >= 1,
+            "Complete restore lost library/statistics.");
+        var invalidBackup = completeBackup + ".invalid.zip"; File.Copy(completeBackup, invalidBackup);
+        using (var zip = ZipFile.Open(invalidBackup, ZipArchiveMode.Update)) zip.CreateEntry("unexpected");
+        var rejected = false; try { await window.RestoreBackupAsync(invalidBackup); } catch (InvalidDataException) { rejected = true; }
+        model = (PlayerViewModel)window.DataContext;
+        await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ContextIdle);
+        await model.WaveformCompletion.WaitAsync(TimeSpan.FromSeconds(30)); await model.ArtworkCompletion.WaitAsync(TimeSpan.FromSeconds(30));
+        Require(rejected && model.Initialized && model.SelectedPlaylist.Name == expectedName && model.Volume == 23 && !model.IsPlaying && model.Queue.Count == 3,
+            "Rejected restore left the current window/model unusable or lost current data.");
+        File.Delete(completeBackup); File.Delete(invalidBackup);
+        Require(Directory.GetFiles(((App)Application.Current).DataDirectory, "*.preserved-*").Length >= 2, "Restore did not retain current database/settings files.");
+        var backupRestore = new { Status = "complete-backup-restore-passed", DatabaseSettingsAndSession = true, LibraryRatingsAndQueue = true, CurrentOriginalsRetained = Directory.GetFiles(((App)Application.Current).DataDirectory, "*.preserved-*").Length >= 2,
+            NoAutoplay = true, NativeCuePositionRestored = true, RejectedArchiveReopensCurrentModel = true, MediaRebound = true };
+        var storageArtwork = await StorageArtworkValidation.RunAsync(fixture, output);
+        var searchPerformance = await PerformanceValidation.SearchAsync(window, output);
         var integration = await IntegrationSmokeValidation.RunAsync(window, model, fixture);
         await model.SaveNowAsync();
         window.UpdateLayout();
@@ -144,6 +175,7 @@ public sealed class UiSmokeValidation : TraceListener
         return new
         {
             WindowsIntegration = integration,
+            CompleteBackupRestore = backupRestore, StorageArtwork = storageArtwork, SearchPerformance = searchPerformance,
             Status = "ui-smoke-passed", Environment = System.Runtime.InteropServices.RuntimeInformation.OSDescription,
             ImportedEntries = model.Entries.Count, DistinctEntryIds = true, SharedTrackIdentity = true,
             ImportDidNotAutoplay = true, NativePreparation = true, DurationSeconds = model.DurationSeconds,

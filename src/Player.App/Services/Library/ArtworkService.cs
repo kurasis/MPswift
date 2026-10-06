@@ -49,7 +49,10 @@ public sealed class ArtworkService
                         if (frame is not null && frame.PixelWidth > 0 && frame.PixelHeight > 0 && (long)frame.PixelWidth * frame.PixelHeight <= 40000000)
                         {
                             token.ThrowIfCancellationRequested(); using var input = new MemoryStream(encoded, false);
-                            var bitmap = new BitmapImage(); bitmap.BeginInit(); bitmap.CacheOption = BitmapCacheOption.OnLoad; bitmap.DecodePixelWidth = 192; bitmap.StreamSource = input; bitmap.EndInit(); bitmap.Freeze(); image = bitmap;
+                            var bitmap = new BitmapImage(); bitmap.BeginInit(); bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                            if (frame.PixelWidth >= frame.PixelHeight) bitmap.DecodePixelWidth = Math.Min(192, frame.PixelWidth);
+                            else bitmap.DecodePixelHeight = Math.Min(192, frame.PixelHeight);
+                            bitmap.StreamSource = input; bitmap.EndInit(); bitmap.Freeze(); image = bitmap;
                         }
                     }
                     catch (Exception e) when (e is FileFormatException or NotSupportedException or ArgumentException or IOException) { }

@@ -338,6 +338,77 @@
       ],
       "expectedTitle": "Fixture — Музыка",
       "expectedBassCodec": "MP4"
+    },
+    {
+      "path": "rf64.wav",
+      "profile": "WAV RF64 PCM16",
+      "codec": "pcm_s16le",
+      "sampleRate": 48000,
+      "channels": 2,
+      "sourceDurationSeconds": 3,
+      "durationToleranceSeconds": 0.03,
+      "sha256": "2b71f8e916392b4ddb28deeb7aa34edc29387927c48f2fe2628fdde697811ebc",
+      "provenance": "Generated from Player.AudioSmoke owned source using ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "license": "CC0-1.0",
+      "expectedBassCodec": "WavePCM",
+      "encoderArguments": [
+        "-c:a",
+        "pcm_s16le",
+        "-rf64",
+        "always"
+      ],
+      "expectedTitle": "Fixture — Музыка",
+      "expectedBitDepth": 16
+    },
+    {
+      "path": "wma2.wma",
+      "profile": "WMA v2 ASF 128 kbps",
+      "codec": "wmav2",
+      "sampleRate": 48000,
+      "channels": 2,
+      "sourceDurationSeconds": 3,
+      "durationToleranceSeconds": 0.15,
+      "sha256": "97e9ea7d8abfc461d41dfa3a2acecbceb408c727b5a6f9345509dd84c537810d",
+      "provenance": "Generated from Player.AudioSmoke owned source using ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers",
+      "license": "CC0-1.0",
+      "expectedBassCodec": "WMA",
+      "encoderArguments": [
+        "-c:a",
+        "wmav2",
+        "-b:a",
+        "128k"
+      ],
+      "expectedTitle": "Fixture — Музыка"
+    },
+    {
+      "path": "dsd64.dsf",
+      "profile": "DSF DSD64 converted to float PCM",
+      "codec": "dsd_lsbf_planar",
+      "sampleRate": 88200,
+      "channels": 2,
+      "sourceDurationSeconds": 3,
+      "durationToleranceSeconds": 0.03,
+      "sha256": "38621331f0fe961d1430e0ece56538010bb77c40cc7f3a22953670869072b3b6",
+      "provenance": "Owned continuous 440 Hz opposite-phase sine, first-order DSD64 generator v1",
+      "license": "CC0-1.0",
+      "expectedBassCodec": "DSD",
+      "generator": "dsd64-first-order-v1",
+      "sourceDsdSampleRate": 2822400
+    },
+    {
+      "path": "dsd64.dff",
+      "profile": "DSDIFF DSD64 converted to float PCM",
+      "codec": "dsd_msbf",
+      "sampleRate": 88200,
+      "channels": 2,
+      "sourceDurationSeconds": 3,
+      "durationToleranceSeconds": 0.03,
+      "sha256": "315eb9eb030f35f520f878c8770c26c672bff66ca6ac26effcb5c66fa79bbcba",
+      "provenance": "Owned continuous 440 Hz opposite-phase sine, first-order DSD64 generator v1",
+      "license": "CC0-1.0",
+      "expectedBassCodec": "DSD",
+      "generator": "dsd64-first-order-v1",
+      "sourceDsdSampleRate": 2822400
     }
   ]
 }

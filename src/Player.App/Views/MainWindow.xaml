@@ -98,6 +98,7 @@
                         <MenuItem Header="{x:Static r:Strings.MoveDown}" Click="OnMoveDown" />
                         <MenuItem Header="{x:Static r:Strings.RefreshWaveform}" Command="{Binding RefreshWaveformCommand}" />
                         <MenuItem Header="{x:Static r:Strings.Backup}" Click="OnBackup" />
+                        <MenuItem Header="{x:Static r:Strings.RestoreBackup}" Click="OnRestoreBackup" />
                     </ContextMenu></Button.ContextMenu>
                 </Button>
             </StackPanel>

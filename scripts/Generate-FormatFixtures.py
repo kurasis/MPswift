@@ -10,6 +10,7 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
+import importlib.util
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -30,12 +31,17 @@ def main():
         raise RuntimeError('Owned source signal checksum changed; review generator before encoding.')
     version = subprocess.run(['ffmpeg', '-version'], check=True, capture_output=True, text=True).stdout.splitlines()[0]
     for item in baseline['fixtures']:
-        subprocess.run(['ffmpeg', '-v', 'error', '-nostdin', '-n', '-i', str(source),
-                        *item['encoderArguments'], '-metadata', 'title=Fixture — Музыка',
-                        '-metadata', 'artist=Local Audio Player tests', '-metadata', 'album=Generated signals',
-                        str(output / item['path'])], check=True)
+        if item.get('generator') == 'dsd64-first-order-v1':
+            spec = importlib.util.spec_from_file_location('dsd_fixture', ROOT / 'scripts/Generate-DsdFixtures.py')
+            module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+            module.generate(output / item['path'])
+        else:
+            subprocess.run(['ffmpeg', '-v', 'error', '-nostdin', '-n', '-i', str(source),
+                            *item['encoderArguments'], '-metadata', 'title=Fixture — Музыка',
+                            '-metadata', 'artist=Local Audio Player tests', '-metadata', 'album=Generated signals',
+                            str(output / item['path'])], check=True)
         item['sha256'] = sha256(output / item['path'])
-        item['provenance'] = 'Generated from Player.AudioSmoke 440 Hz opposite-phase PCM fixture using ' + version
+        item['provenance'] = ('Owned continuous 440 Hz opposite-phase sine, first-order DSD64 generator v1' if item.get('generator') else 'Generated from Player.AudioSmoke 440 Hz opposite-phase PCM fixture using ' + version)
     (output / 'manifest.json').write_text(json.dumps(baseline, indent=2, ensure_ascii=False) + '\n')
     source.unlink()
     source.with_name(source.name + '.json').unlink()

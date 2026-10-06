@@ -35,21 +35,29 @@ public sealed class LibraryWindow : Window
         var roots = new ComboBox { ItemsSource = model.LibraryRoots, DisplayMemberPath = "Path", Margin = new Thickness(0, 0, 0, 8) }; DockPanel.SetDock(roots, Dock.Top); panel.Children.Add(roots);
         Button(Strings.Get("DisableRoot"), async (_, _) => { if (roots.SelectedItem is LibraryRoot root) await model.DisableLibraryRootAsync(root); });
         _list = new ListBox { ItemsSource = _files, DisplayMemberPath = "Track.Title", SelectionMode = SelectionMode.Extended }; panel.Children.Add(_list);
+        VirtualizingPanel.SetIsVirtualizing(_list, true); VirtualizingPanel.SetVirtualizationMode(_list, VirtualizationMode.Recycling);
+        ScrollViewer.SetCanContentScroll(_list, true);
         model.PropertyChanged += OnModelChanged;
         Loaded += async (_, _) => await SearchAsync(); Closed += (_, _) => { _closed = true; model.PropertyChanged -= OnModelChanged; _searchDelay?.Cancel(); };
     }
     private async void OnModelChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) { if (e.PropertyName == nameof(PlayerViewModel.IsScanning) && !_model.IsScanning) await SearchAsync(); }
     private async Task SearchAsync()
     {
-        if (_model.LibraryIndex is null || _closed) return;
-        var generation = ++_queryGeneration;
         try
         {
-            var page = await _model.LibraryIndex.SearchAsync(_search.Text, _offset);
-            if (_closed || generation != _queryGeneration) return;
-            _files.Clear(); foreach (var file in page.Files) _files.Add(file);
-            _status.Text = string.Format(Strings.Culture, Strings.Get("LibraryPage"), page.Total, page.Total == 0 ? 0 : _offset + 1, _offset + page.Files.Length, _model.ScanStatus);
+            await LoadPageAsync(_search.Text, _offset);
         }
         catch (Exception e) { if (!_closed) { _status.Text = Strings.ErrorUnexpected; _model.Details = e.Message; } }
     }
+    internal async Task<LibraryPage?> LoadPageAsync(string query, int offset)
+    {
+        if (_model.LibraryIndex is null || _closed) return null;
+        var generation = ++_queryGeneration;
+        var page = await _model.LibraryIndex.SearchAsync(query, offset);
+        if (_closed || generation != _queryGeneration) return null;
+        _files.Clear(); foreach (var file in page.Files) _files.Add(file);
+        _status.Text = string.Format(Strings.Culture, Strings.Get("LibraryPage"), page.Total, page.Total == 0 ? 0 : page.Offset + 1, page.Offset + page.Files.Length, _model.ScanStatus);
+        return page;
+    }
+    internal ListBox ResultList => _list;
 }

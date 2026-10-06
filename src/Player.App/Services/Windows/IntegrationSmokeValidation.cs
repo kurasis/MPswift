@@ -93,6 +93,7 @@ public static class IntegrationSmokeValidation
         var realized = Count<ListBoxItem>(list);
         var playlistRows = model.Entries.Count;
         Check(model.Entries.Count > 9900 && realized > 0 && realized < 150, "Playlist realized unbounded row containers.");
+        var scrollPerformance = await PerformanceValidation.ScrollAsync(window, list);
         model.DeletePlaylist(); model.SelectedPlaylist = selected;
         window.Width = 640; window.Height = 520; window.UpdateLayout();
         Check(((Button)window.FindName("PlayPauseButton")).ActualWidth > 0 && list.ActualHeight > 0, "Minimum layout hid transport/playlist.");
@@ -100,6 +101,7 @@ public static class IntegrationSmokeValidation
         return new { Status = "windows-integration-passed", SecondProcessActivation = true, ConcurrentFileForwarding = true, NoImplicitAutoplay = true,
             OversizedIpcRejected = true, CurrentUserOnlyPipe = true, SeekAutomationRange = true, SoftwareRoutedDropdownEscape = true, CloseToTrayPreservesState = true,
             Language = model.WindowSettings.Language, ResourceKeys = resourceCount, RealizedRowContainers = realized, PlaylistRows = playlistRows, GlobalPlaylistCapacity = 10000,
+            ScrollPerformance = scrollPerformance,
             MediaSession = app.MediaSessionAvailable ? "registered; metadata synchronized" : "unavailable in this Windows session",
             GlobalMediaKeyPress = "not-run", ScreenReader = "not-run", PhysicalDpiAndMonitorMoves = "not-run" };
     }

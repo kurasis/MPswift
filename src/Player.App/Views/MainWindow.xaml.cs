@@ -5,6 +5,8 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using Player.App.Resources;
 using Player.App.ViewModels;
+using Player.App.Services.Storage;
+using System.IO;
 
 namespace Player.App.Views;
 
@@ -16,6 +18,7 @@ public partial class MainWindow : Window
     private bool _shutdownComplete;
     private bool _shutdownStarted;
     private bool _exitRequested;
+    public Task RestoreCompletion { get; private set; } = Task.CompletedTask;
     private PlayerViewModel Model => (PlayerViewModel)DataContext;
     public MainWindow()
     {
@@ -119,6 +122,7 @@ public partial class MainWindow : Window
     {
         if (_shutdownComplete) return;
         e.Cancel = true;
+        if (!RestoreCompletion.IsCompleted) return;
         if (Model.WindowSettings.CloseToTray && !_exitRequested) { Hide(); return; }
         if (_shutdownStarted) return;
         _shutdownStarted = true;
@@ -231,10 +235,54 @@ public partial class MainWindow : Window
     }
     private async void OnBackup(object sender, RoutedEventArgs e)
     {
-        var dialog = new Microsoft.Win32.SaveFileDialog { Filter = Strings.Get("BackupFilter"), FileName = "player-backup-" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".db" };
+        var dialog = new Microsoft.Win32.SaveFileDialog { Filter = Strings.Get("BackupFilter"), FileName = "player-backup-" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".zip" };
         if (dialog.ShowDialog(this) != true) return;
         try { Services.Audio.LocalFileAccess.ValidateDirectory(System.IO.Path.GetDirectoryName(dialog.FileName)!); await Model.BackupAsync(dialog.FileName); Model.Message = Strings.Get("BackupSaved"); }
         catch (Exception error) { Model.Message = Strings.Get("SaveFailed"); Model.Details = error.Message; }
+    }
+    private async void OnRestoreBackup(object sender, RoutedEventArgs e)
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog { Filter = Strings.Get("BackupFilter") };
+        if (dialog.ShowDialog(this) != true || MessageBox.Show(this, Strings.Get("RestoreBackupPrompt"), Strings.RestoreBackup, MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
+        try { await RestoreBackupAsync(Services.Audio.LocalFileAccess.ValidateFile(dialog.FileName)); Model.Message = Strings.Get("BackupRestored"); }
+        catch (Exception error) { Model.Message = Strings.Get("SaveFailed"); Model.Details = error.Message; }
+    }
+    public async Task RestoreBackupAsync(string archive)
+    {
+        if (!RestoreCompletion.IsCompleted) throw new InvalidOperationException("Restore already in progress.");
+        var completion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously); RestoreCompletion = completion.Task;
+        var app = (App)Application.Current; var directory = app.DataDirectory;
+        var closedModel = false;
+        IsEnabled = false;
+        try
+        {
+            await Model.SaveNowAsync();
+            foreach (Window owned in OwnedWindows.Cast<Window>().ToArray()) owned.Close();
+            app.SuspendMedia();
+            await Model.DisposeWithoutSavingAsync();
+            closedModel = true;
+            try
+            {
+                if (Path.GetExtension(archive).Equals(".zip", StringComparison.OrdinalIgnoreCase)) await BackupBundle.RestoreAsync(directory, archive);
+                else await Task.Run(() => DatabaseRecovery.Restore(Path.Combine(directory, "library.db"), archive));
+            }
+            finally
+            {
+                // Failed validation/installation reopens the preserved current data. Never manufacture an empty replacement.
+                if (!File.Exists(Path.Combine(directory, "library.db")) || !File.Exists(Path.Combine(directory, "settings.json")))
+                    throw new IOException("Saved files are unavailable after restore; retained originals require recovery.");
+                var replacement = app.CreateModel(directory);
+                try { await replacement.InitializeAsync(); }
+                catch { await replacement.DisposeWithoutSavingAsync(); throw; }
+                DataContext = replacement; closedModel = false; app.RebindMedia(this, replacement);
+            }
+        }
+        catch (Exception error) when (closedModel)
+        {
+            MessageBox.Show(this, Strings.Get("StartupFailure") + "\n\n" + error.Message, Strings.Get("SavedDataUnavailable"), MessageBoxButton.OK, MessageBoxImage.Error);
+            _shutdownComplete = true; app.Shutdown(1); throw;
+        }
+        finally { IsEnabled = true; completion.SetResult(); }
     }
     public async Task CloseForValidationAsync()
     {
