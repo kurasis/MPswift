@@ -55,6 +55,7 @@ try {
     & "$PSScriptRoot/Crash-Smoke.ps1"
     & "$PSScriptRoot/Crash-Smoke.ps1" -Migration
     & "$PSScriptRoot/Resilience-Smoke.ps1"
+    & "$PSScriptRoot/Optional-Wma-Smoke.ps1"
     if ($Play) {
         $result = & dotnet $tool --engine-play $fixture
         $code = $LASTEXITCODE

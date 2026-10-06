@@ -33,7 +33,15 @@ public sealed class BassAudioBackend : IAudioBackend, IAdvancedAudioBackend
     public AudioSourceInfo Open(AudioRequest request)
     {
         ObjectDisposedException.ThrowIf(_disposed, this); CloseSource();
-        var opened = BassMixerGraph.OpenSource(request);
+        (int Handle, AudioSourceInfo Info, double Start) opened;
+        try { opened = BassMixerGraph.OpenSource(request); }
+        catch (AudioBackendException error) when (error.Category == AudioErrorCategory.Decoder && Path.GetExtension(request.Path).Equals(".wma", StringComparison.OrdinalIgnoreCase) &&
+            (_context.DecoderErrors.ContainsKey("basswma") || error.NativeCode == 1000))
+        {
+            throw new AudioBackendException(AudioErrorCategory.Dependency,
+                "WMA is unavailable: the approved BASSWMA plug-in and Windows Media Format components are required. " +
+                (_context.DecoderErrors.TryGetValue("basswma", out var detail) ? detail : error.Message), error.NativeCode);
+        }
         _preparedHandle = opened.Handle; _info = opened.Info; _request = request; _position = TimeSpan.Zero;
         if (_graph is not null) { Bass.StreamFree(_preparedHandle); _preparedHandle = 0; _info = _graph.Load(request); }
         return _info;

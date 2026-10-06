@@ -8,7 +8,7 @@ using Player.Core.Playback;
 var json = new JsonSerializerOptions { WriteIndented = true };
 void Report(object result) => Console.WriteLine(JsonSerializer.Serialize(result, json));
 
-if (args.Length == 0 || args[0] is not ("--generate-fixture" or "--probe" or "--decode" or "--play" or "--formats" or "--extended-formats" or "--engine" or "--engine-play" or "--waveform" or "--mixer" or "--stress") ||
+if (args.Length == 0 || args[0] is not ("--generate-fixture" or "--probe" or "--decode" or "--play" or "--formats" or "--extended-formats" or "--missing-wma" or "--engine" or "--engine-play" or "--waveform" or "--mixer" or "--stress") ||
     args.Length != (args[0] == "--probe" ? 1 : 2))
 {
     Console.Error.WriteLine("Usage: Player.AudioSmoke --generate-fixture <new.wav> | --probe | --decode <local-file> | --play <local-file> | --formats <fixture-directory> | --engine <local-file> | --engine-play <local-file>");
@@ -28,6 +28,27 @@ try
         return 3;
     }
     var versions = NativeLibraryBootstrap.LoadAndVerify();
+    if (args[0] == "--missing-wma")
+    {
+        Require(NativeLibraryBootstrap.DecoderValidationErrors.ContainsKey("basswma"), "Missing-WMA check requires an owned copy without BASSWMA.");
+        var wav = BassSmokeSession.ValidateSourcePath(Path.Combine(args[1], "pcm16.wav"));
+        var wma = BassSmokeSession.ValidateSourcePath(Path.Combine(args[1], "wma2.wma"));
+        var wavHash = HashFile(wav); var wmaHash = HashFile(wma); AudioError? unavailable;
+        await using (var player = new SerializedAudioPlayer(() => new BassAudioBackend()))
+        {
+            Require(await player.LoadAsync(new(Guid.NewGuid(), wav), false) && player.Snapshot.CanSeek, "Core WAV failed without optional WMA dependency.");
+            Require(!await player.LoadAsync(new(Guid.NewGuid(), wma), false), "WMA unexpectedly loaded without its approved plug-in.");
+            unavailable = player.Snapshot.Error;
+            Require(unavailable?.Category == AudioErrorCategory.Dependency, "Missing optional WMA was not reported as a dependency error.");
+            Require(await player.LoadAsync(new(Guid.NewGuid(), wav), false) && player.Snapshot.State == PlaybackState.Stopped && player.Snapshot.CanSeek, "Core playback did not recover after unavailable WMA.");
+        }
+        using (new FileStream(wav, FileMode.Open, FileAccess.Read, FileShare.None)) { }
+        using (new FileStream(wma, FileMode.Open, FileAccess.Read, FileShare.None)) { }
+        Require(wavHash == HashFile(wav) && wmaHash == HashFile(wma), "Optional-dependency test changed source files.");
+        Report(new { Status = "missing-optional-wma-passed", CoreWavAvailableBeforeAndAfter = true, WmaError = unavailable, SourceUnchanged = true, SourceHandlesReleased = true,
+            Method = "Isolated actual tool copy with the approved WMA DLL omitted; MF fallback disabled", WindowsN = "not-run: this is a dependency failure check, not an N OS" });
+        return 0;
+    }
     if (args[0] == "--probe")
     {
         Report(new { Status = "native-load-passed", Versions = versions, Environment = RuntimeInformation.OSDescription });
