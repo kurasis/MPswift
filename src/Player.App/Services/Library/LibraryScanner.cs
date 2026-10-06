@@ -89,6 +89,10 @@ public sealed class LibraryWatcher : IDisposable
     private readonly Timer _timer;
     private readonly Action<Guid[]> _rescan;
     private bool _disposed;
+    private int _overflowCount;
+    public int OverflowCount => Volatile.Read(ref _overflowCount);
+    internal int BufferSize { get; init; } = 8192;
+    internal Action? NotificationCheckpoint { get; init; }
     public LibraryWatcher(Action<Guid[]> rescan) { _rescan = rescan; _timer = new Timer(_ => Flush(), null, Timeout.Infinite, Timeout.Infinite); }
     public void Watch(IEnumerable<LibraryRoot> roots)
     {
@@ -98,9 +102,10 @@ public sealed class LibraryWatcher : IDisposable
             try
             {
                 LocalFileAccess.ValidateDirectory(root.Path);
-                var watcher = new FileSystemWatcher(root.Path) { IncludeSubdirectories = true, NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite | NotifyFilters.Size };
-                void Changed(object sender, FileSystemEventArgs e) { var extension = Path.GetExtension(e.FullPath); if (extension.Length == 0 || MediaMetadataReader.Extensions.Contains(extension) || new[] { "cover.jpg", "cover.png", "folder.jpg", "folder.png" }.Contains(Path.GetFileName(e.FullPath).ToLowerInvariant())) Dirty(root.Id); }
-                watcher.Changed += Changed; watcher.Created += Changed; watcher.Deleted += Changed; watcher.Renamed += (sender, e) => { Changed(sender, e); var oldExtension = Path.GetExtension(e.OldFullPath); if (oldExtension.Length == 0 || MediaMetadataReader.Extensions.Contains(oldExtension)) Dirty(root.Id); }; watcher.Error += (_, _) => Dirty(root.Id);
+                var watcher = new FileSystemWatcher(root.Path) { IncludeSubdirectories = true, InternalBufferSize = BufferSize, NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite | NotifyFilters.Size };
+                void Changed(object sender, FileSystemEventArgs e) { NotificationCheckpoint?.Invoke(); var extension = Path.GetExtension(e.FullPath); if (extension.Length == 0 || MediaMetadataReader.Extensions.Contains(extension) || new[] { "cover.jpg", "cover.png", "folder.jpg", "folder.png" }.Contains(Path.GetFileName(e.FullPath).ToLowerInvariant())) Dirty(root.Id); }
+                watcher.Changed += Changed; watcher.Created += Changed; watcher.Deleted += Changed; watcher.Renamed += (sender, e) => { Changed(sender, e); var oldExtension = Path.GetExtension(e.OldFullPath); if (oldExtension.Length == 0 || MediaMetadataReader.Extensions.Contains(oldExtension)) Dirty(root.Id); };
+                watcher.Error += (_, e) => { if (e.GetException() is InternalBufferOverflowException) Interlocked.Increment(ref _overflowCount); Dirty(root.Id); };
                 _watchers.Add(watcher); watcher.EnableRaisingEvents = true;
             }
             catch (IOException) { Dirty(root.Id); }

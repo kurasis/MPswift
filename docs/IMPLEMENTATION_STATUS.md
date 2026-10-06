@@ -49,7 +49,7 @@ Windows CI now runs an actual 50-warmup + 1,000 production load/prepare-next/see
 ## Resume and commands
 
 - Use existing checkout `/workspace/MPswift`; activate `source /workspace/toolchains/activate.sh`. No new worktree or service is required. The cloud startup draft was refreshed for Stage F/G continuation; install instructions remain unchanged.
-- `scripts/Build.ps1`: locked restore, Release cross-build and 115 platform-neutral/storage/IPC/logging tests.
+- `scripts/Build.ps1`: locked restore, Release cross-build and 124 platform-neutral/storage/IPC/logging/metadata tests.
 - `scripts/Setup-Native.ps1`: verify/provision 13 pinned development DLLs and upstream notices. Generic MPC/TTA notices are kept in separate subdirectories to avoid collisions.
 - `scripts/Publish-Development.ps1`: self-contained local output, manifest hashes and companion audit; no public ZIP/release.
 - `scripts/Package-Candidate.ps1`: local development-only portable ZIP, hashes/dependency declarations/help; `scripts/Test-CandidateIntegrity.ps1` tests rejection; `scripts/Verify-Candidate.ps1 -Directory <extracted-app>` audits it. `scripts/Package-Smoke.ps1` requires real Windows and a generated candidate.
@@ -100,3 +100,12 @@ Next work: remaining full-profile (HE-AAC, APE/MPC, WMA lossless/N, WV hybrid), 
 ## G8 implementation (Windows verification pending)
 
 Nine additional owned profiles cover explicit HE-AAC/HE-AACv2, APE, Musepack SV8, WavPack hybrid with/without correction, PCM24 192 kHz stereo and 96 kHz 6/8-channel PCM/FLAC. Manifest hashes and pinned encoder provenance are retained in EXTENDED_FIXTURES.md. Actual Windows smoke adds bit-exact APE/WV correction comparisons, native WMA lossless/Pro encoding with independent ASF codec-tag checks and a sparse RF64 over 4 GiB with bounded 64-bit seeks including the end. Linux locked Release build: 115 tests, no warnings/errors. Native checks await CI; Windows N and device output remain unrun. G9 follows immediately.
+
+
+## G9 implementation (Windows verification pending)
+
+Metadata preflight bounds ID3/APE/FLAC/RIFF/AIFF/DSF/DFF/Ogg/ASF/MP4 tag containers to 32 MiB before TagLib allocation, skips audio payloads with 64-bit offsets, and rejects truncated/overflowing declarations. Metadata array joining is bounded while building strings. Saved/indexed tracks validate their dimensions immediately, before accumulating later rows. Nine new real-file/SQLite cases bring the Linux locked suite to 124 passing tests; owned corpus compatibility and >4 GiB audio-payload skipping pass.
+
+The new owned Windows route exercises real portable-directory deny ACLs and explicit accept/decline fallback choices, huge/truncated tags and a 100k-character valid title with native audio preserved, actual FileSystemWatcher kernel-buffer overflow and production rescan with stable IDs/ratings/playlists, and cancellation after a committed 64-row batch followed by resumption. A separate 128 MiB disposable NTFS VHD is filled until actual Windows disk-full; production SQLite/settings/complete-backup writes must reject, preserve committed data, then succeed after freeing space. DiskPart selects only a unique newly created VHD and detaches/removes it in finally.
+
+The migration route kills the actual WPF apphost after production schema-two DDL and before its Commit, verifies schema-one/ALTER rollback before startup, then retries real migration and checks schema-one backups, native session preparation and no autoplay. Diagnostic checkpoint callbacks are internal and only used by marker-guarded validation routes. Actual power loss and Windows N remain unrun; hosted Windows integration is not Windows 11/hardware acceptance. Windows outcomes await CI.

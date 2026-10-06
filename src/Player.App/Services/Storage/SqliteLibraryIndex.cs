@@ -26,7 +26,7 @@ public sealed partial class SqlitePlayerStore
     public Task UpsertFilesAsync(IndexedFile[] files)
     {
         if (files.Length > 64) throw new ArgumentException("Write batch exceeds 64 files.");
-        foreach (var file in files) { Player.Core.Media.LocalMediaPath.Parse(file.Path); if (file.Id == Guid.Empty || file.Size < 0 || file.ModifiedUtcTicks < 0 || file.Generation.Length > 100 || file.Track.Id == Guid.Empty) throw new InvalidDataException("Invalid index record."); }
+        foreach (var file in files) { Player.Core.Media.LocalMediaPath.Parse(file.Path); LibraryState.ValidateTrack(file.Track); if (file.Id == Guid.Empty || file.Size < 0 || file.ModifiedUtcTicks < 0 || file.Generation.Length > 100 || file.Track.Id == Guid.Empty) throw new InvalidDataException("Invalid index record."); }
         return Queue(() =>
         {
             var connection = Open(); using var transaction = connection.BeginTransaction();
@@ -106,7 +106,11 @@ public sealed partial class SqlitePlayerStore
         });
     }
     private static IndexedFile ReadIndex(string json)
-    { if (json.Length > 524288) throw new InvalidDataException("Index metadata too large."); return JsonSerializer.Deserialize<IndexedFile>(json) ?? throw new InvalidDataException("Invalid index metadata."); }
+    {
+        if (json.Length > 524288) throw new InvalidDataException("Index metadata too large.");
+        var file = JsonSerializer.Deserialize<IndexedFile>(json) ?? throw new InvalidDataException("Invalid index metadata.");
+        LibraryState.ValidateTrack(file.Track); return file;
+    }
     private void AddIndexSchema(SqliteConnection connection, bool migrate)
     {
         if (migrate)
@@ -124,6 +128,8 @@ public sealed partial class SqlitePlayerStore
             CREATE TABLE ListeningHistory(Id TEXT PRIMARY KEY,TrackId TEXT NOT NULL,Started INTEGER NOT NULL,Listened INTEGER NOT NULL,Counted INTEGER NOT NULL CHECK(Counted IN(0,1)));
             CREATE INDEX ListeningByTime ON ListeningHistory(Started);
             PRAGMA user_version=2;
-            """); transaction.Commit();
+            """);
+        if (migrate) MigrationBeforeCommit?.Invoke();
+        transaction.Commit();
     }
 }

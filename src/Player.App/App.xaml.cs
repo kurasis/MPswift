@@ -30,7 +30,7 @@ public partial class App : Application
     private async void OnStartup(object sender, StartupEventArgs e)
     {
         var uiSmoke = e.Args.Length == 3 && e.Args[0] == "--ui-smoke";
-        var crashSmoke = e.Args.Length == 3 && e.Args[0] == "--crash-smoke" && e.Args[1] is "checkpoint" or "verify" && File.Exists(Path.Combine(Environment.CurrentDirectory, ".player-crash-validation"));
+        var crashSmoke = e.Args.Length == 3 && e.Args[0] == "--crash-smoke" && e.Args[1] is "checkpoint" or "verify" or "migration-checkpoint" or "migration-verify" or "failures" && File.Exists(Path.Combine(Environment.CurrentDirectory, ".player-crash-validation"));
         var smoke = uiSmoke || crashSmoke;
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
         OpenRequest? request = null;
@@ -97,7 +97,13 @@ public partial class App : Application
         _log = new RotatingLog(Path.Combine(directory, "Logs"), [Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), directory, AppContext.BaseDirectory]);
         _log.Record("startup", Player.Core.ProductInfo.Version + " · " + System.Runtime.InteropServices.RuntimeInformation.OSDescription);
         PlayerViewModel model;
-        try { model = CreateModel(directory); }
+        try
+        {
+            var migrationOutput = Path.Combine(Environment.CurrentDirectory, "artifacts", "smoke");
+            if (crashSmoke && e.Args[1] == "migration-checkpoint") await MigrationSmokeValidation.SeedAsync(directory, Path.GetFullPath(e.Args[2]));
+            if (crashSmoke && e.Args[1] == "migration-verify") MigrationSmokeValidation.AssertRolledBack(directory);
+            model = CreateModel(directory, crashSmoke && e.Args[1] == "migration-checkpoint" ? () => MigrationSmokeValidation.PauseBeforeCommit(directory, migrationOutput) : null);
+        }
         catch (Exception error) { ReportStartupFailure(smoke, error); Shutdown(1); return; }
         var window = new MainWindow
         {
@@ -156,7 +162,8 @@ public partial class App : Application
             try
             {
                 result = crashSmoke
-                    ? await CrashSmokeValidation.RunAsync(model, e.Args[1], Path.GetFullPath(e.Args[2]), directory, output)
+                    ? e.Args[1] == "failures" ? await ResilienceSmokeValidation.RunAsync(Path.GetFullPath(e.Args[2]), output)
+                        : e.Args[1] == "migration-verify" ? await MigrationSmokeValidation.VerifyAsync(model, directory) : await CrashSmokeValidation.RunAsync(model, e.Args[1], Path.GetFullPath(e.Args[2]), directory, output)
                     : await validation!.RunAsync(window, model, Path.GetFullPath(e.Args[1]), Path.GetFullPath(e.Args[2]), output);
                 await window.CloseForValidationAsync();
             }
@@ -207,13 +214,13 @@ public partial class App : Application
         }
         else MessageBox.Show(Strings.Get("StartupFailure") + "\n\n" + error.Message, Strings.Get("SavedDataUnavailable"), MessageBoxButton.OK, MessageBoxImage.Error);
     }
-    public PlayerViewModel CreateModel(string directory)
+    public PlayerViewModel CreateModel(string directory, Action? migrationBeforeCommit = null)
     {
         var settings = new SettingsFile(directory);
         var options = settings.Load();
         var player = new SerializedAudioPlayer(() => new BassAudioBackend());
         return new PlayerViewModel(player, new PlaybackCoordinator(player), new MediaImportService(), new FileDialogService(), Dispatcher,
-            new SqlitePlayerStore(Path.Combine(directory, "library.db"), Strings.DefaultPlaylist), settings,
+            new SqlitePlayerStore(Path.Combine(directory, "library.db"), Strings.DefaultPlaylist) { MigrationBeforeCommit = migrationBeforeCommit }, settings,
             new BassWaveformService(new WaveformCache(Path.Combine(directory, "Cache", "Waveforms"), options.WaveformCacheMiB * 1024L * 1024)));
     }
 }

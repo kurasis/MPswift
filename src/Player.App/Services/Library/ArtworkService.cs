@@ -28,6 +28,7 @@ public sealed class ArtworkService
                 byte[]? encoded = null;
                 try
                 {
+                    Player.Core.Media.MetadataReadGuard.Validate(source);
                     using var file = TagLib.File.Create(source, TagLib.ReadStyle.Average);
                     var picture = file.Tag.Pictures.FirstOrDefault(p => p.Type == TagLib.PictureType.FrontCover) ?? file.Tag.Pictures.FirstOrDefault();
                     if (picture?.Data.Count is > 0 and <= MaximumBytes) encoded = picture.Data.Data;

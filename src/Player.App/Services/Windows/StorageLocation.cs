@@ -10,14 +10,17 @@ public static class StorageLocation
     public static string Resolve()
     {
         var user = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "MPswift", "LocalAudioPlayer");
-        if (!File.Exists(Path.Combine(AppContext.BaseDirectory, "portable.marker"))) return Prepare(user);
-        try { return Prepare(Path.Combine(AppContext.BaseDirectory, "Data")); }
+        return Resolve(AppContext.BaseDirectory, user, error => MessageBox.Show(Strings.Get("PortableUnwritable") + "\n\n" + error.Message,
+            Strings.Get("StorageUnavailable"), MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes);
+    }
+    internal static string Resolve(string applicationDirectory, string userDirectory, Func<Exception, bool> chooseFallback)
+    {
+        if (!File.Exists(Path.Combine(applicationDirectory, "portable.marker"))) return Prepare(userDirectory);
+        try { return Prepare(Path.Combine(applicationDirectory, "Data")); }
         catch (Exception error) when (error is IOException or UnauthorizedAccessException)
         {
-            var choice = MessageBox.Show(Strings.Get("PortableUnwritable") + "\n\n" + error.Message,
-                Strings.Get("StorageUnavailable"), MessageBoxButton.YesNo, MessageBoxImage.Warning);
-            if (choice != MessageBoxResult.Yes) throw;
-            return Prepare(user);
+            if (!chooseFallback(error)) throw;
+            return Prepare(userDirectory);
         }
     }
     public static string Prepare(string path)

@@ -18,6 +18,7 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
     private bool _closing;
     private SqliteConnection? _connection;
     private FileStream? _ownership;
+    internal Action? MigrationBeforeCommit { get; init; }
     public SqlitePlayerStore(string path, string defaultPlaylistName = "Default")
     {
         if (string.IsNullOrWhiteSpace(defaultPlaylistName) || defaultPlaylistName.Length > 200) throw new ArgumentException("Invalid default playlist name.");
@@ -53,6 +54,7 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
                 var json = reader.GetString(2);
                 if (json.Length > 524288) throw new InvalidDataException("Oversized track metadata.");
                 var track = JsonSerializer.Deserialize<MediaTrack>(json) ?? throw new InvalidDataException("Invalid saved track.");
+                LibraryState.ValidateTrack(track);
                 entries.Add(new PlaylistEntry(Guid.Parse(reader.GetString(0)), track, reader.GetBoolean(1), reader.GetInt64(3)));
             }
             playlists[i] = playlists[i] with { Entries = entries.ToArray() };
