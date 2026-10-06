@@ -45,6 +45,9 @@ internal static class FolderDropValidation
         try
         {
             var strip = (UIElement)window.FindName("PlaylistTabStrip");
+            await DropAsync(strip, @"\\owned-invalid-source.invalid\music", @"\\?\C:\music");
+            Check(model.Playlists.Count == initialIds.Count && original.Entries.Count == originalOrder.Length && !model.IsImporting &&
+                model.Message == Strings.Get("ErrorFileUnavailable"), "Non-local/device drops were not rejected before import.");
             await DropAsync(strip, first, second, fixture);
             var created = model.Playlists.Where(p => !initialIds.Contains(p.Id)).ToArray();
             Check(created.Length == 2 && created.All(p => p.Name == "Альбом 🎵") &&
@@ -80,7 +83,8 @@ internal static class FolderDropValidation
                 model.Message == Strings.Get("TabLimit") && !model.IsImporting, "Tab-limit drop imported into the wrong playlist or left the model busy.");
             return new { Status = "folder-drop-passed", SoftwareRoutedWpfEvents = true, RecursiveFolders = true,
                 SeparateSameNameFolders = true, MixedFilesKeepOriginalTarget = true, TabChildAndEmptyStrip = true,
-                EmptyFolder = true, TrackListKeepsSelectedTarget = true, SQLitePersistence = true, TabLimit = true, NoAutoplay = true };
+                EmptyFolder = true, TrackListKeepsSelectedTarget = true, SQLitePersistence = true, TabLimit = true,
+                NonLocalDevicePathsRejected = true, NoAutoplay = true };
         }
         finally
         {

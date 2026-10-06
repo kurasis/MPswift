@@ -329,10 +329,20 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         IsImporting = true; _importCancellation = new CancellationTokenSource();
         try
         {
-            foreach (var path in paths)
+            foreach (var input in paths)
             {
                 if (_closing || _importCancellation.IsCancellationRequested) return;
                 if (_knownRows.Count >= 10000) { Message = Strings.Get("ImportLimit"); return; }
+                string path;
+                try
+                {
+                    // Match the importer: reject network/device paths before probing them.
+                    path = Path.GetFullPath(input);
+                    Player.Core.Media.LocalMediaPath.Parse(path.EndsWith('\\') ? path + "local-folder" : path);
+                    if (new DriveInfo(Path.GetPathRoot(path)!).DriveType == DriveType.Network) throw new IOException("Network drives are unsupported.");
+                }
+                catch (Exception error) when (error is IOException or UnauthorizedAccessException or ArgumentException)
+                { Message = Strings.Get("ErrorFileUnavailable"); Details = error.Message; continue; }
                 if (Directory.Exists(path))
                 {
                     if (Playlists.Count >= 100) { Message = Strings.Get("TabLimit"); return; }
