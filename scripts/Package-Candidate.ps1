@@ -23,7 +23,7 @@ try {
     }
     Copy-Item README.md (Join-Path $app 'README.md')
     'Explicit portable data location; created only on first normal launch.' | Set-Content (Join-Path $app 'portable.marker') -Encoding utf8
-    'LOCAL DEVELOPMENT CANDIDATE. NOT APPROVED FOR PUBLIC DISTRIBUTION. See docs/RELEASE_ACCEPTANCE.md and docs/THIRD_PARTY_NOTICES.md.' | Set-Content (Join-Path $app 'DEVELOPMENT-ONLY.txt') -Encoding utf8
+    'DEVELOPMENT BUILD. FULL STAGE G ACCEPTANCE IS INCOMPLETE. See docs/RELEASE_ACCEPTANCE.md and docs/THIRD_PARTY_NOTICES.md.' | Set-Content (Join-Path $app 'DEVELOPMENT-ONLY.txt') -Encoding utf8
     $assets = Get-Content src/Player.App/obj/project.assets.json -Raw | ConvertFrom-Json -AsHashtable
     $packages = @{}
     foreach ($identity in $assets.libraries.Keys) {
@@ -90,7 +90,7 @@ try {
     ($hash + '  ' + $name) | Set-Content ($zip + '.sha256') -Encoding utf8
     [ordered]@{ Status = 'local-candidate-packaged'; SourceCommit = $source; SourceTreeDirty = $dirty; Zip = $name; ZipSha256 = $hash; Bytes = (Get-Item $zip).Length; Files = $files.Count; Dependencies = $inventory.Count; NativeLibraries = $native.libraries.Count; DistributionApproved = $false } | ConvertTo-Json | Set-Content (Join-Path $output 'package-audit.json') -Encoding utf8
     Write-Host "Local development candidate: $zip"
-    Write-Host 'Distribution approval remains false. No GitHub release or binary artifact upload was performed.'
+    Write-Host 'Full Stage G acceptance remains open. Packaging itself does not upload; successful main CI publishes a separate development prerelease.'
 } finally {
     if (Test-Path $staging) { Remove-Item $staging -Recurse -Force }
     Pop-Location

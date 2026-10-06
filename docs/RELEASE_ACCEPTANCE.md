@@ -1,6 +1,6 @@
 # Stage G release acceptance
 
-This is an executable development candidate and a verification workflow, not approved version 1.0. No scope reduction is accepted. Public releases, purchases, registry associations/default overrides and private audio distribution are not part of the authorized work.
+This is an executable development candidate and a verification workflow, not approved version 1.0. No scope reduction is accepted. The owner now authorizes GitHub development prereleases with ZIP/checksum assets after successful main CI. Stable version 1.0 acceptance, licensing purchases, registry associations/default overrides and private audio distribution remain separate.
 
 ## Automated reproducible commands
 
@@ -11,7 +11,7 @@ This is an executable development candidate and a verification workflow, not app
 ./scripts/Package-Smoke.ps1
 ```
 
-Build uses locked restore. Package creation uses a fresh owned staging folder, audits all application/runtime/native files, retains dependency declarations/available upstream texts, writes a per-file SHA-256 manifest/checksum list and an outer ZIP checksum, and rejects data/log/cache/music/reference/debug inputs. Every candidate is explicitly marked DEVELOPMENT-ONLY, with distributionApproved=false. It never uploads binary assets. Verify-Candidate rejects missing/changed/extra files and checks native x64 PE/hash. Package smoke runs the extracted self-contained executable from a Unicode path and different working directory with invalid DOTNET_ROOT, using only owned fixtures. An installed SDK elsewhere on a hosted runner means this is not clean-machine proof.
+Build uses locked restore. Package creation uses a fresh owned staging folder, audits all application/runtime/native files, retains dependency declarations/available upstream texts, writes a per-file SHA-256 manifest/checksum list and an outer ZIP checksum, and rejects data/log/cache/music/reference/debug inputs. Every candidate is explicitly marked DEVELOPMENT-ONLY, with distributionApproved=false. Package creation itself does not upload assets. Main CI publishes the Windows-built ZIP as a separate development prerelease after both matrix jobs and Windows package smoke pass. Remote asset digests are checked before the draft becomes visible. Verify-Candidate rejects missing/changed/extra files and checks native x64 PE/hash. Package smoke runs the extracted self-contained executable from a Unicode path and different working directory with invalid DOTNET_ROOT, using only owned fixtures. An installed SDK elsewhere on a hosted runner means this is not clean-machine proof.
 
 ## Required evidence still preventing version 1.0
 

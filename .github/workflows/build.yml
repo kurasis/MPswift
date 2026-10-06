@@ -47,6 +47,18 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: ./scripts/Package-Smoke.ps1
+      - name: Retain verified Windows ZIP for publication
+        if: runner.os == 'Windows' && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: portable-windows-build
+          path: |
+            artifacts/portable/*.zip
+            artifacts/portable/*.zip.sha256
+            artifacts/portable/package-audit.json
+            artifacts/portable/integrity-audit.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Retain test and native decode evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -61,3 +73,25 @@ jobs:
             artifacts/smoke/stage-d-mixer/*.f32
           if-no-files-found: warn
           retention-days: 14
+
+  publish:
+    name: Publish separate Windows ZIP prerelease
+    needs: build
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: portable-windows-build
+          path: artifacts/portable
+      - name: Publish verified ZIP and checksums
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: ./scripts/Publish-GitHubBuild.ps1 -RunId '${{ github.run_id }}' -Attempt '${{ github.run_attempt }}'

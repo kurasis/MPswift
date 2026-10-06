@@ -130,3 +130,8 @@ After 50 warmup iterations, 1,000 actual native load/prepare-next/seek/stop cycl
 Final keyboard review fixes window-level Escape stealing an open dropdown's dismissal and button/checkbox focus suppressing unrelated playlist shortcuts. The local locked Release cross-build still passes with 0 warnings/errors and all 95 tests. The software-routed real WPF dropdown-Escape regression passed in both languages and the extracted self-contained app in run 37410949382; physical keyboard acceptance remains distinct.
 
 Local candidate `LocalAudioPlayer-dev-1f3e66446808-win-x64.zip` is from clean committed source `1f3e664`, 85,361,406 bytes, SHA-256 `cce375d1abac00f4952273ebb12d370ae6e265b8b9787ac9a5fdd82cca226ad6`. Its full audit and all four negative integrity checks passed. Windows/Linux/local ZIP hashes can differ with package build metadata and timestamps; each report records its own exact hash. Distribution remains unapproved.
+
+
+## GitHub build publication (2026-10-06)
+
+Added separate main-only development prerelease publication after successful Linux/Windows matrix checks, Windows package smoke and artifact handoff. The publisher validates clean commit identity, package/integrity agreement, ZIP size/hash/checksum and GitHub asset digests before publishing a draft. The first end-to-end workflow will provide the actual publication/download evidence; previous runtime evidence remains source-specific.

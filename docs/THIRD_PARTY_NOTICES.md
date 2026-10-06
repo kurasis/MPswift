@@ -1,6 +1,6 @@
 # Third-party inventory and distribution gate
 
-This is the development dependency inventory through Stage G, not final release clearance. Native files are downloaded into ignored local development paths. No native binaries are committed or published as release assets.
+This is the development dependency inventory through Stage G, not final release clearance. Native files are downloaded into ignored local development paths. Native binaries remain outside Git history. The owner authorizes publishing development ZIPs in separate GitHub prereleases; this does not close the licensing acceptance gates below.
 
 ## Managed application packages
 
@@ -34,7 +34,7 @@ Versions/content hashes are also locked in `src/Player.App/packages.lock.json`. 
 
 SHA-256 of each official archive and x64 DLL is recorded in `native/manifest.json`. Upstream accompanying text is retained by `Setup-Native.ps1`. The official BASS terms permit qualifying non-commercial use and require the applicable license for commercial products. ManagedBass's MIT license does not replace BASS terms.
 
-**AAC gate:** the actual downloaded `readme.txt` states GPL distribution and identifies FAAD2/Nero commercial licensing. Merely loading this DLL dynamically is not distribution clearance. Before a release, select an owner-approved compatible source/license and corresponding-source path or replace this candidate with a licensed, verified bundled decoder. No licensing purchases or public binary assets are authorized by current development work.
+**AAC gate:** the actual downloaded `readme.txt` states GPL distribution and identifies FAAD2/Nero commercial licensing. Merely loading this DLL dynamically is not distribution clearance. Before a release, select an owner-approved compatible source/license and corresponding-source path or replace this candidate with a licensed, verified bundled decoder. The owner now authorizes development ZIP publication; licensing purchases and full license acceptance remain separate.
 
 TagLibSharp's declared **LGPL-2.1-only** terms require a matching-source and replaceability/relinking/notice review for the actual distributed package. Final notices and corresponding-source provision are not prepared yet. Microsoft.Data.Sqlite includes SQLitePCLRaw/native SQLite dependencies: inventory those exact binaries and terms when packaging. Self-contained .NET/WPF runtime notices also belong in the actual release inventory.
 
@@ -47,7 +47,7 @@ Before Stage G distribution: record the owner's intended use, applicable native 
 
 ## Stage E development add-ons
 
-Pinned development manifest includes BASSWMA 2.4.5.13 (Windows Media Format modules required), BASSAPE 2.4.1.0, BASSWV 2.4.7.4, BASSDSD 2.4.2.0, BASS_MPC 2.4.1.2 and BASS_TTA 2.4.0.2. Archive/DLL hashes and HTTPS upstream URLs are in `native/manifest.json`; generic MPC/TTA notices are copied into separate addon subdirectories. MPC's upstream readme describes free use/distribution with retained notices; TTA includes LGPL text. Distribution approval remains false for all addons, pending intended-use/license-obligation review. No purchases or public release were made. WMA is not represented as optional-component-free Windows N support; DSD uses float PCM decoding only.
+Pinned development manifest includes BASSWMA 2.4.5.13 (Windows Media Format modules required), BASSAPE 2.4.1.0, BASSWV 2.4.7.4, BASSDSD 2.4.2.0, BASS_MPC 2.4.1.2 and BASS_TTA 2.4.0.2. Archive/DLL hashes and HTTPS upstream URLs are in `native/manifest.json`; generic MPC/TTA notices are copied into separate addon subdirectories. MPC's upstream readme describes free use/distribution with retained notices; TTA includes LGPL text. Distribution approval remains false for all addons, pending intended-use/license-obligation review. Licensing purchases remain separately authorized; development ZIP publication is now owner-authorized. WMA is not represented as optional-component-free Windows N support; DSD uses float PCM decoding only.
 
 ## Stage F Windows SDK projection
 
@@ -55,4 +55,4 @@ The WPF target is `net10.0-windows10.0.19041.0`, with `WindowsSdkPackageVersion`
 
 ## Stage G candidate inventory
 
-Package-Candidate reads the app's restored project.assets.json and actual framework download dependencies, retaining **14** resolved managed/runtime/projection declarations plus available top-level LICENSE/NOTICE/COPYING texts. Native companions remain beside their pinned DLLs. The actual package inventory is dependency-inventory.json, file identities/sizes/SHA-256 are package-manifest.json and SHA256SUMS.txt, and the outer ZIP has a separate checksum. Files unavailable from a NuGet archive are not invented: expressions/license URLs remain declared metadata, with distributionReview pending. The Windows SDK targeting pack declares its SDK license URL; actual projection/WinRT redistribution obligations still require review. Existing corresponding-source/app-license/intended-use gates remain open. No public ZIP/release/native artifact upload has been performed.
+Package-Candidate reads the app's restored project.assets.json and actual framework download dependencies, retaining **14** resolved managed/runtime/projection declarations plus available top-level LICENSE/NOTICE/COPYING texts. Native companions remain beside their pinned DLLs. The actual package inventory is dependency-inventory.json, file identities/sizes/SHA-256 are package-manifest.json and SHA256SUMS.txt, and the outer ZIP has a separate checksum. Files unavailable from a NuGet archive are not invented: expressions/license URLs remain declared metadata, with distributionReview pending. The Windows SDK targeting pack declares its SDK license URL; actual projection/WinRT redistribution obligations still require review. Existing corresponding-source/app-license/intended-use gates remain open. Successful main CI now publishes a separately tagged development ZIP with its inventory and checksums, as explicitly requested by the owner.
