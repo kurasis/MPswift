@@ -2,11 +2,12 @@
 Set-StrictMode -Version Latest
 function New-PlayerAcceptanceWorkspace {
     param([string]$CandidateDirectory, [string]$OutputDirectory)
-    $candidate = [IO.Path]::GetFullPath($CandidateDirectory)
+    $candidate = [IO.Path]::GetFullPath($ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($CandidateDirectory))
     $manifest = Get-Content (Join-Path $candidate 'package-manifest.json') -Raw | ConvertFrom-Json
     if ($manifest.schemaVersion -ne 1 -or $manifest.platform -ne 'win-x64' -or $manifest.distributionApproved) { throw 'A development win-x64 candidate manifest is required.' }
     $token = [guid]::NewGuid().ToString('N')
-    $workspace = Join-Path ([IO.Path]::GetFullPath($OutputDirectory)) ('player-acceptance-' + $token)
+    $parent = [IO.Path]::GetFullPath($ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputDirectory))
+    $workspace = Join-Path $parent ('player-acceptance-' + $token)
     New-Item $workspace -ItemType Directory -ErrorAction Stop | Out-Null
     $token | Set-Content (Join-Path $workspace '.player-acceptance-validation') -Encoding ascii
     $copy = Join-Path $workspace 'App'; New-Item $copy -ItemType Directory | Out-Null

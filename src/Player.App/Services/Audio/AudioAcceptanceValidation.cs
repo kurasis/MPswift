@@ -37,7 +37,7 @@ internal static class AudioAcceptanceValidation
                 return new { Status = "blocked", Mode = mode, Selected = selected, Reason = "The digital reference profile requires a supported stereo shared mix format; multichannel capture acceptance is separate.", Output = "not-run" };
             using (var backend = new BassAudioBackend())
             {
-                backend.SetOutput(new(deviceId, mode == "exclusive")); backend.SetProcessing(new());
+                backend.SetOutput(new(selected.Id, mode == "exclusive")); backend.SetProcessing(new());
                 var rate = mode == "digital" ? selected.MixRate : 48000;
                 var primary = Path.Combine(root, "owned output primary.wav"); var secondary = Path.Combine(root, "owned output secondary.wav");
                 AcceptanceSignal.WriteWave(primary, rate, 2, 12, 997); AcceptanceSignal.WriteWave(secondary, rate, 2, 12, 1301);
@@ -89,7 +89,7 @@ internal static class AudioAcceptanceValidation
                 try { backend.Play(); throw new InvalidDataException("Explicit unavailable endpoint silently fell back."); }
                 catch (AudioBackendException error) when (error.Category == AudioErrorCategory.OutputUnavailable)
                 { phases.Add(new { Phase = "explicit-unavailable-endpoint-refused", Detail = error.Message, AutomaticFallback = false, PhysicalHotplug = "not-run" }); }
-                backend.SetOutput(new(deviceId, mode == "exclusive")); backend.Play(); Check(Advance(backend, 300).Position > TimeSpan.Zero, "Explicit output retry failed.");
+                backend.SetOutput(new(selected.Id, mode == "exclusive")); backend.Play(); Check(Advance(backend, 300).Position > TimeSpan.Zero, "Explicit output retry failed.");
                 var afterMaster = BassWasapi.GetVolume(curve); var afterMuted = BassWasapi.GetMute(curve);
                 Check(Math.Abs(afterMaster - master) <= .000001 && afterMuted == masterMuted, "Observed Windows master gain/mute changed during app-gain/transport tests; volume-isolation evidence is inconclusive.");
                 phases.Add(new { Phase = "transport-and-gain", Shared = !negotiated.IsExclusive, Exclusive = negotiated.IsExclusive, negotiated.Frequency, negotiated.Channels,
@@ -114,15 +114,15 @@ internal static class AudioAcceptanceValidation
                             if (position.Ended) { ended = true; break; }
                             Thread.Sleep(10);
                         }
-                        Check(transition && ended, "Real output did not adopt/end the scheduled CUE boundary.");
                         Thread.Sleep(200); capture.Stop(); backend.Stop();
                         var samples = capture.Samples(); var file = Path.Combine(root, "loopback.f32");
                         using (var stream = new FileStream(file, FileMode.CreateNew, FileAccess.Write, FileShare.None)) stream.Write(MemoryMarshal.AsBytes(samples.AsSpan()));
                         var analysis = DigitalBoundaryAnalyzer.Analyze(samples, 2, rate, rate * 4, rate * 2);
                         digital = new { Status = analysis.Status, Loopback = loop, SampleFormat = "float32 little endian, interleaved stereo", Rate = rate,
                             CaptureFile = Path.GetFileName(file), CaptureSha256 = Hash(file), CaptureBytes = new FileInfo(file).Length, CapacityBytes = capture.CapacityBytes,
-                            CallbackError = capture.CallbackError, ScheduledCueTransition = true, Analysis = analysis,
+                            CallbackError = capture.CallbackError, ScheduledCueTransition = transition, NaturalEnd = ended, Analysis = analysis,
                             Boundary = "Contiguous segments of one owned PCM/WAV file; other codecs/track-gapless profiles remain separate", OtherSystemAudio = "Not suppressed; interference invalidates reference comparison" };
+                        Check(transition && ended, "Real output did not adopt/end the scheduled CUE boundary; the actual quiescent capture was retained.");
                         Check(analysis.Status == "digital-boundary-passed", "Digital boundary comparison failed; inspect the saved actual capture.");
                     }
                 }
@@ -172,7 +172,9 @@ internal static class AudioAcceptanceValidation
                 try
                 {
                     Check(BassWasapi.Init(device, rate, channels, WasapiInitFlags.Shared, .1f, 0, _callback), "Open selected endpoint loopback failed: " + Bass.LastError);
-                    initialized = true; Check(BassWasapi.Start(), "Start loopback failed: " + Bass.LastError); _ready.TrySetResult(); _finish.Wait();
+                    initialized = true;
+                    Check(BassWasapi.GetInfo(out var format) && format.Frequency == rate && format.Channels == channels, "Actual loopback format changed; capture cannot be labeled with the requested dimensions.");
+                    Check(BassWasapi.Start(), "Start loopback failed: " + Bass.LastError); _ready.TrySetResult(); _finish.Wait();
                 }
                 catch (Exception error) { _ready.TrySetException(error); _closed.TrySetException(error); }
                 finally

@@ -1,36 +1,36 @@
 {
-  "sourceCommit": "b3a45df316948f71eee8087b0b7fd795247bca5f",
-  "runUrl": "https://github.com/kurasis/MPswift/actions/runs/37434613237",
+  "sourceCommit": "dec7664441bfdd6b1dee0cc3b7b0f70dde91c292",
+  "runUrl": "https://github.com/kurasis/MPswift/actions/runs/37435560367",
   "runAttempt": 1,
   "runStatus": "completed",
   "runConclusion": "success",
   "jobs": [
     {
-      "id": 112173259267,
-      "name": "build (ubuntu-24.04)",
-      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37434613237/job/112173259267",
-      "status": "completed",
-      "conclusion": "success"
-    },
-    {
-      "id": 112173259456,
+      "id": 112176380393,
       "name": "build (windows-2022)",
-      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37434613237/job/112173259456",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37435560367/job/112176380393",
       "status": "completed",
       "conclusion": "success"
     },
     {
-      "id": 112175418799,
+      "id": 112176380566,
+      "name": "build (ubuntu-24.04)",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37435560367/job/112176380566",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 112178382056,
       "name": "Publish separate Windows ZIP prerelease",
-      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37434613237/job/112175418799",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37435560367/job/112178382056",
       "status": "completed",
       "conclusion": "success"
     }
   ],
   "artifacts": [
     {
-      "name": "evidence-windows-2022",
-      "archiveSha256": "995968227bc82fc2a815deeaa8b5a80c6b0955b79eb014755fc69f8d83ecfc02",
+      "name": "evidence-ubuntu-24.04",
+      "archiveSha256": "fc6ce25b20c65a735e9eb04a311d550027604e263fa2b160658165c05b1dac4d",
       "tests": [
         {
           "total": "150",
@@ -54,7 +54,7 @@
       "reports": {
         "portable/integrity-audit.json": {
           "Status": "candidate-integrity-negative-checks-passed",
-          "SourceCommit": "b3a45df316948f71eee8087b0b7fd795247bca5f",
+          "SourceCommit": "dec7664441bfdd6b1dee0cc3b7b0f70dde91c292",
           "SourceTreeDirty": false,
           "Checks": [
             "changed file",
@@ -62,29 +62,81 @@
             "extra file",
             "empty checksum list"
           ],
-          "ZipSha256": "c3e2e3418205878eb18ee603df31a5caa6359d72a82585cf29e6215c64915758",
+          "ZipSha256": "d5d4ece2047e20f349d32aed1832313061d6940afa96338b3ac5ee2d08d0294f",
           "RestoredCopyPassed": true
         },
         "portable/package-audit.json": {
           "Status": "local-candidate-packaged",
-          "SourceCommit": "b3a45df316948f71eee8087b0b7fd795247bca5f",
+          "SourceCommit": "dec7664441bfdd6b1dee0cc3b7b0f70dde91c292",
           "SourceTreeDirty": false,
-          "Zip": "LocalAudioPlayer-dev-b3a45df31694-win-x64.zip",
-          "ZipSha256": "c3e2e3418205878eb18ee603df31a5caa6359d72a82585cf29e6215c64915758",
-          "Bytes": 85484710,
+          "Zip": "LocalAudioPlayer-dev-dec7664441bf-win-x64.zip",
+          "ZipSha256": "d5d4ece2047e20f349d32aed1832313061d6940afa96338b3ac5ee2d08d0294f",
+          "Bytes": 85485163,
+          "Files": 555,
+          "Dependencies": 14,
+          "NativeLibraries": 13,
+          "DistributionApproved": false
+        }
+      }
+    },
+    {
+      "name": "evidence-windows-2022",
+      "archiveSha256": "7c83c588b36bd26d7c982a27cab2f0bdd2f7830f51306f650ff0c14ef6b7aca3",
+      "tests": [
+        {
+          "total": "150",
+          "executed": "150",
+          "passed": "150",
+          "failed": "0",
+          "error": "0",
+          "timeout": "0",
+          "aborted": "0",
+          "inconclusive": "0",
+          "passedButRunAborted": "0",
+          "notRunnable": "0",
+          "notExecuted": "0",
+          "disconnected": "0",
+          "warning": "0",
+          "completed": "0",
+          "inProgress": "0",
+          "pending": "0"
+        }
+      ],
+      "reports": {
+        "portable/package-audit.json": {
+          "Status": "local-candidate-packaged",
+          "SourceCommit": "dec7664441bfdd6b1dee0cc3b7b0f70dde91c292",
+          "SourceTreeDirty": false,
+          "Zip": "LocalAudioPlayer-dev-dec7664441bf-win-x64.zip",
+          "ZipSha256": "650d0abadde5d99e140e9d4bd236a8ad42db5856edbd5d03ce21ae272adb008c",
+          "Bytes": 85485471,
           "Files": 555,
           "Dependencies": 14,
           "NativeLibraries": 13,
           "DistributionApproved": false
         },
+        "portable/integrity-audit.json": {
+          "Status": "candidate-integrity-negative-checks-passed",
+          "SourceCommit": "dec7664441bfdd6b1dee0cc3b7b0f70dde91c292",
+          "SourceTreeDirty": false,
+          "Checks": [
+            "changed file",
+            "missing file",
+            "extra file",
+            "empty checksum list"
+          ],
+          "ZipSha256": "650d0abadde5d99e140e9d4bd236a8ad42db5856edbd5d03ce21ae272adb008c",
+          "RestoredCopyPassed": true
+        },
         "smoke/g10-desktop-en.json": {
           "Status": "g10-owned-desktop-workflow-passed",
           "Failure": null,
-          "SourceCommit": "b3a45df316948f71eee8087b0b7fd795247bca5f",
+          "SourceCommit": "dec7664441bfdd6b1dee0cc3b7b0f70dde91c292",
           "SourceTreeDirty": false,
-          "PackageManifestSha256": "9c87437e0d423dfcd8865097f37318d8630771edacffeca527ec29e8c53a363e",
-          "StartedUtc": "2026-10-06T08:18:20.5433004+00:00",
-          "EndedUtc": "2026-10-06T08:18:28.1110559+00:00",
+          "PackageManifestSha256": "fca5ad33f681b9367a7c2710fe8bd211bb477eec6f812a842ecf5008928b7dc1",
+          "StartedUtc": "2026-10-06T08:26:30.4850020+00:00",
+          "EndedUtc": "2026-10-06T08:26:34.4061377+00:00",
+          "PowerShellVersion": "5.1.20348.5622",
           "Windows": {
             "Caption": "Microsoft Windows Server 2022 Datacenter",
             "Build": "20348",
@@ -106,11 +158,11 @@
           "FirstRun": {
             "Status": "g10-owned-desktop-passed",
             "Phase": "first",
-            "SourceEntryId": "7a90a9ed-55fd-4fd0-8412-2eddab7f0d31",
+            "SourceEntryId": "d60c2caf-99ee-429f-a959-b967063702b4",
             "EntryIds": [
-              "7a90a9ed-55fd-4fd0-8412-2eddab7f0d31",
-              "5fbad850-e25c-4c28-824c-8e8ce0079b31",
-              "1d85aed2-6066-45b5-8a4d-534949a0494f"
+              "d60c2caf-99ee-429f-a959-b967063702b4",
+              "e838964b-41c8-447b-8c97-a79ee72e56c5",
+              "ba8152b4-7d0e-49e5-b2e2-351789b58b8c"
             ],
             "NativeCueAndLibrary": true,
             "SourceFile": "owned tone Музыка 🎵.wav",
@@ -122,7 +174,7 @@
             "ActualProcessRestart": false,
             "Desktop": {
               "Status": "g10-desktop-automation-passed",
-              "ProcessId": 3100,
+              "ProcessId": 5028,
               "Language": "en",
               "Os": "Microsoft Windows 10.0.20348",
               "Build": 20348,
@@ -381,11 +433,11 @@
           "ActualApphostRestart": {
             "Status": "g10-owned-desktop-passed",
             "Phase": "restart",
-            "SourceEntryId": "7a90a9ed-55fd-4fd0-8412-2eddab7f0d31",
+            "SourceEntryId": "d60c2caf-99ee-429f-a959-b967063702b4",
             "EntryIds": [
-              "7a90a9ed-55fd-4fd0-8412-2eddab7f0d31",
-              "5fbad850-e25c-4c28-824c-8e8ce0079b31",
-              "1d85aed2-6066-45b5-8a4d-534949a0494f"
+              "d60c2caf-99ee-429f-a959-b967063702b4",
+              "e838964b-41c8-447b-8c97-a79ee72e56c5",
+              "ba8152b4-7d0e-49e5-b2e2-351789b58b8c"
             ],
             "NativeCueAndLibrary": true,
             "SourceFile": "owned tone Музыка 🎵.wav",
@@ -397,7 +449,7 @@
             "ActualProcessRestart": true,
             "Desktop": {
               "Status": "g10-desktop-automation-passed",
-              "ProcessId": 1840,
+              "ProcessId": 6560,
               "Language": "en",
               "Os": "Microsoft Windows 10.0.20348",
               "Build": 20348,
@@ -654,28 +706,28 @@
             }
           },
           "Network": {
-            "first": {
+            "restart": {
               "Status": "no-app-network-events-observed",
-              "RootProcessId": 3100,
+              "RootProcessId": 6560,
               "ControlNetworkEvents": 12,
               "ApplicationNetworkEvents": 0,
               "UnattributedNetworkEvents": 0,
               "RootStartEvents": 1,
               "DescendantProcessIds": [],
-              "ParsedEvents": 51,
+              "ParsedEvents": 28,
               "LossFree": true,
               "PositiveControlBeforeAndAfter": true,
               "Method": "Microsoft-Windows-Kernel-Network and Kernel-Process ETW; owned loopback positive control; PID and descendant attribution"
             },
-            "restart": {
+            "first": {
               "Status": "no-app-network-events-observed",
-              "RootProcessId": 1840,
+              "RootProcessId": 5028,
               "ControlNetworkEvents": 12,
               "ApplicationNetworkEvents": 0,
               "UnattributedNetworkEvents": 0,
               "RootStartEvents": 1,
               "DescendantProcessIds": [],
-              "ParsedEvents": 51,
+              "ParsedEvents": 28,
               "LossFree": true,
               "PositiveControlBeforeAndAfter": true,
               "Method": "Microsoft-Windows-Kernel-Network and Kernel-Process ETW; owned loopback positive control; PID and descendant attribution"
@@ -695,16 +747,17 @@
               "Version": "10.0.20348.1 (WinBuild.160101.0800)"
             }
           ],
-          "TraceSha256": "939623906692d454197e7eaa35391e9fc5a28be5b1ec0610360860775703e099"
+          "TraceSha256": "5e9fbd11f9f2046aeedf4beb0a50b9fc9b1c43b39b367d428bdf66eda63b8242"
         },
         "smoke/g10-desktop-ru.json": {
           "Status": "g10-owned-desktop-workflow-passed",
           "Failure": null,
-          "SourceCommit": "b3a45df316948f71eee8087b0b7fd795247bca5f",
+          "SourceCommit": "dec7664441bfdd6b1dee0cc3b7b0f70dde91c292",
           "SourceTreeDirty": false,
-          "PackageManifestSha256": "9c87437e0d423dfcd8865097f37318d8630771edacffeca527ec29e8c53a363e",
-          "StartedUtc": "2026-10-06T08:18:32.0506950+00:00",
-          "EndedUtc": "2026-10-06T08:18:35.6659637+00:00",
+          "PackageManifestSha256": "fca5ad33f681b9367a7c2710fe8bd211bb477eec6f812a842ecf5008928b7dc1",
+          "StartedUtc": "2026-10-06T08:26:39.8489228+00:00",
+          "EndedUtc": "2026-10-06T08:26:42.8813884+00:00",
+          "PowerShellVersion": "5.1.20348.5622",
           "Windows": {
             "Caption": "Microsoft Windows Server 2022 Datacenter",
             "Build": "20348",
@@ -726,11 +779,11 @@
           "FirstRun": {
             "Status": "g10-owned-desktop-passed",
             "Phase": "first",
-            "SourceEntryId": "4ecc6154-eca5-4eb2-9f42-b36ad27c877d",
+            "SourceEntryId": "705cb44e-dad7-4563-9e23-4bbe805b7218",
             "EntryIds": [
-              "4ecc6154-eca5-4eb2-9f42-b36ad27c877d",
-              "cad0abf4-d5a6-4028-a394-eb7c08e90bfa",
-              "5cef467b-29c5-424a-95cb-9bf44dead126"
+              "705cb44e-dad7-4563-9e23-4bbe805b7218",
+              "9f527753-e225-4115-a29f-47ccebaf268e",
+              "6ba4259e-2dbc-45a2-bb8e-b112fc82bb4b"
             ],
             "NativeCueAndLibrary": true,
             "SourceFile": "owned tone Музыка 🎵.wav",
@@ -742,7 +795,7 @@
             "ActualProcessRestart": false,
             "Desktop": {
               "Status": "g10-desktop-automation-passed",
-              "ProcessId": 8124,
+              "ProcessId": 7384,
               "Language": "ru",
               "Os": "Microsoft Windows 10.0.20348",
               "Build": 20348,
@@ -1001,11 +1054,11 @@
           "ActualApphostRestart": {
             "Status": "g10-owned-desktop-passed",
             "Phase": "restart",
-            "SourceEntryId": "4ecc6154-eca5-4eb2-9f42-b36ad27c877d",
+            "SourceEntryId": "705cb44e-dad7-4563-9e23-4bbe805b7218",
             "EntryIds": [
-              "4ecc6154-eca5-4eb2-9f42-b36ad27c877d",
-              "cad0abf4-d5a6-4028-a394-eb7c08e90bfa",
-              "5cef467b-29c5-424a-95cb-9bf44dead126"
+              "705cb44e-dad7-4563-9e23-4bbe805b7218",
+              "9f527753-e225-4115-a29f-47ccebaf268e",
+              "6ba4259e-2dbc-45a2-bb8e-b112fc82bb4b"
             ],
             "NativeCueAndLibrary": true,
             "SourceFile": "owned tone Музыка 🎵.wav",
@@ -1017,7 +1070,7 @@
             "ActualProcessRestart": true,
             "Desktop": {
               "Status": "g10-desktop-automation-passed",
-              "ProcessId": 3088,
+              "ProcessId": 2800,
               "Language": "ru",
               "Os": "Microsoft Windows 10.0.20348",
               "Build": 20348,
@@ -1274,28 +1327,28 @@
             }
           },
           "Network": {
-            "first": {
+            "restart": {
               "Status": "no-app-network-events-observed",
-              "RootProcessId": 8124,
+              "RootProcessId": 2800,
               "ControlNetworkEvents": 12,
               "ApplicationNetworkEvents": 0,
               "UnattributedNetworkEvents": 0,
               "RootStartEvents": 1,
               "DescendantProcessIds": [],
-              "ParsedEvents": 27,
+              "ParsedEvents": 47,
               "LossFree": true,
               "PositiveControlBeforeAndAfter": true,
               "Method": "Microsoft-Windows-Kernel-Network and Kernel-Process ETW; owned loopback positive control; PID and descendant attribution"
             },
-            "restart": {
+            "first": {
               "Status": "no-app-network-events-observed",
-              "RootProcessId": 3088,
+              "RootProcessId": 7384,
               "ControlNetworkEvents": 12,
               "ApplicationNetworkEvents": 0,
               "UnattributedNetworkEvents": 0,
               "RootStartEvents": 1,
               "DescendantProcessIds": [],
-              "ParsedEvents": 27,
+              "ParsedEvents": 47,
               "LossFree": true,
               "PositiveControlBeforeAndAfter": true,
               "Method": "Microsoft-Windows-Kernel-Network and Kernel-Process ETW; owned loopback positive control; PID and descendant attribution"
@@ -1315,19 +1368,20 @@
               "Version": "10.0.20348.1 (WinBuild.160101.0800)"
             }
           ],
-          "TraceSha256": "e1e266b091550da35386d27bf3d07c2328d686909168ad73f8a8d1b09d1a737a"
+          "TraceSha256": "86999f2f265e9b4f2af1e320152fa86ca8a089d2f193a255bf4c73acc106cd92"
         },
         "smoke/g11-device-probe.json": {
           "Status": "g11-device-probe-complete",
           "Failure": null,
           "Mode": "Probe",
-          "SourceCommit": "b3a45df316948f71eee8087b0b7fd795247bca5f",
+          "SourceCommit": "dec7664441bfdd6b1dee0cc3b7b0f70dde91c292",
           "SourceTreeDirty": false,
-          "PackageManifestSha256": "9c87437e0d423dfcd8865097f37318d8630771edacffeca527ec29e8c53a363e",
-          "StartedUtc": "2026-10-06T08:18:37.9695821+00:00",
-          "EndedUtc": "2026-10-06T08:18:38.6800820+00:00",
+          "PackageManifestSha256": "fca5ad33f681b9367a7c2710fe8bd211bb477eec6f812a842ecf5008928b7dc1",
+          "StartedUtc": "2026-10-06T08:26:46.6354250+00:00",
+          "EndedUtc": "2026-10-06T08:26:47.6128036+00:00",
+          "PowerShellVersion": "5.1.20348.5622",
           "InvalidExternalDotnetRoots": true,
-          "ActualApphostProcessId": 2720,
+          "ActualApphostProcessId": 5724,
           "ActualNativeAudio": {
             "Status": "g11-device-probe-complete",
             "Mode": "probe",
@@ -1351,8 +1405,8 @@
         },
         "smoke/package-smoke.json": {
           "Status": "packaged-executable-smoke-passed",
-          "SourceCommit": "b3a45df316948f71eee8087b0b7fd795247bca5f",
-          "ZipSha256": "c3e2e3418205878eb18ee603df31a5caa6359d72a82585cf29e6215c64915758",
+          "SourceCommit": "dec7664441bfdd6b1dee0cc3b7b0f70dde91c292",
+          "ZipSha256": "650d0abadde5d99e140e9d4bd236a8ad42db5856edbd5d03ce21ae272adb008c",
           "UnicodeExtractionPath": true,
           "ArbitraryWorkingDirectory": true,
           "InvalidExternalDotnetRoot": true,
@@ -1361,57 +1415,6 @@
           "CleanWindows11WithoutSdk": "not-run",
           "NetworkDisconnected": "not-run",
           "DeviceOutput": "not-run",
-          "DistributionApproved": false
-        }
-      }
-    },
-    {
-      "name": "evidence-ubuntu-24.04",
-      "archiveSha256": "e6510055ad927b6e04dbfe0984f2a8f03a1c8a37cf19d24fcb9eb4998ef842f8",
-      "tests": [
-        {
-          "total": "150",
-          "executed": "150",
-          "passed": "150",
-          "failed": "0",
-          "error": "0",
-          "timeout": "0",
-          "aborted": "0",
-          "inconclusive": "0",
-          "passedButRunAborted": "0",
-          "notRunnable": "0",
-          "notExecuted": "0",
-          "disconnected": "0",
-          "warning": "0",
-          "completed": "0",
-          "inProgress": "0",
-          "pending": "0"
-        }
-      ],
-      "reports": {
-        "portable/integrity-audit.json": {
-          "Status": "candidate-integrity-negative-checks-passed",
-          "SourceCommit": "b3a45df316948f71eee8087b0b7fd795247bca5f",
-          "SourceTreeDirty": false,
-          "Checks": [
-            "changed file",
-            "missing file",
-            "extra file",
-            "empty checksum list"
-          ],
-          "ZipSha256": "067c62197adbcba7164d4bb4c1309f0bf3412412ccb2a00468bac4739d84796d",
-          "RestoredCopyPassed": true
-        },
-        "portable/package-audit.json": {
-          "Status": "local-candidate-packaged",
-          "SourceCommit": "b3a45df316948f71eee8087b0b7fd795247bca5f",
-          "SourceTreeDirty": false,
-          "Zip": "LocalAudioPlayer-dev-b3a45df31694-win-x64.zip",
-          "ZipSha256": "067c62197adbcba7164d4bb4c1309f0bf3412412ccb2a00468bac4739d84796d",
-          "Bytes": 85484388,
-          "Files": 555,
-          "Dependencies": 14,
-          "NativeLibraries": 13,
           "DistributionApproved": false
         }
       }
@@ -1451,5 +1454,6 @@
       "sha256": "c09edcc900fff248ec1de988b0d816de7beebef2ca44441b6838adfad5f8a8ec"
     }
   ],
-  "boundary": "Hosted Windows Server 2022 integration; not clean/offline Windows 11 or physical DPI/Narrator. G11 native probe observed zero enabled outputs; shared/exclusive, endpoint capture, listening and hardware transition acceptance not run."
+  "boundary": "Hosted Windows Server 2022 integration with shipped Windows PowerShell 5.1.20348.5622 runners; not clean/offline Windows 11 or physical DPI/Narrator. G11 native probe observed zero enabled outputs; shared/exclusive, endpoint capture, listening and hardware transition acceptance not run.",
+  "localRelativePathCheck": "New-PlayerAcceptanceWorkspace copied and hashed a complete candidate using relative candidate/output paths while PowerShell location differed from Environment.CurrentDirectory; Linux PowerShell 7.6.6, 2026-10-06."
 }
