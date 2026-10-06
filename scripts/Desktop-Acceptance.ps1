@@ -36,7 +36,7 @@ if ($null -eq $failure -and $null -ne $trace -and $traceStopped) {
             $name = 'network-report-' + $phase + '.json'
             $analysis = Start-PlayerAcceptanceProcess $workspace @('--network-report', $xml, $context, $name)
             if (Test-Path (Join-Path $workspace.Root $name)) { $traffic[$phase] = Get-Content (Join-Path $workspace.Root $name) -Raw | ConvertFrom-Json }
-            if ($analysis.ExitCode -ne 0) { $failure = "ETW $phase was failed or insufficient evidence." }
+            if ($analysis.ExitCode -ne 0) { $failure = "ETW $phase was failed or insufficient evidence."; break }
         }
     }
 }
@@ -53,7 +53,7 @@ $windows11 = $os.ProductType -eq 1 -and [int]$os.BuildNumber -ge 22000
 $standard = $null -ne $first -and -not $first.Desktop.ElevatedAdministrator
 $baseline = $null -eq $failure -and $windows11 -and $standard -and $upAdapters.Count -eq 0 -and $runtimeFound.Count -eq 0 -and -not $dotnetOnPath -and -not $SkipTraffic
 $report = [ordered]@{ Status = $(if ($null -ne $failure) { 'failed' } else { 'g10-owned-desktop-workflow-passed' }); Failure = $failure;
-    SourceCommit = $workspace.SourceCommit; SourceTreeDirty = $workspace.SourceTreeDirty; PackageManifestSha256 = $workspace.ManifestSha256; StartedUtc = $began.ToString('O'); EndedUtc = $ended.ToString('O');
+    SourceCommit = $workspace.SourceCommit; SourceTreeDirty = $workspace.SourceTreeDirty; PackageManifestSha256 = $workspace.ManifestSha256; StartedUtc = $began.ToString('O'); EndedUtc = $ended.ToString('O'); PowerShellVersion = $PSVersionTable.PSVersion.ToString();
     Windows = [ordered]@{ Caption = $os.Caption; Build = $os.BuildNumber; ProductType = $os.ProductType; Windows11Client = $windows11 };
     StandardUserApp = $standard; UpNetworkAdapters = $upAdapters.Count; InstalledRuntimeKnownLocations = $runtimeFound; DotnetOnPath = $dotnetOnPath;
     RuntimeDetectionBoundary = 'Known global/user locations and PATH, not an exhaustive drive scan'; InvalidExternalDotnetRoot = $true;

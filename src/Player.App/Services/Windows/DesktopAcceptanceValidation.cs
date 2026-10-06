@@ -32,11 +32,13 @@ internal static class DesktopAcceptanceValidation
     public static async Task<object> RunOwnedAsync(MainWindow window, PlayerViewModel model, string phase)
     {
         var root = AcceptanceWorkspace.Validate(); var media = Path.Combine(root, "media"); var source = Path.Combine(media, "owned tone Музыка 🎵.wav");
+        byte[] originalHash;
         if (phase == "first")
         {
             Check(model.Entries.Count == 0, "First-run acceptance requires a fresh portable database.");
             Directory.CreateDirectory(media);
             AcceptanceSignal.WriteWave(source);
+            originalHash = SHA256.HashData(File.ReadAllBytes(source));
             var cue = Path.Combine(media, "owned.cue");
             File.WriteAllText(cue, "FILE \"owned tone Музыка 🎵.wav\" WAVE\nTRACK 01 AUDIO\nTITLE \"First\"\nINDEX 01 00:00:00\nTRACK 02 AUDIO\nTITLE \"Second\"\nINDEX 01 00:01:00\n", new System.Text.UTF8Encoding(false, true));
             await model.AddPathsAsync([source, cue]);
@@ -55,6 +57,7 @@ internal static class DesktopAcceptanceValidation
         {
             await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ContextIdle);
             using var previous = JsonDocument.Parse(File.ReadAllText(AcceptanceWorkspace.ReadFile(Path.Combine(root, "desktop-first.json"))));
+            originalHash = Convert.FromHexString(previous.RootElement.GetProperty("SourceSha256").GetString()!);
             Check(model.Entries.Count == 3 && model.Entries.Select(e => e.Id).SequenceEqual(previous.RootElement.GetProperty("EntryIds").EnumerateArray().Select(e => e.GetGuid())) &&
                 model.Snapshot.EntryId == previous.RootElement.GetProperty("SourceEntryId").GetGuid() &&
                 Math.Abs(model.SeekPosition - .5) < .01 && !model.IsPlaying, "Actual apphost restart lost entry/session or autoplayed.");
@@ -65,13 +68,13 @@ internal static class DesktopAcceptanceValidation
         Check(model.Waveform is not null, "Owned native waveform did not reach the window.");
         var indexed = await model.LibraryIndex!.SearchAsync("owned tone");
         Check(indexed.Total >= 1 && indexed.Files.Any(f => f.Track.Path == source), "Owned library workflow or restored index failed.");
-        var before = SHA256.HashData(File.ReadAllBytes(source));
+        Check(originalHash.SequenceEqual(SHA256.HashData(File.ReadAllBytes(source))), "Native import/library/preparation/waveform or restart changed its audio source.");
         var desktop = await RunAsync(window, model, root);
         await model.SaveNowAsync();
-        Check(before.SequenceEqual(SHA256.HashData(File.ReadAllBytes(source))), "Desktop workflow changed its audio source.");
+        Check(originalHash.SequenceEqual(SHA256.HashData(File.ReadAllBytes(source))), "Desktop workflow changed its audio source.");
         return new { Status = "g10-owned-desktop-passed", Phase = phase, SourceEntryId = model.Snapshot.EntryId,
             EntryIds = model.Entries.Select(e => e.Id), NativeCueAndLibrary = true,
-            SourceFile = Path.GetFileName(source), SourceSha256 = Convert.ToHexString(before).ToLowerInvariant(),
+            SourceFile = Path.GetFileName(source), SourceSha256 = Convert.ToHexString(originalHash).ToLowerInvariant(),
             Provenance = "Owned deterministic PCM16, 48 kHz stereo, 3 seconds, 997 Hz; CC0", NativeDurationSeconds = model.DurationSeconds,
             NoAutoplay = true, NativeWaveform = true, ActualProcessRestart = phase == "restart", Desktop = desktop };
     }

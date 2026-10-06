@@ -1,0 +1,1455 @@
+{
+  "sourceCommit": "b3a45df316948f71eee8087b0b7fd795247bca5f",
+  "runUrl": "https://github.com/kurasis/MPswift/actions/runs/37434613237",
+  "runAttempt": 1,
+  "runStatus": "completed",
+  "runConclusion": "success",
+  "jobs": [
+    {
+      "id": 112173259267,
+      "name": "build (ubuntu-24.04)",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37434613237/job/112173259267",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 112173259456,
+      "name": "build (windows-2022)",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37434613237/job/112173259456",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 112175418799,
+      "name": "Publish separate Windows ZIP prerelease",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37434613237/job/112175418799",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "evidence-windows-2022",
+      "archiveSha256": "995968227bc82fc2a815deeaa8b5a80c6b0955b79eb014755fc69f8d83ecfc02",
+      "tests": [
+        {
+          "total": "150",
+          "executed": "150",
+          "passed": "150",
+          "failed": "0",
+          "error": "0",
+          "timeout": "0",
+          "aborted": "0",
+          "inconclusive": "0",
+          "passedButRunAborted": "0",
+          "notRunnable": "0",
+          "notExecuted": "0",
+          "disconnected": "0",
+          "warning": "0",
+          "completed": "0",
+          "inProgress": "0",
+          "pending": "0"
+        }
+      ],
+      "reports": {
+        "portable/integrity-audit.json": {
+          "Status": "candidate-integrity-negative-checks-passed",
+          "SourceCommit": "b3a45df316948f71eee8087b0b7fd795247bca5f",
+          "SourceTreeDirty": false,
+          "Checks": [
+            "changed file",
+            "missing file",
+            "extra file",
+            "empty checksum list"
+          ],
+          "ZipSha256": "c3e2e3418205878eb18ee603df31a5caa6359d72a82585cf29e6215c64915758",
+          "RestoredCopyPassed": true
+        },
+        "portable/package-audit.json": {
+          "Status": "local-candidate-packaged",
+          "SourceCommit": "b3a45df316948f71eee8087b0b7fd795247bca5f",
+          "SourceTreeDirty": false,
+          "Zip": "LocalAudioPlayer-dev-b3a45df31694-win-x64.zip",
+          "ZipSha256": "c3e2e3418205878eb18ee603df31a5caa6359d72a82585cf29e6215c64915758",
+          "Bytes": 85484710,
+          "Files": 555,
+          "Dependencies": 14,
+          "NativeLibraries": 13,
+          "DistributionApproved": false
+        },
+        "smoke/g10-desktop-en.json": {
+          "Status": "g10-owned-desktop-workflow-passed",
+          "Failure": null,
+          "SourceCommit": "b3a45df316948f71eee8087b0b7fd795247bca5f",
+          "SourceTreeDirty": false,
+          "PackageManifestSha256": "9c87437e0d423dfcd8865097f37318d8630771edacffeca527ec29e8c53a363e",
+          "StartedUtc": "2026-10-06T08:18:20.5433004+00:00",
+          "EndedUtc": "2026-10-06T08:18:28.1110559+00:00",
+          "Windows": {
+            "Caption": "Microsoft Windows Server 2022 Datacenter",
+            "Build": "20348",
+            "ProductType": 3,
+            "Windows11Client": false
+          },
+          "StandardUserApp": false,
+          "UpNetworkAdapters": 3,
+          "InstalledRuntimeKnownLocations": [
+            "dotnet/sdk",
+            "dotnet/shared/Microsoft.NETCore.App",
+            "dotnet/shared/Microsoft.WindowsDesktop.App",
+            "dotnet/shared/Microsoft.NETCore.App",
+            "dotnet/shared/Microsoft.WindowsDesktop.App"
+          ],
+          "DotnetOnPath": true,
+          "RuntimeDetectionBoundary": "Known global/user locations and PATH, not an exhaustive drive scan",
+          "InvalidExternalDotnetRoot": true,
+          "FirstRun": {
+            "Status": "g10-owned-desktop-passed",
+            "Phase": "first",
+            "SourceEntryId": "7a90a9ed-55fd-4fd0-8412-2eddab7f0d31",
+            "EntryIds": [
+              "7a90a9ed-55fd-4fd0-8412-2eddab7f0d31",
+              "5fbad850-e25c-4c28-824c-8e8ce0079b31",
+              "1d85aed2-6066-45b5-8a4d-534949a0494f"
+            ],
+            "NativeCueAndLibrary": true,
+            "SourceFile": "owned tone Музыка 🎵.wav",
+            "SourceSha256": "3abfc7f6ad9c5526b5b6c4879520e15ce6e5a1bafff07e5c6c4ec84c41965ad2",
+            "Provenance": "Owned deterministic PCM16, 48 kHz stereo, 3 seconds, 997 Hz; CC0",
+            "NativeDurationSeconds": 3,
+            "NoAutoplay": true,
+            "NativeWaveform": true,
+            "ActualProcessRestart": false,
+            "Desktop": {
+              "Status": "g10-desktop-automation-passed",
+              "ProcessId": 3100,
+              "Language": "en",
+              "Os": "Microsoft Windows 10.0.20348",
+              "Build": 20348,
+              "ElevatedAdministrator": true,
+              "PerMonitorV2": true,
+              "ActualWindowDpi": 96,
+              "HighContrastObserved": false,
+              "Monitors": [
+                {
+                  "Primary": true,
+                  "Bounds": "{X=0,Y=0,Width=1024,Height=768}",
+                  "WorkArea": "{X=0,Y=0,Width=1024,Height=728}"
+                }
+              ],
+              "AccessibleControls": [
+                {
+                  "Type": "Button",
+                  "Name": "Minimize",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Maximize / Restore",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Close",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Slider",
+                  "Name": "Volume",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "CheckBox",
+                  "Name": "Mute",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "CheckBox",
+                  "Name": "Shuffle",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "ComboBox",
+                  "Name": "Repeat",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Previous",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Stop",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Play",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Next",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Slider",
+                  "Name": "Seek position",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "New playlist",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Playlist actions",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "List",
+                  "Name": "Playlists",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "List",
+                  "Name": "Default",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "CheckBox",
+                  "Name": "Enabled for automatic playback",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "ComboBox",
+                  "Name": "Rating",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "CheckBox",
+                  "Name": "Enabled for automatic playback",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "ComboBox",
+                  "Name": "Rating",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "CheckBox",
+                  "Name": "Enabled for automatic playback",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "ComboBox",
+                  "Name": "Rating",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Add files",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Add folder",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Remove from playlist",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Local help / About (F1)",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Edit",
+                  "Name": "Search this playlist (Ctrl+F)",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                }
+              ],
+              "TrackAndPlaylistNames": true,
+              "VolumeMuteAndSeekProviders": true,
+              "SoftwareTabNavigation": {
+                "Required": [
+                  "search",
+                  "volume",
+                  "tracks",
+                  "playlists",
+                  "waveform",
+                  "repeat",
+                  "play"
+                ],
+                "Reached": [
+                  "search",
+                  "volume",
+                  "repeat",
+                  "play",
+                  "waveform",
+                  "playlists",
+                  "tracks"
+                ],
+                "Steps": [
+                  "Search this playlist (Ctrl+F)",
+                  "Minimize",
+                  "Maximize / Restore",
+                  "Close",
+                  "Volume",
+                  "Mute",
+                  "Shuffle",
+                  "Repeat",
+                  "Previous",
+                  "Stop",
+                  "Play",
+                  "Next",
+                  "Seek position",
+                  "Seek position",
+                  "New playlist",
+                  "Playlist actions",
+                  "Default",
+                  "owned tone Музыка 🎵"
+                ]
+              },
+              "StateAndErrorLiveRegions": true,
+              "MinimumSizeControlsWithinClient": true,
+              "Renderings": [
+                {
+                  "File": "g10-minimum-en.png",
+                  "Dpi": 96,
+                  "PixelWidth": 640,
+                  "PixelHeight": 520
+                },
+                {
+                  "File": "g10-render-en-96.png",
+                  "Dpi": 96,
+                  "PixelWidth": 840,
+                  "PixelHeight": 728
+                },
+                {
+                  "File": "g10-render-en-144.png",
+                  "Dpi": 144,
+                  "PixelWidth": 1260,
+                  "PixelHeight": 1092
+                },
+                {
+                  "File": "g10-render-en-192.png",
+                  "Dpi": 192,
+                  "PixelWidth": 1680,
+                  "PixelHeight": 1456
+                }
+              ],
+              "PhysicalDpiChangesAndMonitorRemoval": "not-run",
+              "NarratorAndPhysicalKeyboard": "not-run",
+              "CleanWindows11NoInstalledRuntime": "not-run",
+              "OfflineNetworkTraffic": "separate ETW process trace",
+              "RenderMethod": "Actual WPF visual rendered to 96/144/192 DPI bitmaps; not physical DPI transitions"
+            }
+          },
+          "ActualApphostRestart": {
+            "Status": "g10-owned-desktop-passed",
+            "Phase": "restart",
+            "SourceEntryId": "7a90a9ed-55fd-4fd0-8412-2eddab7f0d31",
+            "EntryIds": [
+              "7a90a9ed-55fd-4fd0-8412-2eddab7f0d31",
+              "5fbad850-e25c-4c28-824c-8e8ce0079b31",
+              "1d85aed2-6066-45b5-8a4d-534949a0494f"
+            ],
+            "NativeCueAndLibrary": true,
+            "SourceFile": "owned tone Музыка 🎵.wav",
+            "SourceSha256": "3abfc7f6ad9c5526b5b6c4879520e15ce6e5a1bafff07e5c6c4ec84c41965ad2",
+            "Provenance": "Owned deterministic PCM16, 48 kHz stereo, 3 seconds, 997 Hz; CC0",
+            "NativeDurationSeconds": 3,
+            "NoAutoplay": true,
+            "NativeWaveform": true,
+            "ActualProcessRestart": true,
+            "Desktop": {
+              "Status": "g10-desktop-automation-passed",
+              "ProcessId": 1840,
+              "Language": "en",
+              "Os": "Microsoft Windows 10.0.20348",
+              "Build": 20348,
+              "ElevatedAdministrator": true,
+              "PerMonitorV2": true,
+              "ActualWindowDpi": 96,
+              "HighContrastObserved": false,
+              "Monitors": [
+                {
+                  "Primary": true,
+                  "Bounds": "{X=0,Y=0,Width=1024,Height=768}",
+                  "WorkArea": "{X=0,Y=0,Width=1024,Height=728}"
+                }
+              ],
+              "AccessibleControls": [
+                {
+                  "Type": "Button",
+                  "Name": "Minimize",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Maximize / Restore",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Close",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Slider",
+                  "Name": "Volume",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "CheckBox",
+                  "Name": "Mute",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "CheckBox",
+                  "Name": "Shuffle",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "ComboBox",
+                  "Name": "Repeat",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Previous",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Stop",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Play",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Next",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Slider",
+                  "Name": "Seek position",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "New playlist",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Playlist actions",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "List",
+                  "Name": "Playlists",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "List",
+                  "Name": "Default",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "CheckBox",
+                  "Name": "Enabled for automatic playback",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "ComboBox",
+                  "Name": "Rating",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "CheckBox",
+                  "Name": "Enabled for automatic playback",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "ComboBox",
+                  "Name": "Rating",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "CheckBox",
+                  "Name": "Enabled for automatic playback",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "ComboBox",
+                  "Name": "Rating",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Add files",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Add folder",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Remove from playlist",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Local help / About (F1)",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Edit",
+                  "Name": "Search this playlist (Ctrl+F)",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                }
+              ],
+              "TrackAndPlaylistNames": true,
+              "VolumeMuteAndSeekProviders": true,
+              "SoftwareTabNavigation": {
+                "Required": [
+                  "search",
+                  "volume",
+                  "tracks",
+                  "playlists",
+                  "waveform",
+                  "repeat",
+                  "play"
+                ],
+                "Reached": [
+                  "search",
+                  "volume",
+                  "repeat",
+                  "play",
+                  "waveform",
+                  "playlists",
+                  "tracks"
+                ],
+                "Steps": [
+                  "Search this playlist (Ctrl+F)",
+                  "Minimize",
+                  "Maximize / Restore",
+                  "Close",
+                  "Volume",
+                  "Mute",
+                  "Shuffle",
+                  "Repeat",
+                  "Previous",
+                  "Stop",
+                  "Play",
+                  "Next",
+                  "Seek position",
+                  "Seek position",
+                  "New playlist",
+                  "Playlist actions",
+                  "Default",
+                  "owned tone Музыка 🎵"
+                ]
+              },
+              "StateAndErrorLiveRegions": true,
+              "MinimumSizeControlsWithinClient": true,
+              "Renderings": [
+                {
+                  "File": "g10-minimum-en.png",
+                  "Dpi": 96,
+                  "PixelWidth": 640,
+                  "PixelHeight": 520
+                },
+                {
+                  "File": "g10-render-en-96.png",
+                  "Dpi": 96,
+                  "PixelWidth": 840,
+                  "PixelHeight": 728
+                },
+                {
+                  "File": "g10-render-en-144.png",
+                  "Dpi": 144,
+                  "PixelWidth": 1260,
+                  "PixelHeight": 1092
+                },
+                {
+                  "File": "g10-render-en-192.png",
+                  "Dpi": 192,
+                  "PixelWidth": 1680,
+                  "PixelHeight": 1456
+                }
+              ],
+              "PhysicalDpiChangesAndMonitorRemoval": "not-run",
+              "NarratorAndPhysicalKeyboard": "not-run",
+              "CleanWindows11NoInstalledRuntime": "not-run",
+              "OfflineNetworkTraffic": "separate ETW process trace",
+              "RenderMethod": "Actual WPF visual rendered to 96/144/192 DPI bitmaps; not physical DPI transitions"
+            }
+          },
+          "Network": {
+            "first": {
+              "Status": "no-app-network-events-observed",
+              "RootProcessId": 3100,
+              "ControlNetworkEvents": 12,
+              "ApplicationNetworkEvents": 0,
+              "UnattributedNetworkEvents": 0,
+              "RootStartEvents": 1,
+              "DescendantProcessIds": [],
+              "ParsedEvents": 51,
+              "LossFree": true,
+              "PositiveControlBeforeAndAfter": true,
+              "Method": "Microsoft-Windows-Kernel-Network and Kernel-Process ETW; owned loopback positive control; PID and descendant attribution"
+            },
+            "restart": {
+              "Status": "no-app-network-events-observed",
+              "RootProcessId": 1840,
+              "ControlNetworkEvents": 12,
+              "ApplicationNetworkEvents": 0,
+              "UnattributedNetworkEvents": 0,
+              "RootStartEvents": 1,
+              "DescendantProcessIds": [],
+              "ParsedEvents": 51,
+              "LossFree": true,
+              "PositiveControlBeforeAndAfter": true,
+              "Method": "Microsoft-Windows-Kernel-Network and Kernel-Process ETW; owned loopback positive control; PID and descendant attribution"
+            }
+          },
+          "TrafficRequested": true,
+          "CleanOfflineBaselinePrerequisitesMet": false,
+          "FullWindows11Acceptance": "not-complete: MP3/FLAC baseline, Narrator, physical DPI/monitor and listening records remain separate",
+          "NetworkMethod": "Unique owned Kernel-Network/Kernel-Process ETW session; stop-time native loss counters; local TCP control before/after; PID and descendants. Other OS traffic is not attributed to the app.",
+          "TraceTools": [
+            {
+              "Tool": "logman.exe",
+              "Version": "10.0.20348.1 (WinBuild.160101.0800)"
+            },
+            {
+              "Tool": "tracerpt.exe",
+              "Version": "10.0.20348.1 (WinBuild.160101.0800)"
+            }
+          ],
+          "TraceSha256": "939623906692d454197e7eaa35391e9fc5a28be5b1ec0610360860775703e099"
+        },
+        "smoke/g10-desktop-ru.json": {
+          "Status": "g10-owned-desktop-workflow-passed",
+          "Failure": null,
+          "SourceCommit": "b3a45df316948f71eee8087b0b7fd795247bca5f",
+          "SourceTreeDirty": false,
+          "PackageManifestSha256": "9c87437e0d423dfcd8865097f37318d8630771edacffeca527ec29e8c53a363e",
+          "StartedUtc": "2026-10-06T08:18:32.0506950+00:00",
+          "EndedUtc": "2026-10-06T08:18:35.6659637+00:00",
+          "Windows": {
+            "Caption": "Microsoft Windows Server 2022 Datacenter",
+            "Build": "20348",
+            "ProductType": 3,
+            "Windows11Client": false
+          },
+          "StandardUserApp": false,
+          "UpNetworkAdapters": 3,
+          "InstalledRuntimeKnownLocations": [
+            "dotnet/sdk",
+            "dotnet/shared/Microsoft.NETCore.App",
+            "dotnet/shared/Microsoft.WindowsDesktop.App",
+            "dotnet/shared/Microsoft.NETCore.App",
+            "dotnet/shared/Microsoft.WindowsDesktop.App"
+          ],
+          "DotnetOnPath": true,
+          "RuntimeDetectionBoundary": "Known global/user locations and PATH, not an exhaustive drive scan",
+          "InvalidExternalDotnetRoot": true,
+          "FirstRun": {
+            "Status": "g10-owned-desktop-passed",
+            "Phase": "first",
+            "SourceEntryId": "4ecc6154-eca5-4eb2-9f42-b36ad27c877d",
+            "EntryIds": [
+              "4ecc6154-eca5-4eb2-9f42-b36ad27c877d",
+              "cad0abf4-d5a6-4028-a394-eb7c08e90bfa",
+              "5cef467b-29c5-424a-95cb-9bf44dead126"
+            ],
+            "NativeCueAndLibrary": true,
+            "SourceFile": "owned tone Музыка 🎵.wav",
+            "SourceSha256": "3abfc7f6ad9c5526b5b6c4879520e15ce6e5a1bafff07e5c6c4ec84c41965ad2",
+            "Provenance": "Owned deterministic PCM16, 48 kHz stereo, 3 seconds, 997 Hz; CC0",
+            "NativeDurationSeconds": 3,
+            "NoAutoplay": true,
+            "NativeWaveform": true,
+            "ActualProcessRestart": false,
+            "Desktop": {
+              "Status": "g10-desktop-automation-passed",
+              "ProcessId": 8124,
+              "Language": "ru",
+              "Os": "Microsoft Windows 10.0.20348",
+              "Build": 20348,
+              "ElevatedAdministrator": true,
+              "PerMonitorV2": true,
+              "ActualWindowDpi": 96,
+              "HighContrastObserved": false,
+              "Monitors": [
+                {
+                  "Primary": true,
+                  "Bounds": "{X=0,Y=0,Width=1024,Height=768}",
+                  "WorkArea": "{X=0,Y=0,Width=1024,Height=728}"
+                }
+              ],
+              "AccessibleControls": [
+                {
+                  "Type": "Button",
+                  "Name": "Свернуть",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Развернуть / Восстановить",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Закрыть",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Slider",
+                  "Name": "Громкость",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "CheckBox",
+                  "Name": "Без звука",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "CheckBox",
+                  "Name": "Случайный порядок",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "ComboBox",
+                  "Name": "Повтор",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Предыдущий",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Стоп",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Воспроизвести",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Следующий",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Slider",
+                  "Name": "Позиция воспроизведения",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Новый плейлист",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Действия с плейлистом",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "List",
+                  "Name": "Плейлисты",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "List",
+                  "Name": "Основной",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "CheckBox",
+                  "Name": "Включён для автоматического воспроизведения",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "ComboBox",
+                  "Name": "Оценка",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "CheckBox",
+                  "Name": "Включён для автоматического воспроизведения",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "ComboBox",
+                  "Name": "Оценка",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "CheckBox",
+                  "Name": "Включён для автоматического воспроизведения",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "ComboBox",
+                  "Name": "Оценка",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Добавить файлы",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Добавить папку",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Убрать из плейлиста",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Локальная справка / О программе (F1)",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Edit",
+                  "Name": "Поиск в плейлисте (Ctrl+F)",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                }
+              ],
+              "TrackAndPlaylistNames": true,
+              "VolumeMuteAndSeekProviders": true,
+              "SoftwareTabNavigation": {
+                "Required": [
+                  "search",
+                  "volume",
+                  "tracks",
+                  "playlists",
+                  "waveform",
+                  "repeat",
+                  "play"
+                ],
+                "Reached": [
+                  "search",
+                  "volume",
+                  "repeat",
+                  "play",
+                  "waveform",
+                  "playlists",
+                  "tracks"
+                ],
+                "Steps": [
+                  "Поиск в плейлисте (Ctrl+F)",
+                  "Свернуть",
+                  "Развернуть / Восстановить",
+                  "Закрыть",
+                  "Громкость",
+                  "Без звука",
+                  "Случайный порядок",
+                  "Повтор",
+                  "Предыдущий",
+                  "Стоп",
+                  "Воспроизвести",
+                  "Следующий",
+                  "Позиция воспроизведения",
+                  "Позиция воспроизведения",
+                  "Новый плейлист",
+                  "Действия с плейлистом",
+                  "Основной",
+                  "owned tone Музыка 🎵"
+                ]
+              },
+              "StateAndErrorLiveRegions": true,
+              "MinimumSizeControlsWithinClient": true,
+              "Renderings": [
+                {
+                  "File": "g10-minimum-ru.png",
+                  "Dpi": 96,
+                  "PixelWidth": 640,
+                  "PixelHeight": 520
+                },
+                {
+                  "File": "g10-render-ru-96.png",
+                  "Dpi": 96,
+                  "PixelWidth": 840,
+                  "PixelHeight": 728
+                },
+                {
+                  "File": "g10-render-ru-144.png",
+                  "Dpi": 144,
+                  "PixelWidth": 1260,
+                  "PixelHeight": 1092
+                },
+                {
+                  "File": "g10-render-ru-192.png",
+                  "Dpi": 192,
+                  "PixelWidth": 1680,
+                  "PixelHeight": 1456
+                }
+              ],
+              "PhysicalDpiChangesAndMonitorRemoval": "not-run",
+              "NarratorAndPhysicalKeyboard": "not-run",
+              "CleanWindows11NoInstalledRuntime": "not-run",
+              "OfflineNetworkTraffic": "separate ETW process trace",
+              "RenderMethod": "Actual WPF visual rendered to 96/144/192 DPI bitmaps; not physical DPI transitions"
+            }
+          },
+          "ActualApphostRestart": {
+            "Status": "g10-owned-desktop-passed",
+            "Phase": "restart",
+            "SourceEntryId": "4ecc6154-eca5-4eb2-9f42-b36ad27c877d",
+            "EntryIds": [
+              "4ecc6154-eca5-4eb2-9f42-b36ad27c877d",
+              "cad0abf4-d5a6-4028-a394-eb7c08e90bfa",
+              "5cef467b-29c5-424a-95cb-9bf44dead126"
+            ],
+            "NativeCueAndLibrary": true,
+            "SourceFile": "owned tone Музыка 🎵.wav",
+            "SourceSha256": "3abfc7f6ad9c5526b5b6c4879520e15ce6e5a1bafff07e5c6c4ec84c41965ad2",
+            "Provenance": "Owned deterministic PCM16, 48 kHz stereo, 3 seconds, 997 Hz; CC0",
+            "NativeDurationSeconds": 3,
+            "NoAutoplay": true,
+            "NativeWaveform": true,
+            "ActualProcessRestart": true,
+            "Desktop": {
+              "Status": "g10-desktop-automation-passed",
+              "ProcessId": 3088,
+              "Language": "ru",
+              "Os": "Microsoft Windows 10.0.20348",
+              "Build": 20348,
+              "ElevatedAdministrator": true,
+              "PerMonitorV2": true,
+              "ActualWindowDpi": 96,
+              "HighContrastObserved": false,
+              "Monitors": [
+                {
+                  "Primary": true,
+                  "Bounds": "{X=0,Y=0,Width=1024,Height=768}",
+                  "WorkArea": "{X=0,Y=0,Width=1024,Height=728}"
+                }
+              ],
+              "AccessibleControls": [
+                {
+                  "Type": "Button",
+                  "Name": "Свернуть",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Развернуть / Восстановить",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Закрыть",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Slider",
+                  "Name": "Громкость",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "CheckBox",
+                  "Name": "Без звука",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "CheckBox",
+                  "Name": "Случайный порядок",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "ComboBox",
+                  "Name": "Повтор",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Предыдущий",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Стоп",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Воспроизвести",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Следующий",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Slider",
+                  "Name": "Позиция воспроизведения",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Новый плейлист",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Действия с плейлистом",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "List",
+                  "Name": "Плейлисты",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "List",
+                  "Name": "Основной",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "CheckBox",
+                  "Name": "Включён для автоматического воспроизведения",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "ComboBox",
+                  "Name": "Оценка",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "CheckBox",
+                  "Name": "Включён для автоматического воспроизведения",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "ComboBox",
+                  "Name": "Оценка",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "CheckBox",
+                  "Name": "Включён для автоматического воспроизведения",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "ComboBox",
+                  "Name": "Оценка",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Добавить файлы",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Добавить папку",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Убрать из плейлиста",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Button",
+                  "Name": "Локальная справка / О программе (F1)",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                },
+                {
+                  "Type": "Edit",
+                  "Name": "Поиск в плейлисте (Ctrl+F)",
+                  "Enabled": true,
+                  "KeyboardFocusable": true
+                }
+              ],
+              "TrackAndPlaylistNames": true,
+              "VolumeMuteAndSeekProviders": true,
+              "SoftwareTabNavigation": {
+                "Required": [
+                  "search",
+                  "volume",
+                  "tracks",
+                  "playlists",
+                  "waveform",
+                  "repeat",
+                  "play"
+                ],
+                "Reached": [
+                  "search",
+                  "volume",
+                  "repeat",
+                  "play",
+                  "waveform",
+                  "playlists",
+                  "tracks"
+                ],
+                "Steps": [
+                  "Поиск в плейлисте (Ctrl+F)",
+                  "Свернуть",
+                  "Развернуть / Восстановить",
+                  "Закрыть",
+                  "Громкость",
+                  "Без звука",
+                  "Случайный порядок",
+                  "Повтор",
+                  "Предыдущий",
+                  "Стоп",
+                  "Воспроизвести",
+                  "Следующий",
+                  "Позиция воспроизведения",
+                  "Позиция воспроизведения",
+                  "Новый плейлист",
+                  "Действия с плейлистом",
+                  "Основной",
+                  "owned tone Музыка 🎵"
+                ]
+              },
+              "StateAndErrorLiveRegions": true,
+              "MinimumSizeControlsWithinClient": true,
+              "Renderings": [
+                {
+                  "File": "g10-minimum-ru.png",
+                  "Dpi": 96,
+                  "PixelWidth": 640,
+                  "PixelHeight": 520
+                },
+                {
+                  "File": "g10-render-ru-96.png",
+                  "Dpi": 96,
+                  "PixelWidth": 840,
+                  "PixelHeight": 728
+                },
+                {
+                  "File": "g10-render-ru-144.png",
+                  "Dpi": 144,
+                  "PixelWidth": 1260,
+                  "PixelHeight": 1092
+                },
+                {
+                  "File": "g10-render-ru-192.png",
+                  "Dpi": 192,
+                  "PixelWidth": 1680,
+                  "PixelHeight": 1456
+                }
+              ],
+              "PhysicalDpiChangesAndMonitorRemoval": "not-run",
+              "NarratorAndPhysicalKeyboard": "not-run",
+              "CleanWindows11NoInstalledRuntime": "not-run",
+              "OfflineNetworkTraffic": "separate ETW process trace",
+              "RenderMethod": "Actual WPF visual rendered to 96/144/192 DPI bitmaps; not physical DPI transitions"
+            }
+          },
+          "Network": {
+            "first": {
+              "Status": "no-app-network-events-observed",
+              "RootProcessId": 8124,
+              "ControlNetworkEvents": 12,
+              "ApplicationNetworkEvents": 0,
+              "UnattributedNetworkEvents": 0,
+              "RootStartEvents": 1,
+              "DescendantProcessIds": [],
+              "ParsedEvents": 27,
+              "LossFree": true,
+              "PositiveControlBeforeAndAfter": true,
+              "Method": "Microsoft-Windows-Kernel-Network and Kernel-Process ETW; owned loopback positive control; PID and descendant attribution"
+            },
+            "restart": {
+              "Status": "no-app-network-events-observed",
+              "RootProcessId": 3088,
+              "ControlNetworkEvents": 12,
+              "ApplicationNetworkEvents": 0,
+              "UnattributedNetworkEvents": 0,
+              "RootStartEvents": 1,
+              "DescendantProcessIds": [],
+              "ParsedEvents": 27,
+              "LossFree": true,
+              "PositiveControlBeforeAndAfter": true,
+              "Method": "Microsoft-Windows-Kernel-Network and Kernel-Process ETW; owned loopback positive control; PID and descendant attribution"
+            }
+          },
+          "TrafficRequested": true,
+          "CleanOfflineBaselinePrerequisitesMet": false,
+          "FullWindows11Acceptance": "not-complete: MP3/FLAC baseline, Narrator, physical DPI/monitor and listening records remain separate",
+          "NetworkMethod": "Unique owned Kernel-Network/Kernel-Process ETW session; stop-time native loss counters; local TCP control before/after; PID and descendants. Other OS traffic is not attributed to the app.",
+          "TraceTools": [
+            {
+              "Tool": "logman.exe",
+              "Version": "10.0.20348.1 (WinBuild.160101.0800)"
+            },
+            {
+              "Tool": "tracerpt.exe",
+              "Version": "10.0.20348.1 (WinBuild.160101.0800)"
+            }
+          ],
+          "TraceSha256": "e1e266b091550da35386d27bf3d07c2328d686909168ad73f8a8d1b09d1a737a"
+        },
+        "smoke/g11-device-probe.json": {
+          "Status": "g11-device-probe-complete",
+          "Failure": null,
+          "Mode": "Probe",
+          "SourceCommit": "b3a45df316948f71eee8087b0b7fd795247bca5f",
+          "SourceTreeDirty": false,
+          "PackageManifestSha256": "9c87437e0d423dfcd8865097f37318d8630771edacffeca527ec29e8c53a363e",
+          "StartedUtc": "2026-10-06T08:18:37.9695821+00:00",
+          "EndedUtc": "2026-10-06T08:18:38.6800820+00:00",
+          "InvalidExternalDotnetRoots": true,
+          "ActualApphostProcessId": 2720,
+          "ActualNativeAudio": {
+            "Status": "g11-device-probe-complete",
+            "Mode": "probe",
+            "Versions": {
+              "bass": "2.4.18.3",
+              "bassmix": "2.4.13.0",
+              "basswasapi": "2.4.4.1"
+            },
+            "Devices": [],
+            "Selected": null,
+            "EnabledOutputs": 0,
+            "Output": "not-run",
+            "DigitalCapture": "not-run",
+            "Listening": "not-run",
+            "Windows": "Microsoft Windows 10.0.20348"
+          },
+          "InstalledMediaDrivers": [],
+          "ManualListening": "not-run",
+          "PhysicalHotplugSleep": "not-run",
+          "EvidenceBoundary": "Probe only enumerates actual native devices. Output modes require a real endpoint; Digital additionally requires matching stereo loopback and measured capture. Other codec boundaries and hardware/listening acceptance remain separate."
+        },
+        "smoke/package-smoke.json": {
+          "Status": "packaged-executable-smoke-passed",
+          "SourceCommit": "b3a45df316948f71eee8087b0b7fd795247bca5f",
+          "ZipSha256": "c3e2e3418205878eb18ee603df31a5caa6359d72a82585cf29e6215c64915758",
+          "UnicodeExtractionPath": true,
+          "ArbitraryWorkingDirectory": true,
+          "InvalidExternalDotnetRoot": true,
+          "TamperRejected": true,
+          "Windows": "Microsoft Windows NT 10.0.20348.0",
+          "CleanWindows11WithoutSdk": "not-run",
+          "NetworkDisconnected": "not-run",
+          "DeviceOutput": "not-run",
+          "DistributionApproved": false
+        }
+      }
+    },
+    {
+      "name": "evidence-ubuntu-24.04",
+      "archiveSha256": "e6510055ad927b6e04dbfe0984f2a8f03a1c8a37cf19d24fcb9eb4998ef842f8",
+      "tests": [
+        {
+          "total": "150",
+          "executed": "150",
+          "passed": "150",
+          "failed": "0",
+          "error": "0",
+          "timeout": "0",
+          "aborted": "0",
+          "inconclusive": "0",
+          "passedButRunAborted": "0",
+          "notRunnable": "0",
+          "notExecuted": "0",
+          "disconnected": "0",
+          "warning": "0",
+          "completed": "0",
+          "inProgress": "0",
+          "pending": "0"
+        }
+      ],
+      "reports": {
+        "portable/integrity-audit.json": {
+          "Status": "candidate-integrity-negative-checks-passed",
+          "SourceCommit": "b3a45df316948f71eee8087b0b7fd795247bca5f",
+          "SourceTreeDirty": false,
+          "Checks": [
+            "changed file",
+            "missing file",
+            "extra file",
+            "empty checksum list"
+          ],
+          "ZipSha256": "067c62197adbcba7164d4bb4c1309f0bf3412412ccb2a00468bac4739d84796d",
+          "RestoredCopyPassed": true
+        },
+        "portable/package-audit.json": {
+          "Status": "local-candidate-packaged",
+          "SourceCommit": "b3a45df316948f71eee8087b0b7fd795247bca5f",
+          "SourceTreeDirty": false,
+          "Zip": "LocalAudioPlayer-dev-b3a45df31694-win-x64.zip",
+          "ZipSha256": "067c62197adbcba7164d4bb4c1309f0bf3412412ccb2a00468bac4739d84796d",
+          "Bytes": 85484388,
+          "Files": 555,
+          "Dependencies": 14,
+          "NativeLibraries": 13,
+          "DistributionApproved": false
+        }
+      }
+    }
+  ],
+  "renderingFiles": [
+    {
+      "file": "g10-minimum-en.png",
+      "sha256": "7242ef1cadfd1ccbd1619948b1388defd44fb59e6772941732bd969b264743f1"
+    },
+    {
+      "file": "g10-minimum-ru.png",
+      "sha256": "60a08c55eb39a03f75f534f248bca06eb866e84d3115b9ec214a7aff4e8c8b8a"
+    },
+    {
+      "file": "g10-render-en-144.png",
+      "sha256": "a7353eab8dbb78bafc061a50abb3f8c67c456eaa51cf9ee6bfd26a358dd04219"
+    },
+    {
+      "file": "g10-render-en-192.png",
+      "sha256": "1da34aab50e79c784fd3a268ac1b814260a2d2834dfdfa5562d99f8b2a0f3988"
+    },
+    {
+      "file": "g10-render-en-96.png",
+      "sha256": "6405dcbd69195b6c252418876dcafe0709a4353f7c0143f41afbef46af02932b"
+    },
+    {
+      "file": "g10-render-ru-144.png",
+      "sha256": "5c4725bdfc8fd9a4e35b8e5ad440b96737845b55822b091657b3dfede13bee2a"
+    },
+    {
+      "file": "g10-render-ru-192.png",
+      "sha256": "01e0de221e107be069b236a8a5a2870ca988afe9c0504d4ab71c98112c5b2cc2"
+    },
+    {
+      "file": "g10-render-ru-96.png",
+      "sha256": "c09edcc900fff248ec1de988b0d816de7beebef2ca44441b6838adfad5f8a8ec"
+    }
+  ],
+  "boundary": "Hosted Windows Server 2022 integration; not clean/offline Windows 11 or physical DPI/Narrator. G11 native probe observed zero enabled outputs; shared/exclusive, endpoint capture, listening and hardware transition acceptance not run."
+}

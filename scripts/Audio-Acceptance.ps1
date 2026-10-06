@@ -19,7 +19,7 @@ try {
 $drivers = @(Get-CimInstance Win32_PnPSignedDriver -Filter "DeviceClass='MEDIA'" | Select-Object DeviceName, DriverVersion, DriverProviderName, IsSigned)
 $report = [ordered]@{ Status = $(if ($failure) { 'failed' } elseif ($run.ExitCode -eq 3) { 'blocked' } else { $audio.Status });
     Failure = $failure; Mode = $Mode; SourceCommit = $workspace.SourceCommit; SourceTreeDirty = $workspace.SourceTreeDirty;
-    PackageManifestSha256 = $workspace.ManifestSha256; StartedUtc = $started.ToString('O'); EndedUtc = [DateTimeOffset]::UtcNow.ToString('O');
+    PackageManifestSha256 = $workspace.ManifestSha256; StartedUtc = $started.ToString('O'); EndedUtc = [DateTimeOffset]::UtcNow.ToString('O'); PowerShellVersion = $PSVersionTable.PSVersion.ToString();
     InvalidExternalDotnetRoots = $true; ActualApphostProcessId = $(if ($run) { $run.ProcessId } else { $null });
     ActualNativeAudio = $audio; InstalledMediaDrivers = $drivers; ManualListening = 'not-run'; PhysicalHotplugSleep = 'not-run';
     EvidenceBoundary = 'Probe only enumerates actual native devices. Output modes require a real endpoint; Digital additionally requires matching stereo loopback and measured capture. Other codec boundaries and hardware/listening acceptance remain separate.' }
