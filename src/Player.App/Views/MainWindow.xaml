@@ -67,7 +67,7 @@
                     PreviewMouseLeftButtonUp="OnSeekEnd" LostMouseCapture="OnSeekCaptureLost" />
             <DockPanel Grid.Row="3"><TextBlock Text="{Binding Elapsed}" /><TextBlock Text="{Binding DurationText}" HorizontalAlignment="Right" /></DockPanel>
         </Grid>
-        <DockPanel Grid.Row="4" Background="{DynamicResource SurfaceBrush}">
+        <DockPanel x:Name="PlaylistTabStrip" Grid.Row="4" Background="{DynamicResource SurfaceBrush}">
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                 <Button Content="+" Click="OnCreatePlaylist" ToolTip="{x:Static r:Strings.NewPlaylist}" AutomationProperties.Name="{x:Static r:Strings.NewPlaylist}" Padding="12,4" Margin="2" />
                 <Button x:Name="PlaylistActions" Content="⋯" Click="OnPlaylistActions" ToolTip="{x:Static r:Strings.PlaylistActions}" AutomationProperties.Name="{x:Static r:Strings.PlaylistActions}" Padding="12,4" Margin="2">

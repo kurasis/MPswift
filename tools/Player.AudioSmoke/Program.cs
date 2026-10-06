@@ -156,6 +156,25 @@ try
                 Require(await player.PlayAsync(), "Production resume failed.");
                 await Task.Delay(350);
                 Require(player.Snapshot.Position > TimeSpan.FromSeconds(0.5), "Resumed playback did not advance.");
+                // Live endpoint regression: actual running replacements, paused/stopped
+                // replacements, repeat Stop and seek after reset must all remain usable.
+                for (var i = 0; i < 20; i++)
+                {
+                    var replacement = new AudioRequest(Guid.NewGuid(), file);
+                    Require(await player.LoadAsync(replacement, true), "Playing track replacement failed: " + player.Snapshot.Error?.Detail);
+                    Require(player.Snapshot.EntryId == replacement.EntryId && player.Snapshot.State == PlaybackState.Playing,
+                        "Playing replacement lost the requested entry/state.");
+                    await Task.Delay(50);
+                }
+                Require(await player.PauseAsync(), "Pause before replacement failed.");
+                Require(await player.LoadAsync(new AudioRequest(Guid.NewGuid(), file), false), "Paused replacement failed.");
+                Require(await player.SeekAsync(TimeSpan.FromSeconds(0.5)) && await player.PlayAsync(), "Replaced source seek/start failed.");
+                Require(await player.StopAsync() && await player.StopAsync(), "Repeated output Stop failed.");
+                Require(await player.LoadAsync(new AudioRequest(Guid.NewGuid(), file), true), "Stopped replacement failed.");
+                Require(await player.SeekAsync(TimeSpan.FromSeconds(1)), "Playing seek with flushed output failed.");
+                await Task.Delay(250);
+                Require(player.Snapshot.State == PlaybackState.Playing && player.Snapshot.Position > TimeSpan.FromSeconds(1),
+                    "Output did not resume after replacing/seeking.");
             }
             else
             {
@@ -170,6 +189,7 @@ try
         using (var exclusive = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.None)) { }
         Require(beforeHash == HashFile(file), "Production engine changed source.");
         Report(new { Status = "production-engine-passed", Environment = RuntimeInformation.OSDescription, Snapshot = final,
+            LiveOutputReplacements = args[0] == "--engine-play" ? "20-running-plus-paused-stopped-replacements-passed" : "not-run",
             Output = args[0] == "--engine-play" ? "shared-api-tested" : "not-run", SourceHandleReleased = true, SourceUnchanged = true, AudiblePlayback = "not-manually-verified" });
         return 0;
     }

@@ -50,8 +50,13 @@ public sealed class BassAudioBackend : IAudioBackend, IAdvancedAudioBackend
     {
         if (_request is null) throw new AudioBackendException(AudioErrorCategory.Decoder, "No source is loaded.");
         if (_position >= _info?.Duration) Seek(TimeSpan.Zero);
+        StartOutput();
+    }
+    private void StartOutput()
+    {
+        var request = _request ?? throw new AudioBackendException(AudioErrorCategory.Decoder, "No source is loaded.");
         EnsureOutput();
-        if (_graph?.ActiveEntryId != _request.EntryId) _graph!.Load(_request, _position);
+        if (_graph?.ActiveEntryId != request.EntryId) _graph!.Load(request, _position);
         if (_prepared is not null) _graph!.PrepareNext(_prepared, _repeatOne);
         _graph!.SetVolume(_volume, _muted, true);
         Check(BassWasapi.Start(), "Start output"); _running = true;
@@ -113,7 +118,7 @@ public sealed class BassAudioBackend : IAudioBackend, IAdvancedAudioBackend
     }
     public void Stop()
     {
-        if (_wasapi) Check(BassWasapi.Stop(true), "Stop and discard output");
+        FlushOutput();
         _running = false; _position = TimeSpan.Zero; _prepared = null;
         _graph?.Seek(TimeSpan.Zero);
         if (_preparedHandle != 0 && _request is not null) Check(Bass.ChannelSetPosition(_preparedHandle, Bass.ChannelSeconds2Bytes(_preparedHandle, _request.Segment?.Start.TotalSeconds ?? 0)), "Reset source");
@@ -123,10 +128,10 @@ public sealed class BassAudioBackend : IAudioBackend, IAdvancedAudioBackend
     {
         if (_request is null || _info is null) throw new AudioBackendException(AudioErrorCategory.Decoder, "Source is not seekable.");
         var resume = _running;
-        if (_wasapi) Check(BassWasapi.Stop(true), "Flush old endpoint samples"); _running = false; _position = position; _prepared = null;
+        FlushOutput(); _position = position; _prepared = null;
         _graph?.Seek(position);
         if (_preparedHandle != 0) Check(Bass.ChannelSetPosition(_preparedHandle, Bass.ChannelSeconds2Bytes(_preparedHandle, (_request.Segment?.Start.TotalSeconds ?? 0) + position.TotalSeconds)), "Seek prepared source");
-        if (resume) { Check(BassWasapi.Start(), "Resume after seek"); _running = true; }
+        if (resume) StartOutput();
     }
     private void FlushAtCurrentPosition() => Seek(_position);
     public void SetVolume(double volume, bool muted) { _volume = volume; _muted = muted; _graph?.SetVolume(volume, muted); }
@@ -145,7 +150,7 @@ public sealed class BassAudioBackend : IAudioBackend, IAdvancedAudioBackend
         if (position.Ended) { Check(BassWasapi.Stop(false), "Pause at natural end"); _running = false; }
         return position with { OutputFormat = _output };
     }
-    private void PauseForDeviceChange() { Check(BassWasapi.Stop(true), "Pause for device change"); _running = false; CloseOutput(); }
+    private void PauseForDeviceChange() => CloseOutput();
     private int Render(nint buffer, int length, nint user)
     {
         try { var count = _graph?.Render(buffer, length) ?? 0; if (count >= 0) return count; Interlocked.Exchange(ref _callbackError, (int)Bass.LastError); }
@@ -157,9 +162,18 @@ public sealed class BassAudioBackend : IAudioBackend, IAdvancedAudioBackend
         if (_wasapi) { Check(BassWasapi.Free(), "Quiesce/free WASAPI"); _wasapi = false; }
         _running = false; _graph?.Dispose(); _graph = null; _output = null; _actualDevice = null;
     }
+    private void FlushOutput()
+    {
+        if (!_wasapi) { _running = false; return; }
+        // Stop callbacks before resetting the endpoint buffer. Some drivers reject Reset
+        // while running, or after the endpoint has independently stopped. Free guarantees
+        // callback quiescence in either case; Play reopens the same requested device/mode.
+        OutputBufferReset.Flush(BassWasapi.IsStarted, BassWasapi.Stop, CloseOutput);
+        _running = false;
+    }
     public void CloseSource()
     {
-        if (_wasapi) Check(BassWasapi.Stop(true), "Quiesce source replacement"); _running = false;
+        FlushOutput();
         _graph?.Clear();
         if (_preparedHandle != 0) { Check(Bass.StreamFree(_preparedHandle), "Free prepared source"); _preparedHandle = 0; }
         _request = null; _prepared = null; _info = null; _position = TimeSpan.Zero; Interlocked.Exchange(ref _callbackError, 0);

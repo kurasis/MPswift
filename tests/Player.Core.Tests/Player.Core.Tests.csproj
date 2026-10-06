@@ -13,4 +13,5 @@
   </ItemGroup>
   <ItemGroup><Using Include="Xunit" /></ItemGroup>
   <ItemGroup><Compile Include="../../src/Player.App/Services/Storage/*.cs" Link="Storage/%(Filename)%(Extension)" /></ItemGroup>
+  <ItemGroup><Compile Include="../../src/Player.App/Services/Audio/OutputBufferReset.cs" Link="Audio/OutputBufferReset.cs" /></ItemGroup>
 </Project>

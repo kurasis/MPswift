@@ -1,5 +1,13 @@
 # Test evidence — Stages A–G
 
+## Track replacement and folder-drop fix (2026-10-06)
+
+Running WASAPI output is stopped before its queued buffer is reset. A failed Stop/Reset now releases the endpoint and mixer before source mutation; the next start reopens the same requested endpoint/mode, including a running seek. Failed release still propagates as an output error. Six control-policy regression cases cover running/already-stopped resets, failed stop/reset recovery and refusal to replace a source when release fails. These are managed policy tests, not actual endpoint evidence. The optional Windows `Smoke.ps1 -Play` now checks 20 running replacements, paused/stopped replacement, repeated stop and playing seek; physical output remains unrun on the cloud/hosted runner.
+
+Dropping folders on the entire playlist tab strip (tab children, empty area or controls) creates one selected playlist per folder, named after the directory, with recursive imports. Loose files in a mixed drop retain the original target. Dropping on the track list keeps the existing append-to-selected behavior. Imports stay serialized/cancellable across all dropped folders and retain the 100-tab/10,000-entry limits without autoplay. Windows EN/RU and extracted-package smoke now software-route actual WPF file-drop events over owned Unicode/nested/same-name/empty folders, verify SQLite names/order/entry IDs and tab-limit behavior, then clean up their owned files/tabs.
+
+Locked local Release build passes with 0 warnings/errors and 130 tests. Windows validation and a fresh separately published GitHub ZIP are pending the new main build; earlier G8/G9 evidence does not validate these changes.
+
 ## Local execution
 
 Executed on **2026-10-05**, Debian GNU/Linux 13 x64 cloud host, .NET SDK **10.0.401**, PowerShell **7.6.6**. No Windows runtime or audio device is available in this host.

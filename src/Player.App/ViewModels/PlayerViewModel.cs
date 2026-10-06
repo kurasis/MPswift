@@ -308,16 +308,64 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     [RelayCommand(CanExecute = nameof(CanImport))] private Task AddFolderAsync()
     { var folder = _dialogs.PickFolder(); return folder is null ? Task.CompletedTask : AddPathsAsync([folder]); }
     private bool CanImport() => !IsImporting && !_closing && _initialized;
+    public bool CanAcceptFileDrop => CanImport();
     [RelayCommand] private void CancelImport() => _importCancellation?.Cancel();
     public Task AddPathsAsync(IEnumerable<string> paths, System.Text.Encoding? fallbackEncoding = null)
     {
         if (!CanImport()) return Task.CompletedTask;
         _importTask = ImportAsync(paths.Take(10001).ToArray(), SelectedPlaylist, fallbackEncoding); return _importTask;
     }
+    public Task AddDroppedPathsAsync(IEnumerable<string> paths, bool createFolderPlaylists)
+    {
+        if (!CanImport()) return Task.CompletedTask;
+        if (!createFolderPlaylists) return AddPathsAsync(paths);
+        _importTask = ImportDroppedPathsAsync(paths.Take(10001).ToArray());
+        return _importTask;
+    }
+    private async Task ImportDroppedPathsAsync(string[] paths)
+    {
+        if (paths.Length == 0) return;
+        var originalTarget = SelectedPlaylist;
+        IsImporting = true; _importCancellation = new CancellationTokenSource();
+        try
+        {
+            foreach (var path in paths)
+            {
+                if (_closing || _importCancellation.IsCancellationRequested) return;
+                if (_knownRows.Count >= 10000) { Message = Strings.Get("ImportLimit"); return; }
+                if (Directory.Exists(path))
+                {
+                    if (Playlists.Count >= 100) { Message = Strings.Get("TabLimit"); return; }
+                    try
+                    {
+                        Services.Audio.LocalFileAccess.ValidateDirectory(path);
+                        var directory = new DirectoryInfo(path);
+                        var name = directory.Name.Trim();
+                        if (name.Length == 0) name = directory.FullName;
+                        // Folder names can exceed the persisted playlist-name limit.
+                        if (name.Length > 200) name = name[..(char.IsHighSurrogate(name[199]) ? 199 : 200)];
+                        CreatePlaylist(name);
+                    }
+                    catch (Exception error) when (error is IOException or UnauthorizedAccessException or ArgumentException)
+                    { Message = Strings.Get("ErrorFileUnavailable"); Details = error.Message; continue; }
+                    await ImportBatchAsync([path], SelectedPlaylist, null);
+                }
+                else if (Playlists.Contains(originalTarget)) await ImportBatchAsync([path], originalTarget, null);
+                // Progress callbacks belong to the captured target and finish before the next batch.
+                await _dispatcher.InvokeAsync(() => { }, DispatcherPriority.ContextIdle);
+            }
+        }
+        finally { IsImporting = false; _importCancellation.Dispose(); _importCancellation = null; }
+    }
     private async Task ImportAsync(string[] paths, PlaylistTabViewModel target, System.Text.Encoding? fallbackEncoding)
     {
         if (paths.Length == 0) return;
         IsImporting = true; _importCancellation = new CancellationTokenSource();
+        try { await ImportBatchAsync(paths, target, fallbackEncoding); }
+        finally { IsImporting = false; _importCancellation.Dispose(); _importCancellation = null; }
+    }
+    private async Task ImportBatchAsync(string[] paths, PlaylistTabViewModel target, System.Text.Encoding? fallbackEncoding)
+    {
         var progress = new Progress<ImportProgress>(report =>
         {
             if (_closing || !Playlists.Contains(target)) return;
@@ -326,14 +374,14 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         });
         try
         {
-            var result = await _importer.ImportAsync(paths, progress, _importCancellation.Token, 10000 - _knownRows.Count, fallbackEncoding);
+            var result = await _importer.ImportAsync(paths, progress, _importCancellation!.Token, 10000 - _knownRows.Count, fallbackEncoding);
             Message = string.Format(Strings.Culture, Strings.Get("Imported"), result.Added, result.Errors);
             if (result.LimitReached) Message += " " + Strings.Get("ImportLimit");
             Details = string.Join(Environment.NewLine, result.Details);
         }
         catch (OperationCanceledException) { Message = Strings.Get("ImportCanceled"); }
         catch (Exception error) { Message = Strings.Get("ErrorUnexpected"); Details = error.Message; }
-        finally { await RefreshRatingsAsync(); IsImporting = false; _importCancellation.Dispose(); _importCancellation = null; }
+        finally { await RefreshRatingsAsync(); }
     }
     [RelayCommand(AllowConcurrentExecutions = true)] private Task PlayEntryAsync(PlaylistRowViewModel? row)
     { if (row is null) return Task.CompletedTask; ChooseSource(); return _coordinator.LoadAsync(row.Id); }

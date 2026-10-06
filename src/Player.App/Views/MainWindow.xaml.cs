@@ -42,12 +42,13 @@ public partial class MainWindow : Window
     private void OnHelp(object sender, RoutedEventArgs e) => new HelpWindow(this, ((App)Application.Current).DataDirectory).Show();
     private void OnDragOver(object sender, DragEventArgs e)
     {
-        e.Effects = e.Data.GetDataPresent(DataFormats.FileDrop) ? DragDropEffects.Copy :
+        e.Effects = e.Data.GetDataPresent(DataFormats.FileDrop) && Model.CanAcceptFileDrop ? DragDropEffects.Copy :
             e.Data.GetDataPresent(EntryDragFormat) && Model.CanReorder && PlaylistList.IsMouseOver ? DragDropEffects.Move : DragDropEffects.None;
         e.Handled = true;
     }
     private async void OnDrop(object sender, DragEventArgs e)
     {
+        e.Handled = true;
         if (e.Data.GetDataPresent(EntryDragFormat) && e.Data.GetData(EntryDragFormat) is PlaylistRowViewModel[] rows && PlaylistList.IsMouseOver)
         {
             var container = ItemsControl.ContainerFromElement(PlaylistList, e.OriginalSource as DependencyObject) as ListBoxItem;
@@ -56,8 +57,21 @@ public partial class MainWindow : Window
             Model.DropEntries(ownRows, insertion);
             PlaylistList.SelectedItems.Clear(); foreach (var ownRow in ownRows) PlaylistList.SelectedItems.Add(ownRow);
         }
-        else if (e.Data.GetData(DataFormats.FileDrop) is string[] paths) await Model.AddPathsAsync(paths);
-        e.Handled = true;
+        else if (e.Data.GetData(DataFormats.FileDrop) is string[] paths)
+            await ImportFileDropAsync(paths, e.OriginalSource as DependencyObject);
+    }
+    internal Task ImportFileDropAsync(string[] paths, DependencyObject? source)
+    {
+        // Use the routed target, including empty strip space and tab children, rather
+        // than mouse position: asynchronous imports may continue after the pointer moves.
+        while (source is not null)
+        {
+            if (ReferenceEquals(source, PlaylistTabStrip)) return Model.AddDroppedPathsAsync(paths, true);
+            source = source is System.Windows.Media.Visual or System.Windows.Media.Media3D.Visual3D
+                ? System.Windows.Media.VisualTreeHelper.GetParent(source)
+                : (source as FrameworkContentElement)?.Parent ?? LogicalTreeHelper.GetParent(source);
+        }
+        return Model.AddDroppedPathsAsync(paths, false);
     }
     private void OnSeekStart(object sender, MouseButtonEventArgs e) => Model.SeekPreview = true;
     private async void OnSeekEnd(object sender, MouseButtonEventArgs e)
