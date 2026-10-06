@@ -1,0 +1,27 @@
+{
+  "package": {
+    "Status": "local-candidate-packaged",
+    "SourceCommit": "3cc26313dfdfb3ea03759f100161464c83424a9b",
+    "SourceTreeDirty": false,
+    "Zip": "LocalAudioPlayer-dev-3cc26313dfdf-win-x64.zip",
+    "ZipSha256": "0e0331bd4dec1e796bd33baae098bfa95f369b0adb62133aa1bdd772b5a3a6f4",
+    "Bytes": 85359977,
+    "Files": 550,
+    "Dependencies": 14,
+    "NativeLibraries": 13,
+    "DistributionApproved": false
+  },
+  "integrity": {
+    "Status": "candidate-integrity-negative-checks-passed",
+    "SourceCommit": "3cc26313dfdfb3ea03759f100161464c83424a9b",
+    "SourceTreeDirty": false,
+    "Checks": [
+      "changed file",
+      "missing file",
+      "extra file",
+      "empty checksum list"
+    ],
+    "ZipSha256": "0e0331bd4dec1e796bd33baae098bfa95f369b0adb62133aa1bdd772b5a3a6f4",
+    "RestoredCopyPassed": true
+  }
+}

@@ -74,9 +74,13 @@ public partial class MainWindow : Window
         if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.N) { OnCreatePlaylist(sender, e); e.Handled = true; return; }
         if (Keyboard.Modifiers == ModifierKeys.None && e.Key == Key.F2 && PlaylistTabs.IsKeyboardFocusWithin) { OnRenamePlaylist(sender, e); e.Handled = true; return; }
         if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.F) { SearchBox.Focus(); SearchBox.SelectAll(); e.Handled = true; return; }
-        if (e.Key == Key.Escape) { Model.ClearSearchCommand.Execute(null); e.Handled = true; return; }
+        if (e.Key == Key.Escape)
+        {
+            if (!SearchBox.IsKeyboardFocusWithin && OwnsShortcut(e.OriginalSource as DependencyObject, e.Key, Keyboard.Modifiers)) return;
+            Model.ClearSearchCommand.Execute(null); e.Handled = true; return;
+        }
         if (e.Key == Key.F1) { OnHelp(sender, e); e.Handled = true; return; }
-        if (OwnsInput(e.OriginalSource as DependencyObject)) return;
+        if (OwnsShortcut(e.OriginalSource as DependencyObject, e.Key, Keyboard.Modifiers)) return;
         if (PlaylistList.IsKeyboardFocusWithin && Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift) && e.Key is Key.Up or Key.Down)
         { Model.MoveEntries(PlaylistList.SelectedItems.Cast<PlaylistRowViewModel>(), e.Key == Key.Up ? -1 : 1); e.Handled = true; return; }
         if (Keyboard.Modifiers == ModifierKeys.None && e.Key == Key.Space) { await Model.PlayPauseCommand.ExecuteAsync(null); e.Handled = true; }
@@ -91,6 +95,20 @@ public partial class MainWindow : Window
         while (element is not null)
         {
             if (element is TextBoxBase or PasswordBox or ButtonBase or Slider or ComboBox or MenuItem) return true;
+            element = element is System.Windows.Media.Visual or System.Windows.Media.Media3D.Visual3D
+                ? System.Windows.Media.VisualTreeHelper.GetParent(element)
+                : (element as FrameworkContentElement)?.Parent ?? LogicalTreeHelper.GetParent(element);
+        }
+        return false;
+    }
+    private static bool OwnsShortcut(DependencyObject? element, Key key, ModifierKeys modifiers)
+    {
+        while (element is not null)
+        {
+            if (element is TextBoxBase or PasswordBox or ComboBox or MenuItem or Slider) return true;
+            // Buttons/checkboxes own Space and Enter, but do not consume playlist Ctrl+A,
+            // reorder, seek or volume shortcuts just because a row checkbox has focus.
+            if (element is ButtonBase && modifiers == ModifierKeys.None && key is Key.Space or Key.Enter) return true;
             element = element is System.Windows.Media.Visual or System.Windows.Media.Media3D.Visual3D
                 ? System.Windows.Media.VisualTreeHelper.GetParent(element)
                 : (element as FrameworkContentElement)?.Parent ?? LogicalTreeHelper.GetParent(element);

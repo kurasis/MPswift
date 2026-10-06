@@ -5,7 +5,7 @@ The full specification remains the target. Unit tests or cross-builds do not sat
 | ID | Priority | Scenario | Planned stage | Status | Evidence / next work |
 | --- | --- | --- | --- | --- | --- |
 
-| AC-001 | P0 | Clean portable launch | B/C | Local self-contained candidate/package smoke prepared; clean baseline unrun | Unicode extraction/arbitrary CWD/invalid DOTNET_ROOT checks prepared; clean Windows 11 without SDK pending |
+| AC-001 | P0 | Clean portable launch | B/C | Self-contained extracted apphost smoke passed; clean Windows 11 baseline unrun | Unicode extraction/arbitrary CWD/invalid DOTNET_ROOT passed on Windows Server 2022; clean Windows 11 without SDK pending |
 | AC-002 | P0 | Network disconnected before first run | B/C | Local-only app implemented; disconnected-first-run acceptance unrun | [Exact release workflow](RELEASE_ACCEPTANCE.md); no runtime downloads/accounts |
 | AC-003 | P0 | Open MP3 and FLAC | B/C | Implemented; MP3/FLAC native integration passed; device acceptance open | MP3 CBR/VBR and FLAC16/24 fixtures; device playback acceptance open |
 | AC-004 | P0 | Core format matrix | B/C | Native matrix passed for 17 representative profiles; full acceptance partial | 17 real fixtures; HE-AAC/profile/device gates open; [formats](FORMAT_SUPPORT.md) |
@@ -39,7 +39,7 @@ The full specification remains the target. Unit tests or cross-builds do not sat
 | AC-032 | P1 | Read-only portable location | D–G | Portable marker/fallback implemented; acceptance partial | Explicit writable Data/per-user choice; readonly-folder Windows acceptance open |
 | AC-033 | P1 | Long playback/stress | D–G | Real 1000-cycle native preparation stress prepared; output soak unrun | 50 warmup/load/prepare/seek/stop; handles/memory/p95 samples; two-hour device playback remains open |
 | AC-034 | P1 | Offline traffic audit | D–G | Not implemented / not run | [Roadmap](ROADMAP.md) |
-| AC-035 | P1 | Package audit | D–G | Local 550-file hash/native/runtime audit and negative integrity checks passed | Fresh candidate/14 dependency declarations/13 native x64; license approval false; [gates](RELEASE_ACCEPTANCE.md) |
+| AC-035 | P1 | Package audit | D–G | Linux/Windows 550-file audit, negative integrity and Windows apphost smoke passed | Fresh candidate/14 dependency declarations/13 native x64; license approval false; [gates](RELEASE_ACCEPTANCE.md) |
 | AC-036 | P1 | Reference visual review | D–G | Actual screenshot reviewed; original vector/chrome/compact dark hierarchy | EN/RU screenshots retained in CI; review found/fixed ambient-language drift; physical scale review open |
 | AC-037 | P1 | P1 format matrix | D–G | Six additional pinned P1 decoder paths implemented; coverage incomplete | 13 DLLs audited, WV/TTA/M4B fixtures added; native/profile/license release blockers remain |
 | AC-038 | P1 | Source preservation | D–G | Codec/independent/long-wave source hash and handle checks passed | Read-only file/hash/handle checks include independent and long-wave paths in Windows CI |

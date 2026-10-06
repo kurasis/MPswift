@@ -1,6 +1,6 @@
 # Known limitations
 
-- Stage F Windows integration passed at `39a8a25`. Stage G code builds and 95 local tests pass; local candidate audit/negative integrity checks pass. Current Stage G packaged-executable/native stress evidence is pending. This is not version 1.0.
+- Stage F Windows integration passed at `39a8a25`. Stage G passes 95 tests on Linux/Windows and actual hosted Windows native stress, EN/RU WPF and extracted self-contained apphost checks at `3cc2631`; full file audits and negative integrity checks pass. Final keyboard refinement is awaiting its Windows regression run. This is not version 1.0.
 - Persistent mixer, scheduled boundaries and crossfade are implemented. Only the committed real-PCM Windows harness can establish the tested mixer combinations; endpoint capture, acoustic listening, output latency, hotplug/sleep/exclusive and lossy gapless are not claimed as verified.
 - EQ uses float biquads through the production render path, conservative positive-band headroom, 20 ms parameter blending and final saturation after app volume. It is not a bit-perfect mode. ReplayGain reads tags only; unknown/invalid tags do not trigger library loudness analysis.
 - Queue/history/remaining shuffle IDs restore without autoplay. Recent navigation is capped at 100 entries, explicit queue at 10,000 items and saved session JSON at 16 MiB. All-disabled/missing traversal is bounded. CUE waveform clipping reuses coarse source buckets, so boundary peaks retain bucket resolution.

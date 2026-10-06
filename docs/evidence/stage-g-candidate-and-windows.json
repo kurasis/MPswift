@@ -1,0 +1,805 @@
+{
+  "sourceCommit": "3cc26313dfdfb3ea03759f100161464c83424a9b",
+  "runUrl": "https://github.com/kurasis/MPswift/actions/runs/37409888948",
+  "evidenceLevel": "real Linux/Windows Server 2022 hosted integration; not Windows 11 offline/device acceptance",
+  "results": {
+    "evidence-ubuntu-24.04": {
+      "reports": {
+        "portable/package-audit.json": {
+          "Status": "local-candidate-packaged",
+          "SourceCommit": "3cc26313dfdfb3ea03759f100161464c83424a9b",
+          "SourceTreeDirty": false,
+          "Zip": "LocalAudioPlayer-dev-3cc26313dfdf-win-x64.zip",
+          "ZipSha256": "4dbfe11fa7a522216bc3a976e07b6e61cf30036d19c05e0268be71dabd6f20ed",
+          "Bytes": 85360035,
+          "Files": 550,
+          "Dependencies": 14,
+          "NativeLibraries": 13,
+          "DistributionApproved": false
+        },
+        "portable/integrity-audit.json": {
+          "Status": "candidate-integrity-negative-checks-passed",
+          "SourceCommit": "3cc26313dfdfb3ea03759f100161464c83424a9b",
+          "SourceTreeDirty": false,
+          "Checks": [
+            "changed file",
+            "missing file",
+            "extra file",
+            "empty checksum list"
+          ],
+          "ZipSha256": "4dbfe11fa7a522216bc3a976e07b6e61cf30036d19c05e0268be71dabd6f20ed",
+          "RestoredCopyPassed": true
+        }
+      },
+      "coreTests": [
+        {
+          "report": "test-results/_runnervm8df0l_2026-10-06_03_38_38_net10.0.trx",
+          "counters": {
+            "total": "95",
+            "executed": "95",
+            "passed": "95",
+            "failed": "0",
+            "error": "0",
+            "timeout": "0",
+            "aborted": "0",
+            "inconclusive": "0",
+            "passedButRunAborted": "0",
+            "notRunnable": "0",
+            "notExecuted": "0",
+            "disconnected": "0",
+            "warning": "0",
+            "completed": "0",
+            "inProgress": "0",
+            "pending": "0"
+          }
+        }
+      ]
+    },
+    "evidence-windows-2022": {
+      "reports": {
+        "portable/integrity-audit.json": {
+          "Status": "candidate-integrity-negative-checks-passed",
+          "SourceCommit": "3cc26313dfdfb3ea03759f100161464c83424a9b",
+          "SourceTreeDirty": false,
+          "Checks": [
+            "changed file",
+            "missing file",
+            "extra file",
+            "empty checksum list"
+          ],
+          "ZipSha256": "153c80d56fbc46cbfdc26e2c83eb2b72414ae7c11ce0cfd0b4c89dfb8c78a059",
+          "RestoredCopyPassed": true
+        },
+        "portable/package-audit.json": {
+          "Status": "local-candidate-packaged",
+          "SourceCommit": "3cc26313dfdfb3ea03759f100161464c83424a9b",
+          "SourceTreeDirty": false,
+          "Zip": "LocalAudioPlayer-dev-3cc26313dfdf-win-x64.zip",
+          "ZipSha256": "153c80d56fbc46cbfdc26e2c83eb2b72414ae7c11ce0cfd0b4c89dfb8c78a059",
+          "Bytes": 85360244,
+          "Files": 550,
+          "Dependencies": 14,
+          "NativeLibraries": 13,
+          "DistributionApproved": false
+        },
+        "smoke/decode.json": {
+          "Status": "decode-passed",
+          "Environment": "Microsoft Windows 10.0.20348",
+          "Architecture": "X64",
+          "Versions": {
+            "bass": "2.4.18.3",
+            "bassmix": "2.4.13.0",
+            "basswasapi": "2.4.4.1"
+          },
+          "SourceSha256": "265bfc54a7b0bfc2b75cf63c427873d00b516bbbb9dcaae17346de76cc4757fb",
+          "Decode": {
+            "SampleRate": 48000,
+            "Channels": 2,
+            "DurationSeconds": 3,
+            "DecodedBytes": 1152000,
+            "Peak": 0.049987793,
+            "Codec": "WavePCM",
+            "BitDepth": 16
+          },
+          "Output": null,
+          "SourceUnchanged": true,
+          "SourceHandleReleased": true,
+          "AudiblePlayback": "not-manually-verified",
+          "Gapless": "not-run"
+        },
+        "smoke/engine.json": {
+          "Status": "production-engine-passed",
+          "Environment": "Microsoft Windows 10.0.20348",
+          "Snapshot": {
+            "Generation": 42,
+            "Revision": 46,
+            "State": 2,
+            "EntryId": "64e71188-2f70-4149-8241-5e8bd40a0118",
+            "Position": "00:00:00",
+            "Duration": "00:00:03",
+            "SourceFormat": {
+              "SampleRate": 48000,
+              "Channels": 2,
+              "Codec": "WavePCM",
+              "BitDepth": 16
+            },
+            "OutputFormat": null,
+            "CanSeek": true,
+            "Volume": 0.5,
+            "Muted": false,
+            "Error": null,
+            "Ended": false,
+            "Transitioned": false
+          },
+          "Output": "not-run",
+          "SourceHandleReleased": true,
+          "SourceUnchanged": true,
+          "AudiblePlayback": "not-manually-verified"
+        },
+        "smoke/formats.json": {
+          "Status": "formats-passed",
+          "Environment": "Microsoft Windows 10.0.20348",
+          "Count": 17,
+          "Results": [
+            {
+              "File": "mp3-cbr.mp3",
+              "Profile": "MP3 CBR",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "0486fe8948b1d6a3f96552b8fada48593c179e43663475fa1619cbd0310576d7",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.048607685,
+                "Codec": "MP3",
+                "BitDepth": 0
+              }
+            },
+            {
+              "File": "mp3-vbr.mp3",
+              "Profile": "MP3 VBR with Xing/LAME",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "f95d3c7358817ce0a63cf3dc9c9e15d2599f873d9d569bb1c89eee1cfa9b8fa2",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.050218564,
+                "Codec": "MP3",
+                "BitDepth": 0
+              }
+            },
+            {
+              "File": "pcm16.wav",
+              "Profile": "WAV PCM16",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "6ce636b4dabd3243eeaee64a6716ceb0dafb7eb6dbb64e542ef838dca1ffa887",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.049987793,
+                "Codec": "WavePCM",
+                "BitDepth": 16
+              }
+            },
+            {
+              "File": "pcm24.wav",
+              "Profile": "WAV PCM24",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "a526ec91a362f2044ea32d121ee76b0ac2ff6aa4962c540da42c28a7375a83c8",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.049987793,
+                "Codec": "WavePCM",
+                "BitDepth": 24
+              }
+            },
+            {
+              "File": "pcm32.wav",
+              "Profile": "WAV PCM32",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "4a8dcbab17493ebc7ab40409eee078b36dec50e914e94023ed77b256712bb6a6",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.049987793,
+                "Codec": "WavePCM",
+                "BitDepth": 32
+              }
+            },
+            {
+              "File": "float32.wav",
+              "Profile": "WAV float32",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "06f4dacaf2aaf18226cbba64ff9463a0150151b8c6b335428f601adc3208e39a",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.049987793,
+                "Codec": "WaveFloat",
+                "BitDepth": 32
+              }
+            },
+            {
+              "File": "pcm16.aiff",
+              "Profile": "AIFF PCM16",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "74fefd0a7d00160d0e8bb313e7ada50145d9a68db26b6a59d894f1b7b266b827",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.049987793,
+                "Codec": "AIFF",
+                "BitDepth": 16
+              }
+            },
+            {
+              "File": "flac16.flac",
+              "Profile": "FLAC 16-bit",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "a45e1acf4e46a18e549d00aec80fe9ce53ba1f8fe5aa7ab05a1637f2e712439d",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.049987793,
+                "Codec": "FLAC",
+                "BitDepth": 16
+              }
+            },
+            {
+              "File": "flac24.flac",
+              "Profile": "FLAC 24-bit",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "508ab2ea6e5e22d6df2ba17b896a8b5099957f100a54ff9e84147b836900a284",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.049987793,
+                "Codec": "FLAC",
+                "BitDepth": 24
+              }
+            },
+            {
+              "File": "vorbis.ogg",
+              "Profile": "Ogg Vorbis",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "c89e006e966c2aa20ad16dfed82ca83e5c7c8138b36e757408bd170421627c93",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.051370002,
+                "Codec": "OGG",
+                "BitDepth": 0
+              }
+            },
+            {
+              "File": "opus.opus",
+              "Profile": "Ogg Opus",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "e4c50d3748d2b62d7a9008726346e8a953cb877ee373538ec81bfe3d0896421a",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.051288154,
+                "Codec": "OPUS",
+                "BitDepth": 0
+              }
+            },
+            {
+              "File": "aac-lc.aac",
+              "Profile": "AAC-LC ADTS",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "8a4291d2f0ee031e1218f156e385b4fec13fa3c96da4693547c1406345a1ef39",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3.008,
+                "DecodedBytes": 1155072,
+                "Peak": 0.05505964,
+                "Codec": "AAC",
+                "BitDepth": 0
+              }
+            },
+            {
+              "File": "aac-lc.m4a",
+              "Profile": "AAC-LC MP4",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "2a1942fb07f64ef11eff75b94c46b9e33c6d4fc784be2f5544dd2dc97cc41d18",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3.021333333333333,
+                "DecodedBytes": 1160192,
+                "Peak": 0.055056825,
+                "Codec": "MP4",
+                "BitDepth": 0
+              }
+            },
+            {
+              "File": "alac.m4a",
+              "Profile": "ALAC MP4",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "1b947ea4937c837d4e99bda0d0badb2c709df5f41f13a01a3cbec23f94839ef8",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.049987793,
+                "Codec": "ALAC",
+                "BitDepth": 16
+              }
+            },
+            {
+              "File": "wavpack.wv",
+              "Profile": "WavPack lossless",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "6b9666259a90028c3695648597f043cafeab500b55708b3779a9ee5b26c056a3",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.049987793,
+                "Codec": "WV",
+                "BitDepth": 16
+              }
+            },
+            {
+              "File": "tta.tta",
+              "Profile": "TTA lossless",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "899e3012efb1ea5a784938143bed13685bd2fa47a28d5c4a7312955ed08bf595",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.049987793,
+                "Codec": "TTA",
+                "BitDepth": 16
+              }
+            },
+            {
+              "File": "audiobook.m4b",
+              "Profile": "M4B AAC-LC without DRM",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "f3107688d080c55b22e4dbc42397f955906995fed51776c1947b6457c2823c85",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3.021333333333333,
+                "DecodedBytes": 1160192,
+                "Peak": 0.055303015,
+                "Codec": "MP4",
+                "BitDepth": 0
+              }
+            }
+          ],
+          "DeviceOutput": "not-run"
+        },
+        "smoke/mixer.json": {
+          "Status": "mixer-passed",
+          "Environment": "Microsoft Windows 10.0.20348",
+          "SplitFrames": 48000,
+          "SampleRate": 48000,
+          "Channels": 2,
+          "LosslessMaximumSampleError": 0,
+          "CueMaximumSampleError": 0,
+          "AddedOrDuplicatedFrames": 0,
+          "PersistentGraph": true,
+          "PreparedNext": true,
+          "CrossfadeIncomingTimeline": true,
+          "SeekCancelsOverlap": true,
+          "SourceUnchanged": true,
+          "Capture": "stage-d-mixer/lossless-capture.f32",
+          "CueCapture": "stage-d-mixer/cue-capture.f32",
+          "CaptureEncoding": "IEEE float32 LE interleaved stereo",
+          "CapturePath": "production mixer callback PCM; no endpoint/system latency",
+          "WasapiOutputCapture": "not-run",
+          "Listening": "not-run",
+          "LossyGapless": "not-claimed",
+          "FixtureLicense": "CC0-1.0"
+        },
+        "smoke/package-smoke.json": {
+          "Status": "packaged-executable-smoke-passed",
+          "SourceCommit": "3cc26313dfdfb3ea03759f100161464c83424a9b",
+          "ZipSha256": "153c80d56fbc46cbfdc26e2c83eb2b72414ae7c11ce0cfd0b4c89dfb8c78a059",
+          "UnicodeExtractionPath": true,
+          "ArbitraryWorkingDirectory": true,
+          "InvalidExternalDotnetRoot": true,
+          "TamperRejected": true,
+          "Windows": "Microsoft Windows NT 10.0.20348.0",
+          "CleanWindows11WithoutSdk": "not-run",
+          "NetworkDisconnected": "not-run",
+          "DeviceOutput": "not-run",
+          "DistributionApproved": false
+        },
+        "smoke/packaged-ui.json": {
+          "WindowsIntegration": {
+            "Status": "windows-integration-passed",
+            "SecondProcessActivation": true,
+            "ConcurrentFileForwarding": true,
+            "NoImplicitAutoplay": true,
+            "OversizedIpcRejected": true,
+            "CurrentUserOnlyPipe": true,
+            "SeekAutomationRange": true,
+            "CloseToTrayPreservesState": true,
+            "Language": "ru",
+            "ResourceKeys": 203,
+            "RealizedRowContainers": 6,
+            "PlaylistRows": 9987,
+            "GlobalPlaylistCapacity": 10000,
+            "MediaSession": "registered; metadata synchronized",
+            "GlobalMediaKeyPress": "not-run",
+            "ScreenReader": "not-run",
+            "PhysicalDpiAndMonitorMoves": "not-run"
+          },
+          "Status": "ui-smoke-passed",
+          "Environment": "Microsoft Windows 10.0.20348",
+          "ImportedEntries": 10,
+          "DistinctEntryIds": true,
+          "SharedTrackIdentity": true,
+          "ImportDidNotAutoplay": true,
+          "NativePreparation": true,
+          "DurationSeconds": 2,
+          "SeekPositionSeconds": 0.25,
+          "SearchLeavesSourceUnchanged": true,
+          "BindingErrors": 0,
+          "UnicodeMetadata": true,
+          "MetadataHandleReleased": true,
+          "DarkTheme": true,
+          "PersistentTabs": 2,
+          "StableOrderAndIds": true,
+          "EditingOtherTabKeepsSource": true,
+          "SessionReopenedWithoutAutoplay": true,
+          "SavedVolume": 23,
+          "SavedMuted": true,
+          "RealWaveform": true,
+          "WaveformBuckets": 200,
+          "LibraryScanReconcileAndIdentity": true,
+          "WorkflowSourceHashesUnchanged": true,
+          "DuplicateRating": true,
+          "M3u8RoundTrip": true,
+          "RelinkPreservesIds": true,
+          "CueImportAndRelativeSeek": true,
+          "CueWaveformBuckets": 200,
+          "LocalFrozenArtwork": true,
+          "LossyCueExportRejected": true,
+          "PersistentQueueItems": 3,
+          "QueueRepeatShuffleRestore": true,
+          "ProcessingSettingsRestore": true,
+          "Screenshot": "stage-c-window.png",
+          "WasapiOutput": "not-run",
+          "Listening": "not-run"
+        },
+        "smoke/probe.json": {
+          "Status": "native-load-passed",
+          "Versions": {
+            "bass": "2.4.18.3",
+            "bassmix": "2.4.13.0",
+            "basswasapi": "2.4.4.1"
+          },
+          "Environment": "Microsoft Windows 10.0.20348"
+        },
+        "smoke/ui-en.json": {
+          "WindowsIntegration": {
+            "Status": "windows-integration-passed",
+            "SecondProcessActivation": true,
+            "ConcurrentFileForwarding": true,
+            "NoImplicitAutoplay": true,
+            "OversizedIpcRejected": true,
+            "CurrentUserOnlyPipe": true,
+            "SeekAutomationRange": true,
+            "CloseToTrayPreservesState": true,
+            "Language": "en",
+            "ResourceKeys": 203,
+            "RealizedRowContainers": 6,
+            "PlaylistRows": 9987,
+            "GlobalPlaylistCapacity": 10000,
+            "MediaSession": "registered; metadata synchronized",
+            "GlobalMediaKeyPress": "not-run",
+            "ScreenReader": "not-run",
+            "PhysicalDpiAndMonitorMoves": "not-run"
+          },
+          "Status": "ui-smoke-passed",
+          "Environment": "Microsoft Windows 10.0.20348",
+          "ImportedEntries": 10,
+          "DistinctEntryIds": true,
+          "SharedTrackIdentity": true,
+          "ImportDidNotAutoplay": true,
+          "NativePreparation": true,
+          "DurationSeconds": 2,
+          "SeekPositionSeconds": 0.25,
+          "SearchLeavesSourceUnchanged": true,
+          "BindingErrors": 0,
+          "UnicodeMetadata": true,
+          "MetadataHandleReleased": true,
+          "DarkTheme": true,
+          "PersistentTabs": 2,
+          "StableOrderAndIds": true,
+          "EditingOtherTabKeepsSource": true,
+          "SessionReopenedWithoutAutoplay": true,
+          "SavedVolume": 23,
+          "SavedMuted": true,
+          "RealWaveform": true,
+          "WaveformBuckets": 200,
+          "LibraryScanReconcileAndIdentity": true,
+          "WorkflowSourceHashesUnchanged": true,
+          "DuplicateRating": true,
+          "M3u8RoundTrip": true,
+          "RelinkPreservesIds": true,
+          "CueImportAndRelativeSeek": true,
+          "CueWaveformBuckets": 200,
+          "LocalFrozenArtwork": true,
+          "LossyCueExportRejected": true,
+          "PersistentQueueItems": 3,
+          "QueueRepeatShuffleRestore": true,
+          "ProcessingSettingsRestore": true,
+          "Screenshot": "stage-c-window.png",
+          "WasapiOutput": "not-run",
+          "Listening": "not-run"
+        },
+        "smoke/stress.json": {
+          "Status": "native-preparation-stress-passed",
+          "Environment": "Microsoft Windows NT 10.0.20348.0",
+          "Method": "50 warmup + 1000 serialized real load/prepare-next/seek/stop cycles; process samples every 100 cycles; no forced GC",
+          "Changes": 1000,
+          "Samples": [
+            {
+              "Changes": 0,
+              "Handles": 277,
+              "PrivateBytes": 12107776,
+              "WorkingSet": 34865152
+            },
+            {
+              "Changes": 100,
+              "Handles": 280,
+              "PrivateBytes": 12029952,
+              "WorkingSet": 34844672
+            },
+            {
+              "Changes": 200,
+              "Handles": 280,
+              "PrivateBytes": 12816384,
+              "WorkingSet": 35627008
+            },
+            {
+              "Changes": 300,
+              "Handles": 280,
+              "PrivateBytes": 13602816,
+              "WorkingSet": 36421632
+            },
+            {
+              "Changes": 400,
+              "Handles": 280,
+              "PrivateBytes": 14499840,
+              "WorkingSet": 37130240
+            },
+            {
+              "Changes": 500,
+              "Handles": 280,
+              "PrivateBytes": 15286272,
+              "WorkingSet": 37900288
+            },
+            {
+              "Changes": 600,
+              "Handles": 280,
+              "PrivateBytes": 16072704,
+              "WorkingSet": 38686720
+            },
+            {
+              "Changes": 700,
+              "Handles": 280,
+              "PrivateBytes": 16863232,
+              "WorkingSet": 39452672
+            },
+            {
+              "Changes": 800,
+              "Handles": 280,
+              "PrivateBytes": 17584128,
+              "WorkingSet": 40218624
+            },
+            {
+              "Changes": 900,
+              "Handles": 283,
+              "PrivateBytes": 18395136,
+              "WorkingSet": 41025536
+            },
+            {
+              "Changes": 1000,
+              "Handles": 283,
+              "PrivateBytes": 19189760,
+              "WorkingSet": 41799680
+            }
+          ],
+          "HandleGrowth": 6,
+          "PrivateByteGrowth": 7081984,
+          "CycleP95Milliseconds": 0.184,
+          "SourceUnchanged": true,
+          "SourceHandleReleased": true,
+          "TwoHourDevicePlayback": "not-run",
+          "EndpointTransitions": "not-run",
+          "Listening": "not-run"
+        },
+        "smoke/ui-ru.json": {
+          "WindowsIntegration": {
+            "Status": "windows-integration-passed",
+            "SecondProcessActivation": true,
+            "ConcurrentFileForwarding": true,
+            "NoImplicitAutoplay": true,
+            "OversizedIpcRejected": true,
+            "CurrentUserOnlyPipe": true,
+            "SeekAutomationRange": true,
+            "CloseToTrayPreservesState": true,
+            "Language": "ru",
+            "ResourceKeys": 203,
+            "RealizedRowContainers": 6,
+            "PlaylistRows": 9987,
+            "GlobalPlaylistCapacity": 10000,
+            "MediaSession": "registered; metadata synchronized",
+            "GlobalMediaKeyPress": "not-run",
+            "ScreenReader": "not-run",
+            "PhysicalDpiAndMonitorMoves": "not-run"
+          },
+          "Status": "ui-smoke-passed",
+          "Environment": "Microsoft Windows 10.0.20348",
+          "ImportedEntries": 10,
+          "DistinctEntryIds": true,
+          "SharedTrackIdentity": true,
+          "ImportDidNotAutoplay": true,
+          "NativePreparation": true,
+          "DurationSeconds": 2,
+          "SeekPositionSeconds": 0.25,
+          "SearchLeavesSourceUnchanged": true,
+          "BindingErrors": 0,
+          "UnicodeMetadata": true,
+          "MetadataHandleReleased": true,
+          "DarkTheme": true,
+          "PersistentTabs": 2,
+          "StableOrderAndIds": true,
+          "EditingOtherTabKeepsSource": true,
+          "SessionReopenedWithoutAutoplay": true,
+          "SavedVolume": 23,
+          "SavedMuted": true,
+          "RealWaveform": true,
+          "WaveformBuckets": 200,
+          "LibraryScanReconcileAndIdentity": true,
+          "WorkflowSourceHashesUnchanged": true,
+          "DuplicateRating": true,
+          "M3u8RoundTrip": true,
+          "RelinkPreservesIds": true,
+          "CueImportAndRelativeSeek": true,
+          "CueWaveformBuckets": 200,
+          "LocalFrozenArtwork": true,
+          "LossyCueExportRejected": true,
+          "PersistentQueueItems": 3,
+          "QueueRepeatShuffleRestore": true,
+          "ProcessingSettingsRestore": true,
+          "Screenshot": "stage-c-window.png",
+          "WasapiOutput": "not-run",
+          "Listening": "not-run"
+        },
+        "smoke/ui.json": {
+          "WindowsIntegration": {
+            "Status": "windows-integration-passed",
+            "SecondProcessActivation": true,
+            "ConcurrentFileForwarding": true,
+            "NoImplicitAutoplay": true,
+            "OversizedIpcRejected": true,
+            "CurrentUserOnlyPipe": true,
+            "SeekAutomationRange": true,
+            "CloseToTrayPreservesState": true,
+            "Language": "ru",
+            "ResourceKeys": 203,
+            "RealizedRowContainers": 6,
+            "PlaylistRows": 9987,
+            "GlobalPlaylistCapacity": 10000,
+            "MediaSession": "registered; metadata synchronized",
+            "GlobalMediaKeyPress": "not-run",
+            "ScreenReader": "not-run",
+            "PhysicalDpiAndMonitorMoves": "not-run"
+          },
+          "Status": "ui-smoke-passed",
+          "Environment": "Microsoft Windows 10.0.20348",
+          "ImportedEntries": 10,
+          "DistinctEntryIds": true,
+          "SharedTrackIdentity": true,
+          "ImportDidNotAutoplay": true,
+          "NativePreparation": true,
+          "DurationSeconds": 2,
+          "SeekPositionSeconds": 0.25,
+          "SearchLeavesSourceUnchanged": true,
+          "BindingErrors": 0,
+          "UnicodeMetadata": true,
+          "MetadataHandleReleased": true,
+          "DarkTheme": true,
+          "PersistentTabs": 2,
+          "StableOrderAndIds": true,
+          "EditingOtherTabKeepsSource": true,
+          "SessionReopenedWithoutAutoplay": true,
+          "SavedVolume": 23,
+          "SavedMuted": true,
+          "RealWaveform": true,
+          "WaveformBuckets": 200,
+          "LibraryScanReconcileAndIdentity": true,
+          "WorkflowSourceHashesUnchanged": true,
+          "DuplicateRating": true,
+          "M3u8RoundTrip": true,
+          "RelinkPreservesIds": true,
+          "CueImportAndRelativeSeek": true,
+          "CueWaveformBuckets": 200,
+          "LocalFrozenArtwork": true,
+          "LossyCueExportRejected": true,
+          "PersistentQueueItems": 3,
+          "QueueRepeatShuffleRestore": true,
+          "ProcessingSettingsRestore": true,
+          "Screenshot": "stage-c-window.png",
+          "WasapiOutput": "not-run",
+          "Listening": "not-run"
+        },
+        "smoke/waveform.json": {
+          "Status": "waveform-passed",
+          "SourceUnchanged": true,
+          "IndependentDecoder": true,
+          "GainAndMuteIndependent": true,
+          "OppositePhasePeaksPreserved": true,
+          "CacheRoundTrip": true,
+          "CorruptCacheRegenerated": true,
+          "ShortBuckets": 300,
+          "LongDurationSeconds": 7200,
+          "LongBuckets": 300000,
+          "LongFramesPerBucket": 192,
+          "PeakPayloadBytes": 2400000,
+          "CancellationAndHandleRelease": true,
+          "DeviceOutput": "not-run",
+          "FixtureLicense": "CC0-1.0"
+        }
+      },
+      "coreTests": [
+        {
+          "report": "test-results/runneradmin_runnervmdlhio_2026-10-06_03_38_57_net10.0.trx",
+          "counters": {
+            "total": "95",
+            "executed": "95",
+            "passed": "95",
+            "failed": "0",
+            "error": "0",
+            "timeout": "0",
+            "aborted": "0",
+            "inconclusive": "0",
+            "passedButRunAborted": "0",
+            "notRunnable": "0",
+            "notExecuted": "0",
+            "disconnected": "0",
+            "warning": "0",
+            "completed": "0",
+            "inProgress": "0",
+            "pending": "0"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -55,6 +55,15 @@ public static class IntegrationSmokeValidation
         var range = (IRangeValueProvider?)peer.GetPattern(PatternInterface.RangeValue) ?? throw new InvalidOperationException("Seek RangeValue pattern missing.");
         Check(range.Maximum == model.DurationSeconds && !range.IsReadOnly && peer.GetName() == Strings.Seek, "Seek accessible range/name incorrect.");
         range.SetValue(0.25); await AwaitAsync(() => Math.Abs(model.SeekPosition - 0.25) < 0.01);
+        // Software-routed real WPF events test shortcut ownership, not a physical keyboard claim.
+        var repeat = (ComboBox)window.FindName("RepeatBox"); model.Search = "no-match";
+        repeat.IsDropDownOpen = true; await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ContextIdle);
+        var presentation = PresentationSource.FromVisual(window) ?? throw new InvalidOperationException("WPF input source missing.");
+        var previewEscape = new System.Windows.Input.KeyEventArgs(System.Windows.Input.Keyboard.PrimaryDevice, presentation, 0, System.Windows.Input.Key.Escape) { RoutedEvent = System.Windows.Input.Keyboard.PreviewKeyDownEvent };
+        repeat.RaiseEvent(previewEscape);
+        Check(!previewEscape.Handled && model.Search == "no-match", "Window stole dropdown Escape or cleared search while a transient control owned it.");
+        repeat.RaiseEvent(new System.Windows.Input.KeyEventArgs(System.Windows.Input.Keyboard.PrimaryDevice, presentation, 0, System.Windows.Input.Key.Escape) { RoutedEvent = System.Windows.Input.Keyboard.KeyDownEvent });
+        Check(!repeat.IsDropDownOpen, "Dropdown did not close on its own Escape route."); model.Search = "";
         var resources = new ResourceManager("Player.App.Resources.Strings", typeof(Strings).Assembly);
         var english = resources.GetResourceSet(CultureInfo.InvariantCulture, true, false)!;
         var russian = resources.GetResourceSet(CultureInfo.GetCultureInfo("ru"), true, false)!;
@@ -89,7 +98,7 @@ public static class IntegrationSmokeValidation
         Check(((Button)window.FindName("PlayPauseButton")).ActualWidth > 0 && list.ActualHeight > 0, "Minimum layout hid transport/playlist.");
         window.Width = 840; window.Height = 860;
         return new { Status = "windows-integration-passed", SecondProcessActivation = true, ConcurrentFileForwarding = true, NoImplicitAutoplay = true,
-            OversizedIpcRejected = true, CurrentUserOnlyPipe = true, SeekAutomationRange = true, CloseToTrayPreservesState = true,
+            OversizedIpcRejected = true, CurrentUserOnlyPipe = true, SeekAutomationRange = true, SoftwareRoutedDropdownEscape = true, CloseToTrayPreservesState = true,
             Language = model.WindowSettings.Language, ResourceKeys = resourceCount, RealizedRowContainers = realized, PlaylistRows = playlistRows, GlobalPlaylistCapacity = 10000,
             MediaSession = app.MediaSessionAvailable ? "registered; metadata synchronized" : "unavailable in this Windows session",
             GlobalMediaKeyPress = "not-run", ScreenReader = "not-run", PhysicalDpiAndMonitorMoves = "not-run" };
