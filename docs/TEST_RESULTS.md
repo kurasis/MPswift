@@ -1,4 +1,4 @@
-# Test evidence — Stages A, B and C
+# Test evidence — Stages A–G
 
 ## Local execution
 
@@ -147,3 +147,18 @@ Crash-Smoke.ps1 now runs after EN/RU smoke on Windows. It creates only a fresh o
 ## G4–G7 block: local results, Windows checks pending
 
 Locked Release cross-build passes 115 tests, zero warnings/errors. Complete ZIP backup/restore has 13 real SQLite/file cases (live WAL, IDs/session/index/ratings/settings, retained originals, invalid entries/checksums/schema/foreign keys, no overwrite, ownership and occupied-path rejection). The expanded Windows harness exercises complete restore through WPF and invalid-restore recovery, real ACL/file-lock failures and artwork limits, 100k production query/page/render timings and nearly 10k playlist scroll timings. These Windows results are not yet observed. Four owned RF64/WMA/DSF/DFF fixtures extend the matrix to 21; actual new native results are pending. Full Windows 11/device/offline/full-disk/profile/licensing acceptance remains open.
+
+
+## G4–G7 observed Windows and package verification (2026-10-06)
+
+[run 37418131090](https://github.com/kurasis/MPswift/actions/runs/37418131090) completed successfully at `a00ee6cc12e42030fc04cd19f7ac228c2d9f602e`. Both systems: 115/115 passed, zero skipped; all 13 complete-bundle cases passed. Windows: 21 real representative native profiles; EN/RU and extracted-package WPF all passed complete ZIP restore/no-autoplay/invalid-restore reopen, actual write-denial ACL and settings locks, original/previous file preservation, partial-install rollback, corrupt/oversized/truncated artwork, 3×192 frozen portrait/cache/cancellation and source/handle checks. Resources have 208 paired keys. Existing crash/restart, 1000-cycle native preparation, real two-hour waveform, source hashes and integrity checks remain passing. The [exact reports](evidence/stage-g-formats-backup-performance-windows.json) retain raw results and archive/source identity. The first `ddb858e` run failed on a harness ACL-restoration no-op; explicit Access-section restoration corrected it without removing failure/recovery assertions.
+
+| Hosted warm case | 100k query + actual WPF page/render p95 / max | 9987-row scroll p95 / max | End working bytes |
+| --- | --- | --- | --- |
+| EN actual app | 170.4583 / 171.3512 ms | 15.3951 / 17.4003 ms | 195088384 |
+| RU actual app | 172.2612 / 173.8339 ms | 11.4703 / 15.8351 ms | 190173184 |
+| Extracted package RU | 231.4654 / 241.8153 ms | 11.5438 / 14.4466 ms | 191012864 |
+
+24 query/UI and 32 scroll samples per case; all met the recorded 250/100 ms comparisons. 100-result pages realized at most 18 library containers; almost 10k playlist rows realized at most 7 during scrolling. Host: Windows Server 2022 build 20348, AMD EPYC 7763, 4 logical processors exposed, 16 GiB physical RAM, NTFS; physical SSD not established. Raw one-core/all-core burst CPU/resource accounting is retained. Dataset is 100k owned synthetic SQLite metadata records, not physical music files/scanning. Loaded-query + serialized warmup are excluded; typing debounce and forced GC are excluded. This is hosted warm measurement, not clean Windows 11, cold launch, idle/steady playback CPU, two-hour device soak or full-disk/power-loss acceptance.
+
+The separate GitHub ZIP for the verified code source was downloaded and all four remote asset digests/sizes, outer ZIP/checksum/source identity and extracted 550-file/13-native inventory were verified again locally. Archive: 85,394,240 bytes; SHA-256 `5078327f607ad245d3a9adc66901a910875b49805dc18fd2c4de33dc5b8c0404`; [GitHub ZIP](https://github.com/kurasis/MPswift/releases/download/build-37418131090-attempt-1/LocalAudioPlayer-dev-a00ee6cc12e4-win-x64.zip). The final documentation main build publishes a distinct ZIP. The actual extracted RU screenshot was reviewed; this does not substitute for physical DPI/Narrator acceptance.

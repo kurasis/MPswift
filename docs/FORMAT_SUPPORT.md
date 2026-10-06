@@ -1,23 +1,23 @@
-# Audio format support — Stage E implementation and verification matrix
+# Audio format support — Stage G implementation and verification matrix
 
-Pinned base and FLAC/Opus/ALAC/AAC add-ons are inventoried in [the native manifest](../native/manifest.json). Seventeen real generated [fixtures](../tests/fixtures/audio/manifest.json) exercise native decode/seek/end/disposal in Windows CI. Stage B Windows native integration passed for all fourteen profiles; exact results are retained in [test evidence](TEST_RESULTS.md). Device playback, listening and full profile acceptance are separate gates.
+Pinned base and FLAC/Opus/ALAC/AAC add-ons are inventoried in [the native manifest](../native/manifest.json). Twenty-one real generated [fixtures](../tests/fixtures/audio/manifest.json) exercise native decode/seek/end/disposal in Windows CI. Stage B Windows native integration passed for all fourteen profiles; exact results are retained in [test evidence](TEST_RESULTS.md). Device playback, listening and full profile acceptance are separate gates.
 
 | Format/container | Priority | Candidate from specification | Verification status |
 | --- | --- | --- | --- |
 | MP3 | P0 | BASS | CBR and VBR/Xing fixtures; native decode/seek/end/disposal passed |
-| WAV | P0 | BASS | PCM16/24/32/float32 fixtures; all four native decode/seek/end/disposal checks passed |
+| WAV | P0 | BASS | PCM16/24/32/float32 and RF64 PCM16 fixtures; native decode/seek/end/disposal checks passed |
 | AIFF/AIF | P0 | BASS | PCM16 fixture; native decode/seek/end/disposal passed |
 | FLAC | P0 | BASSFLAC | 16/24-bit fixtures; native decode/seek/end/disposal passed |
 | Ogg Vorbis | P0 | BASS | Vorbis fixture; native decode/seek/end/disposal passed |
 | Opus / Ogg Opus | P0 | BASSOPUS | Opus fixture; native decode/seek/end/disposal passed |
 | AAC / M4A | P0 | Approved AAC decoding path | AAC-LC ADTS/MP4 fixtures; native decode/seek/end/disposal passed; HE-AAC untested; distribution path unresolved |
 | ALAC / M4A | P0 | BASSALAC or a verified bundled path | ALAC MP4 fixture; native decode/seek/end/disposal passed |
-| WMA | P1 | Pinned BASSWMA | Provisioned; Windows Media Format system dependency explicit; native/profile/N acceptance unrun |
+| WMA | P1 | Pinned BASSWMA | WMA v2/ASF 128 kbps decode/seek/end/disposal passed; Windows Media Format dependency explicit; lossless/Pro/N acceptance unrun |
 | APE | P1 | Pinned BASSAPE | Provisioned; actual codec/seek/large fixtures unrun |
 | WavPack / WV | P1 | Pinned BASSWV | Lossless decode/seek/end/disposal passed; hybrid/correction-file unrun |
 | Musepack / MPC | P1 | Pinned BASS_MPC | Upstream binary/notice provisioned; real profile fixture unrun, distribution review open |
 | TTA | P1 | Pinned BASS_TTA | Lossless decode/seek/end/disposal passed; LGPL terms retained/review open |
-| DSF / DFF | P1 | Pinned BASSDSD | Float PCM path only; provisioned, actual DSF/DFF conversion fixtures unrun; no native DSD claim |
+| DSF / DFF | P1 | Pinned BASSDSD | Owned DSD64 DSF/DSDIFF decode/seek/end/disposal passed at 88.2 kHz float PCM; native DSD output unimplemented |
 | CUE + supported audio | P1 | Tokenizer/parser and bounded logical decoder sources | Domain and real logical bounds/seek/waveform/WPF passed; production callback CUE sample error 0 |
 | M4B without DRM | P1 | Pinned AAC/MP4 path | AAC-LC decode/seek/end/disposal passed; chapters not implemented |
 | MOD / XM / IT / S3M | P2 | BASS music/module API | Not implemented / not tested |
@@ -26,7 +26,7 @@ Pinned base and FLAC/Opus/ALAC/AAC add-ons are inventoried in [the native manife
 | SACD ISO, archives, exotic game formats | Out of v1.0 | Separate proposal | Excluded from v1.0 |
 | DRM-protected media | Excluded | None | Excluded from v1.0 |
 
-Windows CI verified source sample rate/channels, duration, codec, applicable bit depth, decoded signal, seek/end and unchanged-source/handle-release checks for 17 representative committed fixtures. This covers those exact encodings only. No audio output mode or gapless combination is advertised as verified. The Linux cloud host cannot run Windows native code. Listening/device checks remain separate and not run.
+Windows CI verified source sample rate/channels, duration, codec, applicable bit depth, decoded signal, seek/end and unchanged-source/handle-release checks for 21 representative committed fixtures. This covers those exact encodings only. No audio output mode or gapless combination is advertised as verified. The Linux cloud host cannot run Windows native code. Listening/device checks remain separate and not run.
 
 Stage E provisions 13 development DLLs and extends the fixture manifest to 17. SHA-256/x64/package audits passed locally; this does not prove decode support. Expanded Windows checks remain unrun after hosted-runner acquisition failure. The historical fourteen-profile result is not silently extended to new binaries/profile combinations. Unverified required profiles remain release blockers.
 
@@ -34,3 +34,6 @@ Stage D/E [run 37367043601 attempt 2](https://github.com/kurasis/MPswift/actions
 
 
 G4 adds owned RF64 PCM16, WMA v2/ASF and deterministic first-order DSD64 DSF/DSDIFF fixtures (21 total). Actual decode/seek/end checks are pending Windows CI. DSF/DFF expectations are 88.2 kHz float PCM, not native DSD output. The generator creates fresh files only and does not change source music. FFprobe independently accepted both DSD containers; that result does not substitute for BASS decoding.
+
+
+G4 native results are now observed in [run 37418131090](https://github.com/kurasis/MPswift/actions/runs/37418131090) at `a00ee6c`: all 21 profiles passed. RF64 decoded PCM16 at 48 kHz / stereo / 3 s; WMA v2 decoded at 48 kHz / stereo / 3 s; DSF/DSDIFF each produced 88.2 kHz stereo float PCM, duration 2.9999319727891156 s and peak 0.099865526. Actual midpoint seek, end, source checksum and handle-release checks passed. See [exact reports](evidence/stage-g-formats-backup-performance-windows.json). Tiny RF64 represents the container path, not a >4 GiB-file test. WMA lossless/Pro/N, HE-AAC, APE/MPC, WV hybrid/correction and full combinations remain open.

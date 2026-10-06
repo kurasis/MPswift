@@ -13,3 +13,15 @@ The owner's request is to study the specification, divide it into clear stages w
 | G — Release verification | M6 | Full automated/manual/digital/audio/stress/performance/offline acceptance, license inventory, clean self-contained portable ZIP/checksums/local help. All P0/P1 gates. |
 
 Implement vertical slices; do not advance an untested feature to verified status. Work on independent code can continue while specific Windows/device checks remain unavailable. Stage B replaces the diagnostic window with working controls; waveform and advanced controls appear only when their implementations are available.
+
+
+## Current Stage G development block
+
+| Slice | Delivered | Observed result at `a00ee6c` |
+| --- | --- | --- |
+| G4 — Format coverage | Owned RF64/WMA v2/DSF/DSDIFF fixtures and deterministic DSD generator | 21 real native profiles passed; required remaining full profiles remain open |
+| G5 — Complete backup | Validated no-overwrite ZIP database/settings backup, retained-original rollback restore and WPF action | 13 new real file/SQLite cases and EN/RU/extracted actual-model restore passed |
+| G6 — Storage/artwork failures | Real ACL/file locks/partial restore rollback; corrupt/large cover and bounded portrait thumbnails | Owned Windows failures/recovery/source preservation passed; full disk/huge-tag isolation remain open |
+| G7 — Performance evidence | Actual 100k production query/WPF pages and 9987-row production scrolling, raw CPU/resources | All hosted warm samples met 250 ms search/100 ms scroll comparisons; reference/cold/steady/device acceptance remains open |
+
+[run 37418131090](https://github.com/kurasis/MPswift/actions/runs/37418131090) and [exact reports](evidence/stage-g-formats-backup-performance-windows.json) retain exact provenance. Continue remaining RELEASE_ACCEPTANCE.md workflows; these slices do not declare version 1.0 complete.
