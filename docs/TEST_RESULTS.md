@@ -1,5 +1,11 @@
 # Test evidence — Stages A–G
 
+## Playlist tab interaction and waveform envelope (2026-10-06)
+
+Local locked Release compilation passes with zero warnings/errors and **184 managed tests**. Energy regressions cover sparse full-scale transients, unequal/opposite-phase channels, chunk continuity, partial bucket weighting, silence, misaligned CUE energy slicing, invalid RMS and v2 cache round-trip/old-format refusal. Peak extrema are still retained.
+
+Windows smoke adds actual localized tab popups, clicked-target duplicate/delete/move, software-routed before/after/self/foreign/outside tab drags, selection/source/queue preservation and persisted SQLite order. A separately owned 12-second PCM16 stereo file has full-scale impulses in every bucket and varying sinusoidal energy, with opposite-phase channels. The production native analyzer must match independently computed quantized PCM RMS within 0.00001, preserve peaks, show a varying solid envelope, render at two widths and retain seek/source/playback behavior. EN/RU/extracted-package outcomes must pass this source's main workflow; these are not physical mouse/device or listening claims.
+
 ## Live localization, icon geometry, build metadata and legacy CUE follow-up (2026-10-06)
 
 Local locked Release build: zero warnings/errors and **175 managed tests pass**. New association tests cover missing WAV/APE, renamed FLAC, exact/CUE stem priority, ambiguous images, existing reference preservation, multi-file/malformed/outside-folder refusal, stable song identities, strict Unicode precedence and configured Windows-1251 decoding/settings compatibility.

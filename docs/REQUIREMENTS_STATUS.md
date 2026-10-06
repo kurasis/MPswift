@@ -1,5 +1,9 @@
 # Requirement and acceptance status
 
+AC-007 follow-up: playlist-tab management is available on right click/keyboard context opening. Tabs can be dragged before/after another tab with insertion feedback and edge scrolling, while source/queue identities and SQLite order are preserved. Private owner-checked payloads distinguish tab movement from existing folder/track drops.
+
+AC-009 follow-up: all-channel PCM extrema are preserved, and independently accumulated RMS produces the solid waveform envelope. Time weighting handles partial buckets/CUE overlaps; sparse full-scale transients no longer make the solid display uniformly full-height. v2 cache identities regenerate old completed caches automatically. Native PCM/render/seek and tab interaction evidence must pass the main Windows workflow before publication.
+
 AC-016 compatibility follow-up: missing single-image WAV/APE FILE references can resolve to an unambiguous same-folder FLAC, with native bounds validation and read-only source preservation. A saved legacy-document encoding preference handles Windows-1251 albums; UTF-8/UTF-16 retain precedence. The last logical song receives a native duration hint. Existing reference files, multi-file CUE sheets and ambiguous associations remain protected.
 
 AC-030 / localization follow-up: Settings Apply switches EN/RU immediately in the current player window; action icons use one 18-DIP vector canvas. Compiled versions derive from the workflow number/attempt and are visible in the title/help, GitHub prerelease, ZIP and manifests. Windows EN/RU/native/WPF and extracted-package checks passed at `c43c81a90e5e` in [run 37464467924](https://github.com/kurasis/MPswift/actions/runs/37464467924), with 175 managed tests on each OS; see [Exact source, reports, screenshot hashes and GitHub download receipt](evidence/live-language-cue-windows.json).

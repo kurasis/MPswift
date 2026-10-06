@@ -29,3 +29,7 @@ Validation includes real folder-drop/render/filter/toggle/order checks, menu pop
 ## Consistent action icons and live language
 
 Main-window actions, window controls, search and playing-row indicator use the same 18-DIP vector component, with 1.5-DIP strokes for outline symbols. Button targets remain sized for their role; cover art is a separate artwork surface. EN/RU bindings refresh in place after Settings Apply, including virtualized templates and detached menus. Compiled build version is visible next to the product name.
+
+## Playlist tab interaction and waveform hierarchy
+
+Tabs share the compact dark menu styling; popup actions use the clicked target. Tab dragging shows an amber insertion marker without replacing selection/playback highlights. The waveform has a solid RMS envelope, subdued raw peak context, fixed linear amplitude, vertical breathing room and one-DIP column gaps. This separates transient extrema from sustained energy while retaining real analysis data.

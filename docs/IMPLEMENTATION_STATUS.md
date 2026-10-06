@@ -1,5 +1,13 @@
 # Implementation checkpoint
 
+## Playlist tab management, dragging and waveform energy (2026-10-06)
+
+Playlist tabs now expose a compact localized right-click/keyboard context menu for rename, duplicate, delete, left/right movement, sort and M3U8 export. Popup actions retain the clicked tab even if selection changes. Dragging tabs uses a private owner-checked payload, before/after insertion markers, threshold handling, horizontal edge scrolling and persisted collection movement; self/foreign/outside drops do not change order. Folder/file drops and track-row dragging retain their separate routes. Moving tabs preserves selected/source/queue identities and never prepares or starts another track.
+
+Waveform analysis keeps all-channel raw min/max peaks and now also accumulates independent mean-square PCM energy. The solid envelope uses time-weighted RMS rather than the maximum transient across a wide display interval. Faint peak columns retain transient context; vertical padding and separated columns avoid a full-height solid block. There is no per-track normalization, signed channel summation or playback-gain/DSP coupling. Geometry is cached until data/size changes. CUE slicing weights the overlap of cached buckets; boundary buckets retain the existing conservative peak behavior. Cache schema/fingerprint v2 regenerates old peak-only production caches automatically, with bounded 3.6 MB completed payloads.
+
+Locked local cross-build and managed checks are recorded below. Main Windows CI must verify actual popups/routed drag events, SQLite order, native RMS against independently computed owned PCM, waveform renders/seek and the extracted package before publication.
+
 ## Live language, consistent icons, versioned builds and CUE compatibility (2026-10-06)
 
 Settings Apply now changes EN/RU labels, template labels, detached menus, accessible names, repeat labels, tray actions and model headings immediately while preserving the same window, selection, search and playback instance. Help and modeless queue/library static labels follow language changes. Action icons share an 18-DIP vector canvas and stroke weight instead of mixed Unicode/font metrics. The title bar exposes the compiled product version.

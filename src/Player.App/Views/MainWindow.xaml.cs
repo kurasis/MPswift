@@ -7,12 +7,21 @@ using Player.App.Resources;
 using Player.App.ViewModels;
 using Player.App.Services.Storage;
 using System.IO;
+using System.Windows.Documents;
+using System.Windows.Media;
+using Player.App.Controls;
 
 namespace Player.App.Views;
 
 public partial class MainWindow : Window
 {
     private const string EntryDragFormat = "LocalAudioPlayer.PlaylistEntries";
+    internal const string PlaylistTabDragFormat = "LocalAudioPlayer.PlaylistTab";
+    internal sealed record PlaylistTabDragPayload(MainWindow Owner, PlaylistTabViewModel Tab);
+    private Point? _tabDragOrigin;
+    private PlaylistTabViewModel? _dragTab;
+    private PlaylistInsertionAdorner? _tabInsertion;
+    private long _lastTabScroll;
     private Point? _dragOrigin;
     private PlaylistRowViewModel[] _dragRows = [];
     private bool _shutdownComplete;
@@ -63,6 +72,23 @@ public partial class MainWindow : Window
     private void OnHelp(object sender, RoutedEventArgs e) => new HelpWindow(this, ((App)Application.Current).DataDirectory).Show();
     private void OnDragOver(object sender, DragEventArgs e)
     {
+        if (e.Data.GetDataPresent(PlaylistTabDragFormat))
+        {
+            var valid = TryTabPayload(e.Data, out _) && HasAncestor(e.OriginalSource as DependencyObject, PlaylistTabs);
+            e.Effects = valid ? DragDropEffects.Move : DragDropEffects.None;
+            ClearTabInsertion();
+            if (valid)
+            {
+                ScrollTabsAtEdge(e.GetPosition(PlaylistTabs).X);
+                var (_, edge) = TabInsertion(e);
+                if (AdornerLayer.GetAdornerLayer(PlaylistTabs) is { } layer)
+                {
+                    _tabInsertion = new(PlaylistTabs, edge, (Brush)FindResource("AccentBrush")) { IsHitTestVisible = false };
+                    layer.Add(_tabInsertion);
+                }
+            }
+            e.Handled = true; return;
+        }
         e.Effects = e.Data.GetDataPresent(DataFormats.FileDrop) && Model.CanAcceptFileDrop ? DragDropEffects.Copy :
             e.Data.GetDataPresent(EntryDragFormat) && Model.CanReorder && PlaylistList.IsMouseOver ? DragDropEffects.Move : DragDropEffects.None;
         e.Handled = true;
@@ -70,6 +96,17 @@ public partial class MainWindow : Window
     private async void OnDrop(object sender, DragEventArgs e)
     {
         e.Handled = true;
+        ClearTabInsertion();
+        if (e.Data.GetDataPresent(PlaylistTabDragFormat))
+        {
+            if (TryTabPayload(e.Data, out var payload) && HasAncestor(e.OriginalSource as DependencyObject, PlaylistTabs))
+            {
+                Model.MovePlaylist(payload!.Tab, TabInsertion(e).Index);
+                e.Effects = DragDropEffects.Move;
+            }
+            else e.Effects = DragDropEffects.None;
+            return;
+        }
         if (e.Data.GetDataPresent(EntryDragFormat) && e.Data.GetData(EntryDragFormat) is PlaylistRowViewModel[] rows && PlaylistList.IsMouseOver)
         {
             var container = ItemsControl.ContainerFromElement(PlaylistList, e.OriginalSource as DependencyObject) as ListBoxItem;
@@ -81,6 +118,105 @@ public partial class MainWindow : Window
         else if (e.Data.GetData(DataFormats.FileDrop) is string[] paths)
             await ImportFileDropAsync(paths, e.OriginalSource as DependencyObject);
     }
+    private bool TryTabPayload(IDataObject data, out PlaylistTabDragPayload? payload)
+    {
+        payload = data.GetData(PlaylistTabDragFormat) as PlaylistTabDragPayload;
+        return payload is not null && ReferenceEquals(payload.Owner, this) && Model.CanMovePlaylists && Model.Playlists.Contains(payload.Tab);
+    }
+    private static bool HasAncestor(DependencyObject? element, DependencyObject ancestor)
+    {
+        while (element is not null)
+        {
+            if (ReferenceEquals(element, ancestor)) return true;
+            element = element is Visual or System.Windows.Media.Media3D.Visual3D ? VisualTreeHelper.GetParent(element) : LogicalTreeHelper.GetParent(element);
+        }
+        return false;
+    }
+    private (int Index, double Edge) TabInsertion(DragEventArgs e)
+    {
+        if (ItemsControl.ContainerFromElement(PlaylistTabs, e.OriginalSource as DependencyObject) is ListBoxItem { DataContext: PlaylistTabViewModel tab } container)
+        {
+            var after = e.GetPosition(container).X >= container.ActualWidth / 2;
+            var edge = container.TransformToAncestor(PlaylistTabs).Transform(new Point(after ? container.ActualWidth : 0, 0)).X;
+            return (Model.Playlists.IndexOf(tab) + (after ? 1 : 0), edge);
+        }
+        // Empty tab-strip space is an insertion after the last tab.
+        if (PlaylistTabs.ItemContainerGenerator.ContainerFromIndex(Model.Playlists.Count - 1) is ListBoxItem last)
+            return (Model.Playlists.Count, last.TransformToAncestor(PlaylistTabs).Transform(new Point(last.ActualWidth, 0)).X);
+        return (Model.Playlists.Count, PlaylistTabs.ActualWidth);
+    }
+    private void ScrollTabsAtEdge(double x)
+    {
+        var now = Environment.TickCount64;
+        if (now - _lastTabScroll < 100 || VisualChild<ScrollViewer>(PlaylistTabs) is not { } scroll) return;
+        if (x < 24) scroll.LineLeft(); else if (x > PlaylistTabs.ActualWidth - 24) scroll.LineRight(); else return;
+        _lastTabScroll = now;
+    }
+    private static T? VisualChild<T>(DependencyObject parent) where T : DependencyObject
+    {
+        for (var i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+        {
+            var child = VisualTreeHelper.GetChild(parent, i);
+            if (child is T found) return found;
+            if (VisualChild<T>(child) is { } nested) return nested;
+        }
+        return null;
+    }
+    private void ClearTabInsertion()
+    {
+        if (_tabInsertion is null) return;
+        AdornerLayer.GetAdornerLayer(PlaylistTabs)?.Remove(_tabInsertion); _tabInsertion = null;
+    }
+    private void OnTabDragLeave(object sender, DragEventArgs e) => ClearTabInsertion();
+    private void OnTabDragStart(object sender, MouseButtonEventArgs e)
+    {
+        _tabDragOrigin = null; _dragTab = null;
+        if (e.ClickCount != 1 || !Model.CanMovePlaylists) return;
+        if (ItemsControl.ContainerFromElement(PlaylistTabs, e.OriginalSource as DependencyObject) is ListBoxItem { DataContext: PlaylistTabViewModel tab })
+        { _tabDragOrigin = e.GetPosition(PlaylistTabs); _dragTab = tab; }
+    }
+    private void OnTabDragMove(object sender, MouseEventArgs e)
+    {
+        if (e.LeftButton != MouseButtonState.Pressed) { _tabDragOrigin = null; _dragTab = null; return; }
+        if (_tabDragOrigin is not { } origin || _dragTab is not { } tab || !Model.CanMovePlaylists) return;
+        var point = e.GetPosition(PlaylistTabs);
+        if (Math.Abs(point.X - origin.X) < SystemParameters.MinimumHorizontalDragDistance && Math.Abs(point.Y - origin.Y) < SystemParameters.MinimumVerticalDragDistance) return;
+        _tabDragOrigin = null; _dragTab = null;
+        try { DragDrop.DoDragDrop(PlaylistTabs, new DataObject(PlaylistTabDragFormat, new PlaylistTabDragPayload(this, tab)), DragDropEffects.Move); }
+        finally { ClearTabInsertion(); }
+    }
+    private void OnTabContextMenuOpening(object sender, ContextMenuEventArgs e)
+    {
+        if (ItemsControl.ContainerFromElement(PlaylistTabs, e.OriginalSource as DependencyObject) is not ListBoxItem { DataContext: PlaylistTabViewModel tab } container)
+        { e.Handled = true; return; }
+        Model.SelectedPlaylist = tab;
+        container.ContextMenu.PlacementTarget = container;
+        foreach (var item in container.ContextMenu.Items.OfType<MenuItem>())
+            item.IsEnabled = !Model.IsImporting && (item.Tag as string != "Left" || Model.Playlists.IndexOf(tab) > 0) &&
+                (item.Tag as string != "Right" || Model.Playlists.IndexOf(tab) < Model.Playlists.Count - 1);
+    }
+    private bool SelectTabMenuTarget(object sender)
+    {
+        var parent = sender as ItemsControl;
+        while (parent is MenuItem item) parent = ItemsControl.ItemsControlFromItemContainer(item);
+        if (parent is not ContextMenu { PlacementTarget: FrameworkElement { DataContext: PlaylistTabViewModel tab } } ||
+            Model.IsImporting || !Model.Playlists.Contains(tab)) return false;
+        Model.SelectedPlaylist = tab; return true;
+    }
+    private void OnTabMenuAction(object sender, RoutedEventArgs e)
+    {
+        if (!SelectTabMenuTarget(sender) || sender is not MenuItem { Tag: string action }) return;
+        switch (action)
+        {
+            case "Rename": OnRenamePlaylist(sender, e); break;
+            case "Duplicate": OnDuplicatePlaylist(sender, e); break;
+            case "Delete": OnDeletePlaylist(sender, e); break;
+            case "Left": OnTabLeft(sender, e); break;
+            case "Right": OnTabRight(sender, e); break;
+            case "Export": OnExportPlaylist(sender, e); break;
+        }
+    }
+    private void OnTabSort(object sender, RoutedEventArgs e) { if (SelectTabMenuTarget(sender)) OnSort(sender, e); }
     internal Task ImportFileDropAsync(string[] paths, DependencyObject? source)
     {
         // Use the routed target, including empty strip space and tab children, rather

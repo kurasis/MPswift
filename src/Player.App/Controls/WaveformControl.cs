@@ -23,46 +23,60 @@ public sealed class WaveformControl : FrameworkElement
     public event Action<double>? PreviewSeek;
     public event Action<double>? CommitSeek;
     private StreamGeometry? _geometry;
+    private StreamGeometry? _peakGeometry;
     private bool _dragging;
     private double _preview;
     public WaveformControl() { Cursor = Cursors.Hand; Focusable = true; }
     protected override AutomationPeer OnCreateAutomationPeer() => new SeekPeer(this);
-    private static void GeometryChanged(DependencyObject owner, DependencyPropertyChangedEventArgs args) => ((WaveformControl)owner)._geometry = null;
-    protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo) { _geometry = null; base.OnRenderSizeChanged(sizeInfo); }
+    private static void GeometryChanged(DependencyObject owner, DependencyPropertyChangedEventArgs args) => ((WaveformControl)owner).ClearGeometry();
+    private void ClearGeometry() { _geometry = null; _peakGeometry = null; }
+    protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo) { ClearGeometry(); base.OnRenderSizeChanged(sizeInfo); }
     protected override void OnRender(DrawingContext drawing)
     {
         drawing.DrawRectangle(Brushes.Transparent, null, new Rect(RenderSize));
         if (ActualWidth <= 0 || ActualHeight <= 0 || Data is null) return;
-        _geometry ??= BuildGeometry(Data);
+        if (_geometry is null) BuildGeometry(Data);
         var remaining = SystemParameters.HighContrast ? SystemColors.WindowTextBrush : (Brush?)TryFindResource("WaveformRemainingBrush") ?? Brushes.LightGray;
         var played = SystemParameters.HighContrast ? SystemColors.HighlightBrush : (Brush?)TryFindResource("AccentBrush") ?? Brushes.Orange;
-        drawing.DrawGeometry(remaining, null, _geometry);
+        var center = ActualHeight / 2;
+        drawing.PushOpacity(0.2); drawing.DrawLine(new Pen(remaining, 1), new Point(0, center), new Point(ActualWidth, center)); drawing.Pop();
+        DrawEnvelope(remaining);
         var fraction = Duration > 0 ? Math.Clamp((_dragging ? _preview : Position) / Duration, 0, 1) : 0;
         drawing.PushClip(new RectangleGeometry(new Rect(0, 0, ActualWidth * fraction, ActualHeight)));
-        drawing.DrawGeometry(played, null, _geometry); drawing.Pop();
-        drawing.DrawLine(new Pen(played, 1), new Point(ActualWidth * fraction, 0), new Point(ActualWidth * fraction, ActualHeight));
+        DrawEnvelope(played); drawing.Pop();
+        drawing.DrawLine(new Pen(played, 1), new Point(ActualWidth * fraction, 4), new Point(ActualWidth * fraction, Math.Max(4, ActualHeight - 4)));
         if (IsKeyboardFocused) drawing.DrawRectangle(null, new Pen(remaining, 1) { DashStyle = DashStyles.Dot }, new Rect(1, 1, Math.Max(0, ActualWidth - 2), Math.Max(0, ActualHeight - 2)));
-    }
-    private StreamGeometry BuildGeometry(WaveformData data)
-    {
-        var geometry = new StreamGeometry();
-        using (var context = geometry.Open())
+        void DrawEnvelope(Brush brush)
         {
-            var columns = Math.Min(4096, Math.Max(1, (int)Math.Ceiling(ActualWidth)));
-            for (var column = 0; column < columns; column++)
+            drawing.PushOpacity(SystemParameters.HighContrast ? 0.35 : 0.18);
+            drawing.DrawGeometry(brush, null, _peakGeometry); drawing.Pop();
+            drawing.DrawGeometry(brush, null, _geometry);
+        }
+    }
+    private void BuildGeometry(WaveformData data)
+    {
+        var geometry = new StreamGeometry(); var peaks = new StreamGeometry();
+        using (var context = geometry.Open())
+        using (var peakContext = peaks.Open())
+        {
+            var columns = WaveformProjection.Create(data, (int)Math.Ceiling(ActualWidth / 2));
+            var center = ActualHeight / 2; var half = Math.Max(0, (ActualHeight - 12) / 2);
+            for (var column = 0; column < columns.Length; column++)
             {
-                var first = (int)((long)column * data.Minimum.Length / columns);
-                var last = Math.Max(first + 1, (int)((long)(column + 1) * data.Minimum.Length / columns));
-                float low = 0, high = 0;
-                for (var i = first; i < Math.Min(last, data.Minimum.Length); i++) { low = Math.Min(low, data.Minimum[i]); high = Math.Max(high, data.Maximum[i]); }
-                var x = ActualWidth * column / columns; var width = Math.Max(1, ActualWidth / columns);
-                var top = ActualHeight * (1 - Math.Clamp(high, 0, 1)) / 2;
-                var bottom = ActualHeight * (1 - Math.Clamp(low, -1, 0)) / 2;
-                context.BeginFigure(new Point(x, top), true, true);
-                context.LineTo(new Point(x + width, top), true, false); context.LineTo(new Point(x + width, bottom), true, false); context.LineTo(new Point(x, bottom), true, false);
+                var x = ActualWidth * column / columns.Length;
+                var width = Math.Max(0.5, ActualWidth / columns.Length - 1);
+                var amplitude = Math.Clamp(columns[column].Rms, 0, 1) * half;
+                if (amplitude > 0) Bar(context, x, width, center - amplitude, center + amplitude);
+                Bar(peakContext, x, width, center - Math.Clamp(columns[column].Maximum, 0, 1) * half,
+                    center - Math.Clamp(columns[column].Minimum, -1, 0) * half);
             }
         }
-        geometry.Freeze(); return geometry;
+        geometry.Freeze(); peaks.Freeze(); _geometry = geometry; _peakGeometry = peaks;
+        static void Bar(StreamGeometryContext context, double x, double width, double top, double bottom)
+        {
+            context.BeginFigure(new Point(x, top), true, true);
+            context.LineTo(new Point(x + width, top), true, false); context.LineTo(new Point(x + width, bottom), true, false); context.LineTo(new Point(x, bottom), true, false);
+        }
     }
     private double Map(Point point) => ActualWidth > 0 && Duration > 0 && double.IsFinite(Duration) ? Math.Clamp(point.X / ActualWidth, 0, 1) * Duration : 0;
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)

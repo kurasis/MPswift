@@ -64,7 +64,7 @@ public sealed class UiSmokeValidation : TraceListener
         await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ContextIdle);
         Require(Math.Abs(model.SeekPosition - 1) < 0.01, "Tagged FLAC production seek failed.");
         await model.WaveformCompletion.WaitAsync(TimeSpan.FromSeconds(30));
-        Require(model.Waveform is { } wave && wave.Minimum.Length == 300 && wave.Minimum.Min() < -0.045 && wave.Maximum.Max() > 0.045, "Real waveform did not reach the view model.");
+        Require(model.Waveform is { } wave && wave.Minimum.Length == 300 && wave.Minimum.Min() < -0.045 && wave.Maximum.Max() > 0.045 && wave.Rms is { Length: 300 } && wave.Rms.All(value => value > .02 && value < .04), "Real waveform peaks/energy did not reach the view model.");
         var sourceTabId = model.SelectedPlaylist.Id;
         var activeEntryId = model.Entries[2].Id;
         var originalOrder = model.Entries.Select(e => e.Id).ToArray();
@@ -102,6 +102,8 @@ public sealed class UiSmokeValidation : TraceListener
         Require(model.WindowSettings.Processing is { ReplayGain: ReplayGainMode.Album, CrossfadeSeconds: 3 }, "Audio processing settings were not restored.");
         var cueImage = await CueImageValidation.RunAsync(window, model, taggedFixture, output);
         var folderDrop = await FolderDropValidation.RunAsync(window, model, fixture, output);
+        var playlistTabs = await PlaylistTabsValidation.RunAsync(window, model, fixture, output);
+        var waveformEnvelope = await WaveformEnvelopeValidation.RunAsync(window, model, output);
         var desktop = await DesktopAcceptanceValidation.RunAsync(window, model, output);
         var customization = await CustomizationValidation.RunAsync(window, model, output);
         // Real Stage E file/SQLite/WPF workflows use only owned copies under the smoke directory.
@@ -182,6 +184,8 @@ public sealed class UiSmokeValidation : TraceListener
             FolderDrop = folderDrop,
             CueImage = cueImage,
             Customization = customization,
+            PlaylistTabs = playlistTabs,
+            WaveformEnvelope = waveformEnvelope,
             DesktopAcceptance = desktop,
             CompleteBackupRestore = backupRestore, StorageArtwork = storageArtwork, SearchPerformance = searchPerformance,
             Status = "ui-smoke-passed", Environment = System.Runtime.InteropServices.RuntimeInformation.OSDescription,

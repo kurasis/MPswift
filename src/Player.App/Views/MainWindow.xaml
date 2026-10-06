@@ -116,9 +116,29 @@
                 </Button>
             </StackPanel>
             <ListBox x:Name="PlaylistTabs" ItemsSource="{Binding Playlists}" SelectedItem="{Binding SelectedPlaylist}" BorderThickness="0" Background="{DynamicResource BackgroundBrush}" Foreground="{DynamicResource TextPrimaryBrush}"
+                     ContextMenuOpening="OnTabContextMenuOpening" PreviewMouseLeftButtonDown="OnTabDragStart" PreviewMouseMove="OnTabDragMove" DragLeave="OnTabDragLeave"
                      ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Disabled" AutomationProperties.Name="{r:Loc Playlists}">
                 <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem">
                     <Setter Property="AutomationProperties.Name" Value="{Binding Name}" />
+                    <Setter Property="ContextMenu"><Setter.Value><ContextMenu>
+                        <MenuItem Header="{r:Loc RenamePlaylist}" Tag="Rename" Click="OnTabMenuAction" />
+                        <MenuItem Header="{r:Loc DuplicatePlaylist}" Tag="Duplicate" Click="OnTabMenuAction" />
+                        <Separator />
+                        <MenuItem Header="{r:Loc TabLeft}" Tag="Left" Click="OnTabMenuAction" />
+                        <MenuItem Header="{r:Loc TabRight}" Tag="Right" Click="OnTabMenuAction" />
+                        <MenuItem Header="{r:Loc SortPlaylist}">
+                            <MenuItem Header="{r:Loc SortTitle}" Tag="Title" Click="OnTabSort" />
+                            <MenuItem Header="{r:Loc SortArtist}" Tag="Artist" Click="OnTabSort" />
+                            <MenuItem Header="{r:Loc SortAlbum}" Tag="Album" Click="OnTabSort" />
+                            <MenuItem Header="{r:Loc SortTrack}" Tag="Track" Click="OnTabSort" />
+                            <MenuItem Header="{r:Loc SortDuration}" Tag="Duration" Click="OnTabSort" />
+                            <MenuItem Header="{r:Loc SortPath}" Tag="Path" Click="OnTabSort" />
+                            <MenuItem Header="{r:Loc SortAdded}" Tag="Date added" Click="OnTabSort" />
+                        </MenuItem>
+                        <MenuItem Header="{r:Loc ExportPlaylist}" Tag="Export" Click="OnTabMenuAction" />
+                        <Separator />
+                        <MenuItem Header="{r:Loc DeletePlaylist}" Tag="Delete" Click="OnTabMenuAction" />
+                    </ContextMenu></Setter.Value></Setter>
                     <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
                     <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListBoxItem"><Border x:Name="TabBorder" CornerRadius="6,6,0,0" Background="{TemplateBinding Background}" BorderBrush="Transparent" BorderThickness="0,0,0,2"><ContentPresenter /></Border><ControlTemplate.Triggers><Trigger Property="IsSelected" Value="True"><Setter TargetName="TabBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" /><Setter Property="Foreground" Value="{DynamicResource AccentBrush}" /><Setter Property="Background" Value="{DynamicResource SurfaceBrush}" /></Trigger><Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="TabBorder" Property="BorderThickness" Value="1,1,1,3" /></Trigger></ControlTemplate.Triggers></ControlTemplate></Setter.Value></Setter>
                 </Style></ListBox.ItemContainerStyle>

@@ -545,7 +545,22 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         SelectedPlaylist = Playlists[0]; UpdateEntries();
     }
     public void MoveTab(int delta)
-    { var from = Playlists.IndexOf(SelectedPlaylist); var to = Math.Clamp(from + delta, 0, Playlists.Count - 1); Playlists.Move(from, to); ScheduleSave(true); }
+    {
+        var from = Playlists.IndexOf(SelectedPlaylist);
+        var to = Math.Clamp(from + delta, 0, Playlists.Count - 1);
+        MovePlaylist(SelectedPlaylist, to > from ? to + 1 : to);
+    }
+    public bool CanMovePlaylists => !_closing && !IsImporting && Playlists.Count > 1;
+    /// <summary>Insertion index is measured before removing the dragged tab.</summary>
+    public bool MovePlaylist(PlaylistTabViewModel tab, int insertionIndex)
+    {
+        var from = Playlists.IndexOf(tab);
+        if (!CanMovePlaylists || from < 0 || insertionIndex < 0 || insertionIndex > Playlists.Count) return false;
+        var to = insertionIndex > from ? insertionIndex - 1 : insertionIndex;
+        if (to == from) return false;
+        Playlists.Move(from, to); ScheduleSave(true);
+        return true;
+    }
     public void MoveEntries(IEnumerable<PlaylistRowViewModel> rows, int delta)
     {
         if (!CanReorder) { Message = Strings.Get("ReorderFiltered"); return; }

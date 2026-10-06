@@ -52,3 +52,9 @@ For an existing whole FLAC row, select it (multiple images are supported), then 
 ## Development build versions
 
 The title bar and F1 help show the compiled version. Published builds use `0.2.<workflow run number>-dev.<attempt>`; restarting a workflow increments its attempt. The ZIP, GitHub release, package manifest, app and core file metadata identify the same version. Local unnumbered builds use `0.2.0-dev.0`. Keep the existing Data folder when replacing a portable build.
+
+## Playlist tabs and waveform
+
+Right-click a playlist tab (or focus it and use Shift+F10) to rename, duplicate, delete, move, sort or export that playlist. Drag a tab before/after another tab; the amber marker shows where it will land. Hold near either edge to scroll overflowing tabs. Tab order is saved, and moving tabs keeps the playing source and queue. Dropping a music folder still creates a playlist.
+
+The waveform now shows measured average PCM energy as its solid envelope and quieter peak context. Short loud transients do not fill every column. Stereo channels are analyzed independently before combining energy; opposite-phase material stays visible. It follows source audio, independent of app volume/EQ. Old cached waveforms regenerate automatically; refresh remains available in the action menu.
