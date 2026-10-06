@@ -50,7 +50,12 @@ internal static class CustomizationValidation
         try
         {
             dialog.Show(); await Idle();
-            Render((FrameworkElement)dialog.Content, output, "settings-" + language + ".png");
+            var settingsSurface = (FrameworkElement)dialog.Content;
+            var applyBounds = dialog.ApplyButton.TransformToAncestor(settingsSurface).TransformBounds(new Rect(dialog.ApplyButton.RenderSize));
+            Check(applyBounds.Width > 0 && applyBounds.Height > 0 && applyBounds.Left >= 0 && applyBounds.Top >= 0 &&
+                applyBounds.Right <= settingsSurface.ActualWidth && applyBounds.Bottom <= settingsSurface.ActualHeight,
+                "Settings Apply button was clipped outside the client surface.");
+            Render(settingsSurface, output, "settings-" + language + ".png");
             dialog.LanguageBox.SelectedIndex = language == "ru" ? 0 : 1;
             dialog.AlbumSectionsBox.IsChecked = !before.ShowAlbumSections;
             dialog.CloseToTrayBox.IsChecked = !before.CloseToTray;

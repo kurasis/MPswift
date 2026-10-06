@@ -7,6 +7,8 @@ Replaced default WPF context-menu chrome with complete dark root/submenu/separat
 Local locked Release cross-build passes without warnings/errors and **162 managed tests pass**. Windows CI exercises actual nested-folder headings, filter/toggle/order behavior, settings persistence/cancel and menu keyboard/actions; it retains new EN/RU menu, submenu, settings and grouped-playlist renders. Exact hosted results belong to the main workflow for this source.
 
 
+Hosted [run 37451047030](https://github.com/kurasis/MPswift/actions/runs/37451047030) passed at `1d92b9b2f980`: 162 tests per OS, real EN/RU nested menus/settings persistence/folder headings and packaged app checks. Reviewed menu/submenu and grouped-folder screenshots. The settings render exposed a diagnostic crop caused by rendering a margin-bearing transparent child; an explicit client surface now captures the complete settings layout, and the Apply button must lie within its bounds. The follow-up main workflow revalidates this render correction.
+
 ## MPswift identity and visual refresh (2026-10-06)
 
 Replaced the working product name with MPswift, including the apphost, assembly metadata, portable folder and release ZIP prefix. Embedded the owner-supplied icon in the executable, window and tray. Applied a graphite/amber Fluent-inspired theme to the main player and shared controls, with a now-playing card, primary transport action, deliberate track selection, localized search/drop guidance and compact toolbar. Existing storage and IPC identities remain compatible. [Design rationale and sources](DESIGN.md).

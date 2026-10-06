@@ -20,7 +20,9 @@ public sealed class PreferencesWindow : Window
         SetResourceReference(StyleProperty, typeof(Window));
         Owner = owner; Title = Strings.Settings; Width = 520; Height = 590; MinWidth = 460; MinHeight = 440;
         WindowStartupLocation = WindowStartupLocation.CenterOwner;
-        var root = new DockPanel { Margin = new Thickness(24) }; Content = root;
+        var root = new DockPanel { Margin = new Thickness(24) };
+        var surface = new Border { Child = root };
+        surface.SetResourceReference(Border.BackgroundProperty, "BackgroundBrush"); Content = surface;
         var footer = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right, Margin = new Thickness(0, 20, 0, 0) };
         DockPanel.SetDock(footer, Dock.Bottom); root.Children.Add(footer);
         var cancel = new Button { Content = Strings.Get("Cancel"), IsCancel = true, Margin = new Thickness(0, 0, 8, 0) };
