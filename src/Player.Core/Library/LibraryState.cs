@@ -40,7 +40,7 @@ public interface IPlayerStore : IAsyncDisposable
 
 public sealed record PlayerSettings(int SchemaVersion = 1, double Volume = 50, bool Muted = false,
     int WaveformCacheMiB = 512, double WindowWidth = 840, double WindowHeight = 860, AudioProcessingSettings? Processing = null, AudioOutputSettings? Output = null,
-    string Language = "en", bool CloseToTray = false, double? WindowLeft = null, double? WindowTop = null, bool WindowMaximized = false)
+    string Language = "en", bool CloseToTray = false, double? WindowLeft = null, double? WindowTop = null, bool WindowMaximized = false, bool ShowAlbumSections = true)
 {
     public PlayerSettings Validate()
     {

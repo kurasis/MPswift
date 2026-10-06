@@ -637,4 +637,18 @@ Backup creates a complete local ZIP of database and settings. Restore backup val
     <data xml:space="preserve" name="RestoreBackupPrompt"><value>Restore playlists, queue, library, ratings, history and settings from this backup? Playback will stop. Current database and settings files will be retained separately. A legacy .db backup restores the database only.</value></data>
     <data xml:space="preserve" name="BackupRestored"><value>Backup restored without autoplay. Restart the application if the backup uses another language.</value></data>
     <data xml:space="preserve" name="FolderDropHint"><value>Drop a folder here to create a playlist</value></data>
+    <data xml:space="preserve" name="Settings"><value>Settings</value></data>
+    <data xml:space="preserve" name="PlaylistMenu"><value>Playlist</value></data>
+    <data xml:space="preserve" name="SelectedTracksMenu"><value>Selected tracks</value></data>
+    <data xml:space="preserve" name="QueueMenu"><value>Playback queue</value></data>
+    <data xml:space="preserve" name="FilesMenu"><value>Files and backups</value></data>
+    <data xml:space="preserve" name="InterfaceSection"><value>Interface</value></data>
+    <data xml:space="preserve" name="PlaylistSection"><value>Playlist appearance</value></data>
+    <data xml:space="preserve" name="BehaviorSection"><value>Window behavior</value></data>
+    <data xml:space="preserve" name="AudioSection"><value>Sound</value></data>
+    <data xml:space="preserve" name="ShowAlbumSections"><value>Show album and folder headings</value></data>
+    <data xml:space="preserve" name="AlbumSectionsHelp"><value>Separate albums and subfolders visually without changing track order.</value></data>
+    <data xml:space="preserve" name="AudioSettingsHelp"><value>Choose an output device and adjust the equalizer, ReplayGain or crossfade.</value></data>
+    <data xml:space="preserve" name="PreferencesSaved"><value>Settings saved.</value></data>
+    <data xml:space="preserve" name="AlbumSectionCount"><value>{0} tracks</value></data>
 </root>

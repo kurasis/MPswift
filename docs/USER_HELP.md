@@ -36,3 +36,9 @@ If settings are damaged or missing and a valid previous settings copy exists, st
 
 
 Use Backup in the action menu to save a complete local .zip containing playlists, queue, library, ratings, history and settings. Music, cache and logs are excluded. Restore backup validates the archive before replacing saved files, retains current database/settings separately, stops playback and restores without autoplay. Failed validation preserves current data. Choose a new backup filename; existing files are never overwritten. Legacy .db backups restore the database only. Restart after restoring a backup with another language.
+
+## Settings and album headings
+
+Use the gear in the title bar to open Settings. Choose English or Russian (applies after restarting MPswift), show/hide album and folder headings, or choose close-to-tray behavior. Apply saves the choices; Cancel leaves them unchanged. The Sound section opens output device, EQ, ReplayGain and crossfade controls.
+
+Dropping a folder onto the playlist tabs creates a playlist including its subfolders. Album headings use tags when present, otherwise folder names. Folder hints distinguish discs/subfolders, and counts reflect visible tracks. Search and reordering update headings without changing the playlist's playback order. The ellipsis menu groups playlist, selected-track, queue and file/backup actions.

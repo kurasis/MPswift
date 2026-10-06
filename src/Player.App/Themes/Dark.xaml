@@ -83,8 +83,44 @@
     </Style>
     <Style x:Key="IconButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}"><Setter Property="Width" Value="34" /><Setter Property="Height" Value="34" /><Setter Property="Padding" Value="0" /><Setter Property="FontSize" Value="16" /></Style>
     <Style TargetType="ToolTip"><Setter Property="Background" Value="{DynamicResource SurfaceBrush}" /><Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" /><Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" /><Setter Property="Padding" Value="10,6" /></Style>
-    <Style TargetType="ContextMenu"><Setter Property="Background" Value="{DynamicResource SurfaceBrush}" /><Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" /><Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" /></Style>
-    <Style TargetType="MenuItem"><Setter Property="Background" Value="{DynamicResource SurfaceBrush}" /><Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" /><Style.Triggers><Trigger Property="IsHighlighted" Value="True"><Setter Property="Background" Value="{DynamicResource HoverBrush}" /></Trigger></Style.Triggers></Style>
+    <Style TargetType="ContextMenu">
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI" /><Setter Property="FontSize" Value="13" />
+        <Setter Property="HasDropShadow" Value="False" /><Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ContextMenu">
+            <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="9" Padding="5">
+                <ScrollViewer MaxHeight="420" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" CanContentScroll="False"><ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle" /></ScrollViewer>
+            </Border>
+        </ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style TargetType="MenuItem">
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" /><Setter Property="Background" Value="Transparent" />
+        <Setter Property="Padding" Value="11,8" /><Setter Property="MinWidth" Value="210" />
+        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="MenuItem">
+            <Grid>
+                <Border x:Name="MenuSurface" Background="{TemplateBinding Background}" CornerRadius="5" BorderThickness="1" BorderBrush="Transparent" Padding="{TemplateBinding Padding}">
+                    <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="20" /></Grid.ColumnDefinitions>
+                        <ContentPresenter ContentSource="Header" VerticalAlignment="Center" RecognizesAccessKey="True" />
+                        <Path x:Name="SubmenuArrow" Grid.Column="1" Data="M0,0 L4,4 0,8" Stroke="{TemplateBinding Foreground}" StrokeThickness="1.4" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="Collapsed" />
+                    </Grid>
+                </Border>
+                <Popup x:Name="PART_Popup" Placement="Right" HorizontalOffset="2" IsOpen="{TemplateBinding IsSubmenuOpen}" Focusable="False" AllowsTransparency="True">
+                    <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="9" Padding="5">
+                        <ScrollViewer MaxHeight="420" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" CanContentScroll="False"><ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle" KeyboardNavigation.TabNavigation="Cycle" /></ScrollViewer>
+                    </Border>
+                </Popup>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="HasItems" Value="True"><Setter TargetName="SubmenuArrow" Property="Visibility" Value="Visible" /></Trigger>
+                <Trigger Property="IsHighlighted" Value="True"><Setter TargetName="MenuSurface" Property="Background" Value="{DynamicResource HoverBrush}" /><Setter TargetName="MenuSurface" Property="BorderBrush" Value="{DynamicResource AccentBrush}" /></Trigger>
+                <Trigger Property="IsSubmenuOpen" Value="True"><Setter TargetName="MenuSurface" Property="Background" Value="{DynamicResource HoverBrush}" /></Trigger>
+                <Trigger Property="IsEnabled" Value="False"><Setter TargetName="MenuSurface" Property="Opacity" Value="0.45" /></Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style x:Key="{x:Static MenuItem.SeparatorStyleKey}" TargetType="Separator">
+        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Separator"><Border Height="1" Margin="9,5" Background="{DynamicResource BorderBrush}" /></ControlTemplate></Setter.Value></Setter>
+    </Style>
     <Style TargetType="ListBox"><Setter Property="Background" Value="{DynamicResource BackgroundBrush}" /><Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" /><Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" /></Style>
     <Style TargetType="Slider" BasedOn="{StaticResource {x:Type Control}}">
         <Setter Property="MinHeight" Value="20" /><Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Slider">

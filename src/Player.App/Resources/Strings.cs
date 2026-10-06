@@ -12,6 +12,20 @@ public static class Strings
     public static void SetLanguage(string language) => Culture = CultureInfo.GetCultureInfo(language == "ru" ? "ru-RU" : "en-US");
     public static string Get(string key) => Manager.GetString(key, Culture)
         ?? throw new MissingManifestResourceException($"Missing resource: {key}");
+    public static string Settings => Get(nameof(Settings));
+    public static string PlaylistMenu => Get(nameof(PlaylistMenu));
+    public static string SelectedTracksMenu => Get(nameof(SelectedTracksMenu));
+    public static string QueueMenu => Get(nameof(QueueMenu));
+    public static string FilesMenu => Get(nameof(FilesMenu));
+    public static string InterfaceSection => Get(nameof(InterfaceSection));
+    public static string PlaylistSection => Get(nameof(PlaylistSection));
+    public static string BehaviorSection => Get(nameof(BehaviorSection));
+    public static string AudioSection => Get(nameof(AudioSection));
+    public static string ShowAlbumSections => Get(nameof(ShowAlbumSections));
+    public static string AlbumSectionsHelp => Get(nameof(AlbumSectionsHelp));
+    public static string AudioSettingsHelp => Get(nameof(AudioSettingsHelp));
+    public static string PreferencesSaved => Get(nameof(PreferencesSaved));
+    public static string AlbumSectionCount => Get(nameof(AlbumSectionCount));
     public static string FolderDropHint => Get(nameof(FolderDropHint));
     public static string StageTitle => Get(nameof(StageTitle));
     public static string StageDescription => Get(nameof(StageDescription));

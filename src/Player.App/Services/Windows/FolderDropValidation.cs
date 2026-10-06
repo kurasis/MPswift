@@ -66,6 +66,22 @@ internal static class FolderDropValidation
             await DropAsync((UIElement)window.FindName("PlaylistList"), second);
             Check(model.Entries.Count == 3 && model.Playlists.Count == initialIds.Count + 3,
                 "Folder drop on the track list changed the add-to-selected behavior.");
+            var groupedOrder = model.Entries.Select(e => e.Id).ToArray();
+            Check(model.Entries.Count(e => e.HasSection) == 3 && model.Entries.Any(e => e.SectionTitle == "Disc 2"),
+                "Nested/same-name folders did not produce distinct album headings.");
+            var list = (ListBox)window.FindName("PlaylistList"); window.UpdateLayout();
+            var firstRow = (ListBoxItem)list.ItemContainerGenerator.ContainerFromItem(model.Entries[0]);
+            Check(firstRow.Template.FindName("AlbumHeading", firstRow) is Border { IsVisible: true }, "Album heading was not rendered.");
+            CustomizationValidation.Render((FrameworkElement)window.Content, output, "album-sections-" + model.WindowSettings.Language + ".png");
+            model.Search = "two.wav";
+            Check(model.VisibleEntries.Cast<PlaylistRowViewModel>().Single() is { HasSection: true, SectionTitle: "Disc 2" },
+                "Filtered nested folder lost its heading.");
+            model.Search = "";
+            model.WindowSettings = model.WindowSettings with { ShowAlbumSections = false };
+            Check(model.Entries.All(e => !e.HasSection), "Album heading preference did not update visible rows.");
+            model.WindowSettings = model.WindowSettings with { ShowAlbumSections = true };
+            Check(model.Entries.Count(e => e.HasSection) == 3 && model.Entries.Select(e => e.Id).SequenceEqual(groupedOrder),
+                "Toggling headings changed occurrence order or failed to restore separators.");
             await model.SaveNowAsync();
             var saved = await ((Services.Storage.SqlitePlayerStore)model.LibraryIndex!).LoadAsync();
             foreach (var playlist in model.Playlists.Where(p => !initialIds.Contains(p.Id)))
@@ -83,7 +99,7 @@ internal static class FolderDropValidation
                 model.Message == Strings.Get("TabLimit") && !model.IsImporting, "Tab-limit drop imported into the wrong playlist or left the model busy.");
             return new { Status = "folder-drop-passed", SoftwareRoutedWpfEvents = true, RecursiveFolders = true,
                 SeparateSameNameFolders = true, MixedFilesKeepOriginalTarget = true, TabChildAndEmptyStrip = true,
-                EmptyFolder = true, TrackListKeepsSelectedTarget = true, SQLitePersistence = true, TabLimit = true,
+                EmptyFolder = true, TrackListKeepsSelectedTarget = true, AlbumHeadingsRendered = true, FilteredHeading = true, HeadingToggleKeepsOrder = true, SQLitePersistence = true, TabLimit = true,
                 NonLocalDevicePathsRejected = true, NoAutoplay = true };
         }
         finally

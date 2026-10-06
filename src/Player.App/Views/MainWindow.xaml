@@ -24,6 +24,7 @@
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0" Background="{DynamicResource SurfaceBrush}" MouseDown="OnSystemMenu">
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button x:Name="SettingsButton" Content="&#xE713;" FontFamily="Segoe MDL2 Assets" Click="OnPreferences" ToolTip="{x:Static r:Strings.Settings}" AutomationProperties.Name="{x:Static r:Strings.Settings}" shell:WindowChrome.IsHitTestVisibleInChrome="True" Padding="14,2" Background="Transparent" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,8,0" />
                 <Button Content="—" Click="OnMinimize" ToolTip="{x:Static r:Strings.Minimize}" AutomationProperties.Name="{x:Static r:Strings.Minimize}" shell:WindowChrome.IsHitTestVisibleInChrome="True" Padding="14,2" Background="Transparent" Foreground="{DynamicResource TextPrimaryBrush}" />
                 <Button Content="□" Click="OnMaximize" ToolTip="{x:Static r:Strings.Maximize}" AutomationProperties.Name="{x:Static r:Strings.Maximize}" shell:WindowChrome.IsHitTestVisibleInChrome="True" Padding="14,2" Background="Transparent" Foreground="{DynamicResource TextPrimaryBrush}" />
                 <Button Content="×" Click="OnCloseWindow" ToolTip="{x:Static r:Strings.Close}" AutomationProperties.Name="{x:Static r:Strings.Close}" shell:WindowChrome.IsHitTestVisibleInChrome="True" Padding="14,2" Background="Transparent" Foreground="{DynamicResource TextPrimaryBrush}" />
@@ -76,33 +77,40 @@
                 <Button Content="+" Click="OnCreatePlaylist" ToolTip="{x:Static r:Strings.NewPlaylist}" AutomationProperties.Name="{x:Static r:Strings.NewPlaylist}" Padding="12,4" Margin="2" />
                 <Button x:Name="PlaylistActions" Content="⋯" Click="OnPlaylistActions" ToolTip="{x:Static r:Strings.PlaylistActions}" AutomationProperties.Name="{x:Static r:Strings.PlaylistActions}" Padding="12,4" Margin="2">
                     <Button.ContextMenu><ContextMenu>
+                        <MenuItem Header="{x:Static r:Strings.PlaylistMenu}">
                         <MenuItem Header="{x:Static r:Strings.RenamePlaylist}" Click="OnRenamePlaylist" />
                         <MenuItem Header="{x:Static r:Strings.DuplicatePlaylist}" Click="OnDuplicatePlaylist" />
-                        <MenuItem Header="{x:Static r:Strings.DeletePlaylist}" Click="OnDeletePlaylist" />
                         <MenuItem Header="{x:Static r:Strings.TabLeft}" Click="OnTabLeft" />
                         <MenuItem Header="{x:Static r:Strings.TabRight}" Click="OnTabRight" />
+                        <MenuItem Header="{x:Static r:Strings.DeletePlaylist}" Click="OnDeletePlaylist" />
+                        </MenuItem>
+                        <MenuItem Header="{x:Static r:Strings.SortPlaylist}"><MenuItem Header="{x:Static r:Strings.SortTitle}" Tag="Title" Click="OnSort" /><MenuItem Header="{x:Static r:Strings.SortArtist}" Tag="Artist" Click="OnSort" /><MenuItem Header="{x:Static r:Strings.SortAlbum}" Tag="Album" Click="OnSort" /><MenuItem Header="{x:Static r:Strings.SortTrack}" Tag="Track" Click="OnSort" /><MenuItem Header="{x:Static r:Strings.SortDuration}" Tag="Duration" Click="OnSort" /><MenuItem Header="{x:Static r:Strings.SortPath}" Tag="Path" Click="OnSort" /><MenuItem Header="{x:Static r:Strings.SortAdded}" Tag="Date added" Click="OnSort" /></MenuItem>
+                        <MenuItem Header="{x:Static r:Strings.SelectedTracksMenu}">
+                        <MenuItem Header="{x:Static r:Strings.PlayNext}" Click="OnPlayNext" />
+                        <MenuItem Header="{x:Static r:Strings.AddQueue}" Click="OnAddQueue" />
+                        <MenuItem Header="{x:Static r:Strings.MoveUp}" Click="OnMoveUp" />
+                        <MenuItem Header="{x:Static r:Strings.MoveDown}" Click="OnMoveDown" />
                         <Separator />
-                        <MenuItem Header="{x:Static r:Strings.Library}" Click="OnLibrary" />
-                        <MenuItem Header="{x:Static r:Strings.ExportPlaylist}" Click="OnExportPlaylist" />
-                        <MenuItem Header="{x:Static r:Strings.Relink}" Click="OnRelink" />
                         <MenuItem Header="{x:Static r:Strings.CopyPath}" Click="OnCopyPath" />
                         <MenuItem Header="{x:Static r:Strings.ShowFile}" Click="OnShowFile" />
                         <MenuItem Header="{x:Static r:Strings.Properties}" Click="OnProperties" />
-                        <MenuItem Header="{x:Static r:Strings.SortPlaylist}"><MenuItem Header="{x:Static r:Strings.SortTitle}" Tag="Title" Click="OnSort" /><MenuItem Header="{x:Static r:Strings.SortArtist}" Tag="Artist" Click="OnSort" /><MenuItem Header="{x:Static r:Strings.SortAlbum}" Tag="Album" Click="OnSort" /><MenuItem Header="{x:Static r:Strings.SortTrack}" Tag="Track" Click="OnSort" /><MenuItem Header="{x:Static r:Strings.SortDuration}" Tag="Duration" Click="OnSort" /><MenuItem Header="{x:Static r:Strings.SortPath}" Tag="Path" Click="OnSort" /><MenuItem Header="{x:Static r:Strings.SortAdded}" Tag="Date added" Click="OnSort" /></MenuItem>
+                        <MenuItem Header="{x:Static r:Strings.Relink}" Click="OnRelink" />
+                        </MenuItem>
+                        <MenuItem Header="{x:Static r:Strings.QueueMenu}">
+                            <MenuItem Header="{x:Static r:Strings.ShowQueue}" Click="OnQueue" />
+                            <MenuItem Header="{x:Static r:Strings.ClearHistory}" Command="{Binding ClearHistoryCommand}" />
+                        </MenuItem>
                         <Separator />
+                        <MenuItem Header="{x:Static r:Strings.Library}" Click="OnLibrary" />
+                        <MenuItem Header="{x:Static r:Strings.FilesMenu}">
+                        <MenuItem Header="{x:Static r:Strings.ExportPlaylist}" Click="OnExportPlaylist" />
                         <MenuItem Header="{x:Static r:Strings.LegacyImport}" Click="OnLegacyImport" />
-                        <MenuItem Header="{x:Static r:Strings.PlayNext}" Click="OnPlayNext" />
-                        <MenuItem Header="{x:Static r:Strings.AddQueue}" Click="OnAddQueue" />
-                        <MenuItem Header="{x:Static r:Strings.ShowQueue}" Click="OnQueue" />
-                        <MenuItem Header="{x:Static r:Strings.ClearHistory}" Command="{Binding ClearHistoryCommand}" />
-                        <MenuItem Header="{x:Static r:Strings.AudioSettings}" Click="OnAudioSettings" />
-                        <MenuItem Header="{x:Static r:Strings.Preferences}" Click="OnPreferences" />
-                        <Separator />
-                        <MenuItem Header="{x:Static r:Strings.MoveUp}" Click="OnMoveUp" />
-                        <MenuItem Header="{x:Static r:Strings.MoveDown}" Click="OnMoveDown" />
-                        <MenuItem Header="{x:Static r:Strings.RefreshWaveform}" Command="{Binding RefreshWaveformCommand}" />
                         <MenuItem Header="{x:Static r:Strings.Backup}" Click="OnBackup" />
                         <MenuItem Header="{x:Static r:Strings.RestoreBackup}" Click="OnRestoreBackup" />
+                        </MenuItem>
+                        <MenuItem Header="{x:Static r:Strings.RefreshWaveform}" Command="{Binding RefreshWaveformCommand}" />
+                        <Separator />
+                        <MenuItem Header="{x:Static r:Strings.Settings}" Click="OnPreferences" />
                     </ContextMenu></Button.ContextMenu>
                 </Button>
             </StackPanel>
@@ -127,7 +135,12 @@
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" /><Setter Property="Padding" Value="8,4" />
                         <Setter Property="MinHeight" Value="56" /><Setter Property="Margin" Value="0,1" /><Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
                         <Setter Property="Background" Value="{DynamicResource AlternateRowBrush}" />
-                        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListBoxItem"><Border x:Name="Row" CornerRadius="7" Background="{TemplateBinding Background}" BorderThickness="1" BorderBrush="Transparent" Padding="{TemplateBinding Padding}"><ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" /></Border><ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Row" Property="Background" Value="{DynamicResource HoverBrush}" /></Trigger><Trigger Property="IsSelected" Value="True"><Setter TargetName="Row" Property="Background" Value="{DynamicResource SelectedRowBrush}" /><Setter TargetName="Row" Property="BorderBrush" Value="{DynamicResource AccentBrush}" /></Trigger><Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Row" Property="BorderBrush" Value="{DynamicResource TextPrimaryBrush}" /></Trigger></ControlTemplate.Triggers></ControlTemplate></Setter.Value></Setter>
+                        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListBoxItem"><StackPanel>
+                            <Border x:Name="AlbumHeading" Background="{DynamicResource BackgroundBrush}" Padding="10,12,10,8" ToolTip="{Binding SectionFolder}">
+                                <Border.Style><Style TargetType="Border"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding HasSection}" Value="True"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></Border.Style>
+                                <StackPanel><TextBlock Text="{Binding SectionTitle}" Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold" FontSize="14" TextTrimming="CharacterEllipsis" /><TextBlock Text="{Binding SectionInfo}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Margin="0,3,0,0" TextTrimming="CharacterEllipsis" /></StackPanel>
+                            </Border>
+                            <Border x:Name="Row" CornerRadius="7" Background="{TemplateBinding Background}" BorderThickness="1" BorderBrush="Transparent" Padding="{TemplateBinding Padding}"><ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" /></Border></StackPanel><ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Row" Property="Background" Value="{DynamicResource HoverBrush}" /></Trigger><Trigger Property="IsSelected" Value="True"><Setter TargetName="Row" Property="Background" Value="{DynamicResource SelectedRowBrush}" /><Setter TargetName="Row" Property="BorderBrush" Value="{DynamicResource AccentBrush}" /></Trigger><Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Row" Property="BorderBrush" Value="{DynamicResource TextPrimaryBrush}" /></Trigger></ControlTemplate.Triggers></ControlTemplate></Setter.Value></Setter>
                         <Setter Property="AutomationProperties.Name" Value="{Binding Title}" />
                         <Setter Property="AutomationProperties.HelpText" Value="{Binding Availability}" />
                         <Style.Triggers><Trigger Property="IsSelected" Value="True"><Setter Property="Background" Value="{DynamicResource SelectedRowBrush}" /><Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" /><Setter Property="BorderThickness" Value="1" /></Trigger></Style.Triggers>

@@ -637,4 +637,18 @@ F1: локальная справка
     <data xml:space="preserve" name="RestoreBackupPrompt"><value>Восстановить плейлисты, очередь, библиотеку, оценки, историю и настройки из этой копии? Воспроизведение остановится. Текущие файлы базы и настроек будут сохранены отдельно. Прежняя копия .db восстанавливает только базу.</value></data>
     <data xml:space="preserve" name="BackupRestored"><value>Резервная копия восстановлена без автозапуска музыки. Перезапустите приложение, если в копии выбран другой язык.</value></data>
     <data xml:space="preserve" name="FolderDropHint"><value>Перетащите папку сюда, чтобы создать плейлист</value></data>
+    <data xml:space="preserve" name="Settings"><value>Настройки</value></data>
+    <data xml:space="preserve" name="PlaylistMenu"><value>Плейлист</value></data>
+    <data xml:space="preserve" name="SelectedTracksMenu"><value>Выбранные треки</value></data>
+    <data xml:space="preserve" name="QueueMenu"><value>Очередь воспроизведения</value></data>
+    <data xml:space="preserve" name="FilesMenu"><value>Файлы и резервные копии</value></data>
+    <data xml:space="preserve" name="InterfaceSection"><value>Интерфейс</value></data>
+    <data xml:space="preserve" name="PlaylistSection"><value>Оформление плейлиста</value></data>
+    <data xml:space="preserve" name="BehaviorSection"><value>Поведение окна</value></data>
+    <data xml:space="preserve" name="AudioSection"><value>Звук</value></data>
+    <data xml:space="preserve" name="ShowAlbumSections"><value>Показывать заголовки альбомов и папок</value></data>
+    <data xml:space="preserve" name="AlbumSectionsHelp"><value>Визуально разделяет альбомы и подпапки, сохраняя порядок треков.</value></data>
+    <data xml:space="preserve" name="AudioSettingsHelp"><value>Выбор устройства вывода, эквалайзер, ReplayGain и плавный переход.</value></data>
+    <data xml:space="preserve" name="PreferencesSaved"><value>Настройки сохранены.</value></data>
+    <data xml:space="preserve" name="AlbumSectionCount"><value>Треков: {0}</value></data>
 </root>

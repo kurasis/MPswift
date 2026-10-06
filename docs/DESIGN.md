@@ -17,3 +17,11 @@ Reviewed sources (retrieved 2026-10-06):
 ## Verification
 
 Existing desktop checks exercise actual EN/RU WPF layout at minimum window size, Tab navigation, automation range/toggle providers, list virtualization and 96/144/192-DPI visual renders. Integration additionally checks MPswift window/apphost metadata and icon availability; packaging requires the renamed EXE, assembly and RU satellite. Physical DPI/Narrator and audio-device acceptance remain separate Stage G gates.
+
+## Menus, settings and album sections
+
+Context menus use explicit dark templates for root/submenu surfaces, highlights and separators, without the default WPF icon rail. Actions are organized into playlist, selected-track, queue and file/backup groups. Keyboard submenu handling and real nested actions remain native MenuItem behavior. A named settings button in the title bar opens language, album-heading and close-to-tray preferences plus the existing audio-output/EQ/ReplayGain/crossfade window. Language is explicitly applied on the next launch; heading and close behavior apply when saved. Cancel discards draft preferences.
+
+Album headings are annotations on the first row of each contiguous visible folder/album run. Album tags take precedence over folder names; the last two folder components and visible run count clarify disc subfolders, with the full source folder in a tooltip. They do not sort, merge duplicate occurrences, change playback order or introduce selectable fake tracks. Filtering, tab changes, imports, sorting and row moves recompute boundaries. Standard recycling virtualization remains enabled. Existing settings default to headings on; the preference persists through normal settings and backup serialization without a schema bump.
+
+Validation includes real folder-drop/render/filter/toggle/order checks, menu popup and submenu images/keyboard navigation/action execution, actual settings Apply persistence and Cancel behavior in EN/RU, plus the existing nearly-10k-row virtualization checks. New pure tests cover nested discs, same-name folders, interleaved album runs, missing tags, filtered boundaries and old-settings compatibility.

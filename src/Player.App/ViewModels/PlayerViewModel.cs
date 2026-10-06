@@ -77,7 +77,17 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     public ObservableCollection<PlaylistRowViewModel> Entries => SelectedPlaylist.Entries;
     public System.ComponentModel.ICollectionView VisibleEntries { get; private set; } = null!;
     public string ProductName => ProductInfo.Name;
-    public PlayerSettings WindowSettings { get; set; } = new();
+    private PlayerSettings _windowSettings = new();
+    public PlayerSettings WindowSettings
+    {
+        get => _windowSettings;
+        set
+        {
+            var refresh = _windowSettings.ShowAlbumSections != value.ShowAlbumSections;
+            _windowSettings = value;
+            if (refresh && VisibleEntries is not null) UpdatePlaylistStatus();
+        }
+    }
     public bool Initialized => _initialized;
 
     [ObservableProperty] private PlaylistTabViewModel _selectedPlaylist = null!;
@@ -567,7 +577,16 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     private void UpdateEntries(bool changed = true)
     { SyncSource(); VisibleEntries?.Refresh(); if (_initialized) ApplySnapshot(_player.Snapshot); HasEntries = Entries.Count > 0; OnPropertyChanged(nameof(CanTransport)); UpdatePlaylistStatus(); if (changed) ScheduleSave(true); }
     private void UpdatePlaylistStatus()
-    { OnPropertyChanged(nameof(HasVisibleEntries)); if (VisibleEntries is not null) PlaylistStatus = string.Format(Strings.Culture, Strings.Get("PlaylistCount"), VisibleEntries.Cast<object>().Count(), Entries.Count); }
+    {
+        OnPropertyChanged(nameof(HasVisibleEntries));
+        if (VisibleEntries is null) return;
+        var rows = VisibleEntries.Cast<PlaylistRowViewModel>().ToArray();
+        var sections = WindowSettings.ShowAlbumSections ? AlbumSections.Create(rows.Select(row => row.Entry.Track)) : [];
+        var sectionIndex = 0;
+        for (var i = 0; i < rows.Length; i++)
+            rows[i].Section = sectionIndex < sections.Count && sections[sectionIndex].StartIndex == i ? sections[sectionIndex++] : null;
+        PlaylistStatus = string.Format(Strings.Culture, Strings.Get("PlaylistCount"), rows.Length, Entries.Count);
+    }
     private LibraryState Capture() => new(Playlists.Select(p => p.Capture()).ToArray(),
         new(SelectedPlaylist.Id, _sourcePlaylistId, _coordinator.ActiveEntry, _player.Snapshot.Position.Ticks, _coordinator.CaptureOrder()));
     private void ScheduleSave(bool libraryChanged)

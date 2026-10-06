@@ -1,5 +1,12 @@
 # Test evidence — Stages A–G
 
+## Menus, settings and album sections (2026-10-06)
+
+Replaced default WPF context-menu chrome with complete dark root/submenu/separator templates and grouped actions. Added a visible settings shortcut with EN/RU selection, persisted album-heading and close-to-tray preferences and access to output/EQ settings. Language changes explicitly require the next launch. Added folder/album run headings with visible track counts and folder hints, preserving duplicates, order, selected entries and virtualized track containers. [Behavior and design](DESIGN.md).
+
+Local locked Release cross-build passes without warnings/errors and **162 managed tests pass**. Windows CI exercises actual nested-folder headings, filter/toggle/order behavior, settings persistence/cancel and menu keyboard/actions; it retains new EN/RU menu, submenu, settings and grouped-playlist renders. Exact hosted results belong to the main workflow for this source.
+
+
 ## MPswift identity and visual refresh (2026-10-06)
 
 Replaced the working product name with MPswift, including the apphost, assembly metadata, portable folder and release ZIP prefix. Embedded the owner-supplied icon in the executable, window and tray. Applied a graphite/amber Fluent-inspired theme to the main player and shared controls, with a now-playing card, primary transport action, deliberate track selection, localized search/drop guidance and compact toolbar. Existing storage and IPC identities remain compatible. [Design rationale and sources](DESIGN.md).
