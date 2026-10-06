@@ -55,6 +55,7 @@ public sealed class SettingsRecoveryTests : IDisposable
     {
         var file = Seed(); File.Delete(Main); Assert.Throws<InvalidDataException>(file.Load);
         Assert.Equal(23, file.LoadWithRecovery(_ => true).Volume);
+        Assert.Empty(Directory.GetFiles(_directory, "*.preserved-*"));
     }
     [Fact]
     public void ExportUsesValidatedValuesWithoutOverwritingExistingFiles()

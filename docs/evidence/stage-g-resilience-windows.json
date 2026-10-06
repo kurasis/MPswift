@@ -1,0 +1,244 @@
+{
+  "sourceCommit": "675bdf6cb7000670538b672c47f70f951fc1c82b",
+  "runUrl": "https://github.com/kurasis/MPswift/actions/runs/37415275489",
+  "environmentBoundary": "real Windows Server 2022 apphost kill/restart; not Windows 11 device/migration/power-loss acceptance",
+  "results": {
+    "evidence-ubuntu-24.04": {
+      "tests": [
+        {
+          "counters": {
+            "total": "102",
+            "executed": "102",
+            "passed": "102",
+            "failed": "0",
+            "error": "0",
+            "timeout": "0",
+            "aborted": "0",
+            "inconclusive": "0",
+            "passedButRunAborted": "0",
+            "notRunnable": "0",
+            "notExecuted": "0",
+            "disconnected": "0",
+            "warning": "0",
+            "completed": "0",
+            "inProgress": "0",
+            "pending": "0"
+          },
+          "settingsRecoveryCases": [
+            {
+              "name": "Player.Core.Tests.SettingsRecoveryTests.MissingMainWithExistingBackupRequiresExplicitRecovery",
+              "outcome": "Passed"
+            },
+            {
+              "name": "Player.Core.Tests.SettingsRecoveryTests.InvalidBackupIsNeverOfferedOrReplacesTheOriginal",
+              "outcome": "Passed"
+            },
+            {
+              "name": "Player.Core.Tests.SettingsRecoveryTests.UnsupportedSchemaCannotSilentlyDowngradeToPreviousSettings(version: 0)",
+              "outcome": "Passed"
+            },
+            {
+              "name": "Player.Core.Tests.SettingsRecoveryTests.ExportUsesValidatedValuesWithoutOverwritingExistingFiles",
+              "outcome": "Passed"
+            },
+            {
+              "name": "Player.Core.Tests.SettingsRecoveryTests.ExplicitRecoveryRestoresValidatedBackupAndPreservesDamagedOriginal",
+              "outcome": "Passed"
+            },
+            {
+              "name": "Player.Core.Tests.SettingsRecoveryTests.DecliningRecoveryChangesNeitherCopy",
+              "outcome": "Passed"
+            },
+            {
+              "name": "Player.Core.Tests.SettingsRecoveryTests.UnsupportedSchemaCannotSilentlyDowngradeToPreviousSettings(version: 2)",
+              "outcome": "Passed"
+            }
+          ]
+        }
+      ],
+      "reports": {
+        "portable/integrity-audit.json": {
+          "Status": "candidate-integrity-negative-checks-passed",
+          "SourceCommit": "675bdf6cb7000670538b672c47f70f951fc1c82b",
+          "SourceTreeDirty": false,
+          "Checks": [
+            "changed file",
+            "missing file",
+            "extra file",
+            "empty checksum list"
+          ],
+          "ZipSha256": "c8ffdafea889d79da132bda05e3222902423307012e72f6385cc011cb79791bf",
+          "RestoredCopyPassed": true
+        },
+        "portable/package-audit.json": {
+          "Status": "local-candidate-packaged",
+          "SourceCommit": "675bdf6cb7000670538b672c47f70f951fc1c82b",
+          "SourceTreeDirty": false,
+          "Zip": "LocalAudioPlayer-dev-675bdf6cb700-win-x64.zip",
+          "ZipSha256": "c8ffdafea889d79da132bda05e3222902423307012e72f6385cc011cb79791bf",
+          "Bytes": 85370209,
+          "Files": 550,
+          "Dependencies": 14,
+          "NativeLibraries": 13,
+          "DistributionApproved": false
+        }
+      }
+    },
+    "evidence-windows-2022": {
+      "tests": [
+        {
+          "counters": {
+            "total": "102",
+            "executed": "102",
+            "passed": "102",
+            "failed": "0",
+            "error": "0",
+            "timeout": "0",
+            "aborted": "0",
+            "inconclusive": "0",
+            "passedButRunAborted": "0",
+            "notRunnable": "0",
+            "notExecuted": "0",
+            "disconnected": "0",
+            "warning": "0",
+            "completed": "0",
+            "inProgress": "0",
+            "pending": "0"
+          },
+          "settingsRecoveryCases": [
+            {
+              "name": "Player.Core.Tests.SettingsRecoveryTests.UnsupportedSchemaCannotSilentlyDowngradeToPreviousSettings(version: 0)",
+              "outcome": "Passed"
+            },
+            {
+              "name": "Player.Core.Tests.SettingsRecoveryTests.DecliningRecoveryChangesNeitherCopy",
+              "outcome": "Passed"
+            },
+            {
+              "name": "Player.Core.Tests.SettingsRecoveryTests.InvalidBackupIsNeverOfferedOrReplacesTheOriginal",
+              "outcome": "Passed"
+            },
+            {
+              "name": "Player.Core.Tests.SettingsRecoveryTests.ExportUsesValidatedValuesWithoutOverwritingExistingFiles",
+              "outcome": "Passed"
+            },
+            {
+              "name": "Player.Core.Tests.SettingsRecoveryTests.MissingMainWithExistingBackupRequiresExplicitRecovery",
+              "outcome": "Passed"
+            },
+            {
+              "name": "Player.Core.Tests.SettingsRecoveryTests.UnsupportedSchemaCannotSilentlyDowngradeToPreviousSettings(version: 2)",
+              "outcome": "Passed"
+            },
+            {
+              "name": "Player.Core.Tests.SettingsRecoveryTests.ExplicitRecoveryRestoresValidatedBackupAndPreservesDamagedOriginal",
+              "outcome": "Passed"
+            }
+          ]
+        }
+      ],
+      "reports": {
+        "portable/integrity-audit.json": {
+          "Status": "candidate-integrity-negative-checks-passed",
+          "SourceCommit": "675bdf6cb7000670538b672c47f70f951fc1c82b",
+          "SourceTreeDirty": false,
+          "Checks": [
+            "changed file",
+            "missing file",
+            "extra file",
+            "empty checksum list"
+          ],
+          "ZipSha256": "661a9b84a1463b517dd222d0ac12490871503f36c9775f47c724a1afc2979001",
+          "RestoredCopyPassed": true
+        },
+        "portable/package-audit.json": {
+          "Status": "local-candidate-packaged",
+          "SourceCommit": "675bdf6cb7000670538b672c47f70f951fc1c82b",
+          "SourceTreeDirty": false,
+          "Zip": "LocalAudioPlayer-dev-675bdf6cb700-win-x64.zip",
+          "ZipSha256": "661a9b84a1463b517dd222d0ac12490871503f36c9775f47c724a1afc2979001",
+          "Bytes": 85370471,
+          "Files": 550,
+          "Dependencies": 14,
+          "NativeLibraries": 13,
+          "DistributionApproved": false
+        },
+        "smoke/crash-restart.json": {
+          "Status": "crash-restart-model-passed",
+          "CommittedPlaylistIdentityOrderAndFlags": true,
+          "ActiveSourceAndPosition": true,
+          "QueueRepeatShuffle": true,
+          "Ratings": true,
+          "VolumeMute": true,
+          "NativePreparation": true,
+          "NoAutoplay": true,
+          "SqliteIntegrityAndReferences": true,
+          "UncommittedValidationTransactionRolledBack": true,
+          "SourceUnchanged": true,
+          "PositionToleranceSeconds": 0.05,
+          "DevicePlayback": "not-run",
+          "KillDuringMigrationOrPowerLoss": "not-run",
+          "Windows": "Microsoft Windows NT 10.0.20348.0",
+          "ForcedWpfTermination": true,
+          "KilledExitCode": -1,
+          "Method": "Actual apphost killed after a production checkpoint, while a diagnostic SQLite write transaction was open; actual WPF/native restart validates the last committed state.",
+          "SourceCommit": "675bdf6cb7000670538b672c47f70f951fc1c82b"
+        },
+        "smoke/package-smoke.json": {
+          "Status": "packaged-executable-smoke-passed",
+          "SourceCommit": "675bdf6cb7000670538b672c47f70f951fc1c82b",
+          "ZipSha256": "661a9b84a1463b517dd222d0ac12490871503f36c9775f47c724a1afc2979001",
+          "UnicodeExtractionPath": true,
+          "ArbitraryWorkingDirectory": true,
+          "InvalidExternalDotnetRoot": true,
+          "TamperRejected": true,
+          "Windows": "Microsoft Windows NT 10.0.20348.0",
+          "CleanWindows11WithoutSdk": "not-run",
+          "NetworkDisconnected": "not-run",
+          "DeviceOutput": "not-run",
+          "DistributionApproved": false
+        },
+        "smoke/ui-en.json": {
+          "Status": "windows-integration-passed",
+          "SecondProcessActivation": true,
+          "ConcurrentFileForwarding": true,
+          "NoImplicitAutoplay": true,
+          "OversizedIpcRejected": true,
+          "CurrentUserOnlyPipe": true,
+          "SeekAutomationRange": true,
+          "SoftwareRoutedDropdownEscape": true,
+          "CloseToTrayPreservesState": true,
+          "Language": "en",
+          "ResourceKeys": 205,
+          "RealizedRowContainers": 6,
+          "PlaylistRows": 9987,
+          "GlobalPlaylistCapacity": 10000,
+          "MediaSession": "registered; metadata synchronized",
+          "GlobalMediaKeyPress": "not-run",
+          "ScreenReader": "not-run",
+          "PhysicalDpiAndMonitorMoves": "not-run"
+        },
+        "smoke/ui-ru.json": {
+          "Status": "windows-integration-passed",
+          "SecondProcessActivation": true,
+          "ConcurrentFileForwarding": true,
+          "NoImplicitAutoplay": true,
+          "OversizedIpcRejected": true,
+          "CurrentUserOnlyPipe": true,
+          "SeekAutomationRange": true,
+          "SoftwareRoutedDropdownEscape": true,
+          "CloseToTrayPreservesState": true,
+          "Language": "ru",
+          "ResourceKeys": 205,
+          "RealizedRowContainers": 6,
+          "PlaylistRows": 9987,
+          "GlobalPlaylistCapacity": 10000,
+          "MediaSession": "registered; metadata synchronized",
+          "GlobalMediaKeyPress": "not-run",
+          "ScreenReader": "not-run",
+          "PhysicalDpiAndMonitorMoves": "not-run"
+        }
+      }
+    }
+  }
+}

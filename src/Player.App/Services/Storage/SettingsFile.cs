@@ -38,7 +38,7 @@ public sealed class SettingsFile(string directory)
             return Load();
         }
     }
-    public string RestoreBackup()
+    public string? RestoreBackup()
     {
         var settings = LoadBackup();
         var temporary = _path + ".restore-" + Guid.NewGuid().ToString("N");
@@ -46,9 +46,9 @@ public sealed class SettingsFile(string directory)
         try
         {
             Export(temporary, settings);
-            if (File.Exists(_path)) File.Replace(temporary, _path, preserved);
-            else File.Move(temporary, _path);
-            return preserved;
+            if (File.Exists(_path)) { File.Replace(temporary, _path, preserved); return preserved; }
+            File.Move(temporary, _path);
+            return null; // No original existed to preserve.
         }
         finally { if (File.Exists(temporary)) File.Delete(temporary); }
     }

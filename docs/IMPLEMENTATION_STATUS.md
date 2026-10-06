@@ -4,7 +4,7 @@ Updated: **2026-10-06**.
 
 ## Current scope
 
-**Stage F implemented and Windows integration observed; Stage G candidate packaging/verification is in progress. 102 local tests pass; the new resilience route awaits Windows validation.** Stage D/E Windows native/WPF checks now pass at `c8426e6` in run 37367043601 attempt 2. Stage F integration passed at `39a8a25`; Stage G follows automatically as requested. Full P0 + P1 acceptance remains the target; this is not version 1.0. Russian chat, English repository and automatic development commit/push/merge remain authorized.
+**Stage F implemented and Windows integration observed; Stage G candidate packaging/verification is in progress. 102 tests pass on Linux/Windows; real WPF forced-termination/restart verification also passed at `675bdf6`.** Stage D/E Windows native/WPF checks now pass at `c8426e6` in run 37367043601 attempt 2. Stage F integration passed at `39a8a25`; Stage G follows automatically as requested. Full P0 + P1 acceptance remains the target; this is not version 1.0. Russian chat, English repository and automatic development commit/push/merge remain authorized.
 
 ## Implemented through Stage E
 
@@ -24,7 +24,7 @@ Updated: **2026-10-06**.
 
 ## Current verification
 
-Locked Linux Release cross-build: **0 warnings / 0 errors; 95 tests passed / 0 failed / 0 skipped**. Tests include actual SQLite migration/backup/index/search/rating/listening integration and a 100,000-record paged dataset, queue/repeat/shuffle/CUE, measured pure-PCM EQ and all previous checks. Local self-contained development publish and all native hashes/companions were audited; stable release acceptance remains open.
+Locked Linux Release cross-build: **0 warnings / 0 errors; 102 tests passed / 0 failed / 0 skipped**. Tests include actual SQLite migration/backup/index/search/rating/listening integration and a 100,000-record paged dataset, queue/repeat/shuffle/CUE, measured pure-PCM EQ and all previous checks. Local self-contained development publish and all native hashes/companions were audited; stable release acceptance remains open.
 
 The latest Stage D/E [Windows/Linux rerun](https://github.com/kurasis/MPswift/actions/runs/37367043601/attempts/2) passed at `c8426e6`: 80 core tests on each OS, 17 real codecs, actual two-hour waveform, callback PCM lossless/CUE maximum error **0**, overlap seek cancellation and all Stage E WPF/database/import/rating/relink/artwork/source-hash checks. [Retained reports](evidence/stage-de-windows-native-ui.json) identify the exact source and Windows Server 2022 environment. Prior zero-step runs failed hosted runner acquisition. This proves production callback PCM and WPF workflows, not endpoint output/listening or Windows 11 release acceptance.
 
@@ -49,7 +49,7 @@ Windows CI now runs an actual 50-warmup + 1,000 production load/prepare-next/see
 ## Resume and commands
 
 - Use existing checkout `/workspace/MPswift`; activate `source /workspace/toolchains/activate.sh`. No new worktree or service is required. The cloud startup draft was refreshed for Stage F/G continuation; install instructions remain unchanged.
-- `scripts/Build.ps1`: locked restore, Release cross-build and 95 platform-neutral/storage/IPC/logging tests.
+- `scripts/Build.ps1`: locked restore, Release cross-build and 102 platform-neutral/storage/IPC/logging tests.
 - `scripts/Setup-Native.ps1`: verify/provision 13 pinned development DLLs and upstream notices. Generic MPC/TTA notices are kept in separate subdirectories to avoid collisions.
 - `scripts/Publish-Development.ps1`: self-contained local output, manifest hashes and companion audit; no public ZIP/release.
 - `scripts/Package-Candidate.ps1`: local development-only portable ZIP, hashes/dependency declarations/help; `scripts/Test-CandidateIntegrity.ps1` tests rejection; `scripts/Verify-Candidate.ps1 -Directory <extracted-app>` audits it. `scripts/Package-Smoke.ps1` requires real Windows and a generated candidate.
@@ -58,7 +58,7 @@ Windows CI now runs an actual 50-warmup + 1,000 production load/prepare-next/see
 
 ## Next work
 
-The implemented Stage G automation and final keyboard regression pass at `1f3e664`; the clean local candidate and exact reports are retained. Continue the full release gates in RELEASE_ACCEPTANCE.md when their Windows 11/hardware/legal prerequisites are available. Windows 11 clean/offline/device/digital/stress/performance/license gates remain explicit; unavailable hardware/fixtures/license decisions cannot be reported passed.
+The implemented Stage G automation, keyboard regression and G2/G3 resilience checks pass on recorded Windows sources; exact reports and GitHub ZIP builds are retained. Continue the full release gates in RELEASE_ACCEPTANCE.md when their Windows 11/hardware/legal prerequisites are available. Windows 11 clean/offline/device/digital/stress/performance/license gates remain explicit; unavailable hardware/fixtures/license decisions cannot be reported passed.
 
 
 ## GitHub build publication (2026-10-06)
@@ -70,4 +70,6 @@ The owner requests separate GitHub ZIP downloads for the current and future buil
 
 G2 adds explicit startup recovery for damaged or missing settings only when the previous backup is valid and supported. The prompt uses the backup language. Declining preserves data and exits; recovery uses an atomic replace and retains damaged bytes separately. Unsupported/newer schemas are not offered a downgrade. Export applies validated/clamped settings. Seven new real file tests cover recovery, refusal, invalid backup, unsupported versions, missing main and safe export. Locked local Release build passes 102 tests with no warnings/errors.
 
-G3 follows automatically with an owned Windows diagnostic route: commit real WPF playlists/queue/ratings/settings/native prepared position, keep a diagnostic SQLite transaction uncommitted, forcibly kill the actual apphost and restart the real application model. Assertions cover committed IDs/order/duplicates/enabled flags, queue occurrence IDs/repeat/shuffle, shared ratings, volume/mute, source/active/position and no autoplay, SQLite integrity/foreign keys and unchanged fixture bytes. The transaction is diagnostic, not a claim to have interrupted every production write/migration or a power failure. Windows execution is pending; clean Windows 11/device/full-disk/migration/power-loss acceptance stays open. Main publication remains gated on successful checks.
+G3 follows automatically with an owned Windows diagnostic route: commit real WPF playlists/queue/ratings/settings/native prepared position, keep a diagnostic SQLite transaction uncommitted, forcibly kill the actual apphost and restart the real application model. Assertions cover committed IDs/order/duplicates/enabled flags, queue occurrence IDs/repeat/shuffle, shared ratings, volume/mute, source/active/position and no autoplay, SQLite integrity/foreign keys and unchanged fixture bytes. The transaction is diagnostic, not a claim to have interrupted every production write/migration or a power failure. [Run 37415275489](https://github.com/kurasis/MPswift/actions/runs/37415275489) passed at `675bdf6`: 102 tests on each OS, 205 paired resource keys in EN/RU and actual forced WPF termination (exit -1), transaction rollback, native prepared session restart and no autoplay. [Exact reports](evidence/stage-g-resilience-windows.json) retain the source and seven settings recovery case outcomes. Clean Windows 11/device/full-disk/migration/power-loss acceptance stays open. Main publication remains gated on successful checks.
+
+Final recovery review makes the retained-original path nullable when the main file was missing, and the localized success message conditional about an existing damaged file. Missing-file recovery does not invent a preserved original. The local 102-test suite still passes; main CI verifies this final refinement before publishing its ZIP.

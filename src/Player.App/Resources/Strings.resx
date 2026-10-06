@@ -630,5 +630,5 @@ Sources remain unchanged. Ratings, history, library, queue and settings are stor
         <value>Portable storage is not writable. Use per-user storage instead?</value>
     </data>
     <data xml:space="preserve" name="RestoreSettingsPrompt"><value>Saved settings are damaged or missing. Restore the previous valid copy? The damaged original will be preserved. Choosing No exits without changing your data.</value></data>
-    <data xml:space="preserve" name="SettingsRestored"><value>Previous settings restored; the damaged original was preserved.</value></data>
+    <data xml:space="preserve" name="SettingsRestored"><value>Previous settings restored. Any existing damaged original was preserved.</value></data>
 </root>
