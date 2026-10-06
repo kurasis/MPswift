@@ -15,6 +15,13 @@ internal static class AudioAcceptanceValidation
 {
     internal sealed record Device(int Index, string Id, string Name, string Type, bool Enabled, bool Default, bool Input, bool Loopback, int MixRate, int MixChannels);
     private static void Check(bool value, string detail) { if (!value) throw new InvalidDataException(detail); }
+    private static bool ReadDeviceMute()
+    {
+        // ManagedBass marshals native -1 as true. Validate the native error before treating it as a mute observation.
+        var muted = BassWasapi.GetMute(WasapiVolumeTypes.Device); var error = Bass.LastError;
+        Check(error == Errors.OK, "Device master-mute observation unavailable: " + error);
+        return muted;
+    }
     public static object Run(string root, string mode, string? deviceId)
     {
         var versions = NativeLibraryBootstrap.LoadAndVerify();
@@ -46,7 +53,7 @@ internal static class AudioAcceptanceValidation
                 Check(BassWasapi.GetInfo(out var negotiated), "Negotiated endpoint information unavailable.");
                 Check(negotiated.IsExclusive == (mode == "exclusive"), "Output mode was silently changed.");
                 var curve = WasapiVolumeTypes.Device | WasapiVolumeTypes.LinearCurve;
-                var master = BassWasapi.GetVolume(curve); var masterMuted = BassWasapi.GetMute(curve);
+                var master = BassWasapi.GetVolume(curve); var masterMuted = ReadDeviceMute();
                 Check(float.IsFinite(master) && master is >= 0 and <= 1, "Device master-volume observation unavailable.");
                 Check(Advance(backend, 400).Position > TimeSpan.Zero, "Actual output did not consume the prepared source.");
                 backend.Pause(); var paused = backend.ReadPosition().Position;
@@ -90,7 +97,7 @@ internal static class AudioAcceptanceValidation
                 catch (AudioBackendException error) when (error.Category == AudioErrorCategory.OutputUnavailable)
                 { phases.Add(new { Phase = "explicit-unavailable-endpoint-refused", Detail = error.Message, AutomaticFallback = false, PhysicalHotplug = "not-run" }); }
                 backend.SetOutput(new(selected.Id, mode == "exclusive")); backend.Play(); Check(Advance(backend, 300).Position > TimeSpan.Zero, "Explicit output retry failed.");
-                var afterMaster = BassWasapi.GetVolume(curve); var afterMuted = BassWasapi.GetMute(curve);
+                var afterMaster = BassWasapi.GetVolume(curve); var afterMuted = ReadDeviceMute();
                 Check(Math.Abs(afterMaster - master) <= .000001 && afterMuted == masterMuted, "Observed Windows master gain/mute changed during app-gain/transport tests; volume-isolation evidence is inconclusive.");
                 phases.Add(new { Phase = "transport-and-gain", Shared = !negotiated.IsExclusive, Exclusive = negotiated.IsExclusive, negotiated.Frequency, negotiated.Channels,
                     MasterVolumeBefore = master, MasterVolumeAfter = afterMaster, SystemMuteBefore = masterMuted, SystemMuteAfter = afterMuted,
