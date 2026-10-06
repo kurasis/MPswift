@@ -173,6 +173,9 @@ public sealed class BassAudioBackend : IAudioBackend, IAdvancedAudioBackend
     }
     public void CloseSource()
     {
+        // The owner closes before Open, and Open also supports direct replacement.
+        // A second close must not reset an already quiescent endpoint again.
+        if (_request is null && _prepared is null && _preparedHandle == 0 && !_running) return;
         FlushOutput();
         _graph?.Clear();
         if (_preparedHandle != 0) { Check(Bass.StreamFree(_preparedHandle), "Free prepared source"); _preparedHandle = 0; }

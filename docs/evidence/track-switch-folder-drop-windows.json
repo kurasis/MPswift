@@ -1,0 +1,629 @@
+{
+  "sourceCommit": "3fc52c6af21654f14bd5b11d8414aa32b71739a0",
+  "runUrl": "https://github.com/kurasis/MPswift/actions/runs/37426989226",
+  "runAttempt": 1,
+  "runStatus": "completed",
+  "runConclusion": "success",
+  "jobs": [
+    {
+      "id": 112148792925,
+      "name": "build (windows-2022)",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37426989226/job/112148792925",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 112148793272,
+      "name": "build (ubuntu-24.04)",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37426989226/job/112148793272",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 112150446175,
+      "name": "Publish separate Windows ZIP prerelease",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37426989226/job/112150446175",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "evidence-windows-2022",
+      "archiveSha256": "92a4895a7c47e8fc23d648097ef79115a096151432987693e146017327461c60",
+      "tests": [
+        {
+          "counters": {
+            "total": "130",
+            "executed": "130",
+            "passed": "130",
+            "failed": "0",
+            "error": "0",
+            "timeout": "0",
+            "aborted": "0",
+            "inconclusive": "0",
+            "passedButRunAborted": "0",
+            "notRunnable": "0",
+            "notExecuted": "0",
+            "disconnected": "0",
+            "warning": "0",
+            "completed": "0",
+            "inProgress": "0",
+            "pending": "0"
+          },
+          "backupCases": [
+            {
+              "executionId": "17642b31-49ee-4585-a8f8-2e9b37fbe331",
+              "testId": "34a235d6-31f7-d562-fb42-949ca3cadc50",
+              "testName": "Player.Core.Tests.BackupBundleTests.ActiveStoreOwnershipRejectsRestoreAndLeavesCurrentSessionUsable",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.5318527",
+              "startTime": "2026-10-06T07:01:19.4073077+00:00",
+              "endTime": "2026-10-06T07:01:19.9394749+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "17642b31-49ee-4585-a8f8-2e9b37fbe331"
+            },
+            {
+              "executionId": "ad7299c0-4195-4e3e-b346-2b990e0065f5",
+              "testId": "aaad2f74-6db1-d530-09e1-5ae601163843",
+              "testName": "Player.Core.Tests.BackupBundleTests.LiveCompleteBackupRestoresDatabaseSettingsIndexAndRatingsAndRetainsCurrentData",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.3844787",
+              "startTime": "2026-10-06T07:01:20.3299948+00:00",
+              "endTime": "2026-10-06T07:01:20.7148161+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "ad7299c0-4195-4e3e-b346-2b990e0065f5"
+            },
+            {
+              "executionId": "d355c5a9-5410-42b6-9f41-405299699fbe",
+              "testId": "eb007079-8e29-a338-1f7d-1097b287dbe3",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"settings\")",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.7522356",
+              "startTime": "2026-10-06T07:01:14.8533625+00:00",
+              "endTime": "2026-10-06T07:01:15.6035566+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "d355c5a9-5410-42b6-9f41-405299699fbe"
+            },
+            {
+              "executionId": "95ca43e9-8820-423e-849e-e3ed9b1329a1",
+              "testId": "3a72f67e-7883-bbc8-e103-9c9c35a5c3cf",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"missing\")",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.3487151",
+              "startTime": "2026-10-06T07:01:16.7581710+00:00",
+              "endTime": "2026-10-06T07:01:17.1060186+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "95ca43e9-8820-423e-849e-e3ed9b1329a1"
+            },
+            {
+              "executionId": "a442f560-8053-44fa-8405-74b4efbd9cc0",
+              "testId": "8c85d5c8-5a0e-d2b6-7d2a-03ae67bcf9db",
+              "testName": "Player.Core.Tests.BackupBundleTests.BackupNeverOverwritesAnExistingArchive",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.3896086",
+              "startTime": "2026-10-06T07:01:19.9397199+00:00",
+              "endTime": "2026-10-06T07:01:20.3297595+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "a442f560-8053-44fa-8405-74b4efbd9cc0"
+            },
+            {
+              "executionId": "c03c4ec9-f070-4a00-808f-c685b167da52",
+              "testId": "5f19db9f-c9b6-8bc5-0143-9355894d8021",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"schema\")",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.3248551",
+              "startTime": "2026-10-06T07:01:17.9482344+00:00",
+              "endTime": "2026-10-06T07:01:18.2734299+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "c03c4ec9-f070-4a00-808f-c685b167da52"
+            },
+            {
+              "executionId": "756d06a0-9ddb-4ac3-ab5b-83659d857ee5",
+              "testId": "2ca07da6-2869-8bce-455f-f8712e1b9850",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"checksum\")",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.3884259",
+              "startTime": "2026-10-06T07:01:17.5593570+00:00",
+              "endTime": "2026-10-06T07:01:17.9480226+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "756d06a0-9ddb-4ac3-ab5b-83659d857ee5"
+            },
+            {
+              "executionId": "79e2f4c7-442f-4768-b5d2-1e047e49bbac",
+              "testId": "417e7402-a283-2c93-a81f-c95b9abba4e9",
+              "testName": "Player.Core.Tests.BackupBundleTests.OccupiedSettingsPathDoesNotMoveTheCurrentDatabase",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.4262896",
+              "startTime": "2026-10-06T07:01:18.9802446+00:00",
+              "endTime": "2026-10-06T07:01:19.4069751+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "79e2f4c7-442f-4768-b5d2-1e047e49bbac"
+            },
+            {
+              "executionId": "fb12ecd9-7e21-433d-90c8-d8b5811bf2f8",
+              "testId": "00954fc2-4bd6-c7db-d0b5-4250424e9552",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"size\")",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.3780602",
+              "startTime": "2026-10-06T07:01:18.2737706+00:00",
+              "endTime": "2026-10-06T07:01:18.6520782+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "fb12ecd9-7e21-433d-90c8-d8b5811bf2f8"
+            },
+            {
+              "executionId": "48b6704c-479e-4f08-a293-5ab8ce311b05",
+              "testId": "e66e35d7-67c6-f1e1-0a79-97b910e8b99a",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"references\")",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.6014680",
+              "startTime": "2026-10-06T07:01:16.1548524+00:00",
+              "endTime": "2026-10-06T07:01:16.7566578+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "48b6704c-479e-4f08-a293-5ab8ce311b05"
+            },
+            {
+              "executionId": "50997c2c-cb52-4aee-b592-b94a502298db",
+              "testId": "ed8aaece-1bec-48f7-a213-27665deabe54",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"duplicate\")",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.5501116",
+              "startTime": "2026-10-06T07:01:15.6038953+00:00",
+              "endTime": "2026-10-06T07:01:16.1546574+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "50997c2c-cb52-4aee-b592-b94a502298db"
+            },
+            {
+              "executionId": "c548d751-fb41-4d07-ad7a-2ccb63c832c6",
+              "testId": "acde5144-27be-8b80-6c6f-ee84e1c7dcc7",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"database\")",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.4525140",
+              "startTime": "2026-10-06T07:01:17.1062608+00:00",
+              "endTime": "2026-10-06T07:01:17.5590380+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "c548d751-fb41-4d07-ad7a-2ccb63c832c6"
+            },
+            {
+              "executionId": "4fd7a9d3-5afa-44cb-9c4e-dfd303a68ad7",
+              "testId": "40c1369b-1465-509e-cc71-5fc12be4d47c",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"traversal\")",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.3273704",
+              "startTime": "2026-10-06T07:01:18.6522683+00:00",
+              "endTime": "2026-10-06T07:01:18.9799826+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "4fd7a9d3-5afa-44cb-9c4e-dfd303a68ad7"
+            }
+          ]
+        }
+      ],
+      "reports": {
+        "smoke/engine.json": {
+          "Status": "production-engine-passed",
+          "Environment": "Microsoft Windows 10.0.20348",
+          "Snapshot": {
+            "Generation": 42,
+            "Revision": 46,
+            "State": 2,
+            "EntryId": "9351bff5-10ad-4676-b030-1638860bb075",
+            "Position": "00:00:00",
+            "Duration": "00:00:03",
+            "SourceFormat": {
+              "SampleRate": 48000,
+              "Channels": 2,
+              "Codec": "WavePCM",
+              "BitDepth": 16
+            },
+            "OutputFormat": null,
+            "CanSeek": true,
+            "Volume": 0.5,
+            "Muted": false,
+            "Error": null,
+            "Ended": false,
+            "Transitioned": false
+          },
+          "LiveOutputReplacements": "not-run",
+          "Output": "not-run",
+          "SourceHandleReleased": true,
+          "SourceUnchanged": true,
+          "AudiblePlayback": "not-manually-verified"
+        },
+        "smoke/package-smoke.json": {
+          "Status": "packaged-executable-smoke-passed",
+          "SourceCommit": "3fc52c6af21654f14bd5b11d8414aa32b71739a0",
+          "ZipSha256": "0f167b15bc937fa3e89d58aa5e5d1624a50a7c2c09360069331318e33ffe8554",
+          "UnicodeExtractionPath": true,
+          "ArbitraryWorkingDirectory": true,
+          "InvalidExternalDotnetRoot": true,
+          "TamperRejected": true,
+          "Windows": "Microsoft Windows NT 10.0.20348.0",
+          "CleanWindows11WithoutSdk": "not-run",
+          "NetworkDisconnected": "not-run",
+          "DeviceOutput": "not-run",
+          "DistributionApproved": false
+        },
+        "smoke/stress.json": {
+          "Status": "native-preparation-stress-passed",
+          "Environment": "Microsoft Windows NT 10.0.20348.0",
+          "Method": "50 warmup + 1000 serialized real load/prepare-next/seek/stop cycles; process samples every 100 cycles; no forced GC",
+          "Changes": 1000,
+          "Samples": [
+            {
+              "Changes": 0,
+              "Handles": 280,
+              "PrivateBytes": 13557760,
+              "WorkingSet": 36278272
+            },
+            {
+              "Changes": 100,
+              "Handles": 280,
+              "PrivateBytes": 13414400,
+              "WorkingSet": 36208640
+            },
+            {
+              "Changes": 200,
+              "Handles": 280,
+              "PrivateBytes": 14204928,
+              "WorkingSet": 36995072
+            },
+            {
+              "Changes": 300,
+              "Handles": 280,
+              "PrivateBytes": 14991360,
+              "WorkingSet": 37781504
+            },
+            {
+              "Changes": 400,
+              "Handles": 280,
+              "PrivateBytes": 15888384,
+              "WorkingSet": 38494208
+            },
+            {
+              "Changes": 500,
+              "Handles": 280,
+              "PrivateBytes": 16674816,
+              "WorkingSet": 39280640
+            },
+            {
+              "Changes": 600,
+              "Handles": 280,
+              "PrivateBytes": 17461248,
+              "WorkingSet": 40058880
+            },
+            {
+              "Changes": 700,
+              "Handles": 280,
+              "PrivateBytes": 18186240,
+              "WorkingSet": 40824832
+            },
+            {
+              "Changes": 800,
+              "Handles": 280,
+              "PrivateBytes": 18972672,
+              "WorkingSet": 41598976
+            },
+            {
+              "Changes": 900,
+              "Handles": 280,
+              "PrivateBytes": 20361216,
+              "WorkingSet": 43548672
+            },
+            {
+              "Changes": 1000,
+              "Handles": 280,
+              "PrivateBytes": 21155840,
+              "WorkingSet": 44343296
+            }
+          ],
+          "HandleGrowth": 0,
+          "PrivateByteGrowth": 7598080,
+          "CycleP95Milliseconds": 0.2437,
+          "SourceUnchanged": true,
+          "SourceHandleReleased": true,
+          "TwoHourDevicePlayback": "not-run",
+          "EndpointTransitions": "not-run",
+          "Listening": "not-run"
+        },
+        "smoke/ui-en.json": {
+          "Status": "ui-smoke-passed",
+          "Environment": "Microsoft Windows 10.0.20348",
+          "FolderDrop": {
+            "Status": "folder-drop-passed",
+            "SoftwareRoutedWpfEvents": true,
+            "RecursiveFolders": true,
+            "SeparateSameNameFolders": true,
+            "MixedFilesKeepOriginalTarget": true,
+            "TabChildAndEmptyStrip": true,
+            "EmptyFolder": true,
+            "TrackListKeepsSelectedTarget": true,
+            "SQLitePersistence": true,
+            "TabLimit": true,
+            "NoAutoplay": true
+          },
+          "BindingErrors": 0,
+          "WasapiOutput": "not-run",
+          "Listening": "not-run"
+        },
+        "smoke/ui-ru.json": {
+          "Status": "ui-smoke-passed",
+          "Environment": "Microsoft Windows 10.0.20348",
+          "FolderDrop": {
+            "Status": "folder-drop-passed",
+            "SoftwareRoutedWpfEvents": true,
+            "RecursiveFolders": true,
+            "SeparateSameNameFolders": true,
+            "MixedFilesKeepOriginalTarget": true,
+            "TabChildAndEmptyStrip": true,
+            "EmptyFolder": true,
+            "TrackListKeepsSelectedTarget": true,
+            "SQLitePersistence": true,
+            "TabLimit": true,
+            "NoAutoplay": true
+          },
+          "BindingErrors": 0,
+          "WasapiOutput": "not-run",
+          "Listening": "not-run"
+        },
+        "smoke/packaged-ui.json": {
+          "Status": "ui-smoke-passed",
+          "Environment": "Microsoft Windows 10.0.20348",
+          "FolderDrop": {
+            "Status": "folder-drop-passed",
+            "SoftwareRoutedWpfEvents": true,
+            "RecursiveFolders": true,
+            "SeparateSameNameFolders": true,
+            "MixedFilesKeepOriginalTarget": true,
+            "TabChildAndEmptyStrip": true,
+            "EmptyFolder": true,
+            "TrackListKeepsSelectedTarget": true,
+            "SQLitePersistence": true,
+            "TabLimit": true,
+            "NoAutoplay": true
+          },
+          "BindingErrors": 0,
+          "WasapiOutput": "not-run",
+          "Listening": "not-run"
+        }
+      }
+    },
+    {
+      "name": "evidence-ubuntu-24.04",
+      "archiveSha256": "1e44dab9160cba3a2cfae2d311e6311f37522dfb9c1bc2199644829424caa6ed",
+      "tests": [
+        {
+          "counters": {
+            "total": "130",
+            "executed": "130",
+            "passed": "130",
+            "failed": "0",
+            "error": "0",
+            "timeout": "0",
+            "aborted": "0",
+            "inconclusive": "0",
+            "passedButRunAborted": "0",
+            "notRunnable": "0",
+            "notExecuted": "0",
+            "disconnected": "0",
+            "warning": "0",
+            "completed": "0",
+            "inProgress": "0",
+            "pending": "0"
+          },
+          "backupCases": [
+            {
+              "executionId": "158f976a-92ae-4075-b147-e0a8c9486d23",
+              "testId": "acde5144-27be-8b80-6c6f-ee84e1c7dcc7",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"database\")",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.3302702",
+              "startTime": "2026-10-06T07:01:06.5963600+00:00",
+              "endTime": "2026-10-06T07:01:06.9277823+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "158f976a-92ae-4075-b147-e0a8c9486d23"
+            },
+            {
+              "executionId": "30b3c67b-30fa-4e48-94f5-35191e529725",
+              "testId": "2ca07da6-2869-8bce-455f-f8712e1b9850",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"checksum\")",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.0383321",
+              "startTime": "2026-10-06T07:01:06.9280664+00:00",
+              "endTime": "2026-10-06T07:01:06.9674030+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "30b3c67b-30fa-4e48-94f5-35191e529725"
+            },
+            {
+              "executionId": "a25b8798-49bd-40cb-9470-62946753092e",
+              "testId": "34a235d6-31f7-d562-fb42-949ca3cadc50",
+              "testName": "Player.Core.Tests.BackupBundleTests.ActiveStoreOwnershipRejectsRestoreAndLeavesCurrentSessionUsable",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.0308013",
+              "startTime": "2026-10-06T07:01:07.0845682+00:00",
+              "endTime": "2026-10-06T07:01:07.1155341+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "a25b8798-49bd-40cb-9470-62946753092e"
+            },
+            {
+              "executionId": "bf15a1bd-ffb3-4e47-9757-68ac47a1e6b2",
+              "testId": "eb007079-8e29-a338-1f7d-1097b287dbe3",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"settings\")",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.6288240",
+              "startTime": "2026-10-06T07:01:05.8327024+00:00",
+              "endTime": "2026-10-06T07:01:06.4625774+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "bf15a1bd-ffb3-4e47-9757-68ac47a1e6b2"
+            },
+            {
+              "executionId": "414e1609-77db-4327-86bc-ba24aaa016ce",
+              "testId": "00954fc2-4bd6-c7db-d0b5-4250424e9552",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"size\")",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.0205100",
+              "startTime": "2026-10-06T07:01:07.0153826+00:00",
+              "endTime": "2026-10-06T07:01:07.0360934+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "414e1609-77db-4327-86bc-ba24aaa016ce"
+            },
+            {
+              "executionId": "1d92a86d-16a3-434e-a431-56326cf16d61",
+              "testId": "3a72f67e-7883-bbc8-e103-9c9c35a5c3cf",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"missing\")",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.0498556",
+              "startTime": "2026-10-06T07:01:06.5456647+00:00",
+              "endTime": "2026-10-06T07:01:06.5961633+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "1d92a86d-16a3-434e-a431-56326cf16d61"
+            },
+            {
+              "executionId": "3f4f9bcd-3a4a-4533-8b8f-273029ad614c",
+              "testId": "aaad2f74-6db1-d530-09e1-5ae601163843",
+              "testName": "Player.Core.Tests.BackupBundleTests.LiveCompleteBackupRestoresDatabaseSettingsIndexAndRatingsAndRetainsCurrentData",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.0538644",
+              "startTime": "2026-10-06T07:01:07.1311954+00:00",
+              "endTime": "2026-10-06T07:01:07.1851805+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "3f4f9bcd-3a4a-4533-8b8f-273029ad614c"
+            },
+            {
+              "executionId": "f004fe59-a94f-446c-ac6a-ec49899ff610",
+              "testId": "5f19db9f-c9b6-8bc5-0143-9355894d8021",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"schema\")",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.0467722",
+              "startTime": "2026-10-06T07:01:06.9676666+00:00",
+              "endTime": "2026-10-06T07:01:07.0151750+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "f004fe59-a94f-446c-ac6a-ec49899ff610"
+            },
+            {
+              "executionId": "e833d5e3-e859-45cd-905b-089b1a63ef4c",
+              "testId": "417e7402-a283-2c93-a81f-c95b9abba4e9",
+              "testName": "Player.Core.Tests.BackupBundleTests.OccupiedSettingsPathDoesNotMoveTheCurrentDatabase",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.0301034",
+              "startTime": "2026-10-06T07:01:07.0549899+00:00",
+              "endTime": "2026-10-06T07:01:07.0842672+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "e833d5e3-e859-45cd-905b-089b1a63ef4c"
+            },
+            {
+              "executionId": "6f4d501b-ff04-4d1a-aa45-680e8693b637",
+              "testId": "40c1369b-1465-509e-cc71-5fc12be4d47c",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"traversal\")",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.0160727",
+              "startTime": "2026-10-06T07:01:07.0374790+00:00",
+              "endTime": "2026-10-06T07:01:07.0546888+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "6f4d501b-ff04-4d1a-aa45-680e8693b637"
+            },
+            {
+              "executionId": "655b6130-78f1-454e-9087-324802981391",
+              "testId": "e66e35d7-67c6-f1e1-0a79-97b910e8b99a",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"references\")",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.0539477",
+              "startTime": "2026-10-06T07:01:06.4912377+00:00",
+              "endTime": "2026-10-06T07:01:06.5455062+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "655b6130-78f1-454e-9087-324802981391"
+            },
+            {
+              "executionId": "4e2263af-50ca-4f0d-b6f2-d18dfd840c62",
+              "testId": "8c85d5c8-5a0e-d2b6-7d2a-03ae67bcf9db",
+              "testName": "Player.Core.Tests.BackupBundleTests.BackupNeverOverwritesAnExistingArchive",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.0146209",
+              "startTime": "2026-10-06T07:01:07.1158334+00:00",
+              "endTime": "2026-10-06T07:01:07.1308846+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "4e2263af-50ca-4f0d-b6f2-d18dfd840c62"
+            },
+            {
+              "executionId": "d0725e85-88e0-4062-9d6b-63c108042668",
+              "testId": "ed8aaece-1bec-48f7-a213-27665deabe54",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"duplicate\")",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.0279343",
+              "startTime": "2026-10-06T07:01:06.4640164+00:00",
+              "endTime": "2026-10-06T07:01:06.4910504+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "d0725e85-88e0-4062-9d6b-63c108042668"
+            }
+          ]
+        }
+      ],
+      "reports": {}
+    }
+  ],
+  "download": {
+    "status": "published-download-verified",
+    "sourceCommit": "3fc52c6af21654f14bd5b11d8414aa32b71739a0",
+    "runUrl": "https://github.com/kurasis/MPswift/actions/runs/37426989226",
+    "releaseUrl": "https://github.com/kurasis/MPswift/releases/tag/build-37426989226-attempt-1",
+    "zipUrl": "https://github.com/kurasis/MPswift/releases/download/build-37426989226-attempt-1/LocalAudioPlayer-dev-3fc52c6af216-win-x64.zip",
+    "bytes": 85433460,
+    "sha256": "0f167b15bc937fa3e89d58aa5e5d1624a50a7c2c09360069331318e33ffe8554"
+  },
+  "limitations": [
+    "Managed reset-policy regressions are not native endpoint evidence.",
+    "Real WASAPI replacement, listening, hotplug and Windows 11 acceptance remain unrun on this hosted runner.",
+    "The subsequent idempotent close refinement and packaged help require their own successful main build."
+  ]
+}
