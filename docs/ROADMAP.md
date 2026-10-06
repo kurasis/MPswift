@@ -25,3 +25,6 @@ Implement vertical slices; do not advance an untested feature to verified status
 | G7 — Performance evidence | Actual 100k production query/WPF pages and 9987-row production scrolling, raw CPU/resources | All hosted warm samples met 250 ms search/100 ms scroll comparisons; reference/cold/steady/device acceptance remains open |
 
 [run 37418131090](https://github.com/kurasis/MPswift/actions/runs/37418131090) and [exact reports](evidence/stage-g-formats-backup-performance-windows.json) retain exact provenance. Continue remaining RELEASE_ACCEPTANCE.md workflows; these slices do not declare version 1.0 complete.
+
+
+G8/G9 are implemented and the observed Windows cases passed at `0ce6a9b` in [run 37423428788](https://github.com/kurasis/MPswift/actions/runs/37423428788); [exact evidence](evidence/stage-g8-g9-windows.json). G8 covers owned HE-AAC/APE/SV8/hybrid/rates, actual WMA lossless/Pro and >4 GiB RF64. G9 covers actual full disk/read-only fallback/migration interruption/watcher overflow/huge tags. Remaining G10–G13 workflows concern clean Windows 11/offline/accessibility/DPI, actual endpoints/digital/listening, sustained playback/reference resources and licensing/version 1.0. Actual Windows N/power-loss and untested codec combinations remain explicit acceptance prerequisites.

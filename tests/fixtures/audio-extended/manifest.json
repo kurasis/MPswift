@@ -88,7 +88,8 @@
       "sha256": "98ff9faf4b1f81fda4bff5b0a3a0b8818547418e7123b5f2071bb82784398674",
       "license": "CC0-1.0",
       "provenance": "Owned 440 Hz opposite-phase PCM; pinned development encoders",
-      "generator": "Generate-ExtendedFixtures.py"
+      "generator": "Generate-ExtendedFixtures.py",
+      "lossyReference": "source-pcm16.wav"
     },
     {
       "path": "pcm24-192k.wav",

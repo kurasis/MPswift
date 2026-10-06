@@ -1,0 +1,2583 @@
+{
+  "sourceCommit": "0ce6a9bb9f31c348368ff614611312c924a058c8",
+  "runUrl": "https://github.com/kurasis/MPswift/actions/runs/37423428788",
+  "runAttempt": 1,
+  "runStatus": "completed",
+  "runConclusion": "success",
+  "jobs": [
+    {
+      "id": 112137655912,
+      "name": "build (windows-2022)",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37423428788/job/112137655912",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 112137656120,
+      "name": "build (ubuntu-24.04)",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37423428788/job/112137656120",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 112139300318,
+      "name": "Publish separate Windows ZIP prerelease",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37423428788/job/112139300318",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "evidence-windows-2022",
+      "archiveSha256": "af0ba8f4f24569775aca1f45c1eb22e1a8164a43b691075447f4a6964483afc4",
+      "tests": [
+        {
+          "counters": {
+            "total": "124",
+            "executed": "124",
+            "passed": "124",
+            "failed": "0",
+            "error": "0",
+            "timeout": "0",
+            "aborted": "0",
+            "inconclusive": "0",
+            "passedButRunAborted": "0",
+            "notRunnable": "0",
+            "notExecuted": "0",
+            "disconnected": "0",
+            "warning": "0",
+            "completed": "0",
+            "inProgress": "0",
+            "pending": "0"
+          },
+          "backupCases": [
+            {
+              "executionId": "c4e43088-91be-4aec-aa67-acc5b616ee11",
+              "testId": "417e7402-a283-2c93-a81f-c95b9abba4e9",
+              "testName": "Player.Core.Tests.BackupBundleTests.OccupiedSettingsPathDoesNotMoveTheCurrentDatabase",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.5637529",
+              "startTime": "2026-10-06T06:24:14.5441367+00:00",
+              "endTime": "2026-10-06T06:24:15.1081279+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "c4e43088-91be-4aec-aa67-acc5b616ee11"
+            },
+            {
+              "executionId": "3217cf1a-4117-4e48-8aa8-e2e246e2921b",
+              "testId": "2ca07da6-2869-8bce-455f-f8712e1b9850",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"checksum\")",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.5614595",
+              "startTime": "2026-10-06T06:24:12.7846474+00:00",
+              "endTime": "2026-10-06T06:24:13.3462670+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "3217cf1a-4117-4e48-8aa8-e2e246e2921b"
+            },
+            {
+              "executionId": "282bbfa4-c2e6-4e99-940e-cae8d0e88d6a",
+              "testId": "40c1369b-1465-509e-cc71-5fc12be4d47c",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"traversal\")",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.3061865",
+              "startTime": "2026-10-06T06:24:14.2369242+00:00",
+              "endTime": "2026-10-06T06:24:14.5437558+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "282bbfa4-c2e6-4e99-940e-cae8d0e88d6a"
+            },
+            {
+              "executionId": "63945a32-0c88-461a-b47b-165fbd061913",
+              "testId": "eb007079-8e29-a338-1f7d-1097b287dbe3",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"settings\")",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.8189328",
+              "startTime": "2026-10-06T06:24:09.1299282+00:00",
+              "endTime": "2026-10-06T06:24:09.9493455+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "63945a32-0c88-461a-b47b-165fbd061913"
+            },
+            {
+              "executionId": "7cdf6fb5-150f-4424-9084-856b6ddb2eab",
+              "testId": "34a235d6-31f7-d562-fb42-949ca3cadc50",
+              "testName": "Player.Core.Tests.BackupBundleTests.ActiveStoreOwnershipRejectsRestoreAndLeavesCurrentSessionUsable",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.6548129",
+              "startTime": "2026-10-06T06:24:15.1083578+00:00",
+              "endTime": "2026-10-06T06:24:15.7635159+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "7cdf6fb5-150f-4424-9084-856b6ddb2eab"
+            },
+            {
+              "executionId": "38e13964-42b5-4d91-a493-545aaebd637e",
+              "testId": "ed8aaece-1bec-48f7-a213-27665deabe54",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"duplicate\")",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.8304869",
+              "startTime": "2026-10-06T06:24:09.9494980+00:00",
+              "endTime": "2026-10-06T06:24:10.7804621+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "38e13964-42b5-4d91-a493-545aaebd637e"
+            },
+            {
+              "executionId": "fcbdfebf-d2cb-4ff1-aa8b-9756415b91f7",
+              "testId": "5f19db9f-c9b6-8bc5-0143-9355894d8021",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"schema\")",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.3542747",
+              "startTime": "2026-10-06T06:24:13.3466294+00:00",
+              "endTime": "2026-10-06T06:24:13.7011380+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "fcbdfebf-d2cb-4ff1-aa8b-9756415b91f7"
+            },
+            {
+              "executionId": "3e8b4247-3f92-44da-b7b9-17a1b625319d",
+              "testId": "3a72f67e-7883-bbc8-e103-9c9c35a5c3cf",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"missing\")",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.5885204",
+              "startTime": "2026-10-06T06:24:11.6886705+00:00",
+              "endTime": "2026-10-06T06:24:12.2774023+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "3e8b4247-3f92-44da-b7b9-17a1b625319d"
+            },
+            {
+              "executionId": "4a0ea205-3a2f-4eb3-b2a5-8f65926d359c",
+              "testId": "8c85d5c8-5a0e-d2b6-7d2a-03ae67bcf9db",
+              "testName": "Player.Core.Tests.BackupBundleTests.BackupNeverOverwritesAnExistingArchive",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.3472800",
+              "startTime": "2026-10-06T06:24:15.7638091+00:00",
+              "endTime": "2026-10-06T06:24:16.1113375+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "4a0ea205-3a2f-4eb3-b2a5-8f65926d359c"
+            },
+            {
+              "executionId": "d282125a-95ce-4fb6-bcf8-ba5368c89481",
+              "testId": "00954fc2-4bd6-c7db-d0b5-4250424e9552",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"size\")",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.5349109",
+              "startTime": "2026-10-06T06:24:13.7013944+00:00",
+              "endTime": "2026-10-06T06:24:14.2367126+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "d282125a-95ce-4fb6-bcf8-ba5368c89481"
+            },
+            {
+              "executionId": "d5a47c09-d226-4e76-99bd-b7fe3a449919",
+              "testId": "aaad2f74-6db1-d530-09e1-5ae601163843",
+              "testName": "Player.Core.Tests.BackupBundleTests.LiveCompleteBackupRestoresDatabaseSettingsIndexAndRatingsAndRetainsCurrentData",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.5917090",
+              "startTime": "2026-10-06T06:24:16.1115650+00:00",
+              "endTime": "2026-10-06T06:24:16.7036344+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "d5a47c09-d226-4e76-99bd-b7fe3a449919"
+            },
+            {
+              "executionId": "b3fde669-7ace-4b7a-96b7-682b51582b17",
+              "testId": "acde5144-27be-8b80-6c6f-ee84e1c7dcc7",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"database\")",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.5062542",
+              "startTime": "2026-10-06T06:24:12.2776177+00:00",
+              "endTime": "2026-10-06T06:24:12.7842665+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "b3fde669-7ace-4b7a-96b7-682b51582b17"
+            },
+            {
+              "executionId": "ac5e7ce5-1fd2-4464-8c7c-ffc76aec49e2",
+              "testId": "e66e35d7-67c6-f1e1-0a79-97b910e8b99a",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"references\")",
+              "computerName": "runnervmdlhio",
+              "duration": "00:00:00.9074008",
+              "startTime": "2026-10-06T06:24:10.7821530+00:00",
+              "endTime": "2026-10-06T06:24:11.6883984+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "ac5e7ce5-1fd2-4464-8c7c-ffc76aec49e2"
+            }
+          ]
+        }
+      ],
+      "reports": {
+        "portable/package-audit.json": {
+          "Status": "local-candidate-packaged",
+          "SourceCommit": "0ce6a9bb9f31c348368ff614611312c924a058c8",
+          "SourceTreeDirty": false,
+          "Zip": "LocalAudioPlayer-dev-0ce6a9bb9f31-win-x64.zip",
+          "ZipSha256": "55d6f4a436bfeea5b701292d04610600383d7376d06c5984858126141292f2f2",
+          "Bytes": 85423307,
+          "Files": 550,
+          "Dependencies": 14,
+          "NativeLibraries": 13,
+          "DistributionApproved": false
+        },
+        "portable/integrity-audit.json": {
+          "Status": "candidate-integrity-negative-checks-passed",
+          "SourceCommit": "0ce6a9bb9f31c348368ff614611312c924a058c8",
+          "SourceTreeDirty": false,
+          "Checks": [
+            "changed file",
+            "missing file",
+            "extra file",
+            "empty checksum list"
+          ],
+          "ZipSha256": "55d6f4a436bfeea5b701292d04610600383d7376d06c5984858126141292f2f2",
+          "RestoredCopyPassed": true
+        },
+        "smoke/decode.json": {
+          "Status": "decode-passed",
+          "Environment": "Microsoft Windows 10.0.20348",
+          "Architecture": "X64",
+          "Versions": {
+            "bass": "2.4.18.3",
+            "bassmix": "2.4.13.0",
+            "basswasapi": "2.4.4.1"
+          },
+          "SourceSha256": "265bfc54a7b0bfc2b75cf63c427873d00b516bbbb9dcaae17346de76cc4757fb",
+          "Decode": {
+            "SampleRate": 48000,
+            "Channels": 2,
+            "DurationSeconds": 3,
+            "DecodedBytes": 1152000,
+            "Peak": 0.049987793,
+            "Codec": "WavePCM",
+            "BitDepth": 16
+          },
+          "Output": null,
+          "SourceUnchanged": true,
+          "SourceHandleReleased": true,
+          "AudiblePlayback": "not-manually-verified",
+          "Gapless": "not-run"
+        },
+        "smoke/engine.json": {
+          "Status": "production-engine-passed",
+          "Environment": "Microsoft Windows 10.0.20348",
+          "Snapshot": {
+            "Generation": 42,
+            "Revision": 46,
+            "State": 2,
+            "EntryId": "354e7297-1088-4203-b49b-39485a1c94c7",
+            "Position": "00:00:00",
+            "Duration": "00:00:03",
+            "SourceFormat": {
+              "SampleRate": 48000,
+              "Channels": 2,
+              "Codec": "WavePCM",
+              "BitDepth": 16
+            },
+            "OutputFormat": null,
+            "CanSeek": true,
+            "Volume": 0.5,
+            "Muted": false,
+            "Error": null,
+            "Ended": false,
+            "Transitioned": false
+          },
+          "Output": "not-run",
+          "SourceHandleReleased": true,
+          "SourceUnchanged": true,
+          "AudiblePlayback": "not-manually-verified"
+        },
+        "smoke/formats-extended.json": {
+          "Status": "formats-passed",
+          "Environment": "Microsoft Windows 10.0.20348",
+          "Count": 9,
+          "Results": [
+            {
+              "File": "he-aac.m4a",
+              "Profile": "HE-AAC SBR MP4",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "90ffbe98156bf4f54d02fc06db4f83e71b9b6bbd45aac3b14a51d4a15c6f5f3d",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3.0573333333333332,
+                "DecodedBytes": 1174016,
+                "Peak": 0.04990586,
+                "Codec": "MP4",
+                "BitDepth": 0
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "he-aac-v2.m4a",
+              "Profile": "HE-AAC v2 SBR+PS MP4",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "354f29e1bf4777243995d45b2bfc8a11524ff9b1d97699b0357b5fbdb14ac9f4",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3.078666666666667,
+                "DecodedBytes": 1182208,
+                "Peak": 0.050283283,
+                "Codec": "MP4",
+                "BitDepth": 0
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "monkey.ape",
+              "Profile": "Monkey's Audio normal",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "12e40af40bae83d481cb263e2f17cde23396f96686711c7cbb8083b336bffae7",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.049987793,
+                "Codec": "APE",
+                "BitDepth": 16
+              },
+              "LosslessMaximumError": 0
+            },
+            {
+              "File": "musepack.mpc",
+              "Profile": "Musepack SV8 standard",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "436c60ffbc9b5364fc64f2f496908a323c49b532f410efc42b0bc599904a4c04",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.050050423,
+                "Codec": "MPC",
+                "BitDepth": 0
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "hybrid-corrected.wv",
+              "Profile": "WavPack hybrid with correction",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "98ff9faf4b1f81fda4bff5b0a3a0b8818547418e7123b5f2071bb82784398674",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.049987793,
+                "Codec": "WV",
+                "BitDepth": 16
+              },
+              "LosslessMaximumError": 0
+            },
+            {
+              "File": "hybrid-lossy.wv",
+              "Profile": "WavPack hybrid without correction",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "98ff9faf4b1f81fda4bff5b0a3a0b8818547418e7123b5f2071bb82784398674",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.05001831,
+                "Codec": "WV",
+                "BitDepth": 16
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "pcm24-192k.wav",
+              "Profile": "PCM24 192 kHz stereo",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "2aeef11455cb12a5266b0460395e843aa056b9bd407f7d874a25e977319e0417",
+              "Decode": {
+                "SampleRate": 192000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 4608000,
+                "Peak": 0.050010443,
+                "Codec": "WavePCM",
+                "BitDepth": 24
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "flac24-96k-6ch.flac",
+              "Profile": "FLAC24 96 kHz 5.1",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "23c005146a10ac7fd7557107b03479ab92516ca48ad70205a21898209a5a1444",
+              "Decode": {
+                "SampleRate": 96000,
+                "Channels": 6,
+                "DurationSeconds": 3,
+                "DecodedBytes": 6912000,
+                "Peak": 0.050010443,
+                "Codec": "FLAC",
+                "BitDepth": 24
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "pcm24-96k-8ch.wav",
+              "Profile": "PCM24 96 kHz 7.1",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "0ba56b84f146bdba8987e1ab2363411d3c970fc5c2a0f69b1af74d318382e9ec",
+              "Decode": {
+                "SampleRate": 96000,
+                "Channels": 8,
+                "DurationSeconds": 3,
+                "DecodedBytes": 9216000,
+                "Peak": 0.050010443,
+                "Codec": "WavePCM",
+                "BitDepth": 24
+              },
+              "LosslessMaximumError": null
+            }
+          ],
+          "DeviceOutput": "not-run"
+        },
+        "smoke/crash-restart.json": {
+          "Status": "crash-restart-model-passed",
+          "CommittedPlaylistIdentityOrderAndFlags": true,
+          "ActiveSourceAndPosition": true,
+          "QueueRepeatShuffle": true,
+          "Ratings": true,
+          "VolumeMute": true,
+          "NativePreparation": true,
+          "NoAutoplay": true,
+          "SqliteIntegrityAndReferences": true,
+          "UncommittedValidationTransactionRolledBack": true,
+          "SourceUnchanged": true,
+          "PositionToleranceSeconds": 0.05,
+          "DevicePlayback": "not-run",
+          "KillDuringMigrationOrPowerLoss": "not-run",
+          "Windows": "Microsoft Windows NT 10.0.20348.0",
+          "ForcedWpfTermination": true,
+          "KilledExitCode": -1,
+          "Method": "Actual apphost killed after a production checkpoint, while a diagnostic SQLite write transaction was open; actual WPF/native restart validates the last committed state.",
+          "SourceCommit": "0ce6a9bb9f31c348368ff614611312c924a058c8"
+        },
+        "smoke/formats.json": {
+          "Status": "formats-passed",
+          "Environment": "Microsoft Windows 10.0.20348",
+          "Count": 21,
+          "Results": [
+            {
+              "File": "mp3-cbr.mp3",
+              "Profile": "MP3 CBR",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "0486fe8948b1d6a3f96552b8fada48593c179e43663475fa1619cbd0310576d7",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.048607685,
+                "Codec": "MP3",
+                "BitDepth": 0
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "mp3-vbr.mp3",
+              "Profile": "MP3 VBR with Xing/LAME",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "f95d3c7358817ce0a63cf3dc9c9e15d2599f873d9d569bb1c89eee1cfa9b8fa2",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.050218564,
+                "Codec": "MP3",
+                "BitDepth": 0
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "pcm16.wav",
+              "Profile": "WAV PCM16",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "6ce636b4dabd3243eeaee64a6716ceb0dafb7eb6dbb64e542ef838dca1ffa887",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.049987793,
+                "Codec": "WavePCM",
+                "BitDepth": 16
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "pcm24.wav",
+              "Profile": "WAV PCM24",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "a526ec91a362f2044ea32d121ee76b0ac2ff6aa4962c540da42c28a7375a83c8",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.049987793,
+                "Codec": "WavePCM",
+                "BitDepth": 24
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "pcm32.wav",
+              "Profile": "WAV PCM32",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "4a8dcbab17493ebc7ab40409eee078b36dec50e914e94023ed77b256712bb6a6",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.049987793,
+                "Codec": "WavePCM",
+                "BitDepth": 32
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "float32.wav",
+              "Profile": "WAV float32",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "06f4dacaf2aaf18226cbba64ff9463a0150151b8c6b335428f601adc3208e39a",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.049987793,
+                "Codec": "WaveFloat",
+                "BitDepth": 32
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "pcm16.aiff",
+              "Profile": "AIFF PCM16",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "74fefd0a7d00160d0e8bb313e7ada50145d9a68db26b6a59d894f1b7b266b827",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.049987793,
+                "Codec": "AIFF",
+                "BitDepth": 16
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "flac16.flac",
+              "Profile": "FLAC 16-bit",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "a45e1acf4e46a18e549d00aec80fe9ce53ba1f8fe5aa7ab05a1637f2e712439d",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.049987793,
+                "Codec": "FLAC",
+                "BitDepth": 16
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "flac24.flac",
+              "Profile": "FLAC 24-bit",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "508ab2ea6e5e22d6df2ba17b896a8b5099957f100a54ff9e84147b836900a284",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.049987793,
+                "Codec": "FLAC",
+                "BitDepth": 24
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "vorbis.ogg",
+              "Profile": "Ogg Vorbis",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "c89e006e966c2aa20ad16dfed82ca83e5c7c8138b36e757408bd170421627c93",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.051370002,
+                "Codec": "OGG",
+                "BitDepth": 0
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "opus.opus",
+              "Profile": "Ogg Opus",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "e4c50d3748d2b62d7a9008726346e8a953cb877ee373538ec81bfe3d0896421a",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.051288154,
+                "Codec": "OPUS",
+                "BitDepth": 0
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "aac-lc.aac",
+              "Profile": "AAC-LC ADTS",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "8a4291d2f0ee031e1218f156e385b4fec13fa3c96da4693547c1406345a1ef39",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3.008,
+                "DecodedBytes": 1155072,
+                "Peak": 0.05505964,
+                "Codec": "AAC",
+                "BitDepth": 0
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "aac-lc.m4a",
+              "Profile": "AAC-LC MP4",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "2a1942fb07f64ef11eff75b94c46b9e33c6d4fc784be2f5544dd2dc97cc41d18",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3.021333333333333,
+                "DecodedBytes": 1160192,
+                "Peak": 0.055056825,
+                "Codec": "MP4",
+                "BitDepth": 0
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "alac.m4a",
+              "Profile": "ALAC MP4",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "1b947ea4937c837d4e99bda0d0badb2c709df5f41f13a01a3cbec23f94839ef8",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.049987793,
+                "Codec": "ALAC",
+                "BitDepth": 16
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "wavpack.wv",
+              "Profile": "WavPack lossless",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "6b9666259a90028c3695648597f043cafeab500b55708b3779a9ee5b26c056a3",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.049987793,
+                "Codec": "WV",
+                "BitDepth": 16
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "tta.tta",
+              "Profile": "TTA lossless",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "899e3012efb1ea5a784938143bed13685bd2fa47a28d5c4a7312955ed08bf595",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.049987793,
+                "Codec": "TTA",
+                "BitDepth": 16
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "audiobook.m4b",
+              "Profile": "M4B AAC-LC without DRM",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "f3107688d080c55b22e4dbc42397f955906995fed51776c1947b6457c2823c85",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3.021333333333333,
+                "DecodedBytes": 1160192,
+                "Peak": 0.055303015,
+                "Codec": "MP4",
+                "BitDepth": 0
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "rf64.wav",
+              "Profile": "WAV RF64 PCM16",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "2b71f8e916392b4ddb28deeb7aa34edc29387927c48f2fe2628fdde697811ebc",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1152000,
+                "Peak": 0.049987793,
+                "Codec": "WavePCM",
+                "BitDepth": 16
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "wma2.wma",
+              "Profile": "WMA v2 ASF 128 kbps",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "97e9ea7d8abfc461d41dfa3a2acecbceb408c727b5a6f9345509dd84c537810d",
+              "Decode": {
+                "SampleRate": 48000,
+                "Channels": 2,
+                "DurationSeconds": 3,
+                "DecodedBytes": 1146880,
+                "Peak": 0.050598145,
+                "Codec": "WMA",
+                "BitDepth": 16
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "dsd64.dsf",
+              "Profile": "DSF DSD64 converted to float PCM",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "38621331f0fe961d1430e0ece56538010bb77c40cc7f3a22953670869072b3b6",
+              "Decode": {
+                "SampleRate": 88200,
+                "Channels": 2,
+                "DurationSeconds": 2.9999319727891156,
+                "DecodedBytes": 2116752,
+                "Peak": 0.099865526,
+                "Codec": "DSD",
+                "BitDepth": 0
+              },
+              "LosslessMaximumError": null
+            },
+            {
+              "File": "dsd64.dff",
+              "Profile": "DSDIFF DSD64 converted to float PCM",
+              "Status": "decode-seek-end-dispose-passed",
+              "SourceSha256": "315eb9eb030f35f520f878c8770c26c672bff66ca6ac26effcb5c66fa79bbcba",
+              "Decode": {
+                "SampleRate": 88200,
+                "Channels": 2,
+                "DurationSeconds": 2.9999319727891156,
+                "DecodedBytes": 2116752,
+                "Peak": 0.099865526,
+                "Codec": "DSD",
+                "BitDepth": 0
+              },
+              "LosslessMaximumError": null
+            }
+          ],
+          "DeviceOutput": "not-run"
+        },
+        "smoke/g9-resilience.json": {
+          "Status": "g9-resilience-passed",
+          "ReadOnlyPortable": {
+            "ActualDeniedDirectoryAcl": true,
+            "ExplicitDeclinePreservedUserDirectory": true,
+            "ExplicitAcceptSavedPerUser": true,
+            "Choices": 2,
+            "PermissionRecovery": true,
+            "InteractiveMessageBox": "policy callback exercised; manual dialog interaction remains separate"
+          },
+          "Metadata": {
+            "ActualOversizedRiffTagBytes": 33554434,
+            "FallbackAndArtworkIsolation": true,
+            "NativeAudioDecodeUnaffected": true,
+            "TruncatedFlacRejected": true,
+            "UnsupportedCompressedFrameIsolated": true,
+            "ValidTitleInputCharacters": 100000,
+            "BoundedTitleCharacters": 4096,
+            "SubsequentValidMetadata": true,
+            "SourceUnchanged": true,
+            "SourceHandlesReleased": true,
+            "Decode": {
+              "SampleRate": 48000,
+              "Channels": 2,
+              "DurationSeconds": 3,
+              "DecodedBytes": 1152000,
+              "Peak": 0.049987793,
+              "Codec": "WavePCM",
+              "BitDepth": 16
+            }
+          },
+          "WatcherOverflow": {
+            "ActualInternalBufferOverflows": 1,
+            "BufferBytes": 4096,
+            "BurstCreateDeletePairs": 4000,
+            "NativeCallbackTemporarilyHeld": true,
+            "DebouncedRootHint": true,
+            "ProductionScannerReconciled": true,
+            "StableIdsAndRatingsAndPlaylist": true,
+            "MissingAndReappearing": true,
+            "CancellationAfterCommittedBatch": 64,
+            "NoFalseMissingFromPartialScan": true,
+            "ResumedFiles": 133
+          },
+          "FullDisk": {
+            "OwnedNtfsVhd": true,
+            "FileSystem": "NTFS",
+            "VolumeBytes": 133099520,
+            "FilledBytes": 120500224,
+            "ActualWindowsDiskFullCode": 112,
+            "ActualSqliteFullCode": 13,
+            "TransactionRollbackPreservedCommittedState": true,
+            "SettingsAndPreviousBytesPreserved": true,
+            "IncompleteBackupNotPublished": true,
+            "SaveAndBackupAfterSpaceFreed": true
+          },
+          "PowerLoss": "not-run",
+          "Windows": "Microsoft Windows NT 10.0.20348.0",
+          "SourceCommit": "0ce6a9bb9f31c348368ff614611312c924a058c8"
+        },
+        "smoke/g8-formats.json": {
+          "Status": "extended-formats-passed",
+          "WmaLossless": {
+            "CodecTag": "0x0163",
+            "EncoderRates": [
+              100,
+              98,
+              90,
+              75,
+              50,
+              25,
+              10
+            ],
+            "EncoderAttempts": [
+              {
+                "Rate": 48000,
+                "Channels": 2,
+                "Flags": 0,
+                "Rates": [
+                  98,
+                  90
+                ],
+                "Opened": false,
+                "Error": "NotAvailable"
+              },
+              {
+                "Rate": 44100,
+                "Channels": 2,
+                "Flags": 0,
+                "Rates": [
+                  100,
+                  98,
+                  90,
+                  75,
+                  50,
+                  25,
+                  10
+                ],
+                "Opened": true,
+                "Error": null
+              }
+            ],
+            "BitrateOrQuality": 100,
+            "Decode": {
+              "SampleRate": 44100,
+              "Channels": 2,
+              "DurationSeconds": 3,
+              "DecodedBytes": 1058400,
+              "Peak": 0.049987793,
+              "Codec": "WMA",
+              "BitDepth": 16
+            },
+            "ExactLosslessMaximumError": 0,
+            "SourceUnchanged": true,
+            "SourceHandleReleased": true
+          },
+          "WmaPro": {
+            "CodecTag": "0x0162",
+            "EncoderRates": [
+              256000,
+              192000,
+              160000,
+              128000,
+              96000,
+              80000,
+              64000,
+              48000
+            ],
+            "EncoderAttempts": [
+              {
+                "Rate": 96000,
+                "Channels": 6,
+                "Flags": 16384,
+                "Rates": [],
+                "Opened": false,
+                "Error": "NotAvailable"
+              },
+              {
+                "Rate": 48000,
+                "Channels": 2,
+                "Flags": 16384,
+                "Rates": [
+                  256000,
+                  192000,
+                  160000,
+                  128000,
+                  96000,
+                  80000,
+                  64000,
+                  48000
+                ],
+                "Opened": true,
+                "Error": null
+              }
+            ],
+            "BitrateOrQuality": 128000,
+            "Decode": {
+              "SampleRate": 48000,
+              "Channels": 2,
+              "DurationSeconds": 3.042,
+              "DecodedBytes": 1152000,
+              "Peak": 0.050079346,
+              "Codec": "WMA",
+              "BitDepth": 16
+            },
+            "ExactLosslessMaximumError": null,
+            "SourceUnchanged": true,
+            "SourceHandleReleased": true
+          },
+          "LargeRf64": {
+            "FileBytes": 4295159376,
+            "DataBytes": 4295159296,
+            "SparseOwnedNtfsFile": true,
+            "CheckedDataOffsets": [
+              0,
+              2147483648,
+              4294968320,
+              4295142912
+            ],
+            "DecodedBytesRead": 131072,
+            "BufferBytes": 32768,
+            "SourcePreservation": "Exclusive reopen, length and all written signal ranges; not a whole-file hash",
+            "BoundaryAndEndSeek": true
+          },
+          "Windows": "Microsoft Windows 10.0.20348",
+          "WindowsN": "not-run: hosted Server is not Windows N",
+          "DeviceOutput": "not-run"
+        },
+        "smoke/generated tone Музыка 🎵.wav.json": {
+          "SchemaVersion": 1,
+          "Path": "generated tone Музыка 🎵.wav",
+          "Container": "WAV",
+          "Codec": "PCM signed 16-bit LE",
+          "SampleRate": 48000,
+          "Channels": 2,
+          "DurationSeconds": 3,
+          "DurationToleranceSeconds": 0.001,
+          "PeakTolerance": 0.001,
+          "ExpectedPeak": 0.05,
+          "Sha256": "265bfc54a7b0bfc2b75cf63c427873d00b516bbbb9dcaae17346de76cc4757fb",
+          "Provenance": "Generated by Player.AudioSmoke.WavFixture; 440 Hz sine with opposite-phase channels",
+          "License": "CC0-1.0",
+          "IntendedChecks": [
+            "decode",
+            "duration",
+            "seek",
+            "end-of-file",
+            "shared output",
+            "disposal"
+          ]
+        },
+        "smoke/migration-restart.json": {
+          "Status": "production-migration-kill-restart-passed",
+          "InterruptedActualProductionDdl": true,
+          "SchemaAndAlterRolledBackBeforeRestart": true,
+          "MigrationRetryCompleted": true,
+          "SchemaOneBackups": 2,
+          "IdentitiesOrderDuplicatesAndFlags": true,
+          "NativePreparation": true,
+          "NoAutoplay": true,
+          "PowerLoss": "not-run: forced process termination is not power loss",
+          "Windows": "Microsoft Windows NT 10.0.20348.0",
+          "ForcedWpfTermination": true,
+          "KilledExitCode": -1,
+          "Method": "Actual apphost killed inside production schema migration after DDL and before Commit; assert schema-one rollback before actual WPF/native restart retries migration.",
+          "SourceCommit": "0ce6a9bb9f31c348368ff614611312c924a058c8"
+        },
+        "smoke/mixer.json": {
+          "Status": "mixer-passed",
+          "Environment": "Microsoft Windows 10.0.20348",
+          "SplitFrames": 48000,
+          "SampleRate": 48000,
+          "Channels": 2,
+          "LosslessMaximumSampleError": 0,
+          "CueMaximumSampleError": 0,
+          "AddedOrDuplicatedFrames": 0,
+          "PersistentGraph": true,
+          "PreparedNext": true,
+          "CrossfadeIncomingTimeline": true,
+          "SeekCancelsOverlap": true,
+          "SourceUnchanged": true,
+          "Capture": "stage-d-mixer/lossless-capture.f32",
+          "CueCapture": "stage-d-mixer/cue-capture.f32",
+          "CaptureEncoding": "IEEE float32 LE interleaved stereo",
+          "CapturePath": "production mixer callback PCM; no endpoint/system latency",
+          "WasapiOutputCapture": "not-run",
+          "Listening": "not-run",
+          "LossyGapless": "not-claimed",
+          "FixtureLicense": "CC0-1.0"
+        },
+        "smoke/optional-wma.json": {
+          "Status": "missing-optional-wma-passed",
+          "CoreWavAvailableBeforeAndAfter": true,
+          "WmaError": {
+            "Category": 2,
+            "ResourceKey": "ErrorDependency",
+            "Detail": "WMA is unavailable: the approved BASSWMA plug-in and Windows Media Format components are required. Could not find file 'D:\\a\\MPswift\\MPswift\\artifacts\\missing-wma-bf979cdff7fc4d7db98fcce0a064108d\\native\\win-x64\\basswma.dll'.",
+            "NativeCode": 41
+          },
+          "SourceUnchanged": true,
+          "SourceHandlesReleased": true,
+          "Method": "Isolated actual tool copy with the approved WMA DLL omitted; MF fallback disabled",
+          "WindowsN": "not-run: this is a dependency failure check, not an N OS"
+        },
+        "smoke/package-smoke.json": {
+          "Status": "packaged-executable-smoke-passed",
+          "SourceCommit": "0ce6a9bb9f31c348368ff614611312c924a058c8",
+          "ZipSha256": "55d6f4a436bfeea5b701292d04610600383d7376d06c5984858126141292f2f2",
+          "UnicodeExtractionPath": true,
+          "ArbitraryWorkingDirectory": true,
+          "InvalidExternalDotnetRoot": true,
+          "TamperRejected": true,
+          "Windows": "Microsoft Windows NT 10.0.20348.0",
+          "CleanWindows11WithoutSdk": "not-run",
+          "NetworkDisconnected": "not-run",
+          "DeviceOutput": "not-run",
+          "DistributionApproved": false
+        },
+        "smoke/packaged-ui.json": {
+          "WindowsIntegration": {
+            "Status": "windows-integration-passed",
+            "SecondProcessActivation": true,
+            "ConcurrentFileForwarding": true,
+            "NoImplicitAutoplay": true,
+            "OversizedIpcRejected": true,
+            "CurrentUserOnlyPipe": true,
+            "SeekAutomationRange": true,
+            "SoftwareRoutedDropdownEscape": true,
+            "CloseToTrayPreservesState": true,
+            "Language": "ru",
+            "ResourceKeys": 208,
+            "RealizedRowContainers": 6,
+            "PlaylistRows": 9987,
+            "GlobalPlaylistCapacity": 10000,
+            "ScrollPerformance": {
+              "ActualPlaylistRows": 9987,
+              "GlobalCapacity": 10000,
+              "Method": "ScrollIntoView + UpdateLayout + Dispatcher ContextIdle; software-driven WPF",
+              "MaximumRealizedContainers": 7,
+              "Timings": {
+                "SamplesMilliseconds": [
+                  1.9648,
+                  6.8583,
+                  7.1885,
+                  5.7779,
+                  5.9655,
+                  5.6639,
+                  9.3249,
+                  4.8578,
+                  6.144,
+                  6.3878,
+                  6.0183,
+                  5.8213,
+                  5.6929,
+                  5.7432,
+                  6.1119,
+                  7.5599,
+                  5.9992,
+                  5.8499,
+                  5.8868,
+                  5.8509,
+                  5.8008,
+                  5.5608,
+                  6.5129,
+                  5.3839,
+                  5.2072,
+                  6.0516,
+                  9.6966,
+                  7.7315,
+                  6.4531,
+                  7.792,
+                  7.0114,
+                  7.8445
+                ],
+                "Count": 32,
+                "P95Milliseconds": 9.3249,
+                "MaximumMilliseconds": 9.6966,
+                "TargetMilliseconds": 100,
+                "AllSamplesWithinTarget": true
+              }
+            },
+            "MediaSession": "registered; metadata synchronized",
+            "GlobalMediaKeyPress": "not-run",
+            "ScreenReader": "not-run",
+            "PhysicalDpiAndMonitorMoves": "not-run"
+          },
+          "CompleteBackupRestore": {
+            "Status": "complete-backup-restore-passed",
+            "DatabaseSettingsAndSession": true,
+            "LibraryRatingsAndQueue": true,
+            "CurrentOriginalsRetained": true,
+            "NoAutoplay": true,
+            "NativeCuePositionRestored": true,
+            "RejectedArchiveReopensCurrentModel": true,
+            "MediaRebound": true
+          },
+          "StorageArtwork": {
+            "Status": "storage-artwork-passed",
+            "WindowsDirectoryWriteDeniedByAcl": true,
+            "LockedSettingsRejected": true,
+            "OriginalAndPreviousSettingsUnchangedOnFailure": true,
+            "WriterRecovered": true,
+            "InvalidCoverRejected": true,
+            "EncodedLimitBytes": 20971520,
+            "PartialBundleRestoreRolledBackOnLockedSettings": true,
+            "OversizedTruncatedHeaderRejected": true,
+            "DeclaredPixelLimit": 40000000,
+            "PortraitThumbnailWidth": 3,
+            "PortraitThumbnailHeight": 192,
+            "FrozenCacheHit": true,
+            "CancellationLeavesWorkerUsable": true,
+            "SourceHashUnchanged": true,
+            "ReaderHandlesReleased": true,
+            "DiskFull": "not-run",
+            "HugeTagProcessIsolation": "not-run"
+          },
+          "SearchPerformance": {
+            "Status": "performance-measured",
+            "Os": "Microsoft Windows 10.0.20348",
+            "Architecture": "X64",
+            "CpuModel": "AMD EPYC 9V74 80-Core Processor",
+            "PhysicalMemoryBytes": 17179869184,
+            "Storage": {
+              "DriveType": 3,
+              "DriveFormat": "NTFS",
+              "TotalSize": 236205371392,
+              "AvailableFreeSpace": 234877583360,
+              "PhysicalSsd": "not-established"
+            },
+            "LogicalProcessors": 4,
+            "DatasetRows": 100000,
+            "Dataset": "Owned synthetic SQLite metadata; no 100k physical music files or filesystem scan",
+            "SeedMilliseconds": 5340.5424,
+            "State": "Warm: Loaded query and serialized warmup drained; no forced GC",
+            "Queries": {
+              "SamplesMilliseconds": [
+                127.2156,
+                135.6742,
+                141.0421,
+                147.2132,
+                195.2178,
+                153.5498,
+                160.3763,
+                164.822,
+                169.8346,
+                180.4848,
+                184.7855,
+                186.2199,
+                193.0648,
+                196.067,
+                193.2602,
+                203.9349,
+                249.3067,
+                221.9436,
+                221.9718,
+                225.8197,
+                225.0388,
+                233.9748,
+                243.8448,
+                252.8088
+              ],
+              "Count": 24,
+              "P95Milliseconds": 249.3067,
+              "MaximumMilliseconds": 252.8088,
+              "TargetMilliseconds": 250,
+              "AllSamplesWithinTarget": false
+            },
+            "QueryAndUi": {
+              "SamplesMilliseconds": [
+                150.2709,
+                146.3843,
+                147.1758,
+                159.5423,
+                159.5502,
+                165.5528,
+                169.3684,
+                174.5964,
+                179.281,
+                197.3289,
+                182.7943,
+                194.112,
+                204.0995,
+                200.4926,
+                226.9328,
+                212.68,
+                219.4999,
+                223.4834,
+                223.4664,
+                229.8688,
+                233.316,
+                238.4764,
+                241.8951,
+                261.6244
+              ],
+              "Count": 24,
+              "P95Milliseconds": 241.8951,
+              "MaximumMilliseconds": 261.6244,
+              "TargetMilliseconds": 250,
+              "AllSamplesWithinTarget": false
+            },
+            "UiMethod": "Production LoadPageAsync + UpdateLayout + Dispatcher ContextIdle; excludes 200 ms typing debounce",
+            "MaximumRealizedContainers": 18,
+            "MeasurementMilliseconds": 9350.4508,
+            "ProcessCpuPercentOfOneCore": 144.71227419323995,
+            "ProcessCpuPercentOfAllLogicalProcessors": 36.17806854830999,
+            "WorkingBytesBefore": 182599680,
+            "WorkingBytesAfter": 190005248,
+            "PrivateBytesBefore": 84049920,
+            "PrivateBytesAfter": 83058688,
+            "LargeLibraryWorkingSetTargetBytes": 471859200,
+            "EndWorkingSetWithinTarget": true,
+            "HandlesBefore": 652,
+            "HandlesAfter": 652,
+            "Acceptance": "Hosted Windows measurement; Windows 11 reference SSD/device/two-hour acceptance remains open"
+          },
+          "Status": "ui-smoke-passed",
+          "Environment": "Microsoft Windows 10.0.20348",
+          "ImportedEntries": 10,
+          "DistinctEntryIds": true,
+          "SharedTrackIdentity": true,
+          "ImportDidNotAutoplay": true,
+          "NativePreparation": true,
+          "DurationSeconds": 2,
+          "SeekPositionSeconds": 0.25,
+          "SearchLeavesSourceUnchanged": true,
+          "BindingErrors": 0,
+          "UnicodeMetadata": true,
+          "MetadataHandleReleased": true,
+          "DarkTheme": true,
+          "PersistentTabs": 2,
+          "StableOrderAndIds": true,
+          "EditingOtherTabKeepsSource": true,
+          "SessionReopenedWithoutAutoplay": true,
+          "SavedVolume": 23,
+          "SavedMuted": true,
+          "RealWaveform": true,
+          "WaveformBuckets": 200,
+          "LibraryScanReconcileAndIdentity": true,
+          "WorkflowSourceHashesUnchanged": true,
+          "DuplicateRating": true,
+          "M3u8RoundTrip": true,
+          "RelinkPreservesIds": true,
+          "CueImportAndRelativeSeek": true,
+          "CueWaveformBuckets": 200,
+          "LocalFrozenArtwork": true,
+          "LossyCueExportRejected": true,
+          "PersistentQueueItems": 3,
+          "QueueRepeatShuffleRestore": true,
+          "ProcessingSettingsRestore": true,
+          "Screenshot": "stage-c-window.png",
+          "WasapiOutput": "not-run",
+          "Listening": "not-run"
+        },
+        "smoke/probe.json": {
+          "Status": "native-load-passed",
+          "Versions": {
+            "bass": "2.4.18.3",
+            "bassmix": "2.4.13.0",
+            "basswasapi": "2.4.4.1"
+          },
+          "Environment": "Microsoft Windows 10.0.20348"
+        },
+        "smoke/stress.json": {
+          "Status": "native-preparation-stress-passed",
+          "Environment": "Microsoft Windows NT 10.0.20348.0",
+          "Method": "50 warmup + 1000 serialized real load/prepare-next/seek/stop cycles; process samples every 100 cycles; no forced GC",
+          "Changes": 1000,
+          "Samples": [
+            {
+              "Changes": 0,
+              "Handles": 280,
+              "PrivateBytes": 12779520,
+              "WorkingSet": 35594240
+            },
+            {
+              "Changes": 100,
+              "Handles": 280,
+              "PrivateBytes": 12644352,
+              "WorkingSet": 35540992
+            },
+            {
+              "Changes": 200,
+              "Handles": 280,
+              "PrivateBytes": 13430784,
+              "WorkingSet": 36323328
+            },
+            {
+              "Changes": 300,
+              "Handles": 280,
+              "PrivateBytes": 14217216,
+              "WorkingSet": 37093376
+            },
+            {
+              "Changes": 400,
+              "Handles": 280,
+              "PrivateBytes": 15106048,
+              "WorkingSet": 37806080
+            },
+            {
+              "Changes": 500,
+              "Handles": 280,
+              "PrivateBytes": 15892480,
+              "WorkingSet": 38572032
+            },
+            {
+              "Changes": 600,
+              "Handles": 280,
+              "PrivateBytes": 16678912,
+              "WorkingSet": 39358464
+            },
+            {
+              "Changes": 700,
+              "Handles": 280,
+              "PrivateBytes": 17403904,
+              "WorkingSet": 40124416
+            },
+            {
+              "Changes": 800,
+              "Handles": 280,
+              "PrivateBytes": 18190336,
+              "WorkingSet": 40910848
+            },
+            {
+              "Changes": 900,
+              "Handles": 280,
+              "PrivateBytes": 18972672,
+              "WorkingSet": 41693184
+            },
+            {
+              "Changes": 1000,
+              "Handles": 280,
+              "PrivateBytes": 19767296,
+              "WorkingSet": 42442752
+            }
+          ],
+          "HandleGrowth": 0,
+          "PrivateByteGrowth": 6987776,
+          "CycleP95Milliseconds": 0.1553,
+          "SourceUnchanged": true,
+          "SourceHandleReleased": true,
+          "TwoHourDevicePlayback": "not-run",
+          "EndpointTransitions": "not-run",
+          "Listening": "not-run"
+        },
+        "smoke/ui-en.json": {
+          "WindowsIntegration": {
+            "Status": "windows-integration-passed",
+            "SecondProcessActivation": true,
+            "ConcurrentFileForwarding": true,
+            "NoImplicitAutoplay": true,
+            "OversizedIpcRejected": true,
+            "CurrentUserOnlyPipe": true,
+            "SeekAutomationRange": true,
+            "SoftwareRoutedDropdownEscape": true,
+            "CloseToTrayPreservesState": true,
+            "Language": "en",
+            "ResourceKeys": 208,
+            "RealizedRowContainers": 6,
+            "PlaylistRows": 9987,
+            "GlobalPlaylistCapacity": 10000,
+            "ScrollPerformance": {
+              "ActualPlaylistRows": 9987,
+              "GlobalCapacity": 10000,
+              "Method": "ScrollIntoView + UpdateLayout + Dispatcher ContextIdle; software-driven WPF",
+              "MaximumRealizedContainers": 7,
+              "Timings": {
+                "SamplesMilliseconds": [
+                  1.7184,
+                  7.8833,
+                  8.0354,
+                  6.8116,
+                  20.0677,
+                  6.7744,
+                  7.2006,
+                  6.5201,
+                  6.6114,
+                  6.4643,
+                  6.392,
+                  6.602,
+                  9.2358,
+                  6.4598,
+                  6.362,
+                  6.4243,
+                  11.9873,
+                  6.1207,
+                  6.2709,
+                  6.862,
+                  6.195,
+                  5.5981,
+                  5.7629,
+                  5.8008,
+                  5.6652,
+                  9.971,
+                  6.3241,
+                  6.2194,
+                  8.7844,
+                  7.7412,
+                  7.4401,
+                  7.0947
+                ],
+                "Count": 32,
+                "P95Milliseconds": 11.9873,
+                "MaximumMilliseconds": 20.0677,
+                "TargetMilliseconds": 100,
+                "AllSamplesWithinTarget": true
+              }
+            },
+            "MediaSession": "registered; metadata synchronized",
+            "GlobalMediaKeyPress": "not-run",
+            "ScreenReader": "not-run",
+            "PhysicalDpiAndMonitorMoves": "not-run"
+          },
+          "CompleteBackupRestore": {
+            "Status": "complete-backup-restore-passed",
+            "DatabaseSettingsAndSession": true,
+            "LibraryRatingsAndQueue": true,
+            "CurrentOriginalsRetained": true,
+            "NoAutoplay": true,
+            "NativeCuePositionRestored": true,
+            "RejectedArchiveReopensCurrentModel": true,
+            "MediaRebound": true
+          },
+          "StorageArtwork": {
+            "Status": "storage-artwork-passed",
+            "WindowsDirectoryWriteDeniedByAcl": true,
+            "LockedSettingsRejected": true,
+            "OriginalAndPreviousSettingsUnchangedOnFailure": true,
+            "WriterRecovered": true,
+            "InvalidCoverRejected": true,
+            "EncodedLimitBytes": 20971520,
+            "PartialBundleRestoreRolledBackOnLockedSettings": true,
+            "OversizedTruncatedHeaderRejected": true,
+            "DeclaredPixelLimit": 40000000,
+            "PortraitThumbnailWidth": 3,
+            "PortraitThumbnailHeight": 192,
+            "FrozenCacheHit": true,
+            "CancellationLeavesWorkerUsable": true,
+            "SourceHashUnchanged": true,
+            "ReaderHandlesReleased": true,
+            "DiskFull": "not-run",
+            "HugeTagProcessIsolation": "not-run"
+          },
+          "SearchPerformance": {
+            "Status": "performance-measured",
+            "Os": "Microsoft Windows 10.0.20348",
+            "Architecture": "X64",
+            "CpuModel": "AMD EPYC 9V74 80-Core Processor",
+            "PhysicalMemoryBytes": 17179869184,
+            "Storage": {
+              "DriveType": 3,
+              "DriveFormat": "NTFS",
+              "TotalSize": 236205371392,
+              "AvailableFreeSpace": 235342135296,
+              "PhysicalSsd": "not-established"
+            },
+            "LogicalProcessors": 4,
+            "DatasetRows": 100000,
+            "Dataset": "Owned synthetic SQLite metadata; no 100k physical music files or filesystem scan",
+            "SeedMilliseconds": 3722.0091,
+            "State": "Warm: Loaded query and serialized warmup drained; no forced GC",
+            "Queries": {
+              "SamplesMilliseconds": [
+                85.1825,
+                92.4027,
+                117.5994,
+                99.071,
+                107.6703,
+                108.3455,
+                117.9403,
+                115.3033,
+                124.0717,
+                120.0171,
+                129.4157,
+                129.2045,
+                142.4844,
+                136.2183,
+                177.5676,
+                143.39,
+                146.0367,
+                164.6286,
+                151.8123,
+                163.3013,
+                171.4074,
+                168.7302,
+                169.7431,
+                171.6296
+              ],
+              "Count": 24,
+              "P95Milliseconds": 171.6296,
+              "MaximumMilliseconds": 177.5676,
+              "TargetMilliseconds": 250,
+              "AllSamplesWithinTarget": true
+            },
+            "QueryAndUi": {
+              "SamplesMilliseconds": [
+                102.1855,
+                102.2196,
+                107.0722,
+                108.0582,
+                118.9419,
+                119.1429,
+                120.1484,
+                131.3065,
+                126.0143,
+                129.594,
+                165.551,
+                164.9308,
+                173.6151,
+                177.0951,
+                191.6737,
+                169.4431,
+                183.9601,
+                205.9018,
+                168.9343,
+                168.5329,
+                179.8004,
+                171.0663,
+                173.982,
+                177.3838
+              ],
+              "Count": 24,
+              "P95Milliseconds": 191.6737,
+              "MaximumMilliseconds": 205.9018,
+              "TargetMilliseconds": 250,
+              "AllSamplesWithinTarget": true
+            },
+            "UiMethod": "Production LoadPageAsync + UpdateLayout + Dispatcher ContextIdle; excludes 200 ms typing debounce",
+            "MaximumRealizedContainers": 18,
+            "MeasurementMilliseconds": 6890.9845,
+            "ProcessCpuPercentOfOneCore": 168.01844496965566,
+            "ProcessCpuPercentOfAllLogicalProcessors": 42.004611242413915,
+            "WorkingBytesBefore": 182304768,
+            "WorkingBytesAfter": 194600960,
+            "PrivateBytesBefore": 86908928,
+            "PrivateBytesAfter": 88637440,
+            "LargeLibraryWorkingSetTargetBytes": 471859200,
+            "EndWorkingSetWithinTarget": true,
+            "HandlesBefore": 627,
+            "HandlesAfter": 630,
+            "Acceptance": "Hosted Windows measurement; Windows 11 reference SSD/device/two-hour acceptance remains open"
+          },
+          "Status": "ui-smoke-passed",
+          "Environment": "Microsoft Windows 10.0.20348",
+          "ImportedEntries": 10,
+          "DistinctEntryIds": true,
+          "SharedTrackIdentity": true,
+          "ImportDidNotAutoplay": true,
+          "NativePreparation": true,
+          "DurationSeconds": 2,
+          "SeekPositionSeconds": 0.25,
+          "SearchLeavesSourceUnchanged": true,
+          "BindingErrors": 0,
+          "UnicodeMetadata": true,
+          "MetadataHandleReleased": true,
+          "DarkTheme": true,
+          "PersistentTabs": 2,
+          "StableOrderAndIds": true,
+          "EditingOtherTabKeepsSource": true,
+          "SessionReopenedWithoutAutoplay": true,
+          "SavedVolume": 23,
+          "SavedMuted": true,
+          "RealWaveform": true,
+          "WaveformBuckets": 200,
+          "LibraryScanReconcileAndIdentity": true,
+          "WorkflowSourceHashesUnchanged": true,
+          "DuplicateRating": true,
+          "M3u8RoundTrip": true,
+          "RelinkPreservesIds": true,
+          "CueImportAndRelativeSeek": true,
+          "CueWaveformBuckets": 200,
+          "LocalFrozenArtwork": true,
+          "LossyCueExportRejected": true,
+          "PersistentQueueItems": 3,
+          "QueueRepeatShuffleRestore": true,
+          "ProcessingSettingsRestore": true,
+          "Screenshot": "stage-c-window.png",
+          "WasapiOutput": "not-run",
+          "Listening": "not-run"
+        },
+        "smoke/ui-ru.json": {
+          "WindowsIntegration": {
+            "Status": "windows-integration-passed",
+            "SecondProcessActivation": true,
+            "ConcurrentFileForwarding": true,
+            "NoImplicitAutoplay": true,
+            "OversizedIpcRejected": true,
+            "CurrentUserOnlyPipe": true,
+            "SeekAutomationRange": true,
+            "SoftwareRoutedDropdownEscape": true,
+            "CloseToTrayPreservesState": true,
+            "Language": "ru",
+            "ResourceKeys": 208,
+            "RealizedRowContainers": 6,
+            "PlaylistRows": 9987,
+            "GlobalPlaylistCapacity": 10000,
+            "ScrollPerformance": {
+              "ActualPlaylistRows": 9987,
+              "GlobalCapacity": 10000,
+              "Method": "ScrollIntoView + UpdateLayout + Dispatcher ContextIdle; software-driven WPF",
+              "MaximumRealizedContainers": 7,
+              "Timings": {
+                "SamplesMilliseconds": [
+                  2.2887,
+                  23.1412,
+                  7.3031,
+                  5.757,
+                  6.0954,
+                  6.1718,
+                  6.2279,
+                  6.735,
+                  6.1897,
+                  10.0094,
+                  10.6517,
+                  9.496,
+                  10.859,
+                  8.1808,
+                  9.6255,
+                  8.4626,
+                  6.0373,
+                  6.3551,
+                  6.5245,
+                  6.1722,
+                  6.2373,
+                  6.3608,
+                  5.4539,
+                  5.5028,
+                  5.3735,
+                  5.4286,
+                  5.9852,
+                  5.8292,
+                  5.5217,
+                  6.1312,
+                  5.794,
+                  5.7593
+                ],
+                "Count": 32,
+                "P95Milliseconds": 10.859,
+                "MaximumMilliseconds": 23.1412,
+                "TargetMilliseconds": 100,
+                "AllSamplesWithinTarget": true
+              }
+            },
+            "MediaSession": "registered; metadata synchronized",
+            "GlobalMediaKeyPress": "not-run",
+            "ScreenReader": "not-run",
+            "PhysicalDpiAndMonitorMoves": "not-run"
+          },
+          "CompleteBackupRestore": {
+            "Status": "complete-backup-restore-passed",
+            "DatabaseSettingsAndSession": true,
+            "LibraryRatingsAndQueue": true,
+            "CurrentOriginalsRetained": true,
+            "NoAutoplay": true,
+            "NativeCuePositionRestored": true,
+            "RejectedArchiveReopensCurrentModel": true,
+            "MediaRebound": true
+          },
+          "StorageArtwork": {
+            "Status": "storage-artwork-passed",
+            "WindowsDirectoryWriteDeniedByAcl": true,
+            "LockedSettingsRejected": true,
+            "OriginalAndPreviousSettingsUnchangedOnFailure": true,
+            "WriterRecovered": true,
+            "InvalidCoverRejected": true,
+            "EncodedLimitBytes": 20971520,
+            "PartialBundleRestoreRolledBackOnLockedSettings": true,
+            "OversizedTruncatedHeaderRejected": true,
+            "DeclaredPixelLimit": 40000000,
+            "PortraitThumbnailWidth": 3,
+            "PortraitThumbnailHeight": 192,
+            "FrozenCacheHit": true,
+            "CancellationLeavesWorkerUsable": true,
+            "SourceHashUnchanged": true,
+            "ReaderHandlesReleased": true,
+            "DiskFull": "not-run",
+            "HugeTagProcessIsolation": "not-run"
+          },
+          "SearchPerformance": {
+            "Status": "performance-measured",
+            "Os": "Microsoft Windows 10.0.20348",
+            "Architecture": "X64",
+            "CpuModel": "AMD EPYC 9V74 80-Core Processor",
+            "PhysicalMemoryBytes": 17179869184,
+            "Storage": {
+              "DriveType": 3,
+              "DriveFormat": "NTFS",
+              "TotalSize": 236205371392,
+              "AvailableFreeSpace": 235342082048,
+              "PhysicalSsd": "not-established"
+            },
+            "LogicalProcessors": 4,
+            "DatasetRows": 100000,
+            "Dataset": "Owned synthetic SQLite metadata; no 100k physical music files or filesystem scan",
+            "SeedMilliseconds": 4547.8652,
+            "State": "Warm: Loaded query and serialized warmup drained; no forced GC",
+            "Queries": {
+              "SamplesMilliseconds": [
+                83.2241,
+                90.8892,
+                116.4787,
+                100.6021,
+                102.3328,
+                107.4389,
+                108.9882,
+                127.9615,
+                122.545,
+                121.1998,
+                124.2726,
+                132.776,
+                145.9113,
+                137.0601,
+                148.2576,
+                147.9574,
+                142.5461,
+                154.1517,
+                154.6005,
+                159.881,
+                165.5555,
+                166.8846,
+                169.414,
+                174.954
+              ],
+              "Count": 24,
+              "P95Milliseconds": 169.414,
+              "MaximumMilliseconds": 174.954,
+              "TargetMilliseconds": 250,
+              "AllSamplesWithinTarget": true
+            },
+            "QueryAndUi": {
+              "SamplesMilliseconds": [
+                100.8668,
+                99.306,
+                104.664,
+                111.3242,
+                108.8623,
+                112.4915,
+                117.924,
+                123.4981,
+                143.8872,
+                139.4077,
+                131.5284,
+                169.0512,
+                152.9262,
+                140.3872,
+                161.6017,
+                161.1842,
+                151.8725,
+                154.6765,
+                159.6139,
+                158.3065,
+                166.1923,
+                168.9708,
+                170.3184,
+                186.6404
+              ],
+              "Count": 24,
+              "P95Milliseconds": 170.3184,
+              "MaximumMilliseconds": 186.6404,
+              "TargetMilliseconds": 250,
+              "AllSamplesWithinTarget": true
+            },
+            "UiMethod": "Production LoadPageAsync + UpdateLayout + Dispatcher ContextIdle; excludes 200 ms typing debounce",
+            "MaximumRealizedContainers": 18,
+            "MeasurementMilliseconds": 6602.5045,
+            "ProcessCpuPercentOfOneCore": 150.0377621855464,
+            "ProcessCpuPercentOfAllLogicalProcessors": 37.5094405463866,
+            "WorkingBytesBefore": 188829696,
+            "WorkingBytesAfter": 197689344,
+            "PrivateBytesBefore": 84500480,
+            "PrivateBytesAfter": 87977984,
+            "LargeLibraryWorkingSetTargetBytes": 471859200,
+            "EndWorkingSetWithinTarget": true,
+            "HandlesBefore": 627,
+            "HandlesAfter": 629,
+            "Acceptance": "Hosted Windows measurement; Windows 11 reference SSD/device/two-hour acceptance remains open"
+          },
+          "Status": "ui-smoke-passed",
+          "Environment": "Microsoft Windows 10.0.20348",
+          "ImportedEntries": 10,
+          "DistinctEntryIds": true,
+          "SharedTrackIdentity": true,
+          "ImportDidNotAutoplay": true,
+          "NativePreparation": true,
+          "DurationSeconds": 2,
+          "SeekPositionSeconds": 0.25,
+          "SearchLeavesSourceUnchanged": true,
+          "BindingErrors": 0,
+          "UnicodeMetadata": true,
+          "MetadataHandleReleased": true,
+          "DarkTheme": true,
+          "PersistentTabs": 2,
+          "StableOrderAndIds": true,
+          "EditingOtherTabKeepsSource": true,
+          "SessionReopenedWithoutAutoplay": true,
+          "SavedVolume": 23,
+          "SavedMuted": true,
+          "RealWaveform": true,
+          "WaveformBuckets": 200,
+          "LibraryScanReconcileAndIdentity": true,
+          "WorkflowSourceHashesUnchanged": true,
+          "DuplicateRating": true,
+          "M3u8RoundTrip": true,
+          "RelinkPreservesIds": true,
+          "CueImportAndRelativeSeek": true,
+          "CueWaveformBuckets": 200,
+          "LocalFrozenArtwork": true,
+          "LossyCueExportRejected": true,
+          "PersistentQueueItems": 3,
+          "QueueRepeatShuffleRestore": true,
+          "ProcessingSettingsRestore": true,
+          "Screenshot": "stage-c-window.png",
+          "WasapiOutput": "not-run",
+          "Listening": "not-run"
+        },
+        "smoke/ui.json": {
+          "WindowsIntegration": {
+            "Status": "windows-integration-passed",
+            "SecondProcessActivation": true,
+            "ConcurrentFileForwarding": true,
+            "NoImplicitAutoplay": true,
+            "OversizedIpcRejected": true,
+            "CurrentUserOnlyPipe": true,
+            "SeekAutomationRange": true,
+            "SoftwareRoutedDropdownEscape": true,
+            "CloseToTrayPreservesState": true,
+            "Language": "ru",
+            "ResourceKeys": 208,
+            "RealizedRowContainers": 6,
+            "PlaylistRows": 9987,
+            "GlobalPlaylistCapacity": 10000,
+            "ScrollPerformance": {
+              "ActualPlaylistRows": 9987,
+              "GlobalCapacity": 10000,
+              "Method": "ScrollIntoView + UpdateLayout + Dispatcher ContextIdle; software-driven WPF",
+              "MaximumRealizedContainers": 7,
+              "Timings": {
+                "SamplesMilliseconds": [
+                  2.2887,
+                  23.1412,
+                  7.3031,
+                  5.757,
+                  6.0954,
+                  6.1718,
+                  6.2279,
+                  6.735,
+                  6.1897,
+                  10.0094,
+                  10.6517,
+                  9.496,
+                  10.859,
+                  8.1808,
+                  9.6255,
+                  8.4626,
+                  6.0373,
+                  6.3551,
+                  6.5245,
+                  6.1722,
+                  6.2373,
+                  6.3608,
+                  5.4539,
+                  5.5028,
+                  5.3735,
+                  5.4286,
+                  5.9852,
+                  5.8292,
+                  5.5217,
+                  6.1312,
+                  5.794,
+                  5.7593
+                ],
+                "Count": 32,
+                "P95Milliseconds": 10.859,
+                "MaximumMilliseconds": 23.1412,
+                "TargetMilliseconds": 100,
+                "AllSamplesWithinTarget": true
+              }
+            },
+            "MediaSession": "registered; metadata synchronized",
+            "GlobalMediaKeyPress": "not-run",
+            "ScreenReader": "not-run",
+            "PhysicalDpiAndMonitorMoves": "not-run"
+          },
+          "CompleteBackupRestore": {
+            "Status": "complete-backup-restore-passed",
+            "DatabaseSettingsAndSession": true,
+            "LibraryRatingsAndQueue": true,
+            "CurrentOriginalsRetained": true,
+            "NoAutoplay": true,
+            "NativeCuePositionRestored": true,
+            "RejectedArchiveReopensCurrentModel": true,
+            "MediaRebound": true
+          },
+          "StorageArtwork": {
+            "Status": "storage-artwork-passed",
+            "WindowsDirectoryWriteDeniedByAcl": true,
+            "LockedSettingsRejected": true,
+            "OriginalAndPreviousSettingsUnchangedOnFailure": true,
+            "WriterRecovered": true,
+            "InvalidCoverRejected": true,
+            "EncodedLimitBytes": 20971520,
+            "PartialBundleRestoreRolledBackOnLockedSettings": true,
+            "OversizedTruncatedHeaderRejected": true,
+            "DeclaredPixelLimit": 40000000,
+            "PortraitThumbnailWidth": 3,
+            "PortraitThumbnailHeight": 192,
+            "FrozenCacheHit": true,
+            "CancellationLeavesWorkerUsable": true,
+            "SourceHashUnchanged": true,
+            "ReaderHandlesReleased": true,
+            "DiskFull": "not-run",
+            "HugeTagProcessIsolation": "not-run"
+          },
+          "SearchPerformance": {
+            "Status": "performance-measured",
+            "Os": "Microsoft Windows 10.0.20348",
+            "Architecture": "X64",
+            "CpuModel": "AMD EPYC 9V74 80-Core Processor",
+            "PhysicalMemoryBytes": 17179869184,
+            "Storage": {
+              "DriveType": 3,
+              "DriveFormat": "NTFS",
+              "TotalSize": 236205371392,
+              "AvailableFreeSpace": 235342082048,
+              "PhysicalSsd": "not-established"
+            },
+            "LogicalProcessors": 4,
+            "DatasetRows": 100000,
+            "Dataset": "Owned synthetic SQLite metadata; no 100k physical music files or filesystem scan",
+            "SeedMilliseconds": 4547.8652,
+            "State": "Warm: Loaded query and serialized warmup drained; no forced GC",
+            "Queries": {
+              "SamplesMilliseconds": [
+                83.2241,
+                90.8892,
+                116.4787,
+                100.6021,
+                102.3328,
+                107.4389,
+                108.9882,
+                127.9615,
+                122.545,
+                121.1998,
+                124.2726,
+                132.776,
+                145.9113,
+                137.0601,
+                148.2576,
+                147.9574,
+                142.5461,
+                154.1517,
+                154.6005,
+                159.881,
+                165.5555,
+                166.8846,
+                169.414,
+                174.954
+              ],
+              "Count": 24,
+              "P95Milliseconds": 169.414,
+              "MaximumMilliseconds": 174.954,
+              "TargetMilliseconds": 250,
+              "AllSamplesWithinTarget": true
+            },
+            "QueryAndUi": {
+              "SamplesMilliseconds": [
+                100.8668,
+                99.306,
+                104.664,
+                111.3242,
+                108.8623,
+                112.4915,
+                117.924,
+                123.4981,
+                143.8872,
+                139.4077,
+                131.5284,
+                169.0512,
+                152.9262,
+                140.3872,
+                161.6017,
+                161.1842,
+                151.8725,
+                154.6765,
+                159.6139,
+                158.3065,
+                166.1923,
+                168.9708,
+                170.3184,
+                186.6404
+              ],
+              "Count": 24,
+              "P95Milliseconds": 170.3184,
+              "MaximumMilliseconds": 186.6404,
+              "TargetMilliseconds": 250,
+              "AllSamplesWithinTarget": true
+            },
+            "UiMethod": "Production LoadPageAsync + UpdateLayout + Dispatcher ContextIdle; excludes 200 ms typing debounce",
+            "MaximumRealizedContainers": 18,
+            "MeasurementMilliseconds": 6602.5045,
+            "ProcessCpuPercentOfOneCore": 150.0377621855464,
+            "ProcessCpuPercentOfAllLogicalProcessors": 37.5094405463866,
+            "WorkingBytesBefore": 188829696,
+            "WorkingBytesAfter": 197689344,
+            "PrivateBytesBefore": 84500480,
+            "PrivateBytesAfter": 87977984,
+            "LargeLibraryWorkingSetTargetBytes": 471859200,
+            "EndWorkingSetWithinTarget": true,
+            "HandlesBefore": 627,
+            "HandlesAfter": 629,
+            "Acceptance": "Hosted Windows measurement; Windows 11 reference SSD/device/two-hour acceptance remains open"
+          },
+          "Status": "ui-smoke-passed",
+          "Environment": "Microsoft Windows 10.0.20348",
+          "ImportedEntries": 10,
+          "DistinctEntryIds": true,
+          "SharedTrackIdentity": true,
+          "ImportDidNotAutoplay": true,
+          "NativePreparation": true,
+          "DurationSeconds": 2,
+          "SeekPositionSeconds": 0.25,
+          "SearchLeavesSourceUnchanged": true,
+          "BindingErrors": 0,
+          "UnicodeMetadata": true,
+          "MetadataHandleReleased": true,
+          "DarkTheme": true,
+          "PersistentTabs": 2,
+          "StableOrderAndIds": true,
+          "EditingOtherTabKeepsSource": true,
+          "SessionReopenedWithoutAutoplay": true,
+          "SavedVolume": 23,
+          "SavedMuted": true,
+          "RealWaveform": true,
+          "WaveformBuckets": 200,
+          "LibraryScanReconcileAndIdentity": true,
+          "WorkflowSourceHashesUnchanged": true,
+          "DuplicateRating": true,
+          "M3u8RoundTrip": true,
+          "RelinkPreservesIds": true,
+          "CueImportAndRelativeSeek": true,
+          "CueWaveformBuckets": 200,
+          "LocalFrozenArtwork": true,
+          "LossyCueExportRejected": true,
+          "PersistentQueueItems": 3,
+          "QueueRepeatShuffleRestore": true,
+          "ProcessingSettingsRestore": true,
+          "Screenshot": "stage-c-window.png",
+          "WasapiOutput": "not-run",
+          "Listening": "not-run"
+        },
+        "smoke/waveform.json": {
+          "Status": "waveform-passed",
+          "SourceUnchanged": true,
+          "IndependentDecoder": true,
+          "GainAndMuteIndependent": true,
+          "OppositePhasePeaksPreserved": true,
+          "CacheRoundTrip": true,
+          "CorruptCacheRegenerated": true,
+          "ShortBuckets": 300,
+          "LongDurationSeconds": 7200,
+          "LongBuckets": 300000,
+          "LongFramesPerBucket": 192,
+          "PeakPayloadBytes": 2400000,
+          "CancellationAndHandleRelease": true,
+          "DeviceOutput": "not-run",
+          "FixtureLicense": "CC0-1.0"
+        }
+      }
+    },
+    {
+      "name": "evidence-ubuntu-24.04",
+      "archiveSha256": "328f7737792fc0e58fb9258458de46c5948b2f63fb4420dd0050096f330d1d92",
+      "tests": [
+        {
+          "counters": {
+            "total": "124",
+            "executed": "124",
+            "passed": "124",
+            "failed": "0",
+            "error": "0",
+            "timeout": "0",
+            "aborted": "0",
+            "inconclusive": "0",
+            "passedButRunAborted": "0",
+            "notRunnable": "0",
+            "notExecuted": "0",
+            "disconnected": "0",
+            "warning": "0",
+            "completed": "0",
+            "inProgress": "0",
+            "pending": "0"
+          },
+          "backupCases": [
+            {
+              "executionId": "770f334b-428d-48ba-ad39-596b50127949",
+              "testId": "3a72f67e-7883-bbc8-e103-9c9c35a5c3cf",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"missing\")",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.0436601",
+              "startTime": "2026-10-06T06:23:46.6490830+00:00",
+              "endTime": "2026-10-06T06:23:46.6922678+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "770f334b-428d-48ba-ad39-596b50127949"
+            },
+            {
+              "executionId": "41304b7c-efe2-433a-9cb3-f840832a0e10",
+              "testId": "40c1369b-1465-509e-cc71-5fc12be4d47c",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"traversal\")",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.0225474",
+              "startTime": "2026-10-06T06:23:46.8620797+00:00",
+              "endTime": "2026-10-06T06:23:46.8844872+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "41304b7c-efe2-433a-9cb3-f840832a0e10"
+            },
+            {
+              "executionId": "ddaff27e-7597-4d7f-929d-4259dffa3c10",
+              "testId": "417e7402-a283-2c93-a81f-c95b9abba4e9",
+              "testName": "Player.Core.Tests.BackupBundleTests.OccupiedSettingsPathDoesNotMoveTheCurrentDatabase",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.0274751",
+              "startTime": "2026-10-06T06:23:46.8846007+00:00",
+              "endTime": "2026-10-06T06:23:46.9123844+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "ddaff27e-7597-4d7f-929d-4259dffa3c10"
+            },
+            {
+              "executionId": "f664927b-b0be-43e8-b47b-c46946b67a95",
+              "testId": "2ca07da6-2869-8bce-455f-f8712e1b9850",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"checksum\")",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.0528617",
+              "startTime": "2026-10-06T06:23:46.7335468+00:00",
+              "endTime": "2026-10-06T06:23:46.7866523+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "f664927b-b0be-43e8-b47b-c46946b67a95"
+            },
+            {
+              "executionId": "29fe7d95-a404-44c5-91ba-0af91255bc9a",
+              "testId": "00954fc2-4bd6-c7db-d0b5-4250424e9552",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"size\")",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.0438615",
+              "startTime": "2026-10-06T06:23:46.8190874+00:00",
+              "endTime": "2026-10-06T06:23:46.8619688+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "29fe7d95-a404-44c5-91ba-0af91255bc9a"
+            },
+            {
+              "executionId": "fec0925e-e6c6-4008-b07a-6ca89d1465a2",
+              "testId": "e66e35d7-67c6-f1e1-0a79-97b910e8b99a",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"references\")",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.0764548",
+              "startTime": "2026-10-06T06:23:46.5712651+00:00",
+              "endTime": "2026-10-06T06:23:46.6481212+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "fec0925e-e6c6-4008-b07a-6ca89d1465a2"
+            },
+            {
+              "executionId": "3b9c76b6-3937-4bf0-b51a-e3a9a37e5420",
+              "testId": "acde5144-27be-8b80-6c6f-ee84e1c7dcc7",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"database\")",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.0405512",
+              "startTime": "2026-10-06T06:23:46.6923892+00:00",
+              "endTime": "2026-10-06T06:23:46.7333026+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "3b9c76b6-3937-4bf0-b51a-e3a9a37e5420"
+            },
+            {
+              "executionId": "c5d0caf1-0209-4841-b0d5-77b7ee91700c",
+              "testId": "34a235d6-31f7-d562-fb42-949ca3cadc50",
+              "testName": "Player.Core.Tests.BackupBundleTests.ActiveStoreOwnershipRejectsRestoreAndLeavesCurrentSessionUsable",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.0526584",
+              "startTime": "2026-10-06T06:23:46.9125359+00:00",
+              "endTime": "2026-10-06T06:23:46.9664563+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "c5d0caf1-0209-4841-b0d5-77b7ee91700c"
+            },
+            {
+              "executionId": "46584a2c-814d-4cea-9999-5e109cf6e55f",
+              "testId": "aaad2f74-6db1-d530-09e1-5ae601163843",
+              "testName": "Player.Core.Tests.BackupBundleTests.LiveCompleteBackupRestoresDatabaseSettingsIndexAndRatingsAndRetainsCurrentData",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.0431678",
+              "startTime": "2026-10-06T06:23:47.0699638+00:00",
+              "endTime": "2026-10-06T06:23:47.1139450+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "46584a2c-814d-4cea-9999-5e109cf6e55f"
+            },
+            {
+              "executionId": "162e966a-9b6e-44c5-950f-dc2768de73ce",
+              "testId": "8c85d5c8-5a0e-d2b6-7d2a-03ae67bcf9db",
+              "testName": "Player.Core.Tests.BackupBundleTests.BackupNeverOverwritesAnExistingArchive",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.1038581",
+              "startTime": "2026-10-06T06:23:46.9666482+00:00",
+              "endTime": "2026-10-06T06:23:47.0697125+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "162e966a-9b6e-44c5-950f-dc2768de73ce"
+            },
+            {
+              "executionId": "17d0301a-4c9a-416b-b2f4-638831404c61",
+              "testId": "5f19db9f-c9b6-8bc5-0143-9355894d8021",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"schema\")",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.0284774",
+              "startTime": "2026-10-06T06:23:46.7867866+00:00",
+              "endTime": "2026-10-06T06:23:46.8190192+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "17d0301a-4c9a-416b-b2f4-638831404c61"
+            },
+            {
+              "executionId": "63227e9e-3617-4a79-aef0-1e44922285e3",
+              "testId": "ed8aaece-1bec-48f7-a213-27665deabe54",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"duplicate\")",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.0397929",
+              "startTime": "2026-10-06T06:23:46.5321221+00:00",
+              "endTime": "2026-10-06T06:23:46.5710252+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "63227e9e-3617-4a79-aef0-1e44922285e3"
+            },
+            {
+              "executionId": "c5a456ff-be81-46d1-8b20-c0fcf0ee417c",
+              "testId": "eb007079-8e29-a338-1f7d-1097b287dbe3",
+              "testName": "Player.Core.Tests.BackupBundleTests.InvalidArchiveIsRejectedBeforeTouchingCurrentData(damage: \"settings\")",
+              "computerName": "runnervm8df0l",
+              "duration": "00:00:00.1089778",
+              "startTime": "2026-10-06T06:23:46.4201267+00:00",
+              "endTime": "2026-10-06T06:23:46.5309755+00:00",
+              "testType": "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b",
+              "outcome": "Passed",
+              "testListId": "8c84fa94-04c1-424b-9868-57a2d4851a1d",
+              "relativeResultsDirectory": "c5a456ff-be81-46d1-8b20-c0fcf0ee417c"
+            }
+          ]
+        }
+      ],
+      "reports": {
+        "portable/integrity-audit.json": {
+          "Status": "candidate-integrity-negative-checks-passed",
+          "SourceCommit": "0ce6a9bb9f31c348368ff614611312c924a058c8",
+          "SourceTreeDirty": false,
+          "Checks": [
+            "changed file",
+            "missing file",
+            "extra file",
+            "empty checksum list"
+          ],
+          "ZipSha256": "bef0d08b5075908adfc1d19bfa80c0528694d1f4c46db1bc6b611c659d3743d8",
+          "RestoredCopyPassed": true
+        },
+        "portable/package-audit.json": {
+          "Status": "local-candidate-packaged",
+          "SourceCommit": "0ce6a9bb9f31c348368ff614611312c924a058c8",
+          "SourceTreeDirty": false,
+          "Zip": "LocalAudioPlayer-dev-0ce6a9bb9f31-win-x64.zip",
+          "ZipSha256": "bef0d08b5075908adfc1d19bfa80c0528694d1f4c46db1bc6b611c659d3743d8",
+          "Bytes": 85423024,
+          "Files": 550,
+          "Dependencies": 14,
+          "NativeLibraries": 13,
+          "DistributionApproved": false
+        }
+      }
+    }
+  ],
+  "independentFixtureParsing": {
+    "method": "FFprobe 7.1.5 on owned fixtures, separate from actual Windows BASS checks",
+    "profiles": [
+      {
+        "path": "pcm24-192k.wav",
+        "streams": [
+          {
+            "codec_name": "pcm_s24le",
+            "sample_rate": "192000",
+            "channels": 2,
+            "bits_per_raw_sample": "24"
+          }
+        ]
+      },
+      {
+        "path": "source-pcm16.wav",
+        "streams": [
+          {
+            "codec_name": "pcm_s16le",
+            "sample_rate": "48000",
+            "channels": 2
+          }
+        ]
+      },
+      {
+        "path": "musepack.mpc",
+        "streams": [
+          {
+            "codec_name": "musepack8",
+            "sample_rate": "48000",
+            "channels": 2
+          }
+        ]
+      },
+      {
+        "path": "monkey.ape",
+        "streams": [
+          {
+            "codec_name": "ape",
+            "sample_rate": "48000",
+            "channels": 2,
+            "bits_per_raw_sample": "16"
+          }
+        ]
+      },
+      {
+        "path": "flac24-96k-6ch.flac",
+        "streams": [
+          {
+            "codec_name": "flac",
+            "sample_rate": "96000",
+            "channels": 6,
+            "bits_per_raw_sample": "24"
+          }
+        ]
+      },
+      {
+        "path": "pcm24-96k-8ch.wav",
+        "streams": [
+          {
+            "codec_name": "pcm_s24le",
+            "sample_rate": "96000",
+            "channels": 8,
+            "bits_per_raw_sample": "24"
+          }
+        ]
+      },
+      {
+        "path": "he-aac-v2.m4a",
+        "streams": [
+          {
+            "codec_name": "aac",
+            "profile": "HE-AACv2",
+            "sample_rate": "48000",
+            "channels": 2
+          }
+        ]
+      },
+      {
+        "path": "he-aac.m4a",
+        "streams": [
+          {
+            "codec_name": "aac",
+            "profile": "HE-AAC",
+            "sample_rate": "48000",
+            "channels": 2
+          }
+        ]
+      },
+      {
+        "path": "hybrid-lossy.wv",
+        "streams": [
+          {
+            "codec_name": "wavpack",
+            "sample_rate": "48000",
+            "channels": 2,
+            "bits_per_raw_sample": "16"
+          }
+        ]
+      },
+      {
+        "path": "hybrid-corrected.wv",
+        "streams": [
+          {
+            "codec_name": "wavpack",
+            "sample_rate": "48000",
+            "channels": 2,
+            "bits_per_raw_sample": "16"
+          }
+        ]
+      }
+    ]
+  },
+  "publishedDownload": {
+    "status": "published-download-verified",
+    "sourceCommit": "0ce6a9bb9f31c348368ff614611312c924a058c8",
+    "runUrl": "https://github.com/kurasis/MPswift/actions/runs/37423428788",
+    "releaseUrl": "https://github.com/kurasis/MPswift/releases/tag/build-37423428788-attempt-1",
+    "zipUrl": "https://github.com/kurasis/MPswift/releases/download/build-37423428788-attempt-1/LocalAudioPlayer-dev-0ce6a9bb9f31-win-x64.zip",
+    "bytes": 85423307,
+    "sha256": "55d6f4a436bfeea5b701292d04610600383d7376d06c5984858126141292f2f2",
+    "evidence": {
+      "evidence-windows-2022": {
+        "tests": [
+          {
+            "total": "124",
+            "executed": "124",
+            "passed": "124",
+            "failed": "0",
+            "error": "0",
+            "timeout": "0",
+            "aborted": "0",
+            "inconclusive": "0",
+            "passedButRunAborted": "0",
+            "notRunnable": "0",
+            "notExecuted": "0",
+            "disconnected": "0",
+            "warning": "0",
+            "completed": "0",
+            "inProgress": "0",
+            "pending": "0"
+          }
+        ],
+        "reports": {
+          "smoke/crash-restart.json": {
+            "Status": "crash-restart-model-passed",
+            "CommittedPlaylistIdentityOrderAndFlags": true,
+            "ActiveSourceAndPosition": true,
+            "QueueRepeatShuffle": true,
+            "Ratings": true,
+            "VolumeMute": true,
+            "NativePreparation": true,
+            "NoAutoplay": true,
+            "SqliteIntegrityAndReferences": true,
+            "UncommittedValidationTransactionRolledBack": true,
+            "SourceUnchanged": true,
+            "PositionToleranceSeconds": 0.05,
+            "DevicePlayback": "not-run",
+            "KillDuringMigrationOrPowerLoss": "not-run",
+            "Windows": "Microsoft Windows NT 10.0.20348.0",
+            "ForcedWpfTermination": true,
+            "KilledExitCode": -1,
+            "Method": "Actual apphost killed after a production checkpoint, while a diagnostic SQLite write transaction was open; actual WPF/native restart validates the last committed state.",
+            "SourceCommit": "0ce6a9bb9f31c348368ff614611312c924a058c8"
+          },
+          "smoke/package-smoke.json": {
+            "Status": "packaged-executable-smoke-passed",
+            "SourceCommit": "0ce6a9bb9f31c348368ff614611312c924a058c8",
+            "ZipSha256": "55d6f4a436bfeea5b701292d04610600383d7376d06c5984858126141292f2f2",
+            "UnicodeExtractionPath": true,
+            "ArbitraryWorkingDirectory": true,
+            "InvalidExternalDotnetRoot": true,
+            "TamperRejected": true,
+            "Windows": "Microsoft Windows NT 10.0.20348.0",
+            "CleanWindows11WithoutSdk": "not-run",
+            "NetworkDisconnected": "not-run",
+            "DeviceOutput": "not-run",
+            "DistributionApproved": false
+          }
+        }
+      },
+      "evidence-ubuntu-24.04": {
+        "tests": [
+          {
+            "total": "124",
+            "executed": "124",
+            "passed": "124",
+            "failed": "0",
+            "error": "0",
+            "timeout": "0",
+            "aborted": "0",
+            "inconclusive": "0",
+            "passedButRunAborted": "0",
+            "notRunnable": "0",
+            "notExecuted": "0",
+            "disconnected": "0",
+            "warning": "0",
+            "completed": "0",
+            "inProgress": "0",
+            "pending": "0"
+          }
+        ],
+        "reports": {}
+      }
+    }
+  }
+}

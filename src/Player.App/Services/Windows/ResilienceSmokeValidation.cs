@@ -176,11 +176,22 @@ public static class ResilienceSmokeValidation
         {
             using (var fill = new FileStream(fillPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, 4096, FileOptions.WriteThrough))
             {
-                var block = new byte[4096];
+                // Fill coarsely, then consume remaining clusters. This preserves
+                // the real disk-full assertion without tens of thousands of flushes.
+                var block = new byte[1024 * 1024];
                 for (var i = 0; i < block.Length; i++) block[i] = (byte)(i % 251);
-                try { while (filled < 160L * 1024 * 1024) { fill.Write(block); filled += block.Length; } fill.Flush(true); }
+                try { while (filled < 160L * 1024 * 1024) { fill.Write(block); filled += block.Length; } }
+                catch (IOException error) when ((error.HResult & 0xffff) is 112 or 39) { diskError = error.HResult & 0xffff; }
+                if (diskError != 0)
+                {
+                    fill.Position = fill.Length;
+                    try { while (filled < 160L * 1024 * 1024) { fill.Write(block, 0, 4096); filled += 4096; } }
+                    catch (IOException error) when ((error.HResult & 0xffff) is 112 or 39) { diskError = error.HResult & 0xffff; }
+                }
+                try { fill.Flush(true); }
                 catch (IOException error) when ((error.HResult & 0xffff) is 112 or 39) { diskError = error.HResult & 0xffff; }
             }
+            filled = new FileInfo(fillPath).Length;
             Check(diskError != 0, "Owned VHD did not produce a real disk-full error.");
             var entries = Enumerable.Range(0, 3000).Select(i => new PlaylistEntry(Guid.NewGuid(), track with { Id = Guid.NewGuid(), Title = new string('x', 4096), Artist = new string('y', 4096) })).ToArray();
             var rejected = false; var sqliteCode = 0;

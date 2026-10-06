@@ -82,6 +82,7 @@ try
             using (var exclusive = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.None)) { }
             if (HashFile(file) != hash) throw new InvalidDataException("Fixture source changed.");
             float? losslessError = null;
+            float? lossyError = null;
             if (fixture.TryGetProperty("correction", out var correction))
             {
                 var companion = correction.GetProperty("path").GetString()!;
@@ -104,7 +105,24 @@ try
                 using (new FileStream(companion, FileMode.Open, FileAccess.Read, FileShare.None)) { }
                 if (HashFile(companion) != correction.GetProperty("sha256").GetString()) throw new InvalidDataException("Correction file changed during decoding.");
             }
-            results.Add(new { File = relative, Profile = fixture.GetProperty("profile").GetString(), Status = "decode-seek-end-dispose-passed", SourceSha256 = hash, Decode = evidence, LosslessMaximumError = losslessError });
+            if (fixture.TryGetProperty("lossyReference", out reference))
+            {
+                var name = reference.GetString()!;
+                if (Path.GetFileName(name) != name || File.Exists(file + "c")) throw new InvalidDataException("Invalid uncorrected hybrid comparison inputs.");
+                var referencePath = Path.Combine(directory, name);
+                if (HashFile(referencePath) != manifest.RootElement.GetProperty("sourceSha256").GetString()) throw new InvalidDataException("Reference checksum mismatch.");
+                lossyError = ExtendedFormatValidation.ComparePcm(file, referencePath);
+                if (lossyError <= 0 || !float.IsFinite(lossyError.Value)) throw new InvalidDataException("Owned uncorrected hybrid control did not expose lossy PCM.");
+                if (HashFile(file) != hash) throw new InvalidDataException("Hybrid comparison changed source.");
+            }
+            using (new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.None)) { }
+            if (fixture.TryGetProperty("losslessReference", out reference) || fixture.TryGetProperty("lossyReference", out reference))
+            {
+                var referencePath = Path.Combine(directory, reference.GetString()!);
+                using (new FileStream(referencePath, FileMode.Open, FileAccess.Read, FileShare.None)) { }
+                if (HashFile(referencePath) != manifest.RootElement.GetProperty("sourceSha256").GetString()) throw new InvalidDataException("Comparison changed the owned reference.");
+            }
+            results.Add(new { File = relative, Profile = fixture.GetProperty("profile").GetString(), Status = "decode-seek-end-dispose-passed", SourceSha256 = hash, Decode = evidence, LosslessMaximumError = losslessError, UncorrectedHybridMaximumError = lossyError });
         }
         if (results.Count == 0) throw new InvalidDataException("No format fixtures executed.");
         Report(new { Status = "formats-passed", Environment = RuntimeInformation.OSDescription, Count = results.Count, Results = results, DeviceOutput = "not-run" });

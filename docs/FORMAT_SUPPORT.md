@@ -10,12 +10,12 @@ Pinned base and FLAC/Opus/ALAC/AAC add-ons are inventoried in [the native manife
 | FLAC | P0 | BASSFLAC | 16/24-bit fixtures; native decode/seek/end/disposal passed |
 | Ogg Vorbis | P0 | BASS | Vorbis fixture; native decode/seek/end/disposal passed |
 | Opus / Ogg Opus | P0 | BASSOPUS | Opus fixture; native decode/seek/end/disposal passed |
-| AAC / M4A | P0 | Approved AAC decoding path | AAC-LC ADTS/MP4 fixtures; native decode/seek/end/disposal passed; HE-AAC untested; distribution path unresolved |
+| AAC / M4A | P0 | Approved AAC decoding path | AAC-LC ADTS/MP4 fixtures; native decode/seek/end/disposal passed; HE-AAC/HE-AACv2 MP4 passed in G8; untested combinations remain open; distribution path unresolved |
 | ALAC / M4A | P0 | BASSALAC or a verified bundled path | ALAC MP4 fixture; native decode/seek/end/disposal passed |
-| WMA | P1 | Pinned BASSWMA | WMA v2/ASF 128 kbps decode/seek/end/disposal passed; Windows Media Format dependency explicit; lossless/Pro/N acceptance unrun |
-| APE | P1 | Pinned BASSAPE | Provisioned; actual codec/seek/large fixtures unrun |
-| WavPack / WV | P1 | Pinned BASSWV | Lossless decode/seek/end/disposal passed; hybrid/correction-file unrun |
-| Musepack / MPC | P1 | Pinned BASS_MPC | Upstream binary/notice provisioned; real profile fixture unrun, distribution review open |
+| WMA | P1 | Pinned BASSWMA | WMA v2/ASF 128 kbps decode/seek/end/disposal passed; Windows Media Format dependency explicit; G8 lossless 44.1 kHz stereo and Pro 48 kHz stereo passed; actual N remains unrun |
+| APE | P1 | Pinned BASSAPE | G8 normal profile native decode/seek/end and exact PCM passed; large APE remains unrun |
+| WavPack / WV | P1 | Pinned BASSWV | Lossless decode/seek/end/disposal passed; G8 hybrid with/without correction and exact corrected PCM passed |
+| Musepack / MPC | P1 | Pinned BASS_MPC | Upstream binary/notice provisioned; G8 owned SV8 native decode/seek/end passed, other profiles/distribution review open |
 | TTA | P1 | Pinned BASS_TTA | Lossless decode/seek/end/disposal passed; LGPL terms retained/review open |
 | DSF / DFF | P1 | Pinned BASSDSD | Owned DSD64 DSF/DSDIFF decode/seek/end/disposal passed at 88.2 kHz float PCM; native DSD output unimplemented |
 | CUE + supported audio | P1 | Tokenizer/parser and bounded logical decoder sources | Domain and real logical bounds/seek/waveform/WPF passed; production callback CUE sample error 0 |
@@ -37,3 +37,6 @@ G4 adds owned RF64 PCM16, WMA v2/ASF and deterministic first-order DSD64 DSF/DSD
 
 
 G4 native results are now observed in [run 37418131090](https://github.com/kurasis/MPswift/actions/runs/37418131090) at `a00ee6c`: all 21 profiles passed. RF64 decoded PCM16 at 48 kHz / stereo / 3 s; WMA v2 decoded at 48 kHz / stereo / 3 s; DSF/DSDIFF each produced 88.2 kHz stereo float PCM, duration 2.9999319727891156 s and peak 0.099865526. Actual midpoint seek, end, source checksum and handle-release checks passed. See [exact reports](evidence/stage-g-formats-backup-performance-windows.json). Tiny RF64 represents the container path, not a >4 GiB-file test. WMA lossless/Pro/N, HE-AAC, APE/MPC, WV hybrid/correction and full combinations remain open.
+
+
+G8 extends the observed matrix to 30 committed profiles plus independently codec-tagged owned WMA lossless/Pro and a real sparse RF64 >4 GiB. Exact rates/channels, PCM comparisons, attempted unavailable encoder inputs, source-preservation methods and Windows N boundary are retained in [G8/G9 reports](evidence/stage-g8-g9-windows.json). PCM24 192 kHz stereo and 96 kHz 6/8-channel files passed; this does not assert physical multichannel endpoint routing or every encoding/rate combination. Full profile/hardware/codec licensing acceptance remains in RELEASE_ACCEPTANCE.md.

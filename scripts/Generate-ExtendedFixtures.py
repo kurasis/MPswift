@@ -61,6 +61,7 @@ def main():
     shutil.copyfile(output/'hybrid-corrected.wv', output/'hybrid-lossy.wv')
     fixtures.append({**fixtures[-1], 'path':'hybrid-lossy.wv', 'profile':'WavPack hybrid without correction'})
     fixtures[-1].pop('correction'); fixtures[-1].pop('losslessReference')
+    fixtures[-1]['lossyReference'] = 'source-pcm16.wav'
     for name, profile, rate, channels, codec, bass, extra in (
             ('pcm24-192k.wav', 'PCM24 192 kHz stereo', 192000, 2, 'pcm_s24le', 'WavePCM', []),
             ('flac24-96k-6ch.flac', 'FLAC24 96 kHz 5.1', 96000, 6, 'flac', 'FLAC', ['-sample_fmt','s32']),

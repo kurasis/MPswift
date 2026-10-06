@@ -133,10 +133,13 @@ public static class ExtendedFormatValidation
         }
         var stream = Bass.CreateStream(path, 0, 0, BassFlags.Decode | BassFlags.Float);
         Check(stream != 0, "Large RF64 open failed: " + Bass.LastError);
-        long readBytes = 0;
+        long readBytes = 0; double duration = 0;
         try
         {
             Check(Bass.ChannelGetLength(stream) == dataLength * 2, "RF64 decoded length truncated at 32 bits.");
+            Check(Bass.ChannelGetInfo(stream, out var info) && info.Frequency == 48000 && info.Channels == 2, "RF64 format facts differ.");
+            duration = Bass.ChannelBytes2Seconds(stream, Bass.ChannelGetLength(stream));
+            Check(Math.Abs(duration - dataLength / 192000d) < 1d / 48000, "RF64 duration truncated at 32 bits.");
             var buffer = new float[8192];
             foreach (var offset in offsets)
             {
@@ -154,7 +157,7 @@ public static class ExtendedFormatValidation
             foreach (var offset in offsets) { source.Position = 80 + offset; source.ReadExactly(buffer); Check(buffer.AsSpan().SequenceEqual(pcm), "RF64 source range changed."); }
         }
         File.Delete(path);
-        return new { FileBytes = dataLength + 80, DataBytes = dataLength, SparseOwnedNtfsFile = true, CheckedDataOffsets = offsets, DecodedBytesRead = readBytes,
+        return new { FileBytes = dataLength + 80, DataBytes = dataLength, SampleRate = 48000, Channels = 2, DurationSeconds = duration, SparseOwnedNtfsFile = true, CheckedDataOffsets = offsets, DecodedBytesRead = readBytes,
             BufferBytes = 32768, SourcePreservation = "Exclusive reopen, length and all written signal ranges; not a whole-file hash", BoundaryAndEndSeek = true };
     }
 
