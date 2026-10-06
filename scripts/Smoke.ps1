@@ -27,7 +27,8 @@ try {
         if ($code -ne 0) { throw "Native $mode failed with exit $code. See artifacts/smoke." }
         Write-Host $result
     }
-    foreach ($check in @(@('--formats', (Join-Path $root 'tests/fixtures/audio'), 'formats'), @('--engine', $fixture, 'engine'), @('--waveform', $fixture, 'waveform'), @('--mixer', $fixture, 'mixer'), @('--stress', $fixture, 'stress'))) {
+    Remove-Item (Join-Path $directory 'g8-owned-formats') -Recurse -Force -ErrorAction SilentlyContinue
+    foreach ($check in @(@('--formats', (Join-Path $root 'tests/fixtures/audio'), 'formats'), @('--formats', (Join-Path $root 'tests/fixtures/audio-extended'), 'formats-extended'), @('--extended-formats', (Join-Path $directory 'g8-owned-formats'), 'g8-formats'), @('--engine', $fixture, 'engine'), @('--waveform', $fixture, 'waveform'), @('--mixer', $fixture, 'mixer'), @('--stress', $fixture, 'stress'))) {
         $result = & dotnet $tool $check[0] $check[1]
         $code = $LASTEXITCODE
         $result | Set-Content (Join-Path $directory "$($check[2]).json") -Encoding utf8

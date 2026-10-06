@@ -8,7 +8,7 @@ using Player.Core.Playback;
 var json = new JsonSerializerOptions { WriteIndented = true };
 void Report(object result) => Console.WriteLine(JsonSerializer.Serialize(result, json));
 
-if (args.Length == 0 || args[0] is not ("--generate-fixture" or "--probe" or "--decode" or "--play" or "--formats" or "--engine" or "--engine-play" or "--waveform" or "--mixer" or "--stress") ||
+if (args.Length == 0 || args[0] is not ("--generate-fixture" or "--probe" or "--decode" or "--play" or "--formats" or "--extended-formats" or "--engine" or "--engine-play" or "--waveform" or "--mixer" or "--stress") ||
     args.Length != (args[0] == "--probe" ? 1 : 2))
 {
     Console.Error.WriteLine("Usage: Player.AudioSmoke --generate-fixture <new.wav> | --probe | --decode <local-file> | --play <local-file> | --formats <fixture-directory> | --engine <local-file> | --engine-play <local-file>");
@@ -34,6 +34,7 @@ try
         return 0;
     }
     if (args[0] == "--stress") { Report(await StressValidation.RunAsync(args[1])); return 0; }
+    if (args[0] == "--extended-formats") { Report(ExtendedFormatValidation.Run(args[1])); return 0; }
     if (args[0] == "--mixer") { Report(MixerValidation.Run(args[1])); return 0; }
     if (args[0] == "--waveform") { Report(await WaveformValidation.RunAsync(args[1])); return 0; }
     if (args[0] == "--formats")
@@ -59,7 +60,24 @@ try
                 throw new InvalidDataException("Unexpected decoded fixture facts: " + relative);
             using (var exclusive = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.None)) { }
             if (HashFile(file) != hash) throw new InvalidDataException("Fixture source changed.");
-            results.Add(new { File = relative, Profile = fixture.GetProperty("profile").GetString(), Status = "decode-seek-end-dispose-passed", SourceSha256 = hash, Decode = evidence });
+            float? losslessError = null;
+            if (fixture.TryGetProperty("correction", out var correction))
+            {
+                var companion = correction.GetProperty("path").GetString()!;
+                if (Path.GetFileName(companion) != companion || HashFile(Path.Combine(directory, companion)) != correction.GetProperty("sha256").GetString())
+                    throw new InvalidDataException("Correction checksum mismatch.");
+            }
+            if (fixture.TryGetProperty("losslessReference", out var reference))
+            {
+                var name = reference.GetString()!;
+                if (Path.GetFileName(name) != name) throw new InvalidDataException("Invalid reference path.");
+                var referencePath = Path.Combine(directory, name);
+                if (HashFile(referencePath) != manifest.RootElement.GetProperty("sourceSha256").GetString()) throw new InvalidDataException("Reference checksum mismatch.");
+                losslessError = ExtendedFormatValidation.ComparePcm(file, referencePath);
+                if (losslessError != 0) throw new InvalidDataException("Lossless fixture PCM differs: " + relative);
+                if (HashFile(file) != hash) throw new InvalidDataException("PCM comparison changed source.");
+            }
+            results.Add(new { File = relative, Profile = fixture.GetProperty("profile").GetString(), Status = "decode-seek-end-dispose-passed", SourceSha256 = hash, Decode = evidence, LosslessMaximumError = losslessError });
         }
         if (results.Count == 0) throw new InvalidDataException("No format fixtures executed.");
         Report(new { Status = "formats-passed", Environment = RuntimeInformation.OSDescription, Count = results.Count, Results = results, DeviceOutput = "not-run" });

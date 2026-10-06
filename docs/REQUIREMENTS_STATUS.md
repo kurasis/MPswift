@@ -53,3 +53,8 @@ Locked Release cross-build passes 115 tests, zero warnings/errors. Complete ZIP 
 
 
 G4–G7 observed status supersedes the pre-CI note above: [run 37418131090](https://github.com/kurasis/MPswift/actions/runs/37418131090) at `a00ee6c` passes 115 tests per OS, 21 profiles and EN/RU/extracted WPF backup/artwork/storage/performance checks. [exact reports](evidence/stage-g-formats-backup-performance-windows.json) retain raw results and boundaries. Whole AC acceptance is not inferred from the covered hosted workflows.
+
+
+## G8 implementation (Windows verification pending)
+
+Nine additional owned profiles cover explicit HE-AAC/HE-AACv2, APE, Musepack SV8, WavPack hybrid with/without correction, PCM24 192 kHz stereo and 96 kHz 6/8-channel PCM/FLAC. Manifest hashes and pinned encoder provenance are retained in EXTENDED_FIXTURES.md. Actual Windows smoke adds bit-exact APE/WV correction comparisons, native WMA lossless/Pro encoding with independent ASF codec-tag checks and a sparse RF64 over 4 GiB with bounded 64-bit seeks including the end. Linux locked Release build: 115 tests, no warnings/errors. Native checks await CI; Windows N and device output remain unrun. G9 follows immediately.
