@@ -42,7 +42,18 @@ public sealed class MediaImportService : IMediaImportService
         void Flush() { if (batch.Count == 0) return; progress.Report(new ImportProgress(batch.ToArray(), processed, errors)); batch.Clear(); }
         try
         {
-            foreach (var source in ExpandDocuments(Enumerate(paths, Error, token), Error, fallbackEncoding, token))
+            // Bound planning before associating images with selected sidecars. Repeated explicit
+            // FLAC inputs still produce repeated album occurrences; folder FLAC+CUE pairs do not.
+            var sources = ExpandDocuments(Enumerate(paths, Error, token), Error, fallbackEncoding, token).Take(MaximumEntries + 1).ToArray();
+            if (sources.Length > MaximumEntries) limit = true;
+            var discovery = new CueAlbumDiscovery(Error, token, fallbackEncoding);
+            string? FindCue(string path)
+            {
+                try { return File.Exists(path) ? discovery.Find(path) : null; }
+                catch (Exception error) when (error is IOException or ArgumentException or UnauthorizedAccessException)
+                { Error("Companion CUE: " + error.Message); return null; }
+            }
+            foreach (var source in CueImportSelection.Resolve(sources, FindCue))
             {
                 token.ThrowIfCancellationRequested();
                 if (processed >= maximumItems) { limit = true; break; }
@@ -54,7 +65,7 @@ public sealed class MediaImportService : IMediaImportService
                         BassSmokeSession.ValidateSourcePath(path);
                         if (new FileInfo(path).Length > 4 * 1024 * 1024) throw new IOException("CUE exceeds 4 MiB.");
                         CueSheet sheet;
-                        try { sheet = CueSheet.Parse(CueSheet.Decode(ReadDocument(path), fallbackEncoding), path); }
+                        try { sheet = CueAlbumDiscovery.Read(path, fallbackEncoding); }
                         catch (System.Text.DecoderFallbackException) { Error("CUE is not valid UTF-8/Unicode. Re-import using the explicit legacy encoding action: " + path); continue; }
                         foreach (var diagnostic in sheet.Diagnostics) Error(diagnostic);
                         foreach (var song in sheet.Songs)

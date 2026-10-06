@@ -651,4 +651,8 @@ F1: локальная справка
     <data xml:space="preserve" name="AudioSettingsHelp"><value>Выбор устройства вывода, эквалайзер, ReplayGain и плавный переход.</value></data>
     <data xml:space="preserve" name="PreferencesSaved"><value>Настройки сохранены.</value></data>
     <data xml:space="preserve" name="AlbumSectionCount"><value>Треков: {0}</value></data>
+    <data xml:space="preserve" name="ExpandCueImage"><value>Развернуть FLAC в песни по CUE</value></data>
+    <data xml:space="preserve" name="SelectFlacImage"><value>Сначала выберите в плейлисте цельный FLAC.</value></data>
+    <data xml:space="preserve" name="NoMatchingCue"><value>Не найдена однозначная корректная CUE-разметка для FLAC. Исходная строка сохранена. Проверьте имя FILE внутри CUE или импортируйте CUE отдельно, при необходимости с выбором кодировки.</value></data>
+    <data xml:space="preserve" name="CueImagesExpanded"><value>Развёрнуто FLAC-альбомов: {0}. Аудиофайлы не изменялись.</value></data>
 </root>

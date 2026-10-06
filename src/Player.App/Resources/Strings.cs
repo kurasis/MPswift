@@ -12,6 +12,10 @@ public static class Strings
     public static void SetLanguage(string language) => Culture = CultureInfo.GetCultureInfo(language == "ru" ? "ru-RU" : "en-US");
     public static string Get(string key) => Manager.GetString(key, Culture)
         ?? throw new MissingManifestResourceException($"Missing resource: {key}");
+    public static string ExpandCueImage => Get(nameof(ExpandCueImage));
+    public static string SelectFlacImage => Get(nameof(SelectFlacImage));
+    public static string NoMatchingCue => Get(nameof(NoMatchingCue));
+    public static string CueImagesExpanded => Get(nameof(CueImagesExpanded));
     public static string Settings => Get(nameof(Settings));
     public static string PlaylistMenu => Get(nameof(PlaylistMenu));
     public static string SelectedTracksMenu => Get(nameof(SelectedTracksMenu));

@@ -1,5 +1,7 @@
 # Requirement and acceptance status
 
+AC-016 follow-up: whole-image FLAC now discovers an unambiguous external CUE automatically and existing rows can expand in place. Native duration validation, source preservation and no whole-file duplication are covered by Windows smoke; explicit multi-file CUE behavior remains available.
+
 AC-007/AC-030 follow-up: recursive folder imports now expose contiguous album/folder headings without reordering; optional headings and language/tray preferences are reachable through the title-bar settings shortcut. Menu keyboard/actions, settings persistence and EN/RU renders are included in hosted validation.
 
 MPswift visual refresh: product/icon/output names and shared dark controls updated; see [design and compatibility](DESIGN.md). AC-030 existing automation/minimum-layout checks must pass again on the renamed Windows candidate. Historical acceptance evidence is not rewritten.

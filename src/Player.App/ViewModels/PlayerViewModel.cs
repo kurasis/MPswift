@@ -423,6 +423,76 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         { row.EligibilityChanged -= RowChanged; row.RatingChanged -= RatingChanged; Entries.Remove(row); _knownRows.Remove(row.Id); }
         UpdateEntries();
     }
+    public Task ExpandCueImagesAsync(IEnumerable<PlaylistRowViewModel> selected)
+    {
+        if (!CanImport()) return Task.CompletedTask;
+        _importTask = ExpandCueImagesCoreAsync(selected.ToArray());
+        return _importTask;
+    }
+    private async Task ExpandCueImagesCoreAsync(PlaylistRowViewModel[] selected)
+    {
+        if (!CanImport()) return;
+        var target = SelectedPlaylist;
+        var rows = selected.Where(row => row.Entry.Track.Segment is null &&
+            Path.GetExtension(row.Path).Equals(".flac", StringComparison.OrdinalIgnoreCase)).Distinct().ToArray();
+        if (rows.Length == 0) { Message = Strings.SelectFlacImage; return; }
+        var details = new List<string>();
+        void Diagnostic(string text) { if (details.Count < 20) details.Add(text[..Math.Min(text.Length, 1024)]); }
+        var expanded = 0;
+        IsImporting = true; _importCancellation = new CancellationTokenSource();
+        try
+        {
+            var token = _importCancellation.Token;
+            var discovery = new CueAlbumDiscovery(Diagnostic, token);
+            foreach (var row in rows)
+            {
+                token.ThrowIfCancellationRequested();
+                try
+                {
+                    var cue = await Task.Run(() => discovery.Find(row.Path), token);
+                    if (cue is null) { Diagnostic(Strings.NoMatchingCue + " " + row.Path); continue; }
+                    var imported = new List<PlaylistEntry>();
+                    var summary = await _importer.ImportAsync([cue], new CollectedImportProgress(imported), token,
+                        10000 - _knownRows.Count + 1);
+                    token.ThrowIfCancellationRequested();
+                    if (summary.Errors != 0 || summary.LimitReached || imported.Count < 2 || imported.Any(entry =>
+                        entry.Track.Segment is null || !string.Equals(entry.Track.Path, row.Path, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        foreach (var detail in summary.Details) Diagnostic(detail);
+                        Diagnostic(summary.LimitReached ? Strings.Get("ImportLimit") : Strings.NoMatchingCue);
+                        continue;
+                    }
+                    if (_knownRows.Count - 1 + imported.Count > 10000) { Diagnostic(Strings.Get("ImportLimit")); continue; }
+                    var position = target.Entries.IndexOf(row);
+                    if (position < 0 || !Playlists.Contains(target)) continue;
+                    // Keep active/queued occurrences intact in the coordinator, just as normal
+                    // removal does. The replacement does not start or interrupt playback.
+                    row.EligibilityChanged -= RowChanged; row.RatingChanged -= RatingChanged;
+                    target.Entries.RemoveAt(position); _knownRows.Remove(row.Id);
+                    PlaylistRowViewModel? first = null;
+                    foreach (var entry in imported)
+                    {
+                        AddRow(target, entry with { Enabled = row.Enabled });
+                        var added = target.Entries[^1]; first ??= added;
+                        target.Entries.Move(target.Entries.Count - 1, position++);
+                    }
+                    if (ReferenceEquals(SelectedPlaylist, target)) SelectedEntry = first;
+                    expanded++; UpdateEntries();
+                }
+                catch (Exception error) when (error is IOException or ArgumentException or UnauthorizedAccessException)
+                { Diagnostic(error.Message); }
+            }
+            await RefreshRatingsAsync();
+            if (expanded > 0) await SaveNowAsync();
+            Message = expanded > 0 ? string.Format(Strings.Culture, Strings.CueImagesExpanded, expanded) : Strings.NoMatchingCue;
+            Details = string.Join(Environment.NewLine, details);
+        }
+        catch (OperationCanceledException) { Message = Strings.Get("ImportCanceled"); }
+        finally { IsImporting = false; _importCancellation.Dispose(); _importCancellation = null; }
+    }
+    private sealed class CollectedImportProgress(List<PlaylistEntry> entries) : IProgress<ImportProgress>
+    { public void Report(ImportProgress value) => entries.AddRange(value.Entries); }
+
     public void CreatePlaylist(string name)
     {
         name = ValidateName(name);

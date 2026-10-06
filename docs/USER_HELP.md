@@ -42,3 +42,9 @@ Use Backup in the action menu to save a complete local .zip containing playlists
 Use the gear in the title bar to open Settings. Choose English or Russian (applies after restarting MPswift), show/hide album and folder headings, or choose close-to-tray behavior. Apply saves the choices; Cancel leaves them unchanged. The Sound section opens output device, EQ, ReplayGain and crossfade controls.
 
 Dropping a folder onto the playlist tabs creates a playlist including its subfolders. Album headings use tags when present, otherwise folder names. Folder hints distinguish discs/subfolders, and counts reflect visible tracks. Search and reordering update headings without changing the playlist's playback order. The ellipsis menu groups playlist, selected-track, queue and file/backup actions.
+
+## Whole-album FLAC and CUE
+
+When a FLAC contains an entire album, keep its companion .cue in the same folder. Add the folder or the FLAC: a single valid CUE referencing that FLAC is expanded into named songs, without creating new audio files. A folder containing both the image and its CUE does not add the whole album twice.
+
+For an existing whole FLAC row, select it (multiple images are supported), then use **⋯ → Selected tracks → Expand FLAC into songs from CUE**. The FILE name inside the CUE must match the actual FLAC. Missing, ambiguous, malformed or out-of-range automatic associations keep the original row. If the CUE uses a legacy encoding, use Files and backups → Import document with legacy encoding, select the .cue and choose its actual encoding. Multi-file CUE sheets can still be imported explicitly. Files without timing metadata remain whole; silence is not guessed as song boundaries.

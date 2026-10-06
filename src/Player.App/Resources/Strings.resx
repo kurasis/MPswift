@@ -651,4 +651,8 @@ Backup creates a complete local ZIP of database and settings. Restore backup val
     <data xml:space="preserve" name="AudioSettingsHelp"><value>Choose an output device and adjust the equalizer, ReplayGain or crossfade.</value></data>
     <data xml:space="preserve" name="PreferencesSaved"><value>Settings saved.</value></data>
     <data xml:space="preserve" name="AlbumSectionCount"><value>{0} tracks</value></data>
+    <data xml:space="preserve" name="ExpandCueImage"><value>Expand FLAC into songs from CUE</value></data>
+    <data xml:space="preserve" name="SelectFlacImage"><value>Select a whole FLAC image in the playlist first.</value></data>
+    <data xml:space="preserve" name="NoMatchingCue"><value>No unambiguous valid CUE for this FLAC. The original entry was kept. Check the FILE name inside the CUE or import the CUE explicitly (legacy encoding if needed).</value></data>
+    <data xml:space="preserve" name="CueImagesExpanded"><value>Expanded {0} FLAC images into songs. Audio files were not changed.</value></data>
 </root>

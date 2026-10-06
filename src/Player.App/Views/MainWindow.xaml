@@ -86,6 +86,7 @@
                         </MenuItem>
                         <MenuItem Header="{x:Static r:Strings.SortPlaylist}"><MenuItem Header="{x:Static r:Strings.SortTitle}" Tag="Title" Click="OnSort" /><MenuItem Header="{x:Static r:Strings.SortArtist}" Tag="Artist" Click="OnSort" /><MenuItem Header="{x:Static r:Strings.SortAlbum}" Tag="Album" Click="OnSort" /><MenuItem Header="{x:Static r:Strings.SortTrack}" Tag="Track" Click="OnSort" /><MenuItem Header="{x:Static r:Strings.SortDuration}" Tag="Duration" Click="OnSort" /><MenuItem Header="{x:Static r:Strings.SortPath}" Tag="Path" Click="OnSort" /><MenuItem Header="{x:Static r:Strings.SortAdded}" Tag="Date added" Click="OnSort" /></MenuItem>
                         <MenuItem Header="{x:Static r:Strings.SelectedTracksMenu}">
+                        <MenuItem Header="{x:Static r:Strings.ExpandCueImage}" Click="OnExpandCueImage" />
                         <MenuItem Header="{x:Static r:Strings.PlayNext}" Click="OnPlayNext" />
                         <MenuItem Header="{x:Static r:Strings.AddQueue}" Click="OnAddQueue" />
                         <MenuItem Header="{x:Static r:Strings.MoveUp}" Click="OnMoveUp" />

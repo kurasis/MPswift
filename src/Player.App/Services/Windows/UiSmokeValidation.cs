@@ -100,6 +100,7 @@ public sealed class UiSmokeValidation : TraceListener
         Require(model.Waveform is not null, "Cached waveform was not restored.");
         Require(model.Queue.Select(q => q.Id).SequenceEqual(queuedIds) && model.Repeat == RepeatMode.All && model.Shuffle, "Queue/repeat/shuffle state was not restored.");
         Require(model.WindowSettings.Processing is { ReplayGain: ReplayGainMode.Album, CrossfadeSeconds: 3 }, "Audio processing settings were not restored.");
+        var cueImage = await CueImageValidation.RunAsync(window, model, taggedFixture, output);
         var folderDrop = await FolderDropValidation.RunAsync(window, model, fixture, output);
         var desktop = await DesktopAcceptanceValidation.RunAsync(window, model, output);
         var customization = await CustomizationValidation.RunAsync(window, model, output);
@@ -179,6 +180,7 @@ public sealed class UiSmokeValidation : TraceListener
         {
             WindowsIntegration = integration,
             FolderDrop = folderDrop,
+            CueImage = cueImage,
             Customization = customization,
             DesktopAcceptance = desktop,
             CompleteBackupRestore = backupRestore, StorageArtwork = storageArtwork, SearchPerformance = searchPerformance,

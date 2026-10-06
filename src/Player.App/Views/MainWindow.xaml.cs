@@ -232,6 +232,11 @@ public partial class MainWindow : Window
         try { await Model.RelinkAsync(row, dialog.FileName); }
         catch (Exception error) { Model.Message = Strings.Get("RelinkFailed"); Model.Details = error.Message; }
     }
+    private async void OnExpandCueImage(object sender, RoutedEventArgs e)
+    {
+        try { await Model.ExpandCueImagesAsync(PlaylistList.SelectedItems.Cast<PlaylistRowViewModel>().ToArray()); }
+        catch (Exception error) { Model.Message = Strings.ErrorUnexpected; Model.Details = error.Message; }
+    }
     private void OnCopyPath(object sender, RoutedEventArgs e) { if (Model.SelectedEntry is { } row) Clipboard.SetText(row.Path); }
     private void OnShowFile(object sender, RoutedEventArgs e)
     {

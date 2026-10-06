@@ -1,5 +1,14 @@
 # Test evidence — Stages A–G
 
+## Whole FLAC images with companion CUE (2026-10-06)
+
+Added bounded, operation-local discovery of unambiguous same-directory CUE sheets referencing a single FLAC image. Automatic association requires at least two songs, no parser diagnostics, and indices within the actual duration from an independently owned native decoder. No endpoint is opened. Folder/combined FLAC+CUE imports prefer the explicitly selected CUE without adding the whole image again; repeated explicitly supplied images still create repeated album occurrences. Multi-file CUE remains available through explicit CUE import. No encoding, missing FILE name, silence-based boundary or embedded FLAC chapter guessing is introduced.
+
+Selected existing whole FLAC rows can be expanded through Selected tracks → Expand FLAC into songs from CUE. Each replacement is staged and only applied after complete import, capacity/source checks; preserves its position and enabled flag, active/queued snapshots, and stable logical CUE identities. Missing, ambiguous, malformed or out-of-range automatic CUE associations retain the original entry. The operation shares the importer cancellation/shutdown lifecycle. Audio and CUE source bytes are read-only.
+
+Local locked Release cross-build: zero warnings/errors, **167 managed tests pass**. Windows smoke adds owned real FLAC/CUE expansion, malformed/ambiguous/out-of-range refusal, folder-pair deduplication, duplicate occurrences, SQLite identities and unchanged-source hashes/exclusive reopen. Real native CUE song durations and PCM reads are checked without output hardware. EN/RU screenshots are retained by the main workflow for this source.
+
+
 ## Menus, settings and album sections (2026-10-06)
 
 Replaced default WPF context-menu chrome with complete dark root/submenu/separator templates and grouped actions. Added a visible settings shortcut with EN/RU selection, persisted album-heading and close-to-tray preferences and access to output/EQ settings. Language changes explicitly require the next launch. Added folder/album run headings with visible track counts and folder hints, preserving duplicates, order, selected entries and virtualized track containers. [Behavior and design](DESIGN.md).
