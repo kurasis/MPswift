@@ -496,9 +496,15 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     public async Task BackupAsync(string path)
     {
         await SaveNowAsync();
-        var settings = WindowSettings with { Volume = Volume, Muted = Muted };
-        if (System.IO.Path.GetExtension(path).Equals(".zip", StringComparison.OrdinalIgnoreCase)) await BackupBundle.CreateAsync(_store, settings, path);
-        else { await _store.BackupAsync(path); await Task.Run(() => SettingsFile.Export(path + ".settings.json", settings)); }
+        await _saveGate.WaitAsync();
+        try
+        {
+            // Export the committed settings paired with the saved database, not edits made while backup I/O awaits.
+            var settings = await Task.Run(_settings.Load);
+            if (System.IO.Path.GetExtension(path).Equals(".zip", StringComparison.OrdinalIgnoreCase)) await BackupBundle.CreateAsync(_store, settings, path);
+            else { await _store.BackupAsync(path); await Task.Run(() => SettingsFile.Export(path + ".settings.json", settings)); }
+        }
+        finally { _saveGate.Release(); }
     }
     private void UpdateEntries(bool changed = true)
     { SyncSource(); VisibleEntries?.Refresh(); if (_initialized) ApplySnapshot(_player.Snapshot); HasEntries = Entries.Count > 0; OnPropertyChanged(nameof(CanTransport)); UpdatePlaylistStatus(); if (changed) ScheduleSave(true); }

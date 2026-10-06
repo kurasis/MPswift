@@ -35,7 +35,13 @@ public static class StorageArtworkValidation
                 folder.SetAccessControl(deniedAcl);
                 try { settings.Save(new(Volume: 91)); permissionRejected = false; } catch (UnauthorizedAccessException) { permissionRejected = true; }
             }
-            finally { folder.SetAccessControl(originalAcl); }
+            finally
+            {
+                // SetAccessControl persists only modified sections; a freshly read descriptor is otherwise a no-op.
+                var restoredAcl = new DirectorySecurity();
+                restoredAcl.SetSecurityDescriptorBinaryForm(originalAcl.GetSecurityDescriptorBinaryForm(), AccessControlSections.Access);
+                folder.SetAccessControl(restoredAcl);
+            }
             Check(permissionRejected && Hash(path) == before && Hash(path + ".bak") == backupBefore, "Denied directory write lost saved data.");
             Check(!Directory.GetFiles(directory, "*.tmp").Any(), "Failed settings save left a temporary file.");
             settings.Save(new(Volume: 35)); Check(settings.Load().Volume == 35, "Settings writer unusable after permissions restored.");

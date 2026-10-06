@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -15,6 +16,9 @@ namespace Player.App.Services.Windows;
 /// <summary>Owned 100k SQLite metadata dataset; actual production query/page WPF rendering and real playlist scroll.</summary>
 public static class PerformanceValidation
 {
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool GetPhysicallyInstalledSystemMemory(out ulong totalMemoryKiB);
     internal static int Containers(DependencyObject parent)
     { var count = parent is ListBoxItem ? 1 : 0; for (var i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++) count += Containers(VisualTreeHelper.GetChild(parent, i)); return count; }
     private static object Timings(List<double> samples, double target) => new
@@ -86,12 +90,17 @@ public static class PerformanceValidation
             }
             timer.Stop(); process.Refresh(); var cpu = (process.TotalProcessorTime - cpuBefore).TotalMilliseconds / timer.Elapsed.TotalMilliseconds * 100;
             if (realized is <= 0 or >= 100) throw new InvalidOperationException("Library page virtualization failed.");
+            var drive = new DriveInfo(Path.GetPathRoot(directory)!);
+            var physicalMemoryAvailable = GetPhysicallyInstalledSystemMemory(out var memoryKiB);
             return new { Status = "performance-measured", Os = System.Runtime.InteropServices.RuntimeInformation.OSDescription, Architecture = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString(),
+                CpuModel = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\CentralProcessor\0", "ProcessorNameString", null)?.ToString()?.Trim() ?? "unavailable",
+                PhysicalMemoryBytes = physicalMemoryAvailable ? (ulong?)(memoryKiB * 1024) : null, Storage = new { drive.DriveType, drive.DriveFormat, drive.TotalSize, drive.AvailableFreeSpace, PhysicalSsd = "not-established" },
                 LogicalProcessors = Environment.ProcessorCount, DatasetRows = 100000, Dataset = "Owned synthetic SQLite metadata; no 100k physical music files or filesystem scan", SeedMilliseconds = seed.Elapsed.TotalMilliseconds,
                 State = "Warm: Loaded query and serialized warmup drained; no forced GC", Queries = Timings(querySamples, 250), QueryAndUi = Timings(uiSamples, 250),
                 UiMethod = "Production LoadPageAsync + UpdateLayout + Dispatcher ContextIdle; excludes 200 ms typing debounce", MaximumRealizedContainers = realized,
                 MeasurementMilliseconds = timer.Elapsed.TotalMilliseconds, ProcessCpuPercentOfOneCore = cpu, ProcessCpuPercentOfAllLogicalProcessors = cpu / Environment.ProcessorCount,
                 WorkingBytesBefore = workingBefore, WorkingBytesAfter = process.WorkingSet64, PrivateBytesBefore = privateBefore, PrivateBytesAfter = process.PrivateMemorySize64,
+                LargeLibraryWorkingSetTargetBytes = 450L * 1024 * 1024, EndWorkingSetWithinTarget = process.WorkingSet64 < 450L * 1024 * 1024,
                 HandlesBefore = handlesBefore, HandlesAfter = process.HandleCount, Acceptance = "Hosted Windows measurement; Windows 11 reference SSD/device/two-hour acceptance remains open" };
         }
         finally { window?.Close(); await model.DisposeWithoutSavingAsync(); Directory.Delete(directory, true); }
