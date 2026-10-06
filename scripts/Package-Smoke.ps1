@@ -85,6 +85,29 @@ try {
     }
     $audio = Get-Content (Join-Path $out 'g11-device-probe.json') -Raw | ConvertFrom-Json
     if ($audio.Status -ne 'g11-device-probe-complete' -or -not $audio.PowerShellVersion.StartsWith('5.1.')) { throw 'Actual native device enumeration did not complete.' }
+    $g12Modes = @('Mixer')
+    if ($audio.ActualNativeAudio.EnabledOutputs -eq 0) { $g12Modes += 'Shared' }
+    foreach ($mode in $g12Modes) {
+        $before = @(Get-ChildItem $owned -Directory -Filter 'player-acceptance-*' | ForEach-Object Name)
+        try {
+            & $legacy -NoProfile -NonInteractive -ExecutionPolicy Bypass -File (Join-Path $app 'acceptance/Stress-Acceptance.ps1') -CandidateDirectory $app -OutputDirectory $owned -Mode $mode -DurationSeconds 60
+            if ($LASTEXITCODE -ne 0) { throw 'Packaged G12 runner failed under Windows PowerShell 5.1.' }
+        } finally {
+            Get-ChildItem $owned -Directory -Filter 'player-acceptance-*' | Where-Object Name -notin $before | ForEach-Object {
+                foreach ($name in @('g12-stress.json','g12-native.json','g12-failure.json')) {
+                    $file = Join-Path $_.FullName $name
+                    if (Test-Path $file) { Copy-Item $file (Join-Path $out "g12-$mode-$name") }
+                }
+            }
+        }
+        $g12 = Get-Content (Join-Path $out "g12-$mode-g12-stress.json") -Raw | ConvertFrom-Json
+        if (-not $g12.PowerShellVersion.StartsWith('5.1.')) { throw 'G12 did not use built-in Windows PowerShell.' }
+        if ($mode -eq 'Mixer') {
+            if ($g12.Status -ne 'g12-native-mixer-passed' -or $g12.ActualNative.StressChanges -ne 1000 -or
+                $g12.ActualNative.ActualSoakSeconds -lt 60 -or -not $g12.ActualNative.SourceHashesAndExclusiveReopen -or
+                $g12.ActualNative.TwoHourOutput -ne 'not-run') { throw 'G12 actual native mixer stress/short soak evidence is incomplete.' }
+        } elseif ($g12.Status -ne 'blocked' -or $g12.ActualNative.Output -ne 'not-run') { throw 'An unavailable output was incorrectly accepted as playback.' }
+    }
     [ordered]@{ Status = 'packaged-executable-smoke-passed'; SourceCommit = $audit.SourceCommit; ZipSha256 = $audit.ZipSha256; UnicodeExtractionPath = $true; ArbitraryWorkingDirectory = $true; InvalidExternalDotnetRoot = $true; TamperRejected = $rejected; Windows = [Environment]::OSVersion.VersionString; CleanWindows11WithoutSdk = 'not-run'; NetworkDisconnected = 'not-run'; DeviceOutput = 'not-run'; DistributionApproved = $false } | ConvertTo-Json | Set-Content (Join-Path $out 'package-smoke.json') -Encoding utf8
 } finally {
     if (Test-Path $owned) { Remove-Item $owned -Recurse -Force }

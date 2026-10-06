@@ -1,5 +1,11 @@
 # Implementation checkpoint
 
+## G12 native stress/soak automation (2026-10-06)
+
+Implemented an owned self-contained stress route and Windows PowerShell 5.1 runner. Mixer performs 50 warm-up + 1000 measured real frame-scheduled decoder transitions, checks adopted occurrence IDs, positive incoming timelines and reference PCM on both channels, then consumes finite/non-silent production native PCM paced by a real monotonic clock. Shared/Exclusive require an actual pinned WASAPI endpoint for 1000 advancing running replacements and sustained scheduled playback; missing output is blocked. Default soak is 7200 seconds excluding stress. Short runs cannot claim two-hour output. Reports preserve CPU/raw handles/private bytes/working set/thread samples, actual durations, timing p95, resource ranges/regression slopes, hardware/version/source hashes and exclusive handle release. No forced GC or growing audio capture buffers. [Exact workflow and scope](STRESS_ACCEPTANCE.md).
+
+Local locked Release compilation/core checks pass. New CPU-accounting and resource-validation tests include uneven sample times, intermediate retention hidden by final cleanup, missing/nonfinite/reset counters and multi-thread CPU above one-core capacity. Windows CI adds a 60-second actual native mixer soak and 1000 PCM transitions via the extracted apphost under Windows PowerShell 5.1; native execution is pending the next main CI. This headless diagnostic does not close full WPF/reference-PC CPU/memory, 2-hour device output, listening or hardware-transition acceptance.
+
 ## G11 endpoint/digital workflows (2026-10-06)
 
 Implemented an explicit owned self-contained apphost route and packaged Windows PowerShell 5.1 runner for actual native device enumeration, shared/exclusive transport and twenty running replacements, app/system-gain observation, format change, unavailable-endpoint refusal and retry, and bounded selected-endpoint stereo loopback. Actual captured PCM is saved with a hash, aligned against a positive reference and measured for pre/post lag and both-channel boundary error. The covered digital profile is contiguous PCM/WAV CUE only; other codecs/DSP/crossfade, physical hotplug/sleep, sustained output and listening remain open. Exclusive output now reopens for changed source frequency/channel layout. [Runner, thresholds and boundaries](AUDIO_ACCEPTANCE.md).

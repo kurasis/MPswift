@@ -1,0 +1,25 @@
+# G12 native transition stress and sustained resource workflow
+
+The verified ZIP includes `acceptance/Stress-Acceptance.ps1` for Windows x64 with built-in Windows PowerShell 5.1. No SDK or encoder download is required. Close the normal player first. Only the full manifested candidate inventory is copied into a new token-owned directory; existing Data/music/apps/device settings remain untouched. Reports include source/package/native hashes and versions, OS/CPU/RAM/media-driver details, actual phase duration and raw samples. Owned WAV inputs use deterministic low-amplitude PCM16 stereo 48 kHz tones, with hashes and exclusive reopening after disposal.
+
+```powershell
+# Actual production mixer PCM and a short real-wall-time check, without any sound endpoint.
+& .\acceptance\Stress-Acceptance.ps1 -CandidateDirectory . -Mode Mixer -DurationSeconds 60
+# Two-hour callback workload: useful native evidence, still not device output.
+& .\acceptance\Stress-Acceptance.ps1 -CandidateDirectory . -Mode Mixer
+# Real device stress followed by at least two hours of advancing WASAPI output.
+& .\acceptance\Stress-Acceptance.ps1 -CandidateDirectory . -Mode Shared
+& .\acceptance\Stress-Acceptance.ps1 -CandidateDirectory . -Mode Exclusive
+```
+
+The default soak is **7200 seconds**, excluding the stress/warm-up phase. `-DurationSeconds` accepts 60–7200; shortened runs are explicitly short checks. `-DeviceId` pins an exact native endpoint ID; otherwise the real default is resolved once and pinned. Missing output reports **blocked**, never simulated playback. Shared/Exclusive tones can be audible; set a comfortable Windows listening level before running. Unsupported exclusive formats return errors with no automatic shared fallback. No master volume/mute setters are used.
+
+Mixer runs 50 warm-up plus **1000 measured actual frame-scheduled transitions** through the production `BassMixerGraph`, opens real independent decoders, verifies each adopted occurrence and positive incoming timeline, and compares each incoming 10 ms PCM block with its owned source reference on both channels. This is distinct from the existing 1000 preparation/seek/stop test. It then pulls actual native PCM in 10 ms blocks paced by a monotonic wall clock, continually schedules/reconciles new real decoder occurrences, and checks finite/non-silent output and consumed PCM duration. Acceleration is allowed only for the separately labelled transition phase; soak wall time is never accelerated.
+
+Shared/Exclusive use the production `BassAudioBackend` on one owner thread: 50 warm-up and 1000 measured running replacements must each reach a positive consumed position within 3 seconds. The requested mode is checked against actual negotiated information. The subsequent soak continually schedules owned three-second sources, observes exact adopted occurrence IDs and refuses unexpected EOF. Only a successful real-output run with at least 7200 elapsed soak seconds can report two-hour output observed. This is timeline/consumption evidence, not a digital loopback or human listening record.
+
+Sampling follows warm-up, every 100 stress transitions and every 5–60 seconds during soak. The bounded progress JSONL is flushed outside the audio callback; no captured audio grows in memory and no forced GC is performed. CPU is process CPU-time delta divided by actual elapsed wall time and observed available logical processors; a one-core equivalent is also reported and may exceed 100% for multiple busy threads. Samples include handles, private bytes, working set and thread count. Analysis reports endpoint growth, observed range, maximum working set and least-squares handle/private-memory slopes at the actual sample times. Guards allow at most 32 handles and 64 MiB private growth/range; final cleanup cannot hide an intermediate excess. These guards and short slopes do not establish an indefinite stable plateau.
+
+`g12-stress.json`, `g12-native.json` and `g12-progress.jsonl` remain in the printed owned directory. A failed run retains partial samples and reason. The helper times out/kills only its own child and disposes it on an interrupted/failed pipeline. Do not substitute missing samples with placeholders. Preserve UTC phase timestamps, package/source/dataset hashes, raw counters, CPU accounting and actual failures together.
+
+Hosted CI executes Mixer for 60 real seconds plus its 1000 native PCM transitions through the extracted self-contained apphost under Windows PowerShell 5.1. If actual Probe finds no outputs, CI also requires Shared to report blocked. Neither closes the two-hour/device gate. G12 still requires long real device runs and full WPF/reference Windows 11 PC resource measurements (>=4 logical cores, >=8 GiB RAM, verified SSD), typical codecs, UI/window states, 10k/100k datasets, cold/warm caches and idle CPU. This headless apphost's CPU includes diagnostic PCM validation/sampling and excludes the full player window/library/waveform workload; the specification's <3% CPU/<250 MiB working-set comparisons cannot be marked met from this profile. Physical transitions/listening remain independent.

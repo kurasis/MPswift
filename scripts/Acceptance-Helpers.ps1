@@ -54,7 +54,11 @@ function Start-PlayerAcceptanceProcess {
     try {
         if (-not $process.WaitForExit($TimeoutSeconds * 1000)) { $process.Kill(); $process.WaitForExit(); throw 'Owned acceptance apphost timed out.' }
         [pscustomobject]@{ ProcessId = $process.Id; ExitCode = $process.ExitCode }
-    } finally { $process.Dispose() }
+    } finally {
+        # A stopped/failed invoking pipeline must not leave this owned acceptance child running.
+        if (-not $process.HasExited) { $process.Kill(); $process.WaitForExit(5000) | Out-Null }
+        $process.Dispose()
+    }
 }
 function Send-PlayerNetworkControl {
     $listener = [Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback, 0)

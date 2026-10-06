@@ -29,6 +29,25 @@ public partial class App : Application
     public string? InstancePipeName => _instance?.PipeName;
     private async void OnStartup(object sender, StartupEventArgs e)
     {
+        if (e.Args.Length is 3 or 4 && e.Args[0] == "--stress-acceptance" && e.Args[1] is "mixer" or "shared" or "exclusive" &&
+            File.Exists(Path.Combine(Environment.CurrentDirectory, AcceptanceWorkspace.Marker)))
+        {
+            ShutdownMode = ShutdownMode.OnExplicitShutdown; var owned = false;
+            try
+            {
+                var root = AcceptanceWorkspace.Validate(); owned = true;
+                using var instance = new SingleInstanceService();
+                if (!instance.IsPrimary) throw new InvalidOperationException("Stress acceptance requires the other player instance to be closed.");
+                if (!int.TryParse(e.Args[2], System.Globalization.NumberStyles.None, CultureInfo.InvariantCulture, out var seconds) || seconds is < 60 or > 7200)
+                    throw new ArgumentException("Soak duration must be 60 through 7200 seconds.");
+                var report = await Task.Run(() => StressAcceptanceValidation.Run(root, e.Args[1], seconds, e.Args.Length == 4 ? e.Args[3] : null));
+                AcceptanceWorkspace.WriteReport("g12-native.json", report);
+                var status = JsonSerializer.SerializeToElement(report).GetProperty("Status").GetString();
+                Shutdown(status is "g12-native-mixer-passed" or "g12-output-workflow-passed" ? 0 : status == "blocked" ? 3 : 1);
+            }
+            catch (Exception error) { if (owned) AcceptanceWorkspace.WriteReport("g12-failure.json", new { Status = "failed", error.Message }); Shutdown(1); }
+            return;
+        }
         if (e.Args.Length is 2 or 3 && e.Args[0] == "--audio-acceptance" && e.Args[1] is "probe" or "shared" or "exclusive" or "digital" &&
             File.Exists(Path.Combine(Environment.CurrentDirectory, AcceptanceWorkspace.Marker)))
         {

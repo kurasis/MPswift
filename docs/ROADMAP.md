@@ -38,3 +38,5 @@ G8/G9 are implemented and the observed Windows cases passed at `0ce6a9b` in [run
 | G13 — Distribution acceptance | Licensing/source/notices review and approved version 1.0 | Development prereleases do not authorize licensing purchases/stable acceptance |
 
 G10/G11 workflows are implemented. Hosted Windows G10 EN/RU first/restart and controlled ETW plus G11 native Probe pass at `dec7664` in [run 37435560367](https://github.com/kurasis/MPswift/actions/runs/37435560367); [exact evidence](evidence/stage-g10-g11-windows.json). Zero enabled hosted outputs leaves actual shared/exclusive/capture/listening gates open. G12 and G13 are the next implementation/workflow slices; clean Windows 11, hardware and manual acceptance remain mandatory.
+
+G12 now implements owned native frame-transition and timed soak/resource runners, including two-hour real WASAPI profiles. CI covers a short native mixer workload; output/reference-PC/full UI acceptance remains open. See [stress workflow](STRESS_ACCEPTANCE.md).
