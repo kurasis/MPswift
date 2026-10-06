@@ -1,11 +1,11 @@
 {
   "package": {
     "Status": "local-candidate-packaged",
-    "SourceCommit": "3cc26313dfdfb3ea03759f100161464c83424a9b",
+    "SourceCommit": "1f3e664468087188dd7893c360b3a9946f89af17",
     "SourceTreeDirty": false,
-    "Zip": "LocalAudioPlayer-dev-3cc26313dfdf-win-x64.zip",
-    "ZipSha256": "0e0331bd4dec1e796bd33baae098bfa95f369b0adb62133aa1bdd772b5a3a6f4",
-    "Bytes": 85359977,
+    "Zip": "LocalAudioPlayer-dev-1f3e66446808-win-x64.zip",
+    "ZipSha256": "cce375d1abac00f4952273ebb12d370ae6e265b8b9787ac9a5fdd82cca226ad6",
+    "Bytes": 85361406,
     "Files": 550,
     "Dependencies": 14,
     "NativeLibraries": 13,
@@ -13,7 +13,7 @@
   },
   "integrity": {
     "Status": "candidate-integrity-negative-checks-passed",
-    "SourceCommit": "3cc26313dfdfb3ea03759f100161464c83424a9b",
+    "SourceCommit": "1f3e664468087188dd7893c360b3a9946f89af17",
     "SourceTreeDirty": false,
     "Checks": [
       "changed file",
@@ -21,7 +21,7 @@
       "extra file",
       "empty checksum list"
     ],
-    "ZipSha256": "0e0331bd4dec1e796bd33baae098bfa95f369b0adb62133aa1bdd772b5a3a6f4",
+    "ZipSha256": "cce375d1abac00f4952273ebb12d370ae6e265b8b9787ac9a5fdd82cca226ad6",
     "RestoredCopyPassed": true
   }
 }
