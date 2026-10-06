@@ -56,7 +56,7 @@ public static class IntegrationSmokeValidation
         Check(range.Maximum == model.DurationSeconds && !range.IsReadOnly && peer.GetName() == Strings.Seek, "Seek accessible range/name incorrect.");
         range.SetValue(0.25); await AwaitAsync(() => Math.Abs(model.SeekPosition - 0.25) < 0.01);
         var resources = new ResourceManager("Player.App.Resources.Strings", typeof(Strings).Assembly);
-        var english = resources.GetResourceSet(CultureInfo.GetCultureInfo("en"), true, false)!;
+        var english = resources.GetResourceSet(CultureInfo.InvariantCulture, true, false)!;
         var russian = resources.GetResourceSet(CultureInfo.GetCultureInfo("ru"), true, false)!;
         var resourceCount = 0;
         foreach (System.Collections.DictionaryEntry entry in english)

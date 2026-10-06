@@ -91,7 +91,14 @@ public sealed class MediaSessionService : IDisposable
     // Documented desktop ISystemMediaTransportControlsInterop, needed because WPF has no CoreWindow.
     [ComImport, Guid("DDB0472D-C911-4A1F-86D9-DC3D71A95F5A"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     private interface ISystemMediaTransportControlsInterop
-    { [PreserveSig] int GetForWindow(nint window, ref Guid iid, out nint controls); }
+    {
+        // IInspectable extends IUnknown with these three slots. GetForWindow is slot 6,
+        // not slot 3; omitting them calls GetIids with an HWND as an output pointer.
+        [PreserveSig] int GetIids(out uint count, out nint ids);
+        [PreserveSig] int GetRuntimeClassName(out nint className);
+        [PreserveSig] int GetTrustLevel(out int trustLevel);
+        [PreserveSig] int GetForWindow(nint window, ref Guid iid, out nint controls);
+    }
     [DllImport("combase.dll", CharSet = CharSet.Unicode)] private static extern int WindowsCreateString(string source, int length, out nint value);
     [DllImport("combase.dll")] private static extern int WindowsDeleteString(nint value);
     [DllImport("combase.dll")] private static extern int RoGetActivationFactory(nint name, ref Guid iid, [MarshalAs(UnmanagedType.Interface)] out ISystemMediaTransportControlsInterop factory);
