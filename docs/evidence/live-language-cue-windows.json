@@ -1,0 +1,224 @@
+{
+  "sourceCommit": "c43c81a90e5e49c269e2be708dcb2c830eb57802",
+  "runUrl": "https://github.com/kurasis/MPswift/actions/runs/37464467924",
+  "runAttempt": 1,
+  "runConclusion": "success",
+  "productVersion": "0.2.55-dev.1",
+  "jobs": [
+    {
+      "id": 112271901195,
+      "name": "build (windows-2022)",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37464467924/job/112271901195",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 112271901536,
+      "name": "build (ubuntu-24.04)",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37464467924/job/112271901536",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 112275492676,
+      "name": "Publish separate Windows ZIP prerelease",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37464467924/job/112275492676",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "tests": {
+    "evidence-windows-2022": [
+      {
+        "total": "175",
+        "executed": "175",
+        "passed": "175",
+        "failed": "0",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      }
+    ],
+    "evidence-ubuntu-24.04": [
+      {
+        "total": "175",
+        "executed": "175",
+        "passed": "175",
+        "failed": "0",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      }
+    ]
+  },
+  "windowsUi": {
+    "smoke/packaged-ui.json": {
+      "CueImage": {
+        "Status": "cue-image-passed",
+        "InPlaceExpansion": true,
+        "WholeImageFallback": true,
+        "AmbiguityRefused": true,
+        "OutOfRangeRefused": true,
+        "FolderPairWithoutDuplicate": true,
+        "DeliberateDuplicateImages": true,
+        "StableLogicalIdentity": true,
+        "PersistedOccurrences": true,
+        "SourceUnchanged": true,
+        "SourceHandleReleased": true,
+        "NativeSongDurations": [
+          1,
+          1,
+          1
+        ],
+        "NoAutoplay": true,
+        "MissingWavReference": true,
+        "RenamedImage": true,
+        "UppercaseExtensions": true,
+        "Windows1251Titles": true,
+        "LastSongDuration": true,
+        "InvalidFolderBoundsFallback": true
+      },
+      "Customization": {
+        "Status": "customization-passed",
+        "CompactMenu": true,
+        "KeyboardSubmenu": true,
+        "NestedAction": true,
+        "LocalizedSettingsShortcut": true,
+        "SettingsPersisted": true,
+        "DraftCancel": true,
+        "PlaybackPreserved": true,
+        "LanguageChange": "immediate; persisted across restarts",
+        "UniformVectorIcons": true,
+        "VisibleBuildVersion": "0.2.55-dev.1"
+      }
+    },
+    "smoke/ui-en.json": {
+      "CueImage": {
+        "Status": "cue-image-passed",
+        "InPlaceExpansion": true,
+        "WholeImageFallback": true,
+        "AmbiguityRefused": true,
+        "OutOfRangeRefused": true,
+        "FolderPairWithoutDuplicate": true,
+        "DeliberateDuplicateImages": true,
+        "StableLogicalIdentity": true,
+        "PersistedOccurrences": true,
+        "SourceUnchanged": true,
+        "SourceHandleReleased": true,
+        "NativeSongDurations": [
+          1,
+          1,
+          1
+        ],
+        "NoAutoplay": true,
+        "MissingWavReference": true,
+        "RenamedImage": true,
+        "UppercaseExtensions": true,
+        "Windows1251Titles": true,
+        "LastSongDuration": true,
+        "InvalidFolderBoundsFallback": true
+      },
+      "Customization": {
+        "Status": "customization-passed",
+        "CompactMenu": true,
+        "KeyboardSubmenu": true,
+        "NestedAction": true,
+        "LocalizedSettingsShortcut": true,
+        "SettingsPersisted": true,
+        "DraftCancel": true,
+        "PlaybackPreserved": true,
+        "LanguageChange": "immediate; persisted across restarts",
+        "UniformVectorIcons": true,
+        "VisibleBuildVersion": "0.2.55-dev.1"
+      }
+    },
+    "smoke/ui-ru.json": {
+      "CueImage": {
+        "Status": "cue-image-passed",
+        "InPlaceExpansion": true,
+        "WholeImageFallback": true,
+        "AmbiguityRefused": true,
+        "OutOfRangeRefused": true,
+        "FolderPairWithoutDuplicate": true,
+        "DeliberateDuplicateImages": true,
+        "StableLogicalIdentity": true,
+        "PersistedOccurrences": true,
+        "SourceUnchanged": true,
+        "SourceHandleReleased": true,
+        "NativeSongDurations": [
+          1,
+          1,
+          1
+        ],
+        "NoAutoplay": true,
+        "MissingWavReference": true,
+        "RenamedImage": true,
+        "UppercaseExtensions": true,
+        "Windows1251Titles": true,
+        "LastSongDuration": true,
+        "InvalidFolderBoundsFallback": true
+      },
+      "Customization": {
+        "Status": "customization-passed",
+        "CompactMenu": true,
+        "KeyboardSubmenu": true,
+        "NestedAction": true,
+        "LocalizedSettingsShortcut": true,
+        "SettingsPersisted": true,
+        "DraftCancel": true,
+        "PlaybackPreserved": true,
+        "LanguageChange": "immediate; persisted across restarts",
+        "UniformVectorIcons": true,
+        "VisibleBuildVersion": "0.2.55-dev.1"
+      }
+    }
+  },
+  "screenshots": {
+    "live-language-en.png": "4c9f5f6065912131919bfc93bf8accb91d6165f6f5a67804872fbcdaade2f0f6",
+    "live-language-ru.png": "112e525e93a1614d0f59c3fb4ff6da0aa96dcfa3808fb6d26e1f8650554f9dc4",
+    "cue-image-ru.png": "dae2a63eae5610fe4b37741d5de9000dee72bd34a5b8665f632e2a5751f79c5b",
+    "settings-ru.png": "c8becd2fe6e0f552f5868abb50862ca548914394fa095c82934d24cde17f542f"
+  },
+  "publishedDownload": {
+    "status": "published-download-verified",
+    "sourceCommit": "c43c81a90e5e49c269e2be708dcb2c830eb57802",
+    "runUrl": "https://github.com/kurasis/MPswift/actions/runs/37464467924",
+    "releaseUrl": "https://github.com/kurasis/MPswift/releases/tag/build-37464467924-attempt-1",
+    "zipUrl": "https://github.com/kurasis/MPswift/releases/download/build-37464467924-attempt-1/MPswift-0.2.55-dev.1-c43c81a90e5e-win-x64.zip",
+    "bytes": 85688638,
+    "sha256": "9f99f5a82e6c31fc20733874098059ac32b3717fb1971679a00bf69bc39624eb"
+  },
+  "windowsArtifactSha256": "6958bc03d48a3a1d2f4fd7b4fc72ddeebe90894391b3147e5cde9f25eebb9b86",
+  "packageSmoke": {
+    "Status": "packaged-executable-smoke-passed",
+    "SourceCommit": "c43c81a90e5e49c269e2be708dcb2c830eb57802",
+    "ZipSha256": "9f99f5a82e6c31fc20733874098059ac32b3717fb1971679a00bf69bc39624eb",
+    "UnicodeExtractionPath": true,
+    "ArbitraryWorkingDirectory": true,
+    "InvalidExternalDotnetRoot": true,
+    "TamperRejected": true,
+    "Windows": "Microsoft Windows NT 10.0.20348.0",
+    "CleanWindows11WithoutSdk": "not-run",
+    "NetworkDisconnected": "not-run",
+    "DeviceOutput": "not-run",
+    "DistributionApproved": false
+  }
+}

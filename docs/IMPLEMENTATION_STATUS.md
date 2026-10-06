@@ -8,7 +8,7 @@ All projects derive informational/file versions from the workflow run number and
 
 Single-image CUE association now handles a missing WAV/APE or renamed FILE: same reference stem, then CUE stem, then the sole same-folder FLAC; existing referenced files and multi-file sheets are preserved. Ambiguous sheets/images and invalid native-duration bounds retain the original FLAC. The saved legacy-document preference explicitly selects Windows-1251 by default, with Windows-1252/DOS-866/Unicode-only alternatives; Unicode is always decoded first. Last-song duration is derived from the independent native decoder. Source bytes stay unchanged. This supersedes the initial exact-FILE-only companion behavior below.
 
-Locked local cross-build and managed checks are recorded in TEST_RESULTS. Windows native/WPF and packaged executable evidence must pass on this source before publication.
+Linux and Windows each passed **175 tests** at `c43c81a90e5e` in [run 37464467924](https://github.com/kurasis/MPswift/actions/runs/37464467924). EN/RU and extracted-package native/WPF checks passed, including live language, rendered icon bounds, missing-WAV/renamed/Windows-1251 CUE imports and final-song durations. The published **0.2.55-dev.1** ZIP was downloaded, all four asset digests checked, and its full 558-file / 13-native-library inventory verified. [Exact source, reports, screenshot hashes and GitHub download receipt](evidence/live-language-cue-windows.json). This documentation checkpoint retains evidence for that exact implementation source; subsequent workflow versions include their own source and inventory metadata.
 
 ## Whole FLAC images with companion CUE (2026-10-06)
 

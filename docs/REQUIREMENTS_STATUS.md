@@ -2,7 +2,7 @@
 
 AC-016 compatibility follow-up: missing single-image WAV/APE FILE references can resolve to an unambiguous same-folder FLAC, with native bounds validation and read-only source preservation. A saved legacy-document encoding preference handles Windows-1251 albums; UTF-8/UTF-16 retain precedence. The last logical song receives a native duration hint. Existing reference files, multi-file CUE sheets and ambiguous associations remain protected.
 
-AC-030 / localization follow-up: Settings Apply switches EN/RU immediately in the current player window; action icons use one 18-DIP vector canvas. Compiled versions derive from the workflow number/attempt and are visible in the title/help, GitHub prerelease, ZIP and manifests. Windows native/WPF/package checks must pass again for this source before it is published.
+AC-030 / localization follow-up: Settings Apply switches EN/RU immediately in the current player window; action icons use one 18-DIP vector canvas. Compiled versions derive from the workflow number/attempt and are visible in the title/help, GitHub prerelease, ZIP and manifests. Windows EN/RU/native/WPF and extracted-package checks passed at `c43c81a90e5e` in [run 37464467924](https://github.com/kurasis/MPswift/actions/runs/37464467924), with 175 managed tests on each OS; see [Exact source, reports, screenshot hashes and GitHub download receipt](evidence/live-language-cue-windows.json).
 
 AC-016 follow-up: whole-image FLAC now discovers an unambiguous external CUE automatically and existing rows can expand in place. Native duration validation, source preservation and no whole-file duplication are covered by Windows smoke; explicit multi-file CUE behavior remains available.
 
