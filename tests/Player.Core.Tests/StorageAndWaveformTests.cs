@@ -118,7 +118,7 @@ public sealed class StorageAndWaveformTests : IDisposable
         Assert.Equal(100, file.Load().Volume); Assert.Equal(16, file.Load().WaveformCacheMiB);
         Assert.Contains("25", File.ReadAllText(Path.Combine(_directory, "settings.json.bak")));
         File.WriteAllText(Path.Combine(_directory, "settings.json"), "{\"SchemaVersion\":2,\"Volume\":20}");
-        Assert.Throws<InvalidDataException>(file.Load);
+        Assert.Throws<SettingsCompatibilityException>(file.Load);
         Assert.Contains("\"SchemaVersion\":2", File.ReadAllText(Path.Combine(_directory, "settings.json")));
     }
     [Fact]

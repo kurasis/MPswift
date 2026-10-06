@@ -135,3 +135,10 @@ Local candidate `LocalAudioPlayer-dev-1f3e66446808-win-x64.zip` is from clean co
 ## GitHub build publication (2026-10-06)
 
 Added separate main-only development prerelease publication after successful Linux/Windows matrix checks, Windows package smoke and artifact handoff. The publisher validates clean commit identity, package/integrity agreement, ZIP size/hash/checksum and GitHub asset digests before publishing a draft. The first end-to-end workflow will provide the actual publication/download evidence; previous runtime evidence remains source-specific.
+
+
+## Stage G2 settings recovery and G3 real process crash harness (2026-10-06)
+
+Locked local Release cross-build passes **0 warnings/errors; 102 passed / 0 failed / 0 skipped**. Seven new cases exercise actual settings/backup files: explicit validated restore with retained corrupted bytes, refusal preserving both files, invalid backup never offered, unsupported schema 0/2 never downgraded, missing main requiring a choice and export clamping/no overwrite. Publisher/runtime paths retain their earlier source-specific evidence.
+
+Crash-Smoke.ps1 now runs after EN/RU smoke on Windows. It creates only a fresh owned directory, commits a production WPF checkpoint, holds destructive changes in an uncommitted diagnostic SQLite transaction, kills the actual apphost and restarts it. The actual Windows result is pending; no passed placeholder or device/migration/power-loss assertion is made. Failures retain a JSON report; private checkpoint/database files are not uploaded.

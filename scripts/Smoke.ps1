@@ -51,6 +51,7 @@ try {
         Copy-Item (Join-Path $directory 'stage-c-window.png') (Join-Path $directory "stage-f-window-$language.png")
         Write-Host ($ui | ConvertTo-Json -Depth 5)
     }
+    & "$PSScriptRoot/Crash-Smoke.ps1"
     if ($Play) {
         $result = & dotnet $tool --engine-play $fixture
         $code = $LASTEXITCODE

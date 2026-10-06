@@ -29,7 +29,9 @@ public partial class App : Application
     public string? InstancePipeName => _instance?.PipeName;
     private async void OnStartup(object sender, StartupEventArgs e)
     {
-        var smoke = e.Args.Length == 3 && e.Args[0] == "--ui-smoke";
+        var uiSmoke = e.Args.Length == 3 && e.Args[0] == "--ui-smoke";
+        var crashSmoke = e.Args.Length == 3 && e.Args[0] == "--crash-smoke" && e.Args[1] is "checkpoint" or "verify" && File.Exists(Path.Combine(Environment.CurrentDirectory, ".player-crash-validation"));
+        var smoke = uiSmoke || crashSmoke;
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
         OpenRequest? request = null;
         try { if (!smoke) request = OpenRequest.ParseArguments(e.Args, Environment.CurrentDirectory); }
@@ -67,14 +69,23 @@ public partial class App : Application
             });
         }
         catch (Exception error) { MessageBox.Show(Strings.Get("ForwardFailed") + "\n\n" + error.Message, Player.Core.ProductInfo.Name); Shutdown(3); return; }
-        using var validation = smoke ? new UiSmokeValidation() : null;
+        using var validation = uiSmoke ? new UiSmokeValidation() : null;
         if (smoke) ShutdownMode = ShutdownMode.OnExplicitShutdown;
         string directory;
-        try { directory = smoke ? StorageLocation.Prepare(Path.Combine(Environment.CurrentDirectory, "artifacts", "smoke", "stage-c-data")) : StorageLocation.Resolve(); }
+        try { directory = smoke ? StorageLocation.Prepare(Path.Combine(Environment.CurrentDirectory, "artifacts", "smoke", crashSmoke ? "stage-g-crash-data" : "stage-c-data")) : StorageLocation.Resolve(); }
         catch (Exception error) { MessageBox.Show(error.Message, Strings.Get("StorageUnavailable")); Shutdown(1); return; }
+        var settingsRecovered = false;
         try
         {
-            var language = new SettingsFile(directory).Load().Validate().Language;
+            var startupSettings = new SettingsFile(directory);
+            var language = startupSettings.LoadWithRecovery(error =>
+            {
+                if (smoke) return false;
+                Strings.SetLanguage(startupSettings.LoadBackup().Language);
+                settingsRecovered = MessageBox.Show(Strings.Get("RestoreSettingsPrompt") + "\n\n" + error.Message,
+                    Strings.Get("SavedDataUnavailable"), MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes;
+                return settingsRecovered;
+            }).Language;
             Strings.SetLanguage(language);
             var culture = CultureInfo.GetCultureInfo(language == "ru" ? "ru-RU" : "en-US");
             CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = culture;
@@ -115,6 +126,7 @@ public partial class App : Application
             }
             else { ReportStartupFailure(smoke, error); Shutdown(1); return; }
         }
+        if (settingsRecovered) model.Message = Strings.Get("SettingsRestored");
         window.Width = Math.Min(model.WindowSettings.WindowWidth, SystemParameters.WorkArea.Width);
         window.Height = Math.Min(model.WindowSettings.WindowHeight, SystemParameters.WorkArea.Height);
         // Clamp saved bounds to the available work area; disconnected monitors cannot strand the window.
@@ -141,7 +153,9 @@ public partial class App : Application
             object result;
             try
             {
-                result = await validation!.RunAsync(window, model, Path.GetFullPath(e.Args[1]), Path.GetFullPath(e.Args[2]), output);
+                result = crashSmoke
+                    ? await CrashSmokeValidation.RunAsync(model, e.Args[1], Path.GetFullPath(e.Args[2]), directory, output)
+                    : await validation!.RunAsync(window, model, Path.GetFullPath(e.Args[1]), Path.GetFullPath(e.Args[2]), output);
                 await window.CloseForValidationAsync();
             }
             catch (Exception error)
@@ -150,7 +164,7 @@ public partial class App : Application
                 result = new { Status = "ui-smoke-failed", error.Message, error.StackTrace };
                 try { await model.DisposeAsync(); } catch (Exception cleanup) { result = new { Status = "ui-smoke-failed", error.Message, Cleanup = cleanup.Message }; }
             }
-            File.WriteAllText(Path.Combine(output, "ui.json"), JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));
+            File.WriteAllText(Path.Combine(output, crashSmoke ? "crash.json" : "ui.json"), JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));
             Shutdown(resultCode);
         }
         else if (request is not null)

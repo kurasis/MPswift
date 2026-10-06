@@ -6,7 +6,7 @@ This is an executable development candidate and a verification workflow, not app
 
 ```powershell
 ./scripts/Build.ps1
-./scripts/Smoke.ps1 -SkipBuild
+./scripts/Smoke.ps1 -SkipBuild # includes real Windows crash/restart validation
 ./scripts/Package-Candidate.ps1 -SkipBuild
 ./scripts/Package-Smoke.ps1
 ```
@@ -21,7 +21,7 @@ Build uses locked restore. Package creation uses a fresh owned staging folder, a
 | AC-003/005/017–022 output | Device model/driver; shared/exclusive availability/busy; actual output consumption/pause/resume/seek; digital boundary captures; app/system volume separation; unplug/default switch/sleep/resume | Callback PCM proves mixer scheduling only; endpoint output/listening/latency are distinct |
 | AC-004/018/037 profiles | Legal HE-AAC/RF64/WMA(lossless/N conditions)/APE/MPC/DSF/DFF/WV hybrid fixtures, rates/channels; per-profile duration/seek/end/metadata; measured advertised lossy padding/boundaries | 17 real representative fixtures do not cover all P0/P1 profiles; untested combinations remain unclaimed |
 | AC-013/030/036 usability | Windows 11 EN/RU screenshots, keyboard-only and Narrator; physical 100/150/200% DPI; cross-monitor move/removal; 10k scroll and 100k query+UI timings | Realized-container count/search integration is useful but not full performance or manual accessibility |
-| AC-023–025/031/032/039 resilience | Malformed/large tags/artwork; watcher overflow; cancellation; disk full/read-only; kill during checkpoint/migration; database recovery and no autoplay | Existing bounded logic/SQLite/native smoke covers subsets; preserve originals throughout |
+| AC-023–025/031/032/039 resilience | Malformed/large tags/artwork; watcher overflow; cancellation; disk full/read-only; kill during checkpoint/migration; database recovery and no autoplay | Explicit settings recovery has real file tests; owned apphost kill/restart harness is added. Disk-full/read-only/migration interruption/power-loss remain separate; preserve originals throughout |
 | AC-033 stress/resources | Real two-hour output and 1000 transitions; resource samples after warm-up; exact CPU/core accounting, hardware/dataset, handles/working set and p95 operations | Decoder/PCM stress is separate from a two-hour playback/device soak |
 | AC-034 offline traffic | Monitor this PID and child processes during representative local workflows; record method/tool/version; distinguish OS/dev-tool traffic | Source review is not a traffic measurement; all intentional app I/O remains local |
 | AC-035 licensing/inventory | Intended owner use/app source license; BASS/add-ons terms; AAC GPL/FAAD2 and matching source/licensed path; TagLib/TTA LGPL source/relinking; Windows SDK redistributable list; SQLite/runtime notices | nuspec metadata and retained texts do not approve commercial distribution or satisfy every source obligation |

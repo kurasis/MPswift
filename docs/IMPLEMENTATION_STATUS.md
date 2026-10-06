@@ -4,7 +4,7 @@ Updated: **2026-10-06**.
 
 ## Current scope
 
-**Stage F implemented and Windows integration observed; Stage G candidate packaging/verification is in progress. 95 tests pass on Linux and Windows.** Stage D/E Windows native/WPF checks now pass at `c8426e6` in run 37367043601 attempt 2. Stage F integration passed at `39a8a25`; Stage G follows automatically as requested. Full P0 + P1 acceptance remains the target; this is not version 1.0. Russian chat, English repository and automatic development commit/push/merge remain authorized.
+**Stage F implemented and Windows integration observed; Stage G candidate packaging/verification is in progress. 102 local tests pass; the new resilience route awaits Windows validation.** Stage D/E Windows native/WPF checks now pass at `c8426e6` in run 37367043601 attempt 2. Stage F integration passed at `39a8a25`; Stage G follows automatically as requested. Full P0 + P1 acceptance remains the target; this is not version 1.0. Russian chat, English repository and automatic development commit/push/merge remain authorized.
 
 ## Implemented through Stage E
 
@@ -64,3 +64,10 @@ The implemented Stage G automation and final keyboard regression pass at `1f3e66
 ## GitHub build publication (2026-10-06)
 
 The owner requests separate GitHub ZIP downloads for the current and future builds. Main push/manual builds now retain the verified Windows-built package, then publish a distinct `build-<run-id>-attempt-<attempt>` prerelease only after both matrix jobs pass. The publisher checks clean source identity, matching audit/integrity evidence, ZIP/hash/size and all remote asset digests before exposing the draft. Releases attach ZIP, SHA-256 and both audits; failed/PR builds do not publish and previous releases are retained. This owner authorization supersedes the prior no-upload rule; stable version 1.0 and full Stage G license/hardware/offline acceptance remain open.
+
+
+## Stage G2/G3 resilience continuation (2026-10-06)
+
+G2 adds explicit startup recovery for damaged or missing settings only when the previous backup is valid and supported. The prompt uses the backup language. Declining preserves data and exits; recovery uses an atomic replace and retains damaged bytes separately. Unsupported/newer schemas are not offered a downgrade. Export applies validated/clamped settings. Seven new real file tests cover recovery, refusal, invalid backup, unsupported versions, missing main and safe export. Locked local Release build passes 102 tests with no warnings/errors.
+
+G3 follows automatically with an owned Windows diagnostic route: commit real WPF playlists/queue/ratings/settings/native prepared position, keep a diagnostic SQLite transaction uncommitted, forcibly kill the actual apphost and restart the real application model. Assertions cover committed IDs/order/duplicates/enabled flags, queue occurrence IDs/repeat/shuffle, shared ratings, volume/mute, source/active/position and no autoplay, SQLite integrity/foreign keys and unchanged fixture bytes. The transaction is diagnostic, not a claim to have interrupted every production write/migration or a power failure. Windows execution is pending; clean Windows 11/device/full-disk/migration/power-loss acceptance stays open. Main publication remains gated on successful checks.
