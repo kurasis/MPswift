@@ -156,6 +156,8 @@ public static class ResilienceSmokeValidation
     }
     private static async Task<object> FullDiskAsync(string volume, string fixture)
     {
+        var drive = new DriveInfo(volume);
+        Check(drive.DriveFormat == "NTFS" && drive.TotalSize <= 128L * 1024 * 1024, "Full-disk target must be the small owned NTFS validation VHD.");
         var directory = Directory.CreateDirectory(Path.Combine(volume, "owned-player-data")).FullName;
         var database = Path.Combine(directory, "library.db"); var fillPath = Path.Combine(volume, "owned-fill.bin");
         var settings = new SettingsFile(directory); settings.Save(new(Volume: 17)); settings.Save(new(Volume: 29));
@@ -189,7 +191,7 @@ public static class ResilienceSmokeValidation
             Check(backupRejected && !File.Exists(archive), "Full-disk backup published an incomplete archive.");
             File.Delete(fillPath); settings.Save(new(Volume: 35)); await store.SaveAsync(original, true); await BackupBundle.CreateAsync(store, settings.Load(), archive);
             Check(settings.Load().Volume == 35 && File.Exists(archive) && !Directory.GetFiles(directory, "*.tmp").Any() && !Directory.GetDirectories(directory, ".player-backup-*").Any(), "Storage writers did not recover after freeing space.");
-            return new { OwnedNtfsVhd = true, FilledBytes = filled, ActualWindowsDiskFullCode = diskError, ActualSqliteFullCode = sqliteCode,
+            return new { OwnedNtfsVhd = true, FileSystem = drive.DriveFormat, VolumeBytes = drive.TotalSize, FilledBytes = filled, ActualWindowsDiskFullCode = diskError, ActualSqliteFullCode = sqliteCode,
                 TransactionRollbackPreservedCommittedState = true, SettingsAndPreviousBytesPreserved = true, IncompleteBackupNotPublished = true, SaveAndBackupAfterSpaceFreed = true };
         }
         finally { if (File.Exists(fillPath)) File.Delete(fillPath); }
