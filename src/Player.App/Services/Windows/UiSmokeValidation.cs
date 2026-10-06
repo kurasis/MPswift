@@ -45,7 +45,7 @@ public sealed class UiSmokeValidation : TraceListener
         Require(title.Text == first.Title, "Now-playing title binding failed.");
         var slider = (Slider)window.FindName("SeekSlider");
         Require(slider.IsEnabled && slider.Maximum == model.DurationSeconds, "Seek range binding failed.");
-        Require(window.Background is SolidColorBrush background && background.Color == Color.FromRgb(0x24, 0x24, 0x24), "Dark window theme was not applied to the derived window.");
+        Require(window.Background is SolidColorBrush background && background.Color == Color.FromRgb(0x14, 0x17, 0x1C), "Dark window theme was not applied to the derived window.");
         await model.CommitSeekAsync(1);
         await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ContextIdle);
         Require(Math.Abs(model.SeekPosition - 1) < 0.01 && !model.IsPlaying, "Seek failed or started stopped audio.");

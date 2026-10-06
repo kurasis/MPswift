@@ -7,6 +7,8 @@ Replaced the working product name with MPswift, including the apphost, assembly 
 Local locked Release cross-build: zero warnings/errors, 157 managed tests passed. Actual Windows UI, renamed self-contained launch, packaging and screenshots require the new main CI; prior reports remain historical source-specific evidence.
 
 
+First refresh CI `37446186476` passed both builds/157 managed tests per OS and native audio checks. Its UI check correctly stopped on the old hard-coded #242424 palette assertion; updated the expected background to the intentional #14171C design token. UI acceptance and publication require the corrected run.
+
 ## G12 native stress/soak automation (2026-10-06)
 
 Implemented an owned self-contained stress route and Windows PowerShell 5.1 runner. Mixer performs 50 warm-up + 1000 measured real frame-scheduled decoder transitions, checks adopted occurrence IDs, positive incoming timelines and reference PCM on both channels, then consumes finite/non-silent production native PCM paced by a real monotonic clock. Shared/Exclusive require an actual pinned WASAPI endpoint for 1000 advancing running replacements and sustained scheduled playback; missing output is blocked. Default soak is 7200 seconds excluding stress. Short runs cannot claim two-hour output. Reports preserve CPU/raw handles/private bytes/working set/thread samples, actual durations, timing p95, resource ranges/regression slopes, hardware/version/source hashes and exclusive handle release. No forced GC or growing audio capture buffers. [Exact workflow and scope](STRESS_ACCEPTANCE.md).
