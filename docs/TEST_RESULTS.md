@@ -1,5 +1,12 @@
 # Test evidence — Stages A–G
 
+## MPswift identity and visual refresh (2026-10-06)
+
+Replaced the working product name with MPswift, including the apphost, assembly metadata, portable folder and release ZIP prefix. Embedded the owner-supplied icon in the executable, window and tray. Applied a graphite/amber Fluent-inspired theme to the main player and shared controls, with a now-playing card, primary transport action, deliberate track selection, localized search/drop guidance and compact toolbar. Existing storage and IPC identities remain compatible. [Design rationale and sources](DESIGN.md).
+
+Local locked Release cross-build: zero warnings/errors, 157 managed tests passed. Actual Windows UI, renamed self-contained launch, packaging and screenshots require the new main CI; prior reports remain historical source-specific evidence.
+
+
 ## G12 native stress/soak automation (2026-10-06)
 
 Implemented an owned self-contained stress route and Windows PowerShell 5.1 runner. Mixer performs 50 warm-up + 1000 measured real frame-scheduled decoder transitions, checks adopted occurrence IDs, positive incoming timelines and reference PCM on both channels, then consumes finite/non-silent production native PCM paced by a real monotonic clock. Shared/Exclusive require an actual pinned WASAPI endpoint for 1000 advancing running replacements and sustained scheduled playback; missing output is blocked. Default soak is 7200 seconds excluding stress. Short runs cannot claim two-hour output. Reports preserve CPU/raw handles/private bytes/working set/thread samples, actual durations, timing p95, resource ranges/regression slopes, hardware/version/source hashes and exclusive handle release. No forced GC or growing audio capture buffers. [Exact workflow and scope](STRESS_ACCEPTANCE.md).

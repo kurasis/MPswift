@@ -1,6 +1,6 @@
-# Local Audio Player — local user help
+# MPswift — local user help
 
-This is a development candidate for Windows x64. Windows 11 is the release target; clean Windows 11/offline/hardware acceptance is not yet complete. No internet service, account, .NET installation or SDK is required by the self-contained app. Extract the whole folder; do not move only the executable. Start `Player.App.exe`. See `DEVELOPMENT-ONLY.txt` and the dependency review before distributing a copy.
+This is a development candidate for Windows x64. Windows 11 is the release target; clean Windows 11/offline/hardware acceptance is not yet complete. No internet service, account, .NET installation or SDK is required by the self-contained app. Extract the whole folder; do not move only the executable. Start `MPswift.exe`. See `DEVELOPMENT-ONLY.txt` and the dependency review before distributing a copy.
 
 ## Files and playlists
 

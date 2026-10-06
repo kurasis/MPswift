@@ -1,5 +1,7 @@
 # Requirement and acceptance status
 
+MPswift visual refresh: product/icon/output names and shared dark controls updated; see [design and compatibility](DESIGN.md). AC-030 existing automation/minimum-layout checks must pass again on the renamed Windows candidate. Historical acceptance evidence is not rewritten.
+
 ## G12 native stress/soak automation (2026-10-06)
 
 Implemented an owned self-contained stress route and Windows PowerShell 5.1 runner. Mixer performs 50 warm-up + 1000 measured real frame-scheduled decoder transitions, checks adopted occurrence IDs, positive incoming timelines and reference PCM on both channels, then consumes finite/non-silent production native PCM paced by a real monotonic clock. Shared/Exclusive require an actual pinned WASAPI endpoint for 1000 advancing running replacements and sustained scheduled playback; missing output is blocked. Default soak is 7200 seconds excluding stress. Short runs cannot claim two-hour output. Reports preserve CPU/raw handles/private bytes/working set/thread samples, actual durations, timing p95, resource ranges/regression slopes, hardware/version/source hashes and exclusive handle release. No forced GC or growing audio capture buffers. [Exact workflow and scope](STRESS_ACCEPTANCE.md).

@@ -32,7 +32,7 @@ try {
     [IO.File]::WriteAllText((Join-Path $volume '.player-volume-token'), $token)
     @{ Directory = $volume; Token = $token } | ConvertTo-Json | Set-Content (Join-Path $owned '.player-owned-volume')
     'Owned development validation.' | Set-Content (Join-Path $owned '.player-crash-validation')
-    $app = Join-Path $root 'src/Player.App/bin/Release/net10.0-windows10.0.19041.0/win-x64/Player.App.exe'
+    $app = Join-Path $root 'src/Player.App/bin/Release/net10.0-windows10.0.19041.0/win-x64/MPswift.exe'
     $fixture = Join-Path $root 'tests/fixtures/audio/pcm16.wav'
     $start = [Diagnostics.ProcessStartInfo]::new($app)
     $start.UseShellExecute = $false; $start.WorkingDirectory = $owned

@@ -9,16 +9,16 @@ $staging = Join-Path $root ('artifacts/candidate-stage-' + [guid]::NewGuid().ToS
 try {
     if (-not $SkipBuild) { & "$PSScriptRoot/Build.ps1" }
     & "$PSScriptRoot/Setup-Native.ps1"
-    $app = Join-Path $staging 'LocalAudioPlayer'
+    $app = Join-Path $staging 'MPswift'
     & dotnet publish src/Player.App/Player.App.csproj -c Release --no-restore -p:CopyOutputSymbolsToPublishDirectory=false -o $app
     if ($LASTEXITCODE -ne 0) { throw 'Self-contained candidate publish failed.' }
     # Reference-project symbols can survive incremental publish; remove only symbols in this fresh owned stage.
     Get-ChildItem $app -Recurse -Filter '*.pdb' -File | Remove-Item
-    foreach ($required in @('Player.App.exe','Player.App.dll','coreclr.dll','PresentationFramework.dll','Microsoft.Windows.SDK.NET.dll','WinRT.Runtime.dll','ru/Player.App.resources.dll','e_sqlite3.dll')) {
+    foreach ($required in @('MPswift.exe','MPswift.dll','coreclr.dll','PresentationFramework.dll','Microsoft.Windows.SDK.NET.dll','WinRT.Runtime.dll','ru/MPswift.resources.dll','e_sqlite3.dll')) {
         if (-not (Test-Path (Join-Path $app $required))) { throw "Missing packaged runtime/application file: $required" }
     }
     New-Item (Join-Path $app 'docs') -ItemType Directory -Force | Out-Null
-    foreach ($document in @('ARCHITECTURE','FORMAT_SUPPORT','TEST_RESULTS','REQUIREMENTS_STATUS','KNOWN_LIMITATIONS','THIRD_PARTY_NOTICES','RELEASE_ACCEPTANCE','USER_HELP','USER_HELP.ru')) {
+    foreach ($document in @('DESIGN','ARCHITECTURE','FORMAT_SUPPORT','TEST_RESULTS','REQUIREMENTS_STATUS','KNOWN_LIMITATIONS','THIRD_PARTY_NOTICES','RELEASE_ACCEPTANCE','USER_HELP','USER_HELP.ru')) {
         Copy-Item "docs/$document.md" (Join-Path $app "docs/$document.md")
     }
     Copy-Item README.md (Join-Path $app 'README.md')
@@ -79,7 +79,7 @@ try {
         if ($relative -match '(^|/)(Data|Cache|Logs|reference|test-results|\.git)(/|$)|\.(db(-wal|-shm)?|peaks|jsonl|wav|flac|mp3|pdb)$') { throw "Private/development input found in candidate: $relative" }
         [ordered]@{ path = $relative; bytes = $_.Length; sha256 = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() }
     })
-    $manifest = [ordered]@{ schemaVersion = 1; product = 'Local Audio Player'; platform = 'win-x64'; sourceCommit = $source; sourceTreeDirty = $dirty; sdk = (& dotnet --version).Trim(); distributionApproved = $false; evidenceLevel = 'local development candidate; Windows 11 clean/offline/hardware/license gates remain'; files = $files }
+    $manifest = [ordered]@{ schemaVersion = 1; product = 'MPswift'; platform = 'win-x64'; sourceCommit = $source; sourceTreeDirty = $dirty; sdk = (& dotnet --version).Trim(); distributionApproved = $false; evidenceLevel = 'local development candidate; Windows 11 clean/offline/hardware/license gates remain'; files = $files }
     $manifest | ConvertTo-Json -Depth 6 | Set-Content (Join-Path $app 'package-manifest.json') -Encoding utf8
     $sums = @($files | ForEach-Object { $_.sha256 + '  ' + $_.path })
     $sums += (Get-FileHash (Join-Path $app 'package-manifest.json') -Algorithm SHA256).Hash.ToLowerInvariant() + '  package-manifest.json'
@@ -87,7 +87,7 @@ try {
     & "$PSScriptRoot/Verify-Candidate.ps1" -Directory $app
     $output = Join-Path $root 'artifacts/portable'
     New-Item $output -ItemType Directory -Force | Out-Null
-    $name = 'LocalAudioPlayer-dev-' + $source.Substring(0,12) + $(if ($dirty) { '-dirty' } else { '' }) + '-win-x64.zip'
+    $name = 'MPswift-dev-' + $source.Substring(0,12) + $(if ($dirty) { '-dirty' } else { '' }) + '-win-x64.zip'
     $zip = Join-Path $output $name
     if (Test-Path $zip) { Remove-Item $zip }
     [IO.Compression.ZipFile]::CreateFromDirectory($app, $zip, [IO.Compression.CompressionLevel]::Optimal, $true)

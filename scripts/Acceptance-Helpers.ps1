@@ -23,7 +23,7 @@ function New-PlayerAcceptanceWorkspace {
         Copy-Item $inputFile $destination
         if ((Get-FileHash $destination -Algorithm SHA256).Hash.ToLowerInvariant() -ne $entry.sha256) { throw "Candidate copy changed: $name" }
     }
-    foreach ($required in @('Player.App.exe','coreclr.dll','PresentationFramework.dll','portable.marker','native/manifest.json')) {
+    foreach ($required in @('MPswift.exe','coreclr.dll','PresentationFramework.dll','portable.marker','native/manifest.json')) {
         if (-not $expected.ContainsKey($required)) { throw "Required candidate file absent: $required" }
     }
     Copy-Item (Join-Path $candidate 'package-manifest.json') (Join-Path $copy 'package-manifest.json')
@@ -42,7 +42,7 @@ function New-PlayerAcceptanceWorkspace {
 function Start-PlayerAcceptanceProcess {
     param($Workspace, [string[]]$Arguments, [int]$TimeoutSeconds = 90)
     $start = New-Object Diagnostics.ProcessStartInfo
-    $start.FileName = Join-Path $Workspace.App 'Player.App.exe'; $start.UseShellExecute = $false; $start.WorkingDirectory = $Workspace.Root
+    $start.FileName = Join-Path $Workspace.App 'MPswift.exe'; $start.UseShellExecute = $false; $start.WorkingDirectory = $Workspace.Root
     # These supported acceptance arguments are owned absolute filenames/known phase tokens.
     # Escape Windows argv quoting; do not construct shell commands from input paths.
     $encoded = foreach ($argument in $Arguments) { '"' + [regex]::Replace([regex]::Replace($argument, '(\\*)"', '$1$1\"'), '(\\+)$', '$1$1') + '"' }

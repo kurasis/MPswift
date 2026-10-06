@@ -9,7 +9,7 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $audit = Get-Content (Join-Path $Directory 'package-audit.json') -Raw | ConvertFrom-Json
 $integrity = Get-Content (Join-Path $Directory 'integrity-audit.json') -Raw | ConvertFrom-Json
-if ($audit.SourceTreeDirty -or $audit.SourceCommit -notmatch '^[a-f0-9]{40}$' -or $audit.Zip -ne "LocalAudioPlayer-dev-$($audit.SourceCommit.Substring(0,12))-win-x64.zip") { throw 'Only clean committed-source Windows candidates can be published.' }
+if ($audit.SourceTreeDirty -or $audit.SourceCommit -notmatch '^[a-f0-9]{40}$' -or $audit.Zip -ne "MPswift-dev-$($audit.SourceCommit.Substring(0,12))-win-x64.zip") { throw 'Only clean committed-source Windows candidates can be published.' }
 if ($env:GITHUB_SHA -ne $audit.SourceCommit) { throw 'Candidate source does not match the publishing workflow commit.' }
 if ($env:GH_REPO -notmatch '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$') { throw 'GitHub repository is required.' }
 if ($audit.Status -ne 'local-candidate-packaged' -or $integrity.Status -ne 'candidate-integrity-negative-checks-passed' -or -not $integrity.RestoredCopyPassed -or $integrity.SourceTreeDirty -or $integrity.SourceCommit -ne $audit.SourceCommit -or $integrity.ZipSha256 -ne $audit.ZipSha256) { throw 'Candidate audit and integrity evidence do not agree.' }
@@ -23,7 +23,7 @@ $notes = Join-Path $Directory 'github-release-notes.md'
 @"
 Windows x64 portable development build from source ``$($audit.SourceCommit)``.
 
-Extract the ZIP and launch ``LocalAudioPlayer/Player.App.exe``. The .NET desktop runtime is included.
+Extract the ZIP and launch ``MPswift/MPswift.exe``. The .NET desktop runtime is included.
 
 Linux/Windows build tests, Windows native/WPF smoke, candidate integrity checks and extracted executable smoke passed in [this workflow]($runUrl). ZIP SHA-256: ``$actual``. Package and integrity reports are attached.
 

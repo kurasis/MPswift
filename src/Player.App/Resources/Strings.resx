@@ -636,4 +636,5 @@ Backup creates a complete local ZIP of database and settings. Restore backup val
     <data xml:space="preserve" name="RestoreBackup"><value>Restore backup…</value></data>
     <data xml:space="preserve" name="RestoreBackupPrompt"><value>Restore playlists, queue, library, ratings, history and settings from this backup? Playback will stop. Current database and settings files will be retained separately. A legacy .db backup restores the database only.</value></data>
     <data xml:space="preserve" name="BackupRestored"><value>Backup restored without autoplay. Restart the application if the backup uses another language.</value></data>
+    <data xml:space="preserve" name="FolderDropHint"><value>Drop a folder here to create a playlist</value></data>
 </root>

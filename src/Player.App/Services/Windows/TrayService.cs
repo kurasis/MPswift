@@ -10,6 +10,7 @@ namespace Player.App.Services.Windows;
 public sealed class TrayService : IDisposable
 {
     private readonly Forms.NotifyIcon _icon;
+    private readonly System.Drawing.Icon _artwork;
     private readonly Forms.ContextMenuStrip _menu = new();
     private readonly MainWindow _window;
     private readonly PlayerViewModel _model;
@@ -23,7 +24,10 @@ public sealed class TrayService : IDisposable
         Item("Next", () => _ = RunAsync(model.NextCommand.ExecuteAsync(null)));
         Item("Previous", () => _ = RunAsync(model.PreviousCommand.ExecuteAsync(null)));
         _menu.Items.Add(new Forms.ToolStripSeparator()); Item("Exit", window.ExitApplication);
-        _icon = new Forms.NotifyIcon { Icon = System.Drawing.SystemIcons.Application, ContextMenuStrip = _menu, Visible = true };
+        using var iconStream = Application.GetResourceStream(new Uri("pack://application:,,,/MPswift;component/Assets/MPswift.ico")).Stream;
+        using var sourceIcon = new System.Drawing.Icon(iconStream);
+        _artwork = (System.Drawing.Icon)sourceIcon.Clone();
+        _icon = new Forms.NotifyIcon { Icon = _artwork, ContextMenuStrip = _menu, Visible = true };
         _icon.DoubleClick += (_, _) => window.Dispatcher.BeginInvoke(window.ShowAndActivate);
         model.PropertyChanged += Changed; Update();
     }
@@ -35,5 +39,5 @@ public sealed class TrayService : IDisposable
         var length = Math.Min(text.Length, 63); if (length < text.Length && char.IsHighSurrogate(text[length - 1])) length--;
         _icon.Text = text[..length]; _play.Text = _model.PlayPauseLabel;
     }
-    public void Dispose() { _model.PropertyChanged -= Changed; _icon.Visible = false; _icon.Dispose(); _menu.Dispose(); }
+    public void Dispose() { _model.PropertyChanged -= Changed; _icon.Visible = false; _icon.Dispose(); _artwork.Dispose(); _menu.Dispose(); }
 }

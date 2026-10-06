@@ -36,7 +36,7 @@ try {
         if ($code -ne 0) { $validationFailures.Add("$($check[0]) failed with exit $code. See artifacts/smoke/$($check[2]).json.") }
         Write-Host $result
     }
-    $app = Join-Path $root 'src/Player.App/bin/Release/net10.0-windows10.0.19041.0/win-x64/Player.App.exe'
+    $app = Join-Path $root 'src/Player.App/bin/Release/net10.0-windows10.0.19041.0/win-x64/MPswift.exe'
     $taggedFixture = Join-Path $root 'tests/fixtures/audio/flac16.flac'
     foreach ($language in @('en', 'ru')) {
         Remove-Item (Join-Path $directory 'stage-e-library') -Recurse -Force -ErrorAction SilentlyContinue

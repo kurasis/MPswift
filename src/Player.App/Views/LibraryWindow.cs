@@ -21,6 +21,7 @@ public sealed class LibraryWindow : Window
     private bool _closed;
     public LibraryWindow(Window owner, PlayerViewModel model)
     {
+        SetResourceReference(StyleProperty, typeof(Window));
         Owner = owner; _model = model; Title = Strings.Get("LibraryTitle"); Width = 780; Height = 580;
         var panel = new DockPanel { Margin = new Thickness(12) }; Content = panel;
         var controls = new WrapPanel(); DockPanel.SetDock(controls, Dock.Top); panel.Children.Add(controls);

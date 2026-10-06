@@ -11,7 +11,7 @@ if ((Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant() -ne $audit
 $owned = Join-Path $root ('artifacts/package-check-' + [guid]::NewGuid().ToString('N') + ' Unicode Музыка 🎵')
 try {
     [IO.Compression.ZipFile]::ExtractToDirectory($archive, $owned)
-    $app = Join-Path $owned 'LocalAudioPlayer'
+    $app = Join-Path $owned 'MPswift'
     & "$PSScriptRoot/Verify-Candidate.ps1" -Directory $app
     # Negative verification affects only this freshly extracted owned copy.
     $help = Join-Path $app 'docs/USER_HELP.md'
@@ -30,7 +30,7 @@ try {
     $fixture = Join-Path $root 'tests/fixtures/audio/pcm16.wav'
     $tagged = Join-Path $root 'tests/fixtures/audio/flac16.flac'
     # Start the apphost, never dotnet run. Its private self-contained runtime must resolve with an invalid DOTNET_ROOT.
-    $start = [Diagnostics.ProcessStartInfo]::new((Join-Path $app 'Player.App.exe'))
+    $start = [Diagnostics.ProcessStartInfo]::new((Join-Path $app 'MPswift.exe'))
     $start.UseShellExecute = $false; $start.WorkingDirectory = $working
     foreach ($argument in @('--ui-smoke', $fixture, $tagged)) { $start.ArgumentList.Add($argument) }
     $start.Environment['DOTNET_ROOT'] = Join-Path $owned 'no external dotnet installation'

@@ -12,6 +12,7 @@ public sealed class AudioSettingsWindow : Window
 {
     public AudioSettingsWindow(Window owner, PlayerViewModel model, AudioDevice[] devices)
     {
+        SetResourceReference(StyleProperty, typeof(Window));
         Owner = owner; Title = Strings.Get("AudioTitle"); Width = 600; Height = 700;
         var panel = new StackPanel { Margin = new Thickness(16) }; Content = new ScrollViewer { Content = panel };
         var settings = (model.WindowSettings.Processing ?? new()).Validate(); var output = model.WindowSettings.Output ?? new();

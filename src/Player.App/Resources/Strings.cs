@@ -12,6 +12,7 @@ public static class Strings
     public static void SetLanguage(string language) => Culture = CultureInfo.GetCultureInfo(language == "ru" ? "ru-RU" : "en-US");
     public static string Get(string key) => Manager.GetString(key, Culture)
         ?? throw new MissingManifestResourceException($"Missing resource: {key}");
+    public static string FolderDropHint => Get(nameof(FolderDropHint));
     public static string StageTitle => Get(nameof(StageTitle));
     public static string StageDescription => Get(nameof(StageDescription));
     public static string VerifyNative => Get(nameof(VerifyNative));

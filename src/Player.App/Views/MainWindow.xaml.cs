@@ -188,7 +188,7 @@ public partial class MainWindow : Window
     {
         var dictionaries = Application.Current.Resources.MergedDictionaries;
         foreach (var dictionary in dictionaries.Where(d => d.Source?.OriginalString.EndsWith("HighContrast.xaml", StringComparison.Ordinal) == true).ToArray()) dictionaries.Remove(dictionary);
-        if (SystemParameters.HighContrast) dictionaries.Add(new ResourceDictionary { Source = new Uri("/Player.App;component/Themes/HighContrast.xaml", UriKind.Relative) });
+        if (SystemParameters.HighContrast) dictionaries.Add(new ResourceDictionary { Source = new Uri("/MPswift;component/Themes/HighContrast.xaml", UriKind.Relative) });
     }
     private void OnRowDragStart(object sender, MouseButtonEventArgs e)
     {

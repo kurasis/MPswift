@@ -1,4 +1,4 @@
-# Local Audio Player
+# MPswift
 
 A Windows 11 x64 offline desktop audio player built with C# / .NET 10 / WPF and BASS through ManagedBass. The GitHub repository is named MPswift; the product name is centralized in `ProductInfo`.
 
@@ -8,7 +8,7 @@ The [provided specification](docs/spec/WINDOWS_AUDIO_PLAYER_SPEC.md) and [develo
 
 ## Download Windows builds
 
-Download the ZIP from [GitHub Releases](https://github.com/kurasis/MPswift/releases). Extract it and run `LocalAudioPlayer/Player.App.exe`; the .NET desktop runtime is bundled. Every successful main push or main workflow dispatch publishes a separate prerelease named `build-<run-id>-attempt-<attempt>`, retaining previous builds. Pull requests and failed builds do not publish. Each release includes its exact source commit, workflow link, SHA-256 and audit reports. `Publish-GitHubBuild.ps1` verifies the transferred ZIP and remote asset digests before publishing the draft. These development builds retain the documented Stage G acceptance boundaries.
+Download the ZIP from [GitHub Releases](https://github.com/kurasis/MPswift/releases). Extract it and run `MPswift/MPswift.exe`; the .NET desktop runtime is bundled. Every successful main push or main workflow dispatch publishes a separate prerelease named `build-<run-id>-attempt-<attempt>`, retaining previous builds. Pull requests and failed builds do not publish. Each release includes its exact source commit, workflow link, SHA-256 and audit reports. `Publish-GitHubBuild.ps1` verifies the transferred ZIP and remote asset digests before publishing the draft. These development builds retain the documented Stage G acceptance boundaries.
 
 ## Development on Windows
 
@@ -44,7 +44,7 @@ Exact packages are in `Directory.Packages.props` and committed `packages.lock.js
 ./scripts/Publish-Development.ps1
 ```
 
-This creates local, self-contained Windows x64 development output in `artifacts/publish/win-x64`. Run `Player.App.exe` on Windows to open the player. For a local development-only portable candidate run `./scripts/Package-Candidate.ps1` and `./scripts/Test-CandidateIntegrity.ps1`. Output is `artifacts/portable/LocalAudioPlayer-dev-<commit>-win-x64.zip`, its `.sha256` and JSON audits. Full Stage G acceptance remains open. `./scripts/Package-Smoke.ps1` exercises the extracted apphost on Windows. Successful main builds automatically publish the Windows-built ZIP, SHA-256 and audit reports as a separate GitHub development prerelease. Licensing purchases remain separately authorized.
+This creates local, self-contained Windows x64 development output in `artifacts/publish/win-x64`. Run `MPswift.exe` on Windows to open the player. For a local development-only portable candidate run `./scripts/Package-Candidate.ps1` and `./scripts/Test-CandidateIntegrity.ps1`. Output is `artifacts/portable/MPswift-dev-<commit>-win-x64.zip`, its `.sha256` and JSON audits. Full Stage G acceptance remains open. `./scripts/Package-Smoke.ps1` exercises the extracted apphost on Windows. Successful main builds automatically publish the Windows-built ZIP, SHA-256 and audit reports as a separate GitHub development prerelease. Licensing purchases remain separately authorized.
 
 CI builds/tests on Linux and Windows and runs native format/seek/end/disposal, production-engine and actual WPF import/binding/screenshot checks on Windows without relying on a sound device. Evidence artifacts contain TRX/JSON results. A separate Windows package artifact feeds publication only after both matrix jobs and all Windows package checks pass. Manual output evidence is written to `artifacts/smoke/output.json` by `Smoke.ps1 -Play`.
 
@@ -63,7 +63,7 @@ Source media is read-only. No app telemetry, accounts, servers or online runtime
 
 ## Local data
 
-Default data location: `%LOCALAPPDATA%/MPswift/LocalAudioPlayer/`. Place an explicit `portable.marker` beside `Player.App.exe` to use its `Data/` directory instead; an unwritable portable location asks before using per-user storage. `library.db` is authoritative playlist/session data; `settings.json` is versioned app settings; `Cache/Waveforms/` is disposable. Never clear the database to clear waveform cache. A data-directory ownership lock rejects a second writer; a per-user single instance forwards local paths before opening storage.
+Default data location: `%LOCALAPPDATA%/MPswift/LocalAudioPlayer/`. Place an explicit `portable.marker` beside `MPswift.exe` to use its `Data/` directory instead; an unwritable portable location asks before using per-user storage. `library.db` is authoritative playlist/session data; `settings.json` is versioned app settings; `Cache/Waveforms/` is disposable. Never clear the database to clear waveform cache. A data-directory ownership lock rejects a second writer; a per-user single instance forwards local paths before opening storage.
 
 Playlist actions include create/rename/duplicate/delete/tab movement, selected-row movement, waveform refresh and a SQLite/settings backup. Ctrl+Shift+Up/Down or drag moves selected entries in manual unfiltered order. Reopen preserves tabs/entries/current source/position/volume/mute and does not autoplay. Corrupt/newer data is preserved, not replaced by empty defaults. Restore from a selected database backup keeps original main/WAL/SHM files. Queue/shuffle/CUE and advanced audio are implemented.
 

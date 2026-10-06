@@ -22,10 +22,15 @@ public static class IntegrationSmokeValidation
     public static async Task<object> RunAsync(MainWindow window, PlayerViewModel model, string fixture)
     {
         static void Check(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
+        Check(window.Title == "MPswift" && window.Icon is not null, "Product title/window icon missing.");
+        var appHost = Path.Combine(AppContext.BaseDirectory, "MPswift.exe");
+        Check(FileVersionInfo.GetVersionInfo(appHost).ProductName == "MPswift", "Apphost product metadata was not renamed.");
+        using (var executableIcon = System.Drawing.Icon.ExtractAssociatedIcon(appHost))
+            Check(executableIcon is not null, "Apphost icon resource missing.");
         var app = (App)Application.Current;
         async Task LaunchAsync(params string[] args)
         {
-            var start = new ProcessStartInfo(Path.Combine(AppContext.BaseDirectory, "Player.App.exe")) { UseShellExecute = false, WorkingDirectory = Environment.CurrentDirectory };
+            var start = new ProcessStartInfo(Path.Combine(AppContext.BaseDirectory, "MPswift.exe")) { UseShellExecute = false, WorkingDirectory = Environment.CurrentDirectory };
             foreach (var argument in args) start.ArgumentList.Add(argument);
             using var process = Process.Start(start) ?? throw new IOException("Second launch did not start.");
             try { await process.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(15)); Check(process.ExitCode == 0, "Second instance did not forward and exit cleanly."); }

@@ -10,6 +10,7 @@ public sealed class QueueWindow : Window
 {
     public QueueWindow(Window owner, PlayerViewModel model)
     {
+        SetResourceReference(StyleProperty, typeof(Window));
         Owner = owner; Title = Strings.Get("QueueTitle"); Width = 580; Height = 420;
         var root = new DockPanel { Margin = new Thickness(12) }; Content = root;
         var actions = new StackPanel { Orientation = Orientation.Horizontal }; DockPanel.SetDock(actions, Dock.Bottom); root.Children.Add(actions);

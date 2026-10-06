@@ -3,6 +3,11 @@
     <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
     <WindowsSdkPackageVersion>10.0.19041.57</WindowsSdkPackageVersion>
     <UseWPF>true</UseWPF>
+    <AssemblyName>MPswift</AssemblyName>
+    <RootNamespace>Player.App</RootNamespace>
+    <Product>MPswift</Product>
+    <Title>MPswift</Title>
+    <ApplicationIcon>Assets/MPswift.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
@@ -15,6 +20,8 @@
     <PublishSingleFile>false</PublishSingleFile>
   </PropertyGroup>
   <ItemGroup>
+    <Resource Include="Assets/MPswift.png" />
+    <Resource Include="Assets/MPswift.ico" />
     <Using Remove="System.Windows.Forms" />
     <Using Remove="System.Drawing" />
     <ProjectReference Include="../Player.Core/Player.Core.csproj" />

@@ -12,7 +12,7 @@ try {
     # propagate the Windows RID to the platform-neutral Core and invalidate its lock.
     & dotnet publish src/Player.App/Player.App.csproj -c Release --no-restore -o artifacts/publish/win-x64
     if ($LASTEXITCODE -ne 0) { throw 'Self-contained development publish failed.' }
-    foreach ($file in @('Player.App.exe', 'Player.App.dll', 'coreclr.dll', 'PresentationFramework.dll', 'native/manifest.json')) {
+    foreach ($file in @('MPswift.exe', 'MPswift.dll', 'coreclr.dll', 'PresentationFramework.dll', 'native/manifest.json')) {
         if (-not (Test-Path (Join-Path $root "artifacts/publish/win-x64/$file"))) { throw "Missing published file: $file" }
     }
     $manifest = Get-Content native/manifest.json -Raw | ConvertFrom-Json

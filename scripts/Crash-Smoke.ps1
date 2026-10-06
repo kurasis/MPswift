@@ -6,7 +6,7 @@ Set-StrictMode -Version Latest
 if (-not $IsWindows) { throw 'Real process crash smoke is NOT RUN: Windows x64 required.' }
 $root = Split-Path $PSScriptRoot -Parent
 $owned = Join-Path $root ('artifacts/crash-check-' + [guid]::NewGuid().ToString('N'))
-$app = Join-Path $root 'src/Player.App/bin/Release/net10.0-windows10.0.19041.0/win-x64/Player.App.exe'
+$app = Join-Path $root 'src/Player.App/bin/Release/net10.0-windows10.0.19041.0/win-x64/MPswift.exe'
 $fixture = Join-Path $root 'tests/fixtures/audio/pcm16.wav'
 $process = $null
 $out = Join-Path $root 'artifacts/smoke'

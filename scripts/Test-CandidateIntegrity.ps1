@@ -8,7 +8,7 @@ $audit = Get-Content (Join-Path $root 'artifacts/portable/package-audit.json') -
 $owned = Join-Path $root ('artifacts/integrity-check-' + [guid]::NewGuid().ToString('N'))
 try {
     [IO.Compression.ZipFile]::ExtractToDirectory((Join-Path $root "artifacts/portable/$($audit.Zip)"), $owned)
-    $app = Join-Path $owned 'LocalAudioPlayer'
+    $app = Join-Path $owned 'MPswift'
     & "$PSScriptRoot/Verify-Candidate.ps1" -Directory $app
     $help = Join-Path $app 'docs/USER_HELP.md'
     $original = [IO.File]::ReadAllBytes($help)

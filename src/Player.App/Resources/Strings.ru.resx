@@ -636,4 +636,5 @@ F1: локальная справка
     <data xml:space="preserve" name="RestoreBackup"><value>Восстановить резервную копию…</value></data>
     <data xml:space="preserve" name="RestoreBackupPrompt"><value>Восстановить плейлисты, очередь, библиотеку, оценки, историю и настройки из этой копии? Воспроизведение остановится. Текущие файлы базы и настроек будут сохранены отдельно. Прежняя копия .db восстанавливает только базу.</value></data>
     <data xml:space="preserve" name="BackupRestored"><value>Резервная копия восстановлена без автозапуска музыки. Перезапустите приложение, если в копии выбран другой язык.</value></data>
+    <data xml:space="preserve" name="FolderDropHint"><value>Перетащите папку сюда, чтобы создать плейлист</value></data>
 </root>

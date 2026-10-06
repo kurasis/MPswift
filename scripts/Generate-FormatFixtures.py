@@ -38,7 +38,7 @@ def main():
         else:
             subprocess.run(['ffmpeg', '-v', 'error', '-nostdin', '-n', '-i', str(source),
                             *item['encoderArguments'], '-metadata', 'title=Fixture — Музыка',
-                            '-metadata', 'artist=Local Audio Player tests', '-metadata', 'album=Generated signals',
+                            '-metadata', 'artist=MPswift tests', '-metadata', 'album=Generated signals',
                             str(output / item['path'])], check=True)
         item['sha256'] = sha256(output / item['path'])
         item['provenance'] = ('Owned continuous 440 Hz opposite-phase sine, first-order DSD64 generator v1' if item.get('generator') else 'Generated from Player.AudioSmoke 440 Hz opposite-phase PCM fixture using ' + version)

@@ -27,7 +27,7 @@ foreach ($line in Get-Content (Join-Path $directory 'SHA256SUMS.txt')) {
     if ((Get-FileHash (Join-Path $directory $relative) -Algorithm SHA256).Hash.ToLowerInvariant() -ne $hash) { throw "Checksum mismatch: $relative" }
 }
 if ($checksums.Count -ne $expected.Count + 1) { throw 'Incomplete checksum list.' }
-foreach ($required in @('Player.App.exe','coreclr.dll','PresentationFramework.dll','e_sqlite3.dll','ru/Player.App.resources.dll','native/manifest.json','portable.marker','docs/USER_HELP.md','docs/USER_HELP.ru.md','dependency-inventory.json','DEVELOPMENT-ONLY.txt')) {
+foreach ($required in @('MPswift.exe','coreclr.dll','PresentationFramework.dll','e_sqlite3.dll','ru/MPswift.resources.dll','native/manifest.json','portable.marker','docs/USER_HELP.md','docs/USER_HELP.ru.md','dependency-inventory.json','DEVELOPMENT-ONLY.txt')) {
     if (-not $expected.ContainsKey($required)) { throw "Required candidate file absent: $required" }
 }
 $native = Get-Content (Join-Path $directory 'native/manifest.json') -Raw | ConvertFrom-Json

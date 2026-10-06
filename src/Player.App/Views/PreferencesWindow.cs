@@ -9,6 +9,7 @@ public sealed class PreferencesWindow : Window
 {
     public PreferencesWindow(Window owner, PlayerViewModel model)
     {
+        SetResourceReference(StyleProperty, typeof(Window));
         Owner = owner; Title = Strings.PreferencesTitle; Width = 480; Height = 300; WindowStartupLocation = WindowStartupLocation.CenterOwner;
         var panel = new StackPanel { Margin = new Thickness(16) }; Content = panel;
         panel.Children.Add(new TextBlock { Text = Strings.Language, TextWrapping = TextWrapping.Wrap });
