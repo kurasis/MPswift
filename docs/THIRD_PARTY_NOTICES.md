@@ -1,6 +1,6 @@
 # Third-party inventory and distribution gate
 
-This is the Stage B dependency inventory, not final release clearance. Native files are downloaded into ignored local development paths. No native binaries are committed or published as release assets.
+This is the development dependency inventory through Stage G, not final release clearance. Native files are downloaded into ignored local development paths. No native binaries are committed or published as release assets.
 
 ## Managed application packages
 
@@ -52,3 +52,7 @@ Pinned development manifest includes BASSWMA 2.4.5.13 (Windows Media Format modu
 ## Stage F Windows SDK projection
 
 The WPF target is `net10.0-windows10.0.19041.0`, with `WindowsSdkPackageVersion` pinned to **10.0.19041.57**. SDK restore provides Microsoft.Windows.SDK.NET and WinRT.Runtime for OS SMTC projection (SDK/CsWinRT notices must accompany a distribution). Minimal documented `ISystemMediaTransportControlsInterop` binds an HWND; it is not a custom media-key/codec implementation. WPF/Windows Forms are framework references from the pinned .NET Windows runtime; Forms is used only for the native tray icon. No new online runtime service was introduced.
+
+## Stage G candidate inventory
+
+Package-Candidate reads the app's restored project.assets.json and actual framework download dependencies, retaining **14** resolved managed/runtime/projection declarations plus available top-level LICENSE/NOTICE/COPYING texts. Native companions remain beside their pinned DLLs. The actual package inventory is dependency-inventory.json, file identities/sizes/SHA-256 are package-manifest.json and SHA256SUMS.txt, and the outer ZIP has a separate checksum. Files unavailable from a NuGet archive are not invented: expressions/license URLs remain declared metadata, with distributionReview pending. The Windows SDK targeting pack declares its SDK license URL; actual projection/WinRT redistribution obligations still require review. Existing corresponding-source/app-license/intended-use gates remain open. No public ZIP/release/native artifact upload has been performed.

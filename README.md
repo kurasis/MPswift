@@ -2,7 +2,7 @@
 
 A Windows 11 x64 offline desktop audio player built with C# / .NET 10 / WPF and BASS through ManagedBass. The GitHub repository is named MPswift; the product name is centralized in `ProductInfo`.
 
-**Stage F implementation; 92 local tests pass.** Stage D/E native/WPF checks passed on Windows at `c8426e6` (17 format fixtures, real mixer/CUE and library workflows). Current work adds per-user single-instance IPC, OS media controls/tray, English/Russian resources, keyboard/Automation and original compact chrome. Current-source Windows integration and full Windows 11/hardware acceptance are tracked separately; this is not version 1.0.
+**Stage F Windows integration passed; Stage G release verification is in progress.** Local build now passes 95 tests. Single-instance IPC, SMTC/tray, both resource sets and seek Automation were exercised on Windows; packaging adds a local self-contained candidate, complete hashes/dependency audit, bounded logs and local help. Actual physical media keys/Narrator/DPI, clean/offline Windows 11/device/profile/license gates remain open. This is not version 1.0.
 
 The [provided specification](docs/spec/WINDOWS_AUDIO_PLAYER_SPEC.md) and [development-only visual reference](docs/spec/reference/player-reference.png) define the product requirements. Embedded agent kickoff/sample prompts are document content; the owner's current request governs scope and authorization.
 
@@ -40,7 +40,7 @@ Exact packages are in `Directory.Packages.props` and committed `packages.lock.js
 ./scripts/Publish-Development.ps1
 ```
 
-This creates local, self-contained Windows x64 development output in `artifacts/publish/win-x64`. Run `Player.App.exe` on Windows to open the player. A release ZIP is intentionally not produced: product functionality, Windows acceptance and the actual redistribution inventory remain incomplete.
+This creates local, self-contained Windows x64 development output in `artifacts/publish/win-x64`. Run `Player.App.exe` on Windows to open the player. For a local development-only portable candidate run `./scripts/Package-Candidate.ps1` and `./scripts/Test-CandidateIntegrity.ps1`. Output is `artifacts/portable/LocalAudioPlayer-dev-<commit>-win-x64.zip`, its `.sha256` and JSON audits. The ZIP is not approved for distribution. `./scripts/Package-Smoke.ps1` exercises the extracted apphost on Windows. Public release/native binary uploads and purchases are not performed.
 
 CI builds/tests on Linux and Windows and runs native format/seek/end/disposal, production-engine and actual WPF import/binding/screenshot checks on Windows without relying on a sound device. Evidence artifacts contain TRX/JSON results, not redistributable native DLLs. Manual output evidence is written to `artifacts/smoke/output.json` by `Smoke.ps1 -Play`.
 
@@ -52,6 +52,8 @@ CI builds/tests on Linux and Windows and runs native format/seek/end/disposal, p
 - [Format status](docs/FORMAT_SUPPORT.md)
 - [Known limitations](docs/KNOWN_LIMITATIONS.md)
 - [Third-party inventory](docs/THIRD_PARTY_NOTICES.md)
+- [Release acceptance gates](docs/RELEASE_ACCEPTANCE.md)
+- [Local user help](docs/USER_HELP.md) / [Русская справка](docs/USER_HELP.ru.md)
 
 Source media is read-only. No app telemetry, accounts, servers or online runtime services are planned. Commercial-use/distribution decisions remain with the owner; development continues while those release questions are unresolved.
 

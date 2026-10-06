@@ -216,7 +216,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
             {
                 var id = _pendingRoots.First(); _pendingRoots.Remove(id); var root = LibraryRoots.FirstOrDefault(r => r.Id == id && r.Enabled); if (root is null) continue;
                 var known = _knownRows.Values.Where(r => r.Entry.Track.Segment is null).Select(r => r.Entry.Track).DistinctBy(t => t.Path, StringComparer.OrdinalIgnoreCase).ToDictionary(t => t.Path, t => t.Id, StringComparer.OrdinalIgnoreCase);
-                var progress = new Progress<ScanProgress>(p => { if (_closing) return; ScanStatus = string.Format(CultureInfo.CurrentCulture, Strings.Get("ScanProgress"), p.Seen, p.Changed, p.Errors); if (p.Details.Length > 0) Details = string.Join(Environment.NewLine, p.Details); });
+                var progress = new Progress<ScanProgress>(p => { if (_closing) return; ScanStatus = string.Format(Strings.Culture, Strings.Get("ScanProgress"), p.Seen, p.Changed, p.Errors); if (p.Details.Length > 0) Details = string.Join(Environment.NewLine, p.Details); });
                 await Task.Run(() => _scanner!.ScanAsync(root, known, progress, _scanCancellation.Token));
             }
             await ReconcilePlaylistMetadataAsync();
@@ -327,7 +327,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         try
         {
             var result = await _importer.ImportAsync(paths, progress, _importCancellation.Token, 10000 - _knownRows.Count, fallbackEncoding);
-            Message = string.Format(CultureInfo.CurrentCulture, Strings.Get("Imported"), result.Added, result.Errors);
+            Message = string.Format(Strings.Culture, Strings.Get("Imported"), result.Added, result.Errors);
             if (result.LimitReached) Message += " " + Strings.Get("ImportLimit");
             Details = string.Join(Environment.NewLine, result.Details);
         }
@@ -441,7 +441,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
             if (!SeekPreview && !_pendingSeek) SeekPosition = Math.Clamp(snapshot.Position.TotalSeconds, 0, DurationSeconds);
             Volume = snapshot.Volume * 100; Muted = snapshot.Muted;
             var sourceTab = Playlists.FirstOrDefault(p => p.Id == _sourcePlaylistId);
-            PlaybackSource = snapshot.EntryId is null ? "" : sourceTab is null ? Strings.Get("DetachedSource") : string.Format(CultureInfo.CurrentCulture, Strings.Get("PlaybackSource"), sourceTab.Name);
+            PlaybackSource = snapshot.EntryId is null ? "" : sourceTab is null ? Strings.Get("DetachedSource") : string.Format(Strings.Culture, Strings.Get("PlaybackSource"), sourceTab.Name);
             if (snapshot.EntryId != _waveEntry && (snapshot.State == PlaybackState.Loading || snapshot.SourceFormat is null))
             {
                 _waveCancellation?.Cancel(); ++_waveGeneration; _waveEntry = null;
@@ -453,9 +453,9 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
             if (track is not null && snapshot.EntryId != _artEntry) { _artEntry = snapshot.EntryId; _artTask = LoadArtworkAsync(track.Path); }
             if (_index is not null && _listening.Update(snapshot, track?.Id, Stopwatch.GetElapsedTime(_clockOrigin), DateTime.UtcNow) is { } occurrence) _statisticsTask = SaveListeningAfterAsync(_statisticsTask, occurrence);
             if (track is not null) { Title = track.Title; Artist = track.Artist ?? Strings.Get("UnknownArtist"); Album = track.Album ?? ""; }
-            Format = snapshot.SourceFormat is { } source ? string.Format(CultureInfo.CurrentCulture, Strings.Get("SourceFormat"), source.Codec, source.SampleRate, source.Channels) : "";
-            if (snapshot.SourceFormat?.BitDepth is { } bits) Format += " · " + string.Format(CultureInfo.CurrentCulture, Strings.Get("SourceBitDepth"), bits);
-            if (snapshot.OutputFormat is { } output) Format += " · " + string.Format(CultureInfo.CurrentCulture, Strings.Get("OutputFormat"), output.SampleRate, output.Channels);
+            Format = snapshot.SourceFormat is { } source ? string.Format(Strings.Culture, Strings.Get("SourceFormat"), source.Codec, source.SampleRate, source.Channels) : "";
+            if (snapshot.SourceFormat?.BitDepth is { } bits) Format += " · " + string.Format(Strings.Culture, Strings.Get("SourceBitDepth"), bits);
+            if (snapshot.OutputFormat is { } output) Format += " · " + string.Format(Strings.Culture, Strings.Get("OutputFormat"), output.SampleRate, output.Channels);
             if (snapshot.Error is { } error) { Message = Strings.Get(error.ResourceKey); Details = error.Detail; }
             else if (snapshot.EntryId is not null && !IsImporting) { Message = ""; Details = ""; }
             var active = snapshot.EntryId is { } entryId ? _knownRows.GetValueOrDefault(entryId) : null;
@@ -482,7 +482,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         _waveCancellation?.Cancel(); _waveCancellation?.Dispose(); _waveCancellation = new();
         var token = _waveCancellation.Token; var generation = ++_waveGeneration;
         Waveform = null; WaveformStatus = Strings.Get("WaveformLoading");
-        var progress = new Progress<double>(value => { if (!_closing && generation == _waveGeneration) WaveformStatus = string.Format(CultureInfo.CurrentCulture, Strings.Get("WaveformProgress"), value); });
+        var progress = new Progress<double>(value => { if (!_closing && generation == _waveGeneration) WaveformStatus = string.Format(Strings.Culture, Strings.Get("WaveformProgress"), value); });
         try
         {
             var data = await _waveforms.AnalyzeAsync(path, progress, token, refresh);
@@ -502,7 +502,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     private void UpdateEntries(bool changed = true)
     { SyncSource(); VisibleEntries?.Refresh(); if (_initialized) ApplySnapshot(_player.Snapshot); HasEntries = Entries.Count > 0; OnPropertyChanged(nameof(CanTransport)); UpdatePlaylistStatus(); if (changed) ScheduleSave(true); }
     private void UpdatePlaylistStatus()
-    { OnPropertyChanged(nameof(HasVisibleEntries)); if (VisibleEntries is not null) PlaylistStatus = string.Format(CultureInfo.CurrentCulture, Strings.Get("PlaylistCount"), VisibleEntries.Cast<object>().Count(), Entries.Count); }
+    { OnPropertyChanged(nameof(HasVisibleEntries)); if (VisibleEntries is not null) PlaylistStatus = string.Format(Strings.Culture, Strings.Get("PlaylistCount"), VisibleEntries.Cast<object>().Count(), Entries.Count); }
     private LibraryState Capture() => new(Playlists.Select(p => p.Capture()).ToArray(),
         new(SelectedPlaylist.Id, _sourcePlaylistId, _coordinator.ActiveEntry, _player.Snapshot.Position.Ticks, _coordinator.CaptureOrder()));
     private void ScheduleSave(bool libraryChanged)

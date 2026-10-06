@@ -18,6 +18,10 @@ namespace Player.App;
 public partial class App : Application
 {
     static App() => System.Windows.Forms.Application.SetHighDpiMode(System.Windows.Forms.HighDpiMode.PerMonitorV2);
+    private RotatingLog? _log;
+    public string DataDirectory { get; private set; } = "";
+    public async Task FlushDiagnosticsAsync() { if (_log is not null) await _log.DisposeAsync(); }
+    private void WatchDiagnostics(PlayerViewModel model) => model.PropertyChanged += (_, args) => { if (args.PropertyName == nameof(PlayerViewModel.Details) && model.Details.Length > 0) _log?.Record("operation", model.Details); };
     private SingleInstanceService? _instance;
     private TrayService? _tray;
     private MediaSessionService? _media;
@@ -71,11 +75,15 @@ public partial class App : Application
         try
         {
             var language = new SettingsFile(directory).Load().Validate().Language;
+            Strings.SetLanguage(language);
             var culture = CultureInfo.GetCultureInfo(language == "ru" ? "ru-RU" : "en-US");
             CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = culture;
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.DefaultThreadCurrentUICulture = culture;
         }
         catch (Exception error) { ReportStartupFailure(smoke, error); Shutdown(1); return; }
+        DataDirectory = directory;
+        _log = new RotatingLog(Path.Combine(directory, "Logs"), [Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), directory, AppContext.BaseDirectory]);
+        _log.Record("startup", Player.Core.ProductInfo.Version + " · " + System.Runtime.InteropServices.RuntimeInformation.OSDescription);
         PlayerViewModel model;
         try { model = CreateModel(directory); }
         catch (Exception error) { ReportStartupFailure(smoke, error); Shutdown(1); return; }
@@ -84,6 +92,7 @@ public partial class App : Application
             DataContext = model
         };
         MainWindow = window;
+        WatchDiagnostics(model);
         try { await model.InitializeAsync(); }
         catch (Exception error)
         {
@@ -98,7 +107,7 @@ public partial class App : Application
                     {
                         var backup = LocalFileAccess.ValidateFile(dialog.FileName);
                         await Task.Run(() => DatabaseRecovery.Restore(Path.Combine(directory, "library.db"), backup));
-                        model = CreateModel(directory); window.DataContext = model; await model.InitializeAsync();
+                        model = CreateModel(directory); WatchDiagnostics(model); window.DataContext = model; await model.InitializeAsync();
                     }
                     catch (Exception restoreError) { ReportStartupFailure(false, restoreError); Shutdown(1); return; }
                 }
@@ -158,7 +167,7 @@ public partial class App : Application
     }
     public void RebindMedia(MainWindow window, PlayerViewModel model)
     {
-        _media?.Dispose(); _media = null;
+        WatchDiagnostics(model); _media?.Dispose(); _media = null;
         try { _media = new MediaSessionService(window, model); } catch (Exception error) { model.Details = error.Message; }
     }
     public bool MediaMetadataMatches(PlayerViewModel model) => _media?.MetadataMatches(model) == true;
@@ -181,7 +190,7 @@ public partial class App : Application
         var options = settings.Load();
         var player = new SerializedAudioPlayer(() => new BassAudioBackend());
         return new PlayerViewModel(player, new PlaybackCoordinator(player), new MediaImportService(), new FileDialogService(), Dispatcher,
-            new SqlitePlayerStore(Path.Combine(directory, "library.db")), settings,
+            new SqlitePlayerStore(Path.Combine(directory, "library.db"), Strings.DefaultPlaylist), settings,
             new BassWaveformService(new WaveformCache(Path.Combine(directory, "Cache", "Waveforms"), options.WaveformCacheMiB * 1024L * 1024)));
     }
 }

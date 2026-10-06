@@ -6,7 +6,11 @@ namespace Player.App.Resources;
 public static class Strings
 {
     private static readonly ResourceManager Manager = new("Player.App.Resources.Strings", typeof(Strings).Assembly);
-    public static string Get(string key) => Manager.GetString(key, CultureInfo.CurrentUICulture)
+    // Dispatcher/IPC continuations can carry the sender's ambient culture. Product language
+    // is selected once at startup and must not follow that per-operation execution context.
+    public static CultureInfo Culture { get; private set; } = CultureInfo.GetCultureInfo("en-US");
+    public static void SetLanguage(string language) => Culture = CultureInfo.GetCultureInfo(language == "ru" ? "ru-RU" : "en-US");
+    public static string Get(string key) => Manager.GetString(key, Culture)
         ?? throw new MissingManifestResourceException($"Missing resource: {key}");
     public static string StageTitle => Get(nameof(StageTitle));
     public static string StageDescription => Get(nameof(StageDescription));

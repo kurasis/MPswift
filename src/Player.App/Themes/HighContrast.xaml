@@ -6,6 +6,6 @@
 <SolidColorBrush x:Key="TextSecondaryBrush" Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}" />
 <SolidColorBrush x:Key="AccentBrush" Color="{DynamicResource {x:Static SystemColors.HighlightColorKey}}" />
 <SolidColorBrush x:Key="BorderBrush" Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}" />
-<SolidColorBrush x:Key="SelectedRowBrush" Color="{DynamicResource {x:Static SystemColors.HighlightColorKey}}" />
+<SolidColorBrush x:Key="SelectedRowBrush" Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}" />
 <SolidColorBrush x:Key="ErrorBrush" Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}" />
 </ResourceDictionary>

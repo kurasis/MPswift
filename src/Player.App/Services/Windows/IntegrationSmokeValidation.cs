@@ -63,6 +63,10 @@ public static class IntegrationSmokeValidation
         { Check(russian.GetString((string)entry.Key) is { Length: > 0 }, "Russian resource missing: " + entry.Key); resourceCount++; }
         Check(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == model.WindowSettings.Language, "Saved language was not applied at startup.");
         Check(((Button)window.FindName("PlayPauseButton")).Content?.ToString() == Strings.Play, "Transport was not localized.");
+        Check(model.State == Strings.Get("State" + model.Snapshot.State), "IPC changed the product language of playback state.");
+        var source = model.Playlists.FirstOrDefault(p => p.Id == model.SourcePlaylistId);
+        if (source is not null) Check(model.PlaybackSource == string.Format(Strings.Culture, Strings.Get("PlaybackSource"), source.Name), "IPC changed the product language of source status.");
+        Check(Strings.Culture.TwoLetterISOLanguageName == model.WindowSettings.Language, "Application resource culture drifted.");
         var closeToTray = model.WindowSettings.CloseToTray;
         using (var tray = new TrayService(window, model))
         {

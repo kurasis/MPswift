@@ -617,4 +617,16 @@ Sources remain unchanged. Ratings, history, library, queue and settings are stor
     <data xml:space="preserve" name="DefaultOutput">
         <value>Windows default output</value>
     </data>
+    <data xml:space="preserve" name="DataLocation">
+        <value>Data location</value>
+    </data>
+    <data xml:space="preserve" name="LogLocation">
+        <value>Local diagnostics</value>
+    </data>
+    <data xml:space="preserve" name="LocalNotices">
+        <value>Dependency notices and limitations are included in the package docs/ and native/ directories. Logs stay local and rotate at five files of 2 MiB; personal path prefixes are redacted. Inspect diagnostics before sharing.</value>
+    </data>
+    <data xml:space="preserve" name="PortableUnwritable">
+        <value>Portable storage is not writable. Use per-user storage instead?</value>
+    </data>
 </root>

@@ -36,7 +36,7 @@ public partial class MainWindow : Window
             && !OwnsInput(element)) await Model.PlayEntryCommand.ExecuteAsync(row);
     }
     private void OnRemove(object sender, RoutedEventArgs e) => Model.RemoveEntriesCommand.Execute(PlaylistList.SelectedItems.Cast<PlaylistRowViewModel>().ToArray());
-    private void OnHelp(object sender, RoutedEventArgs e) => MessageBox.Show(this, Strings.Get("HelpText"), Strings.Get("Help"), MessageBoxButton.OK, MessageBoxImage.Information);
+    private void OnHelp(object sender, RoutedEventArgs e) => new HelpWindow(this, ((App)Application.Current).DataDirectory).Show();
     private void OnDragOver(object sender, DragEventArgs e)
     {
         e.Effects = e.Data.GetDataPresent(DataFormats.FileDrop) ? DragDropEffects.Copy :
@@ -107,7 +107,7 @@ public partial class MainWindow : Window
         IsEnabled = false;
         Model.WindowSettings = Model.WindowSettings with { WindowWidth = RestoreBounds.Width, WindowHeight = RestoreBounds.Height,
             WindowLeft = RestoreBounds.Left, WindowTop = RestoreBounds.Top, WindowMaximized = WindowState == WindowState.Maximized };
-        try { await Model.DisposeAsync(); _shutdownComplete = true; Close(); }
+        try { await Model.DisposeAsync(); await ((App)Application.Current).FlushDiagnosticsAsync(); _shutdownComplete = true; Close(); }
         catch (Exception error)
         {
             Model.Message = Strings.Get("ErrorUnexpected"); Model.Details = error.Message;
@@ -129,8 +129,9 @@ public partial class MainWindow : Window
     private void OnSystemSettings(object? sender, PropertyChangedEventArgs e) { if (e.PropertyName == nameof(SystemParameters.HighContrast)) Dispatcher.BeginInvoke(ApplyContrastTheme); }
     private void ApplyContrastTheme()
     {
-        Resources.MergedDictionaries.Clear();
-        if (SystemParameters.HighContrast) Resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri("/Player.App;component/Themes/HighContrast.xaml", UriKind.Relative) });
+        var dictionaries = Application.Current.Resources.MergedDictionaries;
+        foreach (var dictionary in dictionaries.Where(d => d.Source?.OriginalString.EndsWith("HighContrast.xaml", StringComparison.Ordinal) == true).ToArray()) dictionaries.Remove(dictionary);
+        if (SystemParameters.HighContrast) dictionaries.Add(new ResourceDictionary { Source = new Uri("/Player.App;component/Themes/HighContrast.xaml", UriKind.Relative) });
     }
     private void OnRowDragStart(object sender, MouseButtonEventArgs e)
     {
@@ -186,7 +187,7 @@ public partial class MainWindow : Window
         if (Model.SelectedEntry is not { } row) return; var track = row.Entry.Track;
         Player.Core.Library.TrackStatistics? statistics = null;
         try { if (Model.LibraryIndex is { } index) statistics = (await index.GetStatisticsAsync([track.Id])).FirstOrDefault(); } catch (Exception error) { Model.Details = error.Message; }
-        var played = statistics?.LastPlayedUtcTicks is { } last ? new DateTime(last, DateTimeKind.Utc).ToLocalTime().ToString("g", System.Globalization.CultureInfo.CurrentCulture) : "—";
+        var played = statistics?.LastPlayedUtcTicks is { } last ? new DateTime(last, DateTimeKind.Utc).ToLocalTime().ToString("g", Strings.Culture) : "—";
         MessageBox.Show(this, $"{track.Title}\n{track.Artist}\n{track.Album}\n{track.Path}\n\n{Strings.Get("MetadataHints")}:\n{track.SampleRateHint} {Strings.Get("HzUnit")} · {track.ChannelsHint} {Strings.Get("ChannelsUnit")} · {track.BitrateHint} {Strings.Get("KbpsUnit")}\n{Strings.Get("DiscLabel")} {track.DiscNumber}, {Strings.Get("TrackLabel")} {track.TrackNumber}, {track.Year}\n{track.Genre}\nCUE: {track.CueDocument ?? "—"}\n{Strings.Rating}: {row.Rating}\n{Strings.Get("CountedPlays")}: {statistics?.PlayCount ?? 0}\n{Strings.Get("LastPlayed")}: {played}", Strings.Get("TrackProperties"));
     }
     private async void OnLegacyImport(object sender, RoutedEventArgs e)
@@ -220,6 +221,7 @@ public partial class MainWindow : Window
     public async Task CloseForValidationAsync()
     {
         await Model.DisposeAsync();
+        await ((App)Application.Current).FlushDiagnosticsAsync();
         _shutdownComplete = true;
         Close();
     }

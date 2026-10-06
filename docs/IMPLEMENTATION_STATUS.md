@@ -4,7 +4,7 @@ Updated: **2026-10-06**.
 
 ## Current scope
 
-**Stage F / M5 implementation added; 92 local tests pass, new Windows integration checks are pending.** Stage D/E Windows native/WPF checks now pass at `c8426e6` in run 37367043601 attempt 2. The owner requested Stage F followed automatically by Stage G. Full P0 + P1 acceptance remains the target; this is not version 1.0. Russian chat, English repository and automatic development commit/push/merge remain authorized.
+**Stage F implemented and Windows integration observed; Stage G candidate packaging/verification is in progress. 95 local tests pass.** Stage D/E Windows native/WPF checks now pass at `c8426e6` in run 37367043601 attempt 2. Stage F integration passed at `39a8a25`; Stage G follows automatically as requested. Full P0 + P1 acceptance remains the target; this is not version 1.0. Russian chat, English repository and automatic development commit/push/merge remain authorized.
 
 ## Implemented through Stage E
 
@@ -24,7 +24,7 @@ Updated: **2026-10-06**.
 
 ## Current verification
 
-Locked Linux Release cross-build: **0 warnings / 0 errors; 92 tests passed / 0 failed / 0 skipped**. Tests include actual SQLite migration/backup/index/search/rating/listening integration and a 100,000-record paged dataset, queue/repeat/shuffle/CUE, measured pure-PCM EQ and all previous checks. Local self-contained development publish and all native hashes/companions were audited; no public release was published.
+Locked Linux Release cross-build: **0 warnings / 0 errors; 95 tests passed / 0 failed / 0 skipped**. Tests include actual SQLite migration/backup/index/search/rating/listening integration and a 100,000-record paged dataset, queue/repeat/shuffle/CUE, measured pure-PCM EQ and all previous checks. Local self-contained development publish and all native hashes/companions were audited; no public release was published.
 
 The latest Stage D/E [Windows/Linux rerun](https://github.com/kurasis/MPswift/actions/runs/37367043601/attempts/2) passed at `c8426e6`: 80 core tests on each OS, 17 real codecs, actual two-hour waveform, callback PCM lossless/CUE maximum error **0**, overlap seek cancellation and all Stage E WPF/database/import/rating/relink/artwork/source-hash checks. [Retained reports](evidence/stage-de-windows-native-ui.json) identify the exact source and Windows Server 2022 environment. Prior zero-step runs failed hosted runner acquisition. This proves production callback PCM and WPF workflows, not endpoint output/listening or Windows 11 release acceptance.
 
@@ -38,15 +38,24 @@ The latest Stage D/E [Windows/Linux rerun](https://github.com/kurasis/MPswift/ac
 - Expanded real WPF smoke launches the actual application in second processes, rejects an oversized request, checks tray state, seek Automation, both startup languages, almost 10k real rows with fewer than 150 realized containers and minimum layout. Actual global media key presses, Narrator and physical 100/150/200% DPI/monitor moves remain manual acceptance.
 Previous [Stage C Windows job](https://github.com/kurasis/MPswift/actions/runs/37359855055/job/111931430685) passed at `a38e81e`: 59 tests, 14 codecs, actual two-hour waveform and WPF persistence. Its matching Linux job later canceled without a runner. This historical result does not verify the new graph/library code. Exact retained evidence remains under `docs/evidence/`.
 
+## Stage F observed checks and Stage G additions
+
+[Stage F run 37408825503](https://github.com/kurasis/MPswift/actions/runs/37408825503) passed at `39a8a25`: 92 core tests on both systems, actual second-process activation/concurrent file forwarding/no autoplay/oversized rejection, seek Automation and tray state, 199 paired resource keys, 6 realized WPF containers for almost 10k rows, SMTC registered and metadata synchronized, EN/RU WPF smoke. [Exact reports](evidence/stage-f-windows-integration.json) retain the source. The initial `0ea5598` failed with access violation: desktop SMTC interop omitted the three IInspectable base slots. The documented vtable correction passed. Screenshot review then found ambient-culture drift in IPC-updated dynamic labels; Stage G fixes resource language affinity and adds direct post-IPC status assertions. User track/tab text remains as supplied.
+
+Stage G adds a 128-entry bounded background diagnostic writer, five rotating 2 MiB logs, redacted personal path prefixes, explicit write-failure status, readable local help and paired packaged quick starts. Candidate scripts publish into a fresh owned folder, include self-contained runtime/Russian satellite/14 restored dependency declarations and available license texts, retain all 13 native companions, reject private data/log/cache/music/reference/debug files, and generate full file/outer ZIP SHA-256 inventories. A first dirty-tree candidate audited **550 files** and passed changed/missing/extra/empty-checksum rejection; it is explicitly development-only with distribution approval false. Clean committed-source output will replace that provisional evidence. No public release/binary upload/license purchase occurred.
+
+Windows CI now runs an actual 50-warmup + 1,000 production load/prepare-next/seek/stop stress with resource/timing samples (no device), audits local candidates on both systems and runs the extracted self-contained app from a Unicode path/arbitrary working directory with invalid external DOTNET_ROOT. These new Windows/package/stress results are not yet marked passed. [Release acceptance](RELEASE_ACCEPTANCE.md) preserves all clean Windows 11/offline/device/digital/listening/two-hour/stress/performance/profile/license gates. The candidate is not version 1.0.
+
 ## Resume and commands
 
 - Use existing checkout `/workspace/MPswift`; activate `source /workspace/toolchains/activate.sh`. No new worktree or service is required. The cloud startup draft was refreshed for Stage D/E and Stage F continuation; install instructions remain unchanged.
-- `scripts/Build.ps1`: locked restore, Release cross-build and 92 platform-neutral/storage/IPC validation tests.
+- `scripts/Build.ps1`: locked restore, Release cross-build and 95 platform-neutral/storage/IPC/logging tests.
 - `scripts/Setup-Native.ps1`: verify/provision 13 pinned development DLLs and upstream notices. Generic MPC/TTA notices are kept in separate subdirectories to avoid collisions.
 - `scripts/Publish-Development.ps1`: self-contained local output, manifest hashes and companion audit; no public ZIP/release.
+- `scripts/Package-Candidate.ps1`: local development-only portable ZIP, hashes/dependency declarations/help; `scripts/Test-CandidateIntegrity.ps1` tests rejection; `scripts/Verify-Candidate.ps1 -Directory <extracted-app>` audits it. `scripts/Package-Smoke.ps1` requires real Windows and a generated candidate.
 - Actual Windows x64: `scripts/Smoke.ps1` runs real format/engine/waveform/mixer/WPF checks without an endpoint. `-Play` adds actual shared-device API checks, separately from listening.
 - Do not report queued/canceled jobs, unrun native tests or pure-PCM domain checks as actual Windows/audio acceptance. See [test results](TEST_RESULTS.md) and [requirement status](REQUIREMENTS_STATUS.md).
 
 ## Next work
 
-Collect/fix Stage F Windows integration evidence. Continue Stage G with local candidate packaging, full hash/dependency/help audit, repeatable acceptance procedures and CI evidence. Windows 11 clean/offline/device/digital/stress/performance/license gates remain explicit; unavailable hardware/fixtures/license decisions cannot be reported passed.
+Collect the expanded Stage G Windows/packaged-executable/stress report; fix failures. Local candidate packaging and complete per-file/native audit plus four negative integrity checks already passed; refresh the final candidate from a clean committed source. Windows 11 clean/offline/device/digital/stress/performance/license gates remain explicit; unavailable hardware/fixtures/license decisions cannot be reported passed.

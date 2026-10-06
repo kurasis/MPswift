@@ -25,7 +25,7 @@ public sealed class LibraryWindow : Window
         var panel = new DockPanel { Margin = new Thickness(12) }; Content = panel;
         var controls = new WrapPanel(); DockPanel.SetDock(controls, Dock.Top); panel.Children.Add(controls);
         void Button(string text, RoutedEventHandler action) { var b = new Button { Content = text, Margin = new Thickness(3) }; b.Click += action; controls.Children.Add(b); }
-        Button(Strings.Get("AddRoot"), async (_, _) => { var d = new Microsoft.Win32.OpenFolderDialog(); if (d.ShowDialog(this) == true) { try { await model.AddLibraryRootAsync(d.FolderName); } catch (Exception e) { MessageBox.Show(this, e.Message); } } });
+        Button(Strings.Get("AddRoot"), async (_, _) => { var d = new Microsoft.Win32.OpenFolderDialog(); if (d.ShowDialog(this) == true) { try { await model.AddLibraryRootAsync(d.FolderName); } catch (Exception e) { MessageBox.Show(this, Strings.ErrorUnexpected + "\n\n" + e.Message, Strings.Get("LibraryTitle")); } } });
         Button(Strings.Get("RefreshRoots"), (_, _) => model.ScanRoots()); Button(Strings.Get("CancelScan"), (_, _) => model.CancelScan());
         Button(Strings.Get("AddSelected"), (_, _) => model.AddLibraryTracks(_list!.SelectedItems.Cast<IndexedFile>().Select(f => f.Track)));
         Button(Strings.Get("PreviousPage"), async (_, _) => { _offset = Math.Max(0, _offset - 100); await SearchAsync(); }); Button(Strings.Get("NextPage"), async (_, _) => { _offset += 100; await SearchAsync(); });
@@ -48,8 +48,8 @@ public sealed class LibraryWindow : Window
             var page = await _model.LibraryIndex.SearchAsync(_search.Text, _offset);
             if (_closed || generation != _queryGeneration) return;
             _files.Clear(); foreach (var file in page.Files) _files.Add(file);
-            _status.Text = string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.Get("LibraryPage"), page.Total, page.Total == 0 ? 0 : _offset + 1, _offset + page.Files.Length, _model.ScanStatus);
+            _status.Text = string.Format(Strings.Culture, Strings.Get("LibraryPage"), page.Total, page.Total == 0 ? 0 : _offset + 1, _offset + page.Files.Length, _model.ScanStatus);
         }
-        catch (Exception e) { if (!_closed) _status.Text = e.Message; }
+        catch (Exception e) { if (!_closed) { _status.Text = Strings.ErrorUnexpected; _model.Details = e.Message; } }
     }
 }

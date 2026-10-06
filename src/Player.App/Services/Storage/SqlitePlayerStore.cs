@@ -14,11 +14,14 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
     private readonly TaskCompletionSource _exit = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private readonly object _gate = new();
     private readonly string _path;
+    private readonly string _defaultPlaylistName;
     private bool _closing;
     private SqliteConnection? _connection;
     private FileStream? _ownership;
-    public SqlitePlayerStore(string path)
+    public SqlitePlayerStore(string path, string defaultPlaylistName = "Default")
     {
+        if (string.IsNullOrWhiteSpace(defaultPlaylistName) || defaultPlaylistName.Length > 200) throw new ArgumentException("Invalid default playlist name.");
+        _defaultPlaylistName = defaultPlaylistName;
         _path = Path.GetFullPath(path);
         new Thread(Run) { IsBackground = true, Name = "Player database" }.Start();
     }
@@ -144,7 +147,7 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
                     CREATE TABLE Session(Id INTEGER PRIMARY KEY CHECK(Id=1), Json TEXT NOT NULL);
                     PRAGMA user_version=1;
                     """);
-                using var initial = Command(connection, transaction, "INSERT INTO Playlists VALUES($id,'Default',0)"); initial.Parameters.AddWithValue("$id", Guid.NewGuid().ToString()); initial.ExecuteNonQuery();
+                using var initial = Command(connection, transaction, "INSERT INTO Playlists VALUES($id,$name,0)"); initial.Parameters.AddWithValue("$id", Guid.NewGuid().ToString()); initial.Parameters.AddWithValue("$name", _defaultPlaylistName); initial.ExecuteNonQuery();
                 transaction.Commit();
             }
             if (schema < 2) AddIndexSchema(connection, existed);

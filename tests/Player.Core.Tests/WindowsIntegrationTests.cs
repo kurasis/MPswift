@@ -8,6 +8,21 @@ namespace Player.Core.Tests;
 public sealed class WindowsIntegrationTests
 {
     [Fact]
+    public async Task InitialPlaylistNameCanBeLocalizedWithoutRenamingSavedUserData()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "mp-language-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(directory);
+        var path = Path.Combine(directory, "library.db");
+        try
+        {
+            Guid id;
+            await using (var store = new Player.App.Services.Storage.SqlitePlayerStore(path, "Основной %_ '"))
+            { var state = await store.LoadAsync(); Assert.Equal("Основной %_ '", state.Playlists[0].Name); id = state.Playlists[0].Id; }
+            await using (var reopened = new Player.App.Services.Storage.SqlitePlayerStore(path, "Default"))
+            { var state = await reopened.LoadAsync(); Assert.Equal(id, state.Playlists[0].Id); Assert.Equal("Основной %_ '", state.Playlists[0].Name); }
+        }
+        finally { Directory.Delete(directory, true); }
+    }
+    [Fact]
     public void CommandLineResolvesUnicodePathsAndRequiresExplicitPlay()
     {
         var request = OpenRequest.ParseArguments(["music\\Музыка 🎵.wav", "C:\\Audio\\track.flac"], "C:\\Player");

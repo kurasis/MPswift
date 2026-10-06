@@ -5,8 +5,8 @@ The full specification remains the target. Unit tests or cross-builds do not sat
 | ID | Priority | Scenario | Planned stage | Status | Evidence / next work |
 | --- | --- | --- | --- | --- | --- |
 
-| AC-001 | P0 | Clean portable launch | B/C | Not implemented / not run | [Roadmap](ROADMAP.md) |
-| AC-002 | P0 | Network disconnected before first run | B/C | Not implemented / not run | [Roadmap](ROADMAP.md) |
+| AC-001 | P0 | Clean portable launch | B/C | Local self-contained candidate/package smoke prepared; clean baseline unrun | Unicode extraction/arbitrary CWD/invalid DOTNET_ROOT checks prepared; clean Windows 11 without SDK pending |
+| AC-002 | P0 | Network disconnected before first run | B/C | Local-only app implemented; disconnected-first-run acceptance unrun | [Exact release workflow](RELEASE_ACCEPTANCE.md); no runtime downloads/accounts |
 | AC-003 | P0 | Open MP3 and FLAC | B/C | Implemented; MP3/FLAC native integration passed; device acceptance open | MP3 CBR/VBR and FLAC16/24 fixtures; device playback acceptance open |
 | AC-004 | P0 | Core format matrix | B/C | Native matrix passed for 17 representative profiles; full acceptance partial | 17 real fixtures; HE-AAC/profile/device gates open; [formats](FORMAT_SUPPORT.md) |
 | AC-005 | P0 | Pause/resume/stop | B/C | Production controls implemented; core unit tested | Owner-thread pause/resume/stop tests; actual device API/manual acceptance open |
@@ -32,15 +32,15 @@ The full specification remains the target. Unit tests or cross-builds do not sat
 | AC-025 | P1 | File changes/watcher overflow | D–G | Fingerprint generations/watcher hints/overflow reconciliation implemented | Actual SQLite missing/reappearance state tested; native watcher overflow pending |
 | AC-026 | P1 | Import/export | D–G | M3U8/PLS/legacy import and atomic M3U8 export implemented | Domain duplicate/order/local/recursive/encoding/CUE refusal tests pass; Windows scan/reconcile workflow passed |
 | AC-027 | P1 | Search does not alter playback order | D–G | Unicode filtering keeps persisted source; manual filtered reorder rejected | Core tests and prior real WPF search proof; expanded tab/reopen check passed |
-| AC-028 | P1 | Single instance | D–G | IPC/CLI implemented; 92 local tests pass, Windows checks pending | Bounded current-user pipe; real second-process race/forwarding smoke prepared |
-| AC-029 | P1 | Media keys/tray | D–G | SMTC/tray implemented; Windows checks pending | One media handler; metadata/state/thumbnail; explicit close-to-tray; actual key press remains manual |
-| AC-030 | P1 | DPI/accessibility/localization | D–G | Paired localization/keyboard/seek Automation/DPI initialization implemented | EN/RU actual WPF smoke prepared; Narrator/physical DPI/manual keyboard review remain open |
+| AC-028 | P1 | Single instance | D–G | Real second-process concurrent forwarding/recovery passed | [Stage F Windows evidence](evidence/stage-f-windows-integration.json); bounded current-user pipe, no autoplay |
+| AC-029 | P1 | Media keys/tray | D–G | Tray state/SMTC API and metadata passed; physical keys unrun | One media handler; actual published metadata matches coordinator; physical key/device-hidden playback pending |
+| AC-030 | P1 | DPI/accessibility/localization | D–G | EN/RU resource/Automation/virtualization smoke passed; manual acceptance open | 199 keys, 6 realized near-10k containers; post-IPC culture fix prepared; Narrator/physical DPI open |
 | AC-031 | P1 | Data migration and full disk | D–G | Schema 1→2/backup/recovery integration tests pass | Actual pre-migration backup/stable IDs; unknown/newer preserve; disk-full Windows acceptance open |
 | AC-032 | P1 | Read-only portable location | D–G | Portable marker/fallback implemented; acceptance partial | Explicit writable Data/per-user choice; readonly-folder Windows acceptance open |
-| AC-033 | P1 | Long playback/stress | D–G | Not implemented / not run | [Roadmap](ROADMAP.md) |
+| AC-033 | P1 | Long playback/stress | D–G | Real 1000-cycle native preparation stress prepared; output soak unrun | 50 warmup/load/prepare/seek/stop; handles/memory/p95 samples; two-hour device playback remains open |
 | AC-034 | P1 | Offline traffic audit | D–G | Not implemented / not run | [Roadmap](ROADMAP.md) |
-| AC-035 | P1 | Package audit | D–G | Not implemented / not run | [Roadmap](ROADMAP.md) |
-| AC-036 | P1 | Reference visual review | D–G | Original compact vector/chrome/theme implemented; review pending | EN/RU screenshots will be retained; reference design manual review remains open |
+| AC-035 | P1 | Package audit | D–G | Local 550-file hash/native/runtime audit and negative integrity checks passed | Fresh candidate/14 dependency declarations/13 native x64; license approval false; [gates](RELEASE_ACCEPTANCE.md) |
+| AC-036 | P1 | Reference visual review | D–G | Actual screenshot reviewed; original vector/chrome/compact dark hierarchy | EN/RU screenshots retained in CI; review found/fixed ambient-language drift; physical scale review open |
 | AC-037 | P1 | P1 format matrix | D–G | Six additional pinned P1 decoder paths implemented; coverage incomplete | 13 DLLs audited, WV/TTA/M4B fixtures added; native/profile/license release blockers remain |
 | AC-038 | P1 | Source preservation | D–G | Codec/independent/long-wave source hash and handle checks passed | Read-only file/hash/handle checks include independent and long-wave paths in Windows CI |
 | AC-039 | P1 | Crash/restart | D–G | Transactional/debounced persistence implemented; crash acceptance open | Session checkpoints and clean-exit flush; actual crash/kill workflow remains pending |

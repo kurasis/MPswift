@@ -617,4 +617,16 @@ F1: локальная справка
     <data xml:space="preserve" name="DefaultOutput">
         <value>Устройство Windows по умолчанию</value>
     </data>
+    <data xml:space="preserve" name="DataLocation">
+        <value>Расположение данных</value>
+    </data>
+    <data xml:space="preserve" name="LogLocation">
+        <value>Локальная диагностика</value>
+    </data>
+    <data xml:space="preserve" name="LocalNotices">
+        <value>Уведомления о зависимостях и ограничения находятся в папках docs/ и native/ сборки. Журналы хранятся локально: до пяти файлов по 2 МиБ; личные префиксы путей скрываются. Проверьте диагностику перед передачей.</value>
+    </data>
+    <data xml:space="preserve" name="PortableUnwritable">
+        <value>Переносимое хранилище недоступно для записи. Использовать хранилище пользователя?</value>
+    </data>
 </root>

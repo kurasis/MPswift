@@ -1,3 +1,4 @@
+using Player.App.Resources;
 using System.IO;
 using System.Windows;
 using Player.App.Services.Audio;
@@ -13,8 +14,8 @@ public static class StorageLocation
         try { return Prepare(Path.Combine(AppContext.BaseDirectory, "Data")); }
         catch (Exception error) when (error is IOException or UnauthorizedAccessException)
         {
-            var choice = MessageBox.Show("Portable storage is not writable. Use per-user storage instead?\n\n" + error.Message,
-                "Storage unavailable", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            var choice = MessageBox.Show(Strings.Get("PortableUnwritable") + "\n\n" + error.Message,
+                Strings.Get("StorageUnavailable"), MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (choice != MessageBoxResult.Yes) throw;
             return Prepare(user);
         }

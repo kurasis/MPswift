@@ -37,12 +37,24 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: ./scripts/Smoke.ps1 -SkipBuild
+      - name: Audit local portable development candidate
+        shell: pwsh
+        run: ./scripts/Package-Candidate.ps1 -SkipBuild
+      - name: Reject modified, missing and extra candidate files
+        shell: pwsh
+        run: ./scripts/Test-CandidateIntegrity.ps1
+      - name: Run extracted self-contained app from Unicode path
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/Package-Smoke.ps1
       - name: Retain test and native decode evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: evidence-${{ matrix.os }}
           path: |
+            artifacts/portable/*audit.json
+            artifacts/portable/*.sha256
             artifacts/test-results/*.trx
             artifacts/smoke/*.json
             artifacts/smoke/*.png
