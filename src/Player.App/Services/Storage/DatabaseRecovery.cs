@@ -22,6 +22,11 @@ public static class DatabaseRecovery
     {
         destination = Path.GetFullPath(destination); backup = Path.GetFullPath(backup);
         if (string.Equals(destination, backup, StringComparison.OrdinalIgnoreCase)) throw new IOException("Choose a separate backup file.");
+        using var destinationLease = DataDirectoryLease.Open(Path.GetDirectoryName(destination)!);
+        using var sourceLease = DataDirectoryLease.Open(Path.GetDirectoryName(backup)!);
+        destination = Path.Combine(destinationLease.DirectoryPath, Path.GetFileName(destination));
+        backup = Path.Combine(sourceLease.DirectoryPath, Path.GetFileName(backup));
+        if (string.Equals(destination, backup, StringComparison.OrdinalIgnoreCase)) throw new IOException("Choose a separate backup file.");
         using var ownership = new FileStream(destination + ".owner.lock", FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
         using var source = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = backup, Mode = SqliteOpenMode.ReadOnly, Pooling = false }.ToString());
         source.Open();

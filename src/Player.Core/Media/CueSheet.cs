@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Collections.Immutable;
 using System.Security.Cryptography;
 using System.Text;
 using Player.Core.Playback;
@@ -15,7 +16,7 @@ public sealed record CueSheet(CueSong[] Songs, string[] Diagnostics)
         documentPath = LocalMediaPath.Parse(documentPath).Value;
         var tracks = new List<Builder>(); var errors = new List<string>();
         string? file = null, album = null, performer = null; Builder? current = null;
-        var remarks = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var remarks = ImmutableDictionary.Create<string, string>(StringComparer.OrdinalIgnoreCase);
         var lineNumber = 0;
         foreach (var line in text.Split('\n'))
         {
@@ -33,7 +34,7 @@ public sealed record CueSheet(CueSong[] Songs, string[] Diagnostics)
                         if (words.Count != 3 || !int.TryParse(words[1], NumberStyles.None, CultureInfo.InvariantCulture, out var number) || number is < 1 or > 999 || words[2].ToUpperInvariant() != "AUDIO" || file is null)
                             throw new InvalidDataException("Expected TRACK number AUDIO after FILE.");
                         if (tracks.Count >= 10000 || tracks.Any(t => t.Number == number)) throw new InvalidDataException("Duplicate track number or track limit exceeded.");
-                        current = new(number, file, performer, new(remarks, StringComparer.OrdinalIgnoreCase)); tracks.Add(current); break;
+                        current = new(number, file, performer, remarks); tracks.Add(current); break;
                     case "TITLE":
                     case "PERFORMER":
                         if (words.Count != 2 || words[1].Length > 4096) throw new InvalidDataException("Invalid metadata field.");
@@ -47,7 +48,7 @@ public sealed record CueSheet(CueSong[] Songs, string[] Diagnostics)
                         else { if (current.Start is not null || current.Pregap > frame) throw new InvalidDataException("INDEX 01 order invalid."); current.Start = frame; } break;
                     case "REM":
                         if (words.Count >= 3 && words[1].Length <= 100)
-                        { var value = string.Join(' ', words.Skip(2)); if (value.Length > 4096) throw new InvalidDataException("REM too long."); (current?.Remarks ?? remarks)[words[1]] = value; } break;
+                        { var value = string.Join(' ', words.Skip(2)); if (value.Length > 4096) throw new InvalidDataException("REM too long."); if (current is null) remarks = remarks.SetItem(words[1], value); else current.Remarks = current.Remarks.SetItem(words[1], value); } break;
                 }
             }
             catch (Exception e) when (e is ArgumentException or InvalidDataException or OverflowException)
@@ -108,6 +109,6 @@ public sealed record CueSheet(CueSong[] Songs, string[] Diagnostics)
         }
         return words;
     }
-    private sealed class Builder(int number, string path, string? performer, Dictionary<string, string> remarks)
-    { public int Number = number; public string Path = path; public string? Performer = performer, Title; public long? Start, Pregap; public bool Invalid; public Dictionary<string, string> Remarks = remarks; }
+    private sealed class Builder(int number, string path, string? performer, ImmutableDictionary<string, string> remarks)
+    { public int Number = number; public string Path = path; public string? Performer = performer, Title; public long? Start, Pregap; public bool Invalid; public ImmutableDictionary<string, string> Remarks = remarks; }
 }

@@ -18,6 +18,7 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
     private bool _closing;
     private SqliteConnection? _connection;
     private FileStream? _ownership;
+    private DataDirectoryLease? _directoryLease;
     internal Action? MigrationBeforeCommit { get; init; }
     public SqlitePlayerStore(string path, string defaultPlaylistName = "Default")
     {
@@ -107,6 +108,8 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
     }
     public Task BackupAsync(string destination) => Queue(() =>
     {
+        using var lease = DataDirectoryLease.Open(Path.GetDirectoryName(Path.GetFullPath(destination))!);
+        destination = Path.Combine(lease.DirectoryPath, Path.GetFileName(destination));
         if (File.Exists(destination)) throw new IOException("Choose a new backup filename; existing files are never overwritten.");
         var connection = Open();
         using var backup = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = destination, Mode = SqliteOpenMode.ReadWriteCreate, Pooling = false }.ToString());
@@ -115,12 +118,14 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
     private SqliteConnection Open()
     {
         if (_connection is not null) return _connection;
-        Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
+        var directoryLease = DataDirectoryLease.Create(Path.GetDirectoryName(_path)!);
+        var databasePath = Path.Combine(directoryLease.DirectoryPath, Path.GetFileName(_path));
         FileStream ownership;
-        try { ownership = new FileStream(_path + ".owner.lock", FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None); }
-        catch (IOException error) when ((error.HResult & 0xffff) is 32 or 33 || !OperatingSystem.IsWindows() && (error.HResult & 0xffff) == 11) { throw new PlayerStoreInUseException(error); }
-        var existed = File.Exists(_path);
-        var connection = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = _path, Mode = existed ? SqliteOpenMode.ReadWrite : SqliteOpenMode.ReadWriteCreate, Pooling = false, DefaultTimeout = 3 }.ToString());
+        try { ownership = new FileStream(databasePath + ".owner.lock", FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None); }
+        catch (IOException error) when ((error.HResult & 0xffff) is 32 or 33 || !OperatingSystem.IsWindows() && (error.HResult & 0xffff) == 11) { directoryLease.Dispose(); throw new PlayerStoreInUseException(error); }
+        catch { directoryLease.Dispose(); throw; }
+        var existed = File.Exists(databasePath);
+        var connection = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = databasePath, Mode = existed ? SqliteOpenMode.ReadWrite : SqliteOpenMode.ReadWriteCreate, Pooling = false, DefaultTimeout = 3 }.ToString());
         try
         {
             connection.Open();
@@ -156,9 +161,9 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
                 transaction.Commit();
             }
             if (schema < 2) AddIndexSchema(connection, existed);
-            _connection = connection; _ownership = ownership; return connection;
+            _connection = connection; _ownership = ownership; _directoryLease = directoryLease; return connection;
         }
-        catch { connection.Dispose(); ownership.Dispose(); throw; }
+        catch { connection.Dispose(); ownership.Dispose(); directoryLease.Dispose(); throw; }
     }
     private static SqliteCommand Command(SqliteConnection connection, SqliteTransaction? transaction, string sql)
     { var command = connection.CreateCommand(); command.Transaction = transaction; command.CommandText = sql; return command; }
@@ -190,6 +195,7 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
         {
             try { _connection?.Dispose(); } catch (Exception error) { failure = error; }
             try { _ownership?.Dispose(); } catch (Exception error) { failure = failure is null ? error : new AggregateException(failure, error); }
+            try { _directoryLease?.Dispose(); } catch (Exception error) { failure = failure is null ? error : new AggregateException(failure, error); }
             _work.Dispose();
         }
         // Reopen is permitted only after both SQLite and the ownership handle are released.

@@ -46,7 +46,11 @@ public static class StorageArtworkValidation
             Check(!Directory.GetFiles(directory, "*.tmp").Any(), "Failed settings save left a temporary file.");
             settings.Save(new(Volume: 35)); Check(settings.Load().Volume == 35, "Settings writer unusable after permissions restored.");
             var database = Path.Combine(directory, "library.db"); var archive = Path.Combine(directory, "complete.zip");
-            await using (var store = new SqlitePlayerStore(database)) { await store.LoadAsync(); await BackupBundle.CreateAsync(store, settings.Load(), archive); }
+            await using (var store = new SqlitePlayerStore(database)) { await store.LoadAsync();
+                var directoryMoveRejected = false;
+                try { Directory.Move(directory, directory + "-moved"); } catch (IOException) { directoryMoveRejected = true; }
+                Check(directoryMoveRejected, "Live database did not pin its data directory.");
+                await BackupBundle.CreateAsync(new BackupDirectoryProbe(store, directory), settings.Load(), archive); }
             var databaseBefore = Hash(database); before = Hash(path); var restoreRejected = false;
             using (var locked = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.None))
                 try { await BackupBundle.RestoreAsync(directory, archive); } catch (IOException) { restoreRejected = true; }
@@ -65,6 +69,7 @@ public static class StorageArtworkValidation
                 writer.Write(10000); writer.Write(10000); writer.Write((ushort)1); writer.Write((ushort)24); writer.Write(new byte[24]);
             }
             Check(await service.LoadAsync(source, CancellationToken.None) is null, "Oversized/truncated image was accepted.");
+            var coverMutations = await ValidateCoverMutationsAsync(source, cover);
             var pixels = Enumerable.Repeat(unchecked((int)0xff448855), 16 * 1024).ToArray();
             var bitmap = BitmapSource.Create(16, 1024, 96, 96, PixelFormats.Bgr32, null, pixels, 16 * 4); bitmap.Freeze();
             var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap)); using (var file = File.Create(cover)) encoder.Save(file);
@@ -80,12 +85,47 @@ public static class StorageArtworkValidation
             using (File.Open(cover, FileMode.Open, FileAccess.ReadWrite, FileShare.None)) { }
             return new { Status = "storage-artwork-passed", WindowsDirectoryWriteDeniedByAcl = true, LockedSettingsRejected = true,
                 OriginalAndPreviousSettingsUnchangedOnFailure = true, WriterRecovered = true, InvalidCoverRejected = true, EncodedLimitBytes = 20 * 1024 * 1024,
-                PartialBundleRestoreRolledBackOnLockedSettings = true,
+                PartialBundleRestoreRolledBackOnLockedSettings = true, LiveDatabaseDirectoryPinned = true, BackupStagingAndDestinationPinned = true,
                 OversizedTruncatedHeaderRejected = true, DeclaredPixelLimit = 40000000, PortraitThumbnailWidth = image!.PixelWidth, PortraitThumbnailHeight = image.PixelHeight,
-                FrozenCacheHit = true, SameFactsSiblingIdentity = true, CancellationLeavesWorkerUsable = true, SourceHashUnchanged = true, ReaderHandlesReleased = true,
+                BoundedCoverMutations = coverMutations, FrozenCacheHit = true, SameFactsSiblingIdentity = true, CancellationLeavesWorkerUsable = true, SourceHashUnchanged = true, ReaderHandlesReleased = true,
                 DiskFull = "not-run", HugeTagProcessIsolation = "not-run" };
         }
         finally { Directory.Delete(directory, true); }
+    }
+    private sealed class BackupDirectoryProbe(IPlayerStore store, string destinationDirectory) : IPlayerStore
+    {
+        public Task<LibraryState> LoadAsync() => store.LoadAsync();
+        public Task SaveAsync(LibraryState state, bool playlistsChanged) => store.SaveAsync(state, playlistsChanged);
+        public Task BackupAsync(string destination)
+        {
+            foreach (var path in new[] { Path.GetDirectoryName(destination)!, destinationDirectory })
+            {
+                var rejected = false;
+                try { Directory.Move(path, path + "-moved"); } catch (IOException) { rejected = true; }
+                if (!rejected) throw new InvalidOperationException("Backup directory changed during its production operation.");
+            }
+            return store.BackupAsync(destination);
+        }
+        public ValueTask DisposeAsync() => ValueTask.CompletedTask; // Borrowed owner; outer validation owns disposal.
+    }
+    private static async Task<object> ValidateCoverMutationsAsync(string source, string cover)
+    {
+        var png = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAD0lEQVR4AQEEAPv/AP8AAAMBAQCNHeWCAAAAAElFTkSuQmCC");
+        var dimensions = png.ToArray();
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(dimensions.AsSpan(16), uint.MaxValue);
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(dimensions.AsSpan(20), uint.MaxValue);
+        var cases = new[] { png[..8], png[..24], png[..40], dimensions, new byte[] { 255, 216, 255, 224, 255, 255, 0, 0 } };
+        for (var i = 0; i < cases.Length; i++)
+        {
+            File.WriteAllBytes(cover, cases[i]);
+            // A fresh service prevents size/time cache reuse from obscuring the malformed input.
+            if (await new ArtworkService().LoadAsync(source, CancellationToken.None) is not null)
+                throw new InvalidOperationException("Malformed owned PNG/JPEG case unexpectedly decoded: " + i);
+        }
+        File.WriteAllBytes(cover, png);
+        if (await new ArtworkService().LoadAsync(source, CancellationToken.None) is not { PixelWidth: 1, PixelHeight: 1, IsFrozen: true })
+            throw new InvalidOperationException("Valid cover did not recover after malformed image controls.");
+        return new { Cases = cases.Length, TruncatedPngRejected = true, OverflowDimensionsRejected = true, InvalidJpegRejected = true, ValidPngRecovered = true };
     }
     private static async Task ValidateSiblingIdentityAsync(ArtworkService service, string source, string cover)
     {

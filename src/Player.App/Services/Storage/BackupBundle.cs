@@ -17,10 +17,12 @@ public static class BackupBundle
     public static async Task CreateAsync(IPlayerStore store, PlayerSettings settings, string destination)
     {
         destination = Path.GetFullPath(destination);
+        using var destinationLease = DataDirectoryLease.Open(Path.GetDirectoryName(destination)!);
+        destination = Path.Combine(destinationLease.DirectoryPath, Path.GetFileName(destination));
         var stage = Path.Combine(Path.GetDirectoryName(destination)!, ".player-backup-" + Guid.NewGuid().ToString("N"));
         var temporary = destination + ".partial-" + Guid.NewGuid().ToString("N");
         if (File.Exists(destination) || Directory.Exists(destination)) throw new IOException("Choose a new backup filename; existing files are never overwritten.");
-        Directory.CreateDirectory(stage);
+        var stageLease = DataDirectoryLease.Create(stage);
         try
         {
             await store.BackupAsync(Path.Combine(stage, "library.db"));
@@ -43,13 +45,14 @@ public static class BackupBundle
                 File.Move(temporary, destination);
             });
         }
-        finally { if (File.Exists(temporary)) File.Delete(temporary); Directory.Delete(stage, true); }
+        finally { stageLease.Dispose(); if (File.Exists(temporary)) File.Delete(temporary); Directory.Delete(stage, true); }
     }
     public static async Task RestoreAsync(string directory, string archive)
     {
-        directory = Path.GetFullPath(directory);
+        using var directoryLease = DataDirectoryLease.Create(directory);
+        directory = directoryLease.DirectoryPath;
         var stage = Path.Combine(directory, ".player-restore-" + Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(stage);
+        var stageLease = DataDirectoryLease.Create(stage);
         try
         {
             await Task.Run(() => ExtractValidated(archive, stage));
@@ -57,10 +60,12 @@ public static class BackupBundle
             await using (var validator = new SqlitePlayerStore(Path.Combine(stage, "library.db"))) await validator.LoadAsync();
             await Task.Run(() => Install(directory, stage));
         }
-        finally { Directory.Delete(stage, true); }
+        finally { stageLease.Dispose(); Directory.Delete(stage, true); }
     }
     private static void ExtractValidated(string archive, string stage)
     {
+        using var archiveLease = DataDirectoryLease.Open(Path.GetDirectoryName(Path.GetFullPath(archive))!);
+        archive = Path.Combine(archiveLease.DirectoryPath, Path.GetFileName(archive));
         using var file = File.OpenRead(archive);
         if (file.Length > MaximumDatabaseBytes + 1048576) throw new InvalidDataException("Backup archive is too large.");
         BackupZipDirectory.Validate(file); // Bound central-directory work before ZipArchive materializes its entries.

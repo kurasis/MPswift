@@ -1,0 +1,54 @@
+# Security deepening: directory continuity and bounded parser coverage
+
+Date: 2026-10-07. Scope: the four further blocks requested by the owner after [the initial audit](SECURITY_AUDIT_2026-10-07.md) and [approved items 2–4](SECURITY_FOLLOWUP_2026-10-07.md). Baseline `ae7448799b9f60293a95df8f03e3512128da00e0`: main run [37594904080](https://github.com/kurasis/MPswift/actions/runs/37594904080), all three jobs passed, 236 tests on each OS and 56 native mutation cases. Static inspection preceded new dynamic checks. Only synthetic owned inputs are used.
+
+## Confirmed findings
+
+### SEC-10 — Mutable data directory names during writes/restoration (medium, conditional local integrity)
+
+- Files/sections: `StorageLocation.Prepare`; `SettingsFile.Save/RestoreBackup/Export`; `SqlitePlayerStore.Open/BackupAsync`; `DatabaseRecovery.Restore`; `BackupBundle.CreateAsync/RestoreAsync/ExtractValidated`; `WaveformCache.WriteCore/ClearCore/Evict`.
+- Cause: path validation/creation did not retain directory identity during subsequent operations. A process with permission to rename/replace a data or staging directory could redirect path-based operations after validation. A local junction can also be retargeted in place using write access to its reparse object. Previous atomic file replacement and archive entry-name checks did not protect the enclosing directory.
+- Conditions/damage: another local process must already have modification rights to the affected directory/link. A resulting settings/cache write, restore move, or cleanup could address an unintended local directory. This is not remote code execution or a demonstrated privilege escalation. Program data belongs to the current user; no elevated product launch is introduced.
+- Minimal fix: `DataDirectoryLease` holds Windows directory handles with no delete sharing over both requested and resolved physical chains; reparse objects additionally retain a share-read-only handle against in-place write access. Canonical physical paths are used for settings/cache/database/backup operations. A live store retains its lease until SQLite and ownership handles close. Backup/restoration stages stay pinned across awaits, validation and installation. Ordinary local directory links continue to work. Leases are scoped and disposed; file writes inside the directory remain possible.
+- Tests: restricted-token lab checks actual/ancestor rename, link deletion and native reparse write-open refusal while pinned, with successful write-open/rename/deletion controls after disposal and no reparse data modifications. Settings and waveform cache round trip through a pre-existing local directory link. WPF Windows validation checks the live database and both backup destination and staging directory during production backup, plus existing failed-restore rollback, ACL, file-lock and disk-full routes.
+- Limits: this is Windows directory continuity, not a portable filesystem sandbox. Linux retains normal test paths. Acquisition cannot authenticate contents or repair compromise that predates acquisition. Individual mutable data files/hardlinks, source DB WAL companions, and the brief release-before-owned-stage-cleanup interval are not a full handle-relative transaction. No claim is made that all file races are eliminated. A same-user attacker can still modify writable installation or data before startup.
+
+### SEC-11 — CUE global REM dictionaries copied for every track (medium availability)
+
+- File/section: `Player.Core/Media/CueSheet.cs`, TRACK builder construction and REM handling.
+- Cause: each TRACK copied the entire common REM dictionary. The 4 MiB document and line limits allowed thousands of global keys followed by 999 tracks. A 10,000-key/999-track document required roughly 280 MiB just for repeated dictionary backing storage, despite a small source document; larger allowed key counts could require much more.
+- Conditions/damage: import or automatic discovery of a crafted local CUE can consume excessive managed memory and stall or terminate the player. No command execution or external network request is established.
+- Minimal fix: immutable persistent dictionaries share unchanged global REM metadata, while track-local overrides create independent updated maps. Public `IReadOnlyDictionary<string,string>` values, case-insensitive keys and metadata contents remain supported; no REM key is discarded and no dependency version is changed. No insertion-order contract exists for this dictionary interface.
+- Tests: a real 10,000-key/999-track parse retains all metadata, limits current-thread allocations to under 96 MiB, and isolates track-only overrides. A separate two-file case preserves changing global metadata and case-insensitive overrides. Deterministic malformed CUE cases and full M3U/PLS entry boundaries exercise local-only/nonrecursive path handling.
+
+### SEC-12 — Artwork tag/sibling reads lacked opening continuity (medium, conditional local integrity)
+
+- File/section: `ArtworkService.LoadAsync`, TagLib source and sibling image file opening.
+- Cause/conditions: artwork used a validated path and then reopened it without the read lease already used by production metadata/waveform readers. Concurrent source or ancestor replacement after validation could change what was parsed, including a different local or reparse target.
+- Minimal fix: use the existing canonical `LocalReadLease` through metadata guard/TagLib reads and through sibling byte reads. Existing encoded-byte, pixel, thumbnail and cache limits remain unchanged. No extra background worker, network call or user permission is added.
+- Tests: existing malformed/large artwork, valid portrait/cache identity, cancellation, source hash and handle-release controls remain. Five additional bounded malformed PNG/JPEG controls cover truncation and overflowing dimensions and require a valid PNG to decode afterward in disposable Windows CI. This is WIC functional/error coverage, not image codec memory-safety proof or a per-image Job sandbox.
+
+## Expanded isolated parser checks
+
+`ParserSecurityValidation` now schedules **214 fresh resource-contained child cases**:
+
+- 98 native decoding cases: 14 short synthetic formats, each control/truncated/header-bits/declared-size/body-bits/body-truncated/tail-bits.
+- 98 actual TagLib cases with the production `MetadataReadGuard` and canonical read lease, over those same originals/mutants. A structured rejection must still parse a valid WAV in the same worker. Unsupported metadata formats are recorded as rejection, not decoder failure; the valid WAV metadata control must parse.
+- 14 actual decoder lifecycle cases: three independent stream opens per format, start/middle/near-end/back-to-start seeks, repeated EOF and decoding after an EOF reset. No sound device is required.
+- Four WavPack hybrid/correction cases: original, truncated, body-damaged and declared-size-damaged `.wvc`. Native rejection or safe fallback decoding is acceptable for damaged correction; original control must decode. Both WV/WVC hashes and exclusive handle reopening are checked.
+
+Each actual worker passes the existing Job membership/limits handshake before parsing: 512 MiB committed memory, eight seconds user CPU, fifteen seconds wall deadline, one process, bounded output, kill/wait on cancellation. The waiting-worker deadline control and restricted-token file/DLL checks remain. Native faults, timeouts, limit kills and unexpected exit codes fail the suite. All tracked original hashes are checked. TagLibSharp 2.3.0 is added only to the existing development harness using the existing repository pin and a reviewed updated harness lockfile; shipped application dependencies and versions are unchanged.
+
+These are deterministic mutations and lifecycle controls, not coverage-guided fuzzing, a restricted-primary-token security sandbox, sanitizers, or proof that closed native libraries/WIC cannot corrupt memory. Native parsing runs only in disposable Windows CI/labs; it is not executed on this Linux workspace or a working PC.
+
+## Existing limits at supported dimensions
+
+`LargeStorageBoundaryTests` saves, reloads, creates a complete backup and restores **100 tabs / 10,000 entries / 10,000 queued entries / 100 history entries / 10,000 shuffle IDs** using the actual production database and backup APIs. Queue/session ordering and identities, metadata and Russian settings survive. A validly shaped queue whose serialized session exceeds the existing 16 Mi UTF-16-unit cap is refused with the previously committed session unchanged. The existing SQLite row/schema/SQL/VM budgets are unchanged. This verifies ordinary metadata at maximum item dimensions, not simultaneous maximum lengths for every field or reference-hardware performance acceptance. Measured time/session/archive sizes are in the current TRX output.
+
+## Verification checkpoint and residual work
+
+The baseline locked Release build passes 236 tests, zero warnings/errors. The modified Linux locked Release build passes **242 tests**, zero failed/skipped/warnings/errors. Windows native, WIC, restricted-token and extracted-package execution must be verified by this source's CI before ZIP publication; its JSON/TRX reports record actual outcomes. Separate lint/type commands are not configured; compiler warnings are errors and existing xUnit analyzers run during build. No suspicious installer or third-party fuzz script is executed.
+
+Official advisory evidence remains [the same-day exact-version observation](evidence/security-dependencies-2026-10-07.json); no managed/native application version is upgraded here. Unknown exact closed embedded codecs remain unknown. Residual work includes coverage-guided/sanitizer tests where vendor source is available, broader body/chunk/image/tag/sidecar corpora, native startup allocations and closed-addon dynamic loading, persistent production streaming/sidecar continuity, individual mutable data-file races, and clean standard-user Windows 11/offline/hardware/full-duration acceptance. Publisher signing requires an owner certificate/key decision; distribution/license gates remain separate. Automated passes do not establish complete application safety.
+
+Official API references: [CreateFile sharing](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew), [reparse-point handling](https://learn.microsoft.com/en-us/windows/win32/fileio/reparse-points), [Job Object limits](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-jobobject_extended_limit_information).

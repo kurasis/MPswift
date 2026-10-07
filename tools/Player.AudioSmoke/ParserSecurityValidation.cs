@@ -32,7 +32,7 @@ internal static class ParserSecurityValidation
         var results = new List<object>(); var failures = new List<string>();
         var sources = new[] { "audio/pcm16.wav", "audio/pcm16.aiff", "audio/flac16.flac", "audio/mp3-vbr.mp3", "audio/vorbis.ogg", "audio/opus.opus",
             "audio/alac.m4a", "audio/aac-lc.aac", "audio/wma2.wma", "audio/wavpack.wv", "audio/tta.tta", "audio/dsd64.dsf", "audio-extended/monkey.ape", "audio-extended/musepack.mpc" };
-        var hashes = sources.ToDictionary(name => name, name => Hash(Path.Combine(fixtures, name)));
+        var hashes = sources.Concat(new[] { "audio-extended/hybrid-corrected.wv", "audio-extended/hybrid-corrected.wvc" }).ToDictionary(name => name, name => Hash(Path.Combine(fixtures, name)));
         object? nativeFiles = null;
         try
         {
@@ -63,11 +63,12 @@ internal static class ParserSecurityValidation
             {
                 var source = File.ReadAllBytes(Path.Combine(fixtures, name));
                 if (source.Length is < 128 or > 4 * 1024 * 1024) throw new InvalidDataException("Security seeds must be small synthetic fixtures.");
-                foreach (var mutation in new[] { "control", "truncated", "header-bits", "declared-size" })
+                foreach (var mutation in new[] { "control", "truncated", "header-bits", "declared-size", "body-bits", "body-truncated", "tail-bits", "lifecycle-control" })
+                foreach (var kind in mutation == "lifecycle-control" ? new[] { "lifecycle" } : new[] { "decode", "metadata" })
                 {
                     var bytes = Mutate(source, Path.GetExtension(name), mutation);
                     var path = Path.Combine(root, "case-" + results.Count + Path.GetExtension(name)); File.WriteAllBytes(path, bytes);
-                    var before = Hash(path); File.WriteAllText(requestPath, JsonSerializer.Serialize(new Request("decode", path)));
+                    var before = Hash(path); File.WriteAllText(requestPath, JsonSerializer.Serialize(new Request(kind, path)));
                     var clock = Stopwatch.StartNew();
                     try
                     {
@@ -75,26 +76,51 @@ internal static class ParserSecurityValidation
                         if (child.ExitCode != 0) throw new InvalidOperationException($"Worker exit {child.ExitCode}: {child.Output} {child.Errors}");
                         using var json = JsonDocument.Parse(child.Output); var evidence = json.RootElement;
                         var outcome = evidence.GetProperty("Outcome").GetString();
-                        if (evidence.GetProperty("Status").GetString() != "bounded-parser-worker-completed" || outcome is not ("decoded" or "rejected") || mutation == "control" && outcome != "decoded")
+                        if (evidence.GetProperty("Status").GetString() != "bounded-parser-worker-completed" || outcome is not ("decoded" or "metadata-parsed" or "lifecycle-passed" or "rejected") ||
+                            kind == "decode" && mutation == "control" && outcome != "decoded" ||
+                            kind == "lifecycle" && outcome != "lifecycle-passed" ||
+                            kind == "metadata" && mutation == "control" && name.EndsWith(".wav", StringComparison.Ordinal) && outcome != "metadata-parsed")
                             throw new InvalidDataException("Worker did not produce current valid control/rejection evidence.");
                         if (before != Hash(path)) throw new InvalidDataException("Decoder changed owned input bytes.");
                         using (File.Open(path, FileMode.Open, FileAccess.Read, FileShare.None)) { }
-                        results.Add(new { Seed = name, Mutation = mutation, Sha256 = before, Outcome = outcome, child.ExitCode, child.PeakCommittedBytes, child.WallMilliseconds, SourceUnchanged = true, Evidence = evidence.Clone() });
+                        results.Add(new { Seed = name, Kind = kind, Mutation = mutation, Sha256 = before, Outcome = outcome, child.ExitCode, child.PeakCommittedBytes, child.WallMilliseconds, SourceUnchanged = true, Evidence = evidence.Clone() });
                     }
                     catch (Exception error)
                     {
-                        var detail = error.Message[..Math.Min(error.Message.Length, 2048)]; failures.Add(name + "/" + mutation + ": " + detail);
-                        results.Add(new { Seed = name, Mutation = mutation, Outcome = "worker-failed", Detail = detail, WallMilliseconds = clock.Elapsed.TotalMilliseconds });
+                        var detail = error.Message[..Math.Min(error.Message.Length, 2048)]; failures.Add(name + "/" + kind + "/" + mutation + ": " + detail);
+                        results.Add(new { Seed = name, Kind = kind, Mutation = mutation, Outcome = "worker-failed", Detail = detail, WallMilliseconds = clock.Elapsed.TotalMilliseconds });
                     }
                 }
             }
-            foreach (var name in sources) if (Hash(Path.Combine(fixtures, name)) != hashes[name]) throw new InvalidDataException("Tracked synthetic seed changed.");
+            var hybrid = Path.Combine(root, "correction.wv"); var sidecar = Path.ChangeExtension(hybrid, ".wvc");
+            File.Copy(Path.Combine(fixtures, "audio-extended/hybrid-corrected.wv"), hybrid);
+            var correction = File.ReadAllBytes(Path.Combine(fixtures, "audio-extended/hybrid-corrected.wvc"));
+            foreach (var mutation in new[] { "control", "truncated", "body-bits", "declared-size" })
+            {
+                File.WriteAllBytes(sidecar, Mutate(correction, ".wvc", mutation));
+                var audioHash = Hash(hybrid); var correctionHash = Hash(sidecar);
+                File.WriteAllText(requestPath, JsonSerializer.Serialize(new Request("decode", hybrid)));
+                try
+                {
+                    var child = await SecurityChildProcess.RunAsync(tool, root, requestPath);
+                    if (child.ExitCode != 0) throw new InvalidOperationException("Correction worker failed: " + child.Output + child.Errors);
+                    using var json = JsonDocument.Parse(child.Output); var evidence = json.RootElement;
+                    var outcome = evidence.GetProperty("Outcome").GetString();
+                    if (evidence.GetProperty("Status").GetString() != "bounded-parser-worker-completed" || outcome is not ("decoded" or "rejected") || mutation == "control" && outcome != "decoded") throw new InvalidDataException("Correction worker evidence invalid.");
+                    if (Hash(hybrid) != audioHash || Hash(sidecar) != correctionHash) throw new InvalidDataException("Correction decoder changed owned source data.");
+                    using (File.Open(hybrid, FileMode.Open, FileAccess.Read, FileShare.None)) { }
+                    using (File.Open(sidecar, FileMode.Open, FileAccess.Read, FileShare.None)) { }
+                    results.Add(new { Seed = "audio-extended/hybrid-corrected.wv", Kind = "correction", Mutation = mutation, Sha256 = audioHash, CorrectionSha256 = correctionHash, Outcome = outcome, child.PeakCommittedBytes, child.WallMilliseconds, SourceUnchanged = true, Evidence = evidence.Clone() });
+                }
+                catch (Exception error) { failures.Add("correction/" + mutation + ": " + error.Message[..Math.Min(error.Message.Length, 2048)]); }
+            }
+            foreach (var name in hashes.Keys) if (Hash(Path.Combine(fixtures, name)) != hashes[name]) throw new InvalidDataException("Tracked synthetic seed changed.");
             var report = new { Status = failures.Count == 0 ? "bounded-parser-security-passed" : "bounded-parser-security-failed", Seeds = sources.Length, Cases = results.Count,
                 Isolation = "Fresh child per case in disposable Windows CI/lab; Job Object resource containment is not a security sandbox",
                 MemoryLimitBytes = SecurityChildProcess.MemoryBytes, UserCpuLimitSeconds = SecurityChildProcess.CpuSeconds, WallLimitSeconds = SecurityChildProcess.WallSeconds,
                 StdoutAndStderrLimitCharacters = 65536, AssignedLimitsQueried = true, TimeoutControlKilledAndWaited = true,
                 NativeFiles = nativeFiles, SeedSha256 = hashes, OriginalSeedHashesUnchanged = true, Results = results, Failures = failures,
-                Coverage = "Deterministic short truncation/header/size mutation corpus; not coverage-guided native fuzzing or proof of memory safety" };
+                Coverage = "Deterministic header/body/tail/size mutations, guarded TagLib reads, seek/reopen/EOF and WavPack correction controls; not coverage-guided native fuzzing or proof of memory safety" };
             var output = Path.Combine(Environment.CurrentDirectory, "artifacts", "smoke", "security-parsers.json"); Directory.CreateDirectory(Path.GetDirectoryName(output)!);
             File.WriteAllText(output, JsonSerializer.Serialize(report, new JsonSerializerOptions { WriteIndented = true }));
             if (failures.Count != 0) throw new InvalidOperationException($"{failures.Count} bounded parser cases failed. See artifacts/smoke/security-parsers.json.");
@@ -117,6 +143,12 @@ internal static class ParserSecurityValidation
         if (Path.GetDirectoryName(input.Source) != root || new FileInfo(input.Source).Length > 4 * 1024 * 1024) throw new InvalidDataException("Worker input must be small and owned.");
         if (input.Kind == "timeout-control") { await Task.Delay(Timeout.InfiniteTimeSpan); throw new InvalidOperationException("Timeout control unexpectedly completed."); }
         if (input.Kind == "lease") return RestrictedFileSecurityValidation.Run(input.Source);
+        if (input.Kind == "metadata") return MetadataWorker(input.Source);
+        if (input.Kind == "lifecycle")
+        {
+            NativeLibraryBootstrap.LoadAndVerify();
+            return new { Status = "bounded-parser-worker-completed", Outcome = "lifecycle-passed", Lifecycle = DecoderLifecycleValidation.Run(input.Source) };
+        }
         if (input.Kind != "decode") throw new InvalidDataException("Unknown worker request.");
         NativeLibraryBootstrap.LoadAndVerify(); // Dependency/loader failures never count as parser rejection.
         using var session = new BassSmokeSession();
@@ -131,10 +163,17 @@ internal static class ParserSecurityValidation
     }
     private static byte[] Mutate(byte[] source, string extension, string mutation)
     {
+        if (mutation == "body-truncated") return source[..(source.Length * 3 / 4)];
         if (mutation == "truncated") return source[..Math.Min(128, source.Length / 2)];
         var bytes = source.ToArray();
         if (mutation == "header-bits")
         { var random = new Random(0x4d5053); for (var i = 0; i < 16; i++) bytes[random.Next(Math.Min(96, bytes.Length))] ^= (byte)(1 << random.Next(8)); }
+        if (mutation is "body-bits" or "tail-bits")
+        {
+            var random = new Random(0x4d5053); var start = mutation == "body-bits" ? source.Length / 3 : source.Length * 3 / 4;
+            var end = mutation == "body-bits" ? source.Length * 2 / 3 : source.Length;
+            for (var i = 0; i < 32; i++) bytes[random.Next(start, end)] ^= (byte)(1 << random.Next(8));
+        }
         if (mutation == "declared-size")
         {
             if (extension == ".wav") BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(4), uint.MaxValue);
@@ -143,6 +182,27 @@ internal static class ParserSecurityValidation
             else bytes.AsSpan(8, Math.Min(16, bytes.Length - 8)).Fill(255);
         }
         return bytes;
+    }
+    private static object MetadataWorker(string source)
+    {
+        using var lease = LocalReadLease.Open(source);
+        try
+        {
+            Player.Core.Media.MetadataReadGuard.Validate(lease.Path);
+            using var file = TagLib.File.Create(lease.Path, TagLib.ReadStyle.Average);
+            var title = file.Tag.Title; var pictures = file.Tag.Pictures;
+            return new { Status = "bounded-parser-worker-completed", Outcome = "metadata-parsed", TitleCharacters = title?.Length ?? 0, Pictures = pictures.Length,
+                PictureBytes = pictures.Sum(p => (long)p.Data.Count), GuardedRead = true };
+        }
+        catch (Exception error) when (error is TagLib.CorruptFileException or TagLib.UnsupportedFormatException or IOException or InvalidDataException or ArgumentException or NotImplementedException)
+        {
+            // Same process must still parse a valid source after this rejection.
+            var control = Path.Combine(Environment.CurrentDirectory, "lease-control.wav");
+            Player.Core.Media.MetadataReadGuard.Validate(control);
+            using var file = TagLib.File.Create(control, TagLib.ReadStyle.Average);
+            if (file.Properties.AudioSampleRate <= 0) throw new InvalidDataException("Metadata rejection damaged the valid control.");
+            return new { Status = "bounded-parser-worker-completed", Outcome = "rejected", Error = error.Message[..Math.Min(error.Message.Length, 1024)], ValidMetadataControlRecovered = true };
+        }
     }
     private static void CopyDirectory(string source, string destination)
     {

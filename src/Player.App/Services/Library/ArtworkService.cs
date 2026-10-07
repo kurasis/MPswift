@@ -28,16 +28,17 @@ public sealed class ArtworkService
                 byte[]? encoded = null;
                 try
                 {
-                    Player.Core.Media.MetadataReadGuard.Validate(source);
-                    using var file = TagLib.File.Create(source, TagLib.ReadStyle.Average);
+                    using var lease = LocalReadLease.Open(source);
+                    Player.Core.Media.MetadataReadGuard.Validate(lease.Path);
+                    using var file = TagLib.File.Create(lease.Path, TagLib.ReadStyle.Average);
                     var picture = file.Tag.Pictures.FirstOrDefault(p => p.Type == TagLib.PictureType.FrontCover) ?? file.Tag.Pictures.FirstOrDefault();
                     if (picture?.Data.Count is > 0 and <= MaximumBytes) encoded = picture.Data.Data;
                 }
                 catch (Exception e) when (e is TagLib.CorruptFileException or TagLib.UnsupportedFormatException or IOException or InvalidDataException or UnauthorizedAccessException or ArgumentException or NotImplementedException) { }
                 if (encoded is null && sibling is not null)
                 {
-                    BassSmokeSession.ValidateSourcePath(sibling);
-                    using var file = new FileStream(sibling, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    using var lease = LocalReadLease.Open(sibling);
+                    var file = lease.Stream;
                     if (file.Length <= MaximumBytes) { encoded = new byte[checked((int)file.Length)]; file.ReadExactly(encoded); }
                 }
                 BitmapSource? image = null;

@@ -2,6 +2,7 @@ using Player.App.Resources;
 using System.IO;
 using System.Windows;
 using Player.App.Services.Audio;
+using Player.App.Services.Storage;
 
 namespace Player.App.Services.Windows;
 
@@ -29,7 +30,8 @@ public static class StorageLocation
         var parent = new DirectoryInfo(full);
         while (!parent.Exists) parent = parent.Parent ?? throw new IOException("No local storage parent exists.");
         LocalFileAccess.ValidateDirectory(parent.FullName);
-        Directory.CreateDirectory(full); LocalFileAccess.ValidateDirectory(full);
+        using var lease = DataDirectoryLease.Create(full);
+        full = lease.DirectoryPath; LocalFileAccess.ValidateDirectory(full);
         var probe = Path.Combine(full, ".write-probe-" + Guid.NewGuid().ToString("N"));
         using (new FileStream(probe, FileMode.CreateNew, FileAccess.Write, FileShare.None, 1, FileOptions.DeleteOnClose)) { }
         return full;

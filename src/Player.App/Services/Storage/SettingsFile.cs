@@ -14,7 +14,8 @@ public sealed class SettingsFile(string directory)
             if (File.Exists(_path + ".bak")) throw new InvalidDataException("Settings are missing but a previous backup exists; choose recovery explicitly.");
             return new();
         }
-        return Read(_path);
+        using var lease = DataDirectoryLease.Open(Path.GetDirectoryName(_path)!);
+        return Read(Path.Combine(lease.DirectoryPath, "settings.json"));
     }
     private static PlayerSettings Read(string path)
     {
@@ -29,7 +30,11 @@ public sealed class SettingsFile(string directory)
         if (value.SchemaVersion != 1) throw new SettingsCompatibilityException(value.SchemaVersion);
         return value.Validate();
     }
-    public PlayerSettings LoadBackup() => Read(_path + ".bak");
+    public PlayerSettings LoadBackup()
+    {
+        using var lease = DataDirectoryLease.Open(Path.GetDirectoryName(_path)!);
+        return Read(Path.Combine(lease.DirectoryPath, "settings.json.bak"));
+    }
     /// <summary>No implicit fallback: only a valid supported backup and explicit user choice permit recovery.</summary>
     public PlayerSettings LoadWithRecovery(Func<Exception, bool> chooseRecovery)
     {
@@ -46,14 +51,16 @@ public sealed class SettingsFile(string directory)
     }
     public string? RestoreBackup()
     {
-        var settings = LoadBackup();
-        var temporary = _path + ".restore-" + Guid.NewGuid().ToString("N");
-        var preserved = _path + ".preserved-" + Guid.NewGuid().ToString("N");
+        using var lease = DataDirectoryLease.Open(Path.GetDirectoryName(_path)!);
+        var path = Path.Combine(lease.DirectoryPath, "settings.json");
+        var settings = Read(path + ".bak");
+        var temporary = path + ".restore-" + Guid.NewGuid().ToString("N");
+        var preserved = path + ".preserved-" + Guid.NewGuid().ToString("N");
         try
         {
             Export(temporary, settings);
-            if (File.Exists(_path)) { File.Replace(temporary, _path, preserved); return preserved; }
-            File.Move(temporary, _path);
+            if (File.Exists(path)) { File.Replace(temporary, path, preserved); return preserved; }
+            File.Move(temporary, path);
             return null; // No original existed to preserve.
         }
         finally { if (File.Exists(temporary)) File.Delete(temporary); }
@@ -61,20 +68,23 @@ public sealed class SettingsFile(string directory)
     public static void Export(string path, PlayerSettings settings)
     {
         settings = settings.Validate();
+        using var lease = DataDirectoryLease.Open(Path.GetDirectoryName(Path.GetFullPath(path))!);
+        path = Path.Combine(lease.DirectoryPath, Path.GetFileName(path));
         using var file = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None);
         JsonSerializer.Serialize(file, settings); file.Flush(true);
     }
     public void Save(PlayerSettings settings)
     {
         settings = settings.Validate();
-        Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
-        var temporary = _path + "." + Guid.NewGuid().ToString("N") + ".tmp";
+        using var lease = DataDirectoryLease.Create(Path.GetDirectoryName(_path)!);
+        var path = Path.Combine(lease.DirectoryPath, "settings.json");
+        var temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
         try
         {
             using (var file = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
             { JsonSerializer.Serialize(file, settings); file.Flush(true); }
-            if (File.Exists(_path)) File.Replace(temporary, _path, _path + ".bak");
-            else File.Move(temporary, _path);
+            if (File.Exists(path)) File.Replace(temporary, path, path + ".bak");
+            else File.Move(temporary, path);
         }
         finally { if (File.Exists(temporary)) File.Delete(temporary); }
     }

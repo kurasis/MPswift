@@ -8,6 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="../../src/Player.Core/Player.Core.csproj" />
     <PackageReference Include="ManagedBass" />
+    <PackageReference Include="TagLibSharp" />
     <PackageReference Include="ManagedBass.Mix" />
     <PackageReference Include="ManagedBass.Wasapi" />
     <Compile Include="../../src/Player.App/Services/Audio/NativeLibraryBootstrap.cs" Link="Audio/NativeLibraryBootstrap.cs" />
@@ -20,6 +21,8 @@
     <Compile Include="../../src/Player.App/Services/Audio/LocalReadLease.cs" Link="Audio/LocalReadLease.cs" />
     <Compile Include="../../src/Player.App/Services/Audio/NativeDecodeContext.cs" Link="Audio/NativeDecodeContext.cs" />
     <Compile Include="../../src/Player.App/Services/Waveforms/BassWaveformService.cs" Link="Waveforms/BassWaveformService.cs" />
+    <Compile Include="../../src/Player.App/Services/Storage/SettingsFile.cs" Link="Storage/SettingsFile.cs" />
+    <Compile Include="../../src/Player.App/Services/Storage/DataDirectoryLease.cs" Link="Storage/DataDirectoryLease.cs" />
     <Compile Include="../../src/Player.App/Services/Storage/WaveformCache.cs" Link="Storage/WaveformCache.cs" />
     <Content Include="../../native/manifest.json" Link="native/manifest.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="../../native/win-x64/**/*.txt" Link="native/win-x64/%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
