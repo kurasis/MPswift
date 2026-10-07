@@ -22,8 +22,10 @@ try {
     if (-not $rejected) { throw 'Changed candidate file was accepted.' }
     [IO.File]::WriteAllBytes($help, $original)
     & "$PSScriptRoot/Verify-Candidate.ps1" -Directory $app
-    $working = Join-Path $owned 'different working directory'
+    $uiToken = [guid]::NewGuid().ToString('N')
+    $working = Join-Path $owned "mpswift-ui-smoke-$uiToken"
     New-Item $working -ItemType Directory -Force | Out-Null
+    $uiToken | Set-Content (Join-Path $working '.player-ui-validation') -Encoding utf8
     $evidence = Join-Path $working 'artifacts/smoke'
     New-Item (Join-Path $evidence 'stage-c-data') -ItemType Directory -Force | Out-Null
     @{ SchemaVersion = 1; Language = 'ru' } | ConvertTo-Json | Set-Content (Join-Path $evidence 'stage-c-data/settings.json') -Encoding utf8

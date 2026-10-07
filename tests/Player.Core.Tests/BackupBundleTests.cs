@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using System.Buffers.Binary;
 using System.Security.Cryptography;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
@@ -111,6 +112,35 @@ public sealed class BackupBundleTests : IDisposable
         await CreateAsync(); File.WriteAllText(Path.Combine(Target, "library.db"), "preserve"); Directory.CreateDirectory(Path.Combine(Target, "settings.json"));
         await Assert.ThrowsAsync<IOException>(() => BackupBundle.RestoreAsync(Target, Archive));
         Assert.Equal("preserve", File.ReadAllText(Path.Combine(Target, "library.db"))); Assert.Empty(Directory.GetFiles(Target, "*.preserved-*"));
+    }
+    [Fact]
+    public async Task TruncatedManifestIsRejectedBeforeInstallingUserData()
+    {
+        await CreateAsync();
+        // A valid JSON body with a forged larger central-directory size was previously accepted.
+        var bytes = File.ReadAllBytes(Archive);
+        var end = bytes.Length - 22;
+        while (BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(end, 4)) != 0x06054b50) end--;
+        var cursor = checked((int)BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(end + 16, 4)));
+        var patched = false;
+        while (BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(cursor, 4)) == 0x02014b50)
+        {
+            var nameLength = BinaryPrimitives.ReadUInt16LittleEndian(bytes.AsSpan(cursor + 28, 2));
+            if (System.Text.Encoding.UTF8.GetString(bytes, cursor + 46, nameLength) == "manifest.json")
+            {
+                BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(cursor + 24, 4), 65536u);
+                patched = true; break;
+            }
+            cursor += 46 + nameLength + BinaryPrimitives.ReadUInt16LittleEndian(bytes.AsSpan(cursor + 30, 2)) + BinaryPrimitives.ReadUInt16LittleEndian(bytes.AsSpan(cursor + 32, 2));
+        }
+        Assert.True(patched); File.WriteAllBytes(Archive, bytes);
+        File.WriteAllText(Path.Combine(Target, "library.db"), "owned original database");
+        new SettingsFile(Target).Save(new(Volume: 81));
+        var settings = File.ReadAllBytes(Path.Combine(Target, "settings.json"));
+        await Assert.ThrowsAnyAsync<InvalidDataException>(() => BackupBundle.RestoreAsync(Target, Archive));
+        Assert.Equal("owned original database", File.ReadAllText(Path.Combine(Target, "library.db")));
+        Assert.Equal(settings, File.ReadAllBytes(Path.Combine(Target, "settings.json")));
+        Assert.Empty(Directory.GetDirectories(Target)); Assert.Empty(Directory.GetFiles(Target, "*.preserved-*"));
     }
     private static string Read(ZipArchiveEntry entry) { using var reader = new StreamReader(entry.Open()); return reader.ReadToEnd(); }
     private static void Rewrite(ZipArchive zip, string name, string value) { zip.GetEntry(name)?.Delete(); using var writer = new StreamWriter(zip.CreateEntry(name).Open()); writer.Write(value); }

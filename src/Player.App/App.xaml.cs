@@ -85,6 +85,15 @@ public partial class App : Application
             return;
         }
         var uiSmoke = e.Args.Length == 3 && e.Args[0] == "--ui-smoke";
+        if (uiSmoke)
+        {
+            try
+            {
+                LocalFileAccess.ValidateDirectory(Environment.CurrentDirectory);
+                UiSmokeWorkspace.Validate(Environment.CurrentDirectory);
+            }
+            catch { Shutdown(2); return; } // Reject before IPC, reports, user-data or clipboard access.
+        }
         var desktopAcceptance = e.Args.Length == 2 && e.Args[0] == "--desktop-acceptance" && e.Args[1] is "first" or "restart" && File.Exists(Path.Combine(Environment.CurrentDirectory, AcceptanceWorkspace.Marker));
         var crashSmoke = e.Args.Length == 3 && e.Args[0] == "--crash-smoke" && e.Args[1] is "checkpoint" or "verify" or "migration-checkpoint" or "migration-verify" or "failures" && File.Exists(Path.Combine(Environment.CurrentDirectory, ".player-crash-validation"));
         var smoke = uiSmoke || crashSmoke || desktopAcceptance;

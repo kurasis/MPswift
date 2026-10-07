@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using Player.App.Controls;
 using Player.App.Resources;
+using Player.App.Services.Audio;
+using Player.App.Services.Storage;
 using Player.App.ViewModels;
 using Player.App.Views;
 
@@ -23,10 +25,54 @@ public static class IntegrationSmokeValidation
     {
         static void Check(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
         Check(window.Title == "MPswift" && window.Icon is not null, "Product title/window icon missing.");
+        // Construct the production command under an owned directory containing a hostile executable name; never run it.
+        var revealDirectory = Path.Combine(Path.GetTempPath(), "mpswift-reveal-test-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(revealDirectory);
+        var previousDirectory = Environment.CurrentDirectory;
+        try
+        {
+            File.WriteAllText(Path.Combine(revealDirectory, "explorer.exe"), "owned non-executable shadow probe");
+            Environment.CurrentDirectory = revealDirectory;
+            var reveal = MainWindow.CreateShowFileStartInfo(fixture);
+            Check(reveal.FileName == Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe") && Path.IsPathFullyQualified(reveal.FileName), "Explorer command could search the working directory/PATH.");
+            Check(!reveal.UseShellExecute && reveal.ArgumentList.SequenceEqual(new[] { "/select,", LocalFileAccess.ValidateFile(fixture) }), "Source path was interpolated into a shell command.");
+        }
+        finally { Environment.CurrentDirectory = previousDirectory; Directory.Delete(revealDirectory, true); }
         var appHost = Path.Combine(AppContext.BaseDirectory, "MPswift.exe");
         Check(FileVersionInfo.GetVersionInfo(appHost).ProductName == "MPswift", "Apphost product metadata was not renamed.");
         using (var executableIcon = System.Drawing.Icon.ExtractAssociatedIcon(appHost))
             Check(executableIcon is not null, "Apphost icon resource missing.");
+        // These child processes must refuse before reaching the running player's IPC or clipboard.
+        var rejectedDirectory = Path.Combine(Path.GetTempPath(), UiSmokeWorkspace.Prefix + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(rejectedDirectory);
+        try
+        {
+            var clipboard = Clipboard.GetDataObject();
+            var clipboardText = Clipboard.ContainsText() ? Clipboard.GetText() : null;
+            foreach (var rejectedCase in new[] { "missing-marker", "wrong-token", "foreign-file" })
+            {
+                if (rejectedCase != "missing-marker")
+                    File.WriteAllText(Path.Combine(rejectedDirectory, UiSmokeWorkspace.Marker), rejectedCase == "wrong-token" ? Guid.NewGuid().ToString("N") : Path.GetFileName(rejectedDirectory)[UiSmokeWorkspace.Prefix.Length..]);
+                if (rejectedCase == "foreign-file") File.WriteAllText(Path.Combine(rejectedDirectory, "personal.txt"), "preserve me");
+                var beforeFiles = Directory.GetFiles(rejectedDirectory, "*", SearchOption.AllDirectories);
+                var beforeBytes = beforeFiles.ToDictionary(path => path, File.ReadAllBytes);
+                var start = new ProcessStartInfo(appHost) { UseShellExecute = false, WorkingDirectory = rejectedDirectory };
+                foreach (var argument in new[] { "--ui-smoke", fixture, fixture }) start.ArgumentList.Add(argument);
+                using var process = Process.Start(start) ?? throw new IOException("Rejected UI smoke did not start.");
+                try
+                {
+                    await process.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(15));
+                    Check(process.ExitCode == 2, "Unowned UI smoke reached validation or IPC instead of refusing.");
+                }
+                catch { if (!process.HasExited) { process.Kill(); await process.WaitForExitAsync(); } throw; }
+                Check(beforeFiles.SequenceEqual(Directory.GetFiles(rejectedDirectory, "*", SearchOption.AllDirectories)) &&
+                    !Directory.GetDirectories(rejectedDirectory).Any(), "Rejected UI smoke created artifacts or user data.");
+                Check(beforeBytes.All(file => File.ReadAllBytes(file.Key).SequenceEqual(file.Value)), "Rejected UI smoke modified existing files.");
+                Check((Clipboard.ContainsText() ? Clipboard.GetText() : null) == clipboardText &&
+                    (Clipboard.GetDataObject()?.GetFormats() ?? []).SequenceEqual(clipboard?.GetFormats() ?? []), "Rejected UI smoke changed the clipboard.");
+            }
+        }
+        finally { Directory.Delete(rejectedDirectory, true); }
         var app = (App)Application.Current;
         async Task LaunchAsync(params string[] args)
         {
@@ -106,7 +152,8 @@ public static class IntegrationSmokeValidation
         Check(((Button)window.FindName("PlayPauseButton")).ActualWidth > 0 && list.ActualHeight > 0, "Minimum layout hid transport/playlist.");
         window.Width = 840; window.Height = 860;
         return new { Status = "windows-integration-passed", SecondProcessActivation = true, ConcurrentFileForwarding = true, NoImplicitAutoplay = true,
-            OversizedIpcRejected = true, CurrentUserOnlyPipe = true, SeekAutomationRange = true, SoftwareRoutedDropdownEscape = true, CloseToTrayPreservesState = true,
+            OversizedIpcRejected = true, CurrentUserOnlyPipe = true, ExplorerQualified = true, OwnedUiSmokeRequired = true,
+            RejectedUiSmokeNoFilesOrClipboard = true, SeekAutomationRange = true, SoftwareRoutedDropdownEscape = true, CloseToTrayPreservesState = true,
             Language = model.WindowSettings.Language, ResourceKeys = resourceCount, RealizedRowContainers = realized, PlaylistRows = playlistRows, GlobalPlaylistCapacity = 10000,
             ScrollPerformance = scrollPerformance,
             MediaSession = app.MediaSessionAvailable ? "registered; metadata synchronized" : "unavailable in this Windows session",

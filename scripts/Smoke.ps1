@@ -39,19 +39,27 @@ try {
     $app = Join-Path $root 'src/Player.App/bin/Release/net10.0-windows10.0.19041.0/win-x64/MPswift.exe'
     $taggedFixture = Join-Path $root 'tests/fixtures/audio/flac16.flac'
     foreach ($language in @('en', 'ru')) {
-        Remove-Item (Join-Path $directory 'stage-e-library') -Recurse -Force -ErrorAction SilentlyContinue
-        Remove-Item (Join-Path $directory 'stage-c-data') -Recurse -Force -ErrorAction SilentlyContinue
-        New-Item (Join-Path $directory 'stage-c-data') -ItemType Directory -Force | Out-Null
-        @{ SchemaVersion = 1; Language = $language } | ConvertTo-Json | Set-Content (Join-Path $directory 'stage-c-data/settings.json') -Encoding utf8
-        Remove-Item (Join-Path $directory 'ui.json'), (Join-Path $directory 'stage-c-window.png') -ErrorAction SilentlyContinue
-        $process = Start-Process -FilePath $app -ArgumentList @('--ui-smoke', ('"' + $fixture + '"'), ('"' + $taggedFixture + '"')) -PassThru
-        if (-not $process.WaitForExit(120000)) { $process.Kill(); throw "WPF $language UI smoke timed out." }
-        if ($process.ExitCode -ne 0) { throw "WPF $language UI smoke failed with exit $($process.ExitCode). See artifacts/smoke/ui.json." }
-        $ui = Get-Content (Join-Path $directory 'ui.json') -Raw | ConvertFrom-Json
-        if ($ui.Status -ne 'ui-smoke-passed') { throw 'WPF UI evidence is not a current successful result.' }
-        Copy-Item (Join-Path $directory 'ui.json') (Join-Path $directory "ui-$language.json")
-        Copy-Item (Join-Path $directory 'stage-c-window.png') (Join-Path $directory "stage-f-window-$language.png")
-        Write-Host ($ui | ConvertTo-Json -Depth 5)
+        $uiToken = [guid]::NewGuid().ToString('N')
+        $uiWorkspace = Join-Path $root "artifacts/mpswift-ui-smoke-$uiToken"
+        $uiEvidence = Join-Path $uiWorkspace 'artifacts/smoke'
+        $process = $null
+        try {
+            New-Item (Join-Path $uiEvidence 'stage-c-data') -ItemType Directory -Force | Out-Null
+            $uiToken | Set-Content (Join-Path $uiWorkspace '.player-ui-validation') -Encoding utf8
+            @{ SchemaVersion = 1; Language = $language } | ConvertTo-Json | Set-Content (Join-Path $uiEvidence 'stage-c-data/settings.json') -Encoding utf8
+            $process = Start-Process -FilePath $app -WorkingDirectory $uiWorkspace -ArgumentList @('--ui-smoke', ('"' + $fixture + '"'), ('"' + $taggedFixture + '"')) -PassThru
+            if (-not $process.WaitForExit(120000)) { $process.Kill(); $process.WaitForExit(); throw "WPF $language UI smoke timed out." }
+            if ($process.ExitCode -ne 0) { throw "WPF $language UI smoke failed with exit $($process.ExitCode). See artifacts/smoke/ui.json." }
+            $ui = Get-Content (Join-Path $uiEvidence 'ui.json') -Raw | ConvertFrom-Json
+            if ($ui.Status -ne 'ui-smoke-passed') { throw 'WPF UI evidence is not a current successful result.' }
+            Copy-Item (Join-Path $uiEvidence 'ui.json') (Join-Path $directory "ui-$language.json")
+            Copy-Item (Join-Path $uiEvidence 'stage-c-window.png') (Join-Path $directory "stage-f-window-$language.png")
+            Write-Host ($ui | ConvertTo-Json -Depth 5)
+        } finally {
+            if ($process) { if (-not $process.HasExited) { $process.Kill(); $process.WaitForExit() }; $process.Dispose() }
+            Get-ChildItem $uiEvidence -File -ErrorAction SilentlyContinue | Where-Object Extension -in @('.json', '.png') | Copy-Item -Destination $directory
+            if (Test-Path $uiWorkspace) { Remove-Item $uiWorkspace -Recurse -Force }
+        }
     }
     # Retain independent failure evidence; any failed assertion still rejects the build.
     foreach ($validation in @(@('Crash-Smoke.ps1', $false), @('Crash-Smoke.ps1', $true), @('Resilience-Smoke.ps1', $false), @('Optional-Wma-Smoke.ps1', $false))) {

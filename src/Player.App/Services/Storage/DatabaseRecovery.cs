@@ -7,6 +7,13 @@ public sealed class NewerDatabaseSchemaException(int version) : IOException($"Da
 
 public static class DatabaseRecovery
 {
+    internal static void ConfigureReadLimits(SqliteConnection connection)
+    {
+        // Existing sessions allow 16 Mi UTF-16 code units. UTF-8 needs at most 3 bytes per unit;
+        // retain 1 MiB for row headers while refusing huge cells before native/managed allocation.
+        const int maximumRowBytes = 49 * 1024 * 1024;
+        SQLitePCL.raw.sqlite3_limit(connection.Handle!, SQLitePCL.raw.SQLITE_LIMIT_LENGTH, maximumRowBytes);
+    }
     /// <summary>Explicit user-selected restore only. Validate first; retain the old main/WAL/SHM files.</summary>
     public static void Restore(string destination, string backup)
     {
@@ -15,6 +22,7 @@ public static class DatabaseRecovery
         using var ownership = new FileStream(destination + ".owner.lock", FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
         using var source = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = backup, Mode = SqliteOpenMode.ReadOnly, Pooling = false }.ToString());
         source.Open();
+        ConfigureReadLimits(source);
         Validate(source);
         var temporary = destination + ".restore-" + Guid.NewGuid().ToString("N");
         var preserved = destination + ".preserved-" + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + "-" + Guid.NewGuid().ToString("N");

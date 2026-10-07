@@ -18,9 +18,11 @@ try {
         if (-not (Test-Path (Join-Path $app $required))) { throw "Missing packaged runtime/application file: $required" }
     }
     New-Item (Join-Path $app 'docs') -ItemType Directory -Force | Out-Null
-    foreach ($document in @('DESIGN','ARCHITECTURE','FORMAT_SUPPORT','TEST_RESULTS','REQUIREMENTS_STATUS','KNOWN_LIMITATIONS','THIRD_PARTY_NOTICES','RELEASE_ACCEPTANCE','SPEC_COMPLETION','USER_HELP','USER_HELP.ru')) {
+    foreach ($document in @('DESIGN','ARCHITECTURE','FORMAT_SUPPORT','TEST_RESULTS','REQUIREMENTS_STATUS','KNOWN_LIMITATIONS','THIRD_PARTY_NOTICES','RELEASE_ACCEPTANCE','SPEC_COMPLETION','SECURITY_AUDIT_2026-10-07','USER_HELP','USER_HELP.ru')) {
         Copy-Item "docs/$document.md" (Join-Path $app "docs/$document.md")
     }
+    New-Item (Join-Path $app 'docs/evidence') -ItemType Directory -Force | Out-Null
+    Copy-Item docs/evidence/security-dependencies-2026-10-07.json (Join-Path $app 'docs/evidence/security-dependencies-2026-10-07.json')
     Copy-Item README.md (Join-Path $app 'README.md')
     New-Item (Join-Path $app 'acceptance') -ItemType Directory -Force | Out-Null
     foreach ($script in @('Acceptance-Helpers.ps1','Desktop-Acceptance.ps1','Audio-Acceptance.ps1','Stress-Acceptance.ps1')) { Copy-Item (Join-Path $PSScriptRoot $script) (Join-Path $app "acceptance/$script") }

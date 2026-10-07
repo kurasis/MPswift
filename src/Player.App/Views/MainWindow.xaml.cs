@@ -421,8 +421,17 @@ public partial class MainWindow : Window
     private void OnShowFile(object sender, RoutedEventArgs e)
     {
         if (Model.SelectedEntry is not { } row) return;
-        try { var path = Services.Audio.BassSmokeSession.ValidateSourcePath(row.Path); var start = new System.Diagnostics.ProcessStartInfo("explorer.exe") { UseShellExecute = false }; start.ArgumentList.Add("/select,"); start.ArgumentList.Add(path); System.Diagnostics.Process.Start(start); }
+        try { System.Diagnostics.Process.Start(CreateShowFileStartInfo(row.Path)); }
         catch (Exception error) { Model.Details = error.Message; }
+    }
+    internal static System.Diagnostics.ProcessStartInfo CreateShowFileStartInfo(string path)
+    {
+        path = Services.Audio.BassSmokeSession.ValidateSourcePath(path);
+        var windows = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+        if (string.IsNullOrEmpty(windows) || !Path.IsPathFullyQualified(windows)) throw new InvalidOperationException("Windows system directory unavailable.");
+        var start = new System.Diagnostics.ProcessStartInfo(Path.Combine(windows, "explorer.exe")) { UseShellExecute = false };
+        start.ArgumentList.Add("/select,"); start.ArgumentList.Add(path);
+        return start;
     }
     private async void OnProperties(object sender, RoutedEventArgs e)
     {

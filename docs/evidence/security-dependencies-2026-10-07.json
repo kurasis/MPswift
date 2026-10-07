@@ -1,0 +1,787 @@
+{
+  "checkedUtc": "2026-10-07T07:04:24.612466+00:00",
+  "source": "https://api.nuget.org/v3/vulnerabilities/index.json",
+  "sources": [
+    {
+      "url": "https://api.nuget.org/v3-vulnerabilities/2026.10.06.23.47.38/vulnerability.base.json",
+      "updated": "2026-10-06T23:47:38.9099889Z",
+      "sha256": "036bf3c2dfb4419100b03eef516d73dc6c372edc15c53e23ffd0e5ddc1b60cac"
+    },
+    {
+      "url": "https://api.nuget.org/v3-vulnerabilities/2026.10.06.23.47.38/2026.10.06.23.47.38/vulnerability.update.json",
+      "updated": "2026-10-06T23:47:38.9099889Z",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    }
+  ],
+  "packages": [
+    {
+      "id": "communitytoolkit.mvvm",
+      "lockedVersion": "8.4.2",
+      "packageAdvisoryRanges": []
+    },
+    {
+      "id": "managedbass",
+      "lockedVersion": "4.0.2",
+      "packageAdvisoryRanges": []
+    },
+    {
+      "id": "managedbass.mix",
+      "lockedVersion": "4.0.2",
+      "packageAdvisoryRanges": []
+    },
+    {
+      "id": "managedbass.wasapi",
+      "lockedVersion": "4.0.2",
+      "packageAdvisoryRanges": []
+    },
+    {
+      "id": "microsoft.codecoverage",
+      "lockedVersion": "18.10.1",
+      "packageAdvisoryRanges": []
+    },
+    {
+      "id": "microsoft.data.sqlite",
+      "lockedVersion": "10.0.12",
+      "packageAdvisoryRanges": []
+    },
+    {
+      "id": "microsoft.data.sqlite.core",
+      "lockedVersion": "10.0.12",
+      "packageAdvisoryRanges": []
+    },
+    {
+      "id": "microsoft.net.test.sdk",
+      "lockedVersion": "18.10.1",
+      "packageAdvisoryRanges": []
+    },
+    {
+      "id": "microsoft.netcore.app.runtime.win-x64",
+      "lockedVersion": "10.0.12",
+      "packageAdvisoryRanges": [
+        {
+          "url": "https://github.com/advisories/GHSA-3gp9-h8hw-pxpw",
+          "severity": 1,
+          "versions": "[3.1.0, 3.1.12)"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-3gp9-h8hw-pxpw",
+          "severity": 1,
+          "versions": "[5.0.0, 5.0.3)"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-rh58-r7jh-xhx3",
+          "severity": 2,
+          "versions": "[3.1.0, 3.1.18)"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-rh58-r7jh-xhx3",
+          "severity": 2,
+          "versions": "[5.0.0, 5.0.9)"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-3w5p-jhp5-c29q",
+          "severity": 2,
+          "versions": "[3.1.0, 3.1.4)"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-vgwq-hfqc-58wv",
+          "severity": 1,
+          "versions": "[3.1.0, 3.1.18)"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-vgwq-hfqc-58wv",
+          "severity": 1,
+          "versions": "[5.0.0, 5.0.9)"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-w4m3-43gp-x8hx",
+          "severity": 2,
+          "versions": "[6.0.0, 6.0.15]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-w4m3-43gp-x8hx",
+          "severity": 2,
+          "versions": "[7.0.0, 7.0.4]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-g4p8-g7mq-wpx4",
+          "severity": 2,
+          "versions": "[7.0.0, 7.0.10]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-g4p8-g7mq-wpx4",
+          "severity": 2,
+          "versions": "[6.0.0, 6.0.21]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-38fq-h5hc-gwv8",
+          "severity": 2,
+          "versions": "[7.0.0, 7.0.10]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-38fq-h5hc-gwv8",
+          "severity": 2,
+          "versions": "[6.0.0, 6.0.21]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-3qf9-qxfj-4whc",
+          "severity": 2,
+          "versions": "[7.0.0, 7.0.10]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-3qf9-qxfj-4whc",
+          "severity": 2,
+          "versions": "[6.0.0, 6.0.21]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-h7jm-g87p-5935",
+          "severity": 2,
+          "versions": "[7.0.0, 7.0.10]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-h7jm-g87p-5935",
+          "severity": 2,
+          "versions": "[6.0.0, 6.0.21]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-gh24-9qjj-mr67",
+          "severity": 2,
+          "versions": "[7.0.0, 7.0.5]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-gh24-9qjj-mr67",
+          "severity": 2,
+          "versions": "[6.0.0, 6.0.16]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-5fxj-whcv-crrc",
+          "severity": 2,
+          "versions": "[8.0.0, 8.0.2]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-5fxj-whcv-crrc",
+          "severity": 2,
+          "versions": "[7.0.0-preview.1.22076.8, 7.0.16]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-824j-wqm8-89mj",
+          "severity": 2,
+          "versions": "[7.0.0, 7.0.2]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-824j-wqm8-89mj",
+          "severity": 2,
+          "versions": "[6.0.0, 6.0.13]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-88q2-h5g3-p4pg",
+          "severity": 2,
+          "versions": "[7.0.0, 7.0.5]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-88q2-h5g3-p4pg",
+          "severity": 2,
+          "versions": "[6.0.0, 6.0.16]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-p57v-gv7q-4xfm",
+          "severity": 2,
+          "versions": "[7.0.0, 7.0.9]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-x469-cv7m-77r9",
+          "severity": 2,
+          "versions": "[7.0.0, 7.0.5]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-555c-2p6r-68mm",
+          "severity": 2,
+          "versions": "[6.0.0, 6.0.16]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-555c-2p6r-68mm",
+          "severity": 2,
+          "versions": "[7.0.0, 7.0.5]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-jx7q-xxmw-44vf",
+          "severity": 2,
+          "versions": "[7.0.0, 7.0.5]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-jx7q-xxmw-44vf",
+          "severity": 2,
+          "versions": "[6.0.0, 6.0.16]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-8f7f-vqg5-jrv9",
+          "severity": 2,
+          "versions": "[6.0.0, 6.0.13)"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-447r-wph3-92pm",
+          "severity": 2,
+          "versions": "[8.0.0, 8.0.6]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-447r-wph3-92pm",
+          "severity": 2,
+          "versions": "[6.0.0, 6.0.31]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-3r34-r6w3-fqp6",
+          "severity": 1,
+          "versions": "[8.0.0, 8.0.8)"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-5v8v-66v8-mwm7",
+          "severity": 1,
+          "versions": "[3.0.0, 3.1.23)"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-5v8v-66v8-mwm7",
+          "severity": 1,
+          "versions": "[5.0.0, 5.0.15)"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-5v8v-66v8-mwm7",
+          "severity": 1,
+          "versions": "[6.0.0, 6.0.3)"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-7fcr-8qw6-92fr",
+          "severity": 1,
+          "versions": "[8.0.0, 8.0.4]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-7fcr-8qw6-92fr",
+          "severity": 1,
+          "versions": "[7.0.0, 7.0.18]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-p54p-p3qm-8vgj",
+          "severity": 2,
+          "versions": "[9.0.0, 9.0.1)"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-jjcv-wr2g-4rv4",
+          "severity": 2,
+          "versions": "[9.0.0, 9.0.1)"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-jjcv-wr2g-4rv4",
+          "severity": 2,
+          "versions": "[8.0.0, 8.0.12)"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-gjf6-3w4p-7xfh",
+          "severity": 2,
+          "versions": "[9.0.0, 9.0.1)"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-gjf6-3w4p-7xfh",
+          "severity": 2,
+          "versions": "[8.0.0, 8.0.12)"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-266m-wp2v-x7mq",
+          "severity": 2,
+          "versions": "[9.0.0, 9.0.5]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-266m-wp2v-x7mq",
+          "severity": 2,
+          "versions": "[8.0.0, 8.0.16]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-gwq6-fmvp-qp68",
+          "severity": 1,
+          "versions": "[9.0.0, 9.0.9]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-gwq6-fmvp-qp68",
+          "severity": 1,
+          "versions": "[8.0.0, 8.0.20]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-g5vf-38cp-4px9",
+          "severity": 2,
+          "versions": "[3.1.0, 3.1.6)"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-73j8-2gch-69rq",
+          "severity": 2,
+          "versions": "[9.0.0, 9.0.13]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-73j8-2gch-69rq",
+          "severity": 2,
+          "versions": "[10.0.0, 10.0.3]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-vmwf-m9c5-3jvc",
+          "severity": 0,
+          "versions": "[10.0.0, 10.0.5]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-vmwf-m9c5-3jvc",
+          "severity": 0,
+          "versions": "[9.0.0, 9.0.14]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-vmwf-m9c5-3jvc",
+          "severity": 0,
+          "versions": "[8.0.0, 8.0.25]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-c6w8-7mp3-34j9",
+          "severity": 1,
+          "versions": "[3.0.0, 3.1.23)"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-c6w8-7mp3-34j9",
+          "severity": 1,
+          "versions": "[5.0.0, 5.0.15)"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-c6w8-7mp3-34j9",
+          "severity": 1,
+          "versions": "[6.0.0, 6.0.3)"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-7q4v-2mr6-5gpx",
+          "severity": 1,
+          "versions": "[8.0.0, 8.0.27]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-7q4v-2mr6-5gpx",
+          "severity": 1,
+          "versions": "[9.0.0, 9.0.16]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-7q4v-2mr6-5gpx",
+          "severity": 1,
+          "versions": "[10.0.0, 10.0.8]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-rg75-q538-x34v",
+          "severity": 2,
+          "versions": "[8.0.0, 8.0.26]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-rg75-q538-x34v",
+          "severity": 2,
+          "versions": "[9.0.0, 9.0.15]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-rg75-q538-x34v",
+          "severity": 2,
+          "versions": "[10.0.0, 10.0.7]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-w7cw-xp7h-6j5j",
+          "severity": 2,
+          "versions": "[10.0.0, 10.0.9]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-w7cw-xp7h-6j5j",
+          "severity": 2,
+          "versions": "[9.0.0, 9.0.17]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-w7cw-xp7h-6j5j",
+          "severity": 2,
+          "versions": "[8.0.0, 8.0.28]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-qvw7-jm5c-6hqw",
+          "severity": 2,
+          "versions": "[10.0.0, 10.0.9]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-qvw7-jm5c-6hqw",
+          "severity": 2,
+          "versions": "[9.0.0, 9.0.17]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-qvw7-jm5c-6hqw",
+          "severity": 2,
+          "versions": "[8.0.0, 8.0.28]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-74jp-vm22-8q8x",
+          "severity": 1,
+          "versions": "[10.0.0, 10.0.9]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-74jp-vm22-8q8x",
+          "severity": 1,
+          "versions": "[9.0.0, 9.0.17]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-74jp-vm22-8q8x",
+          "severity": 1,
+          "versions": "[8.0.0, 8.0.28]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-wp74-jgxh-gv4q",
+          "severity": 2,
+          "versions": "[10.0.0, 10.0.9]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-wp74-jgxh-gv4q",
+          "severity": 2,
+          "versions": "[9.0.0, 9.0.17]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-wp74-jgxh-gv4q",
+          "severity": 2,
+          "versions": "[8.0.0, 8.0.28]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-cvvh-rhrc-wg4q",
+          "severity": 2,
+          "versions": "[10.0.0, 10.0.9]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-cvvh-rhrc-wg4q",
+          "severity": 2,
+          "versions": "[9.0.0, 9.0.17]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-cvvh-rhrc-wg4q",
+          "severity": 2,
+          "versions": "[8.0.0, 8.0.28]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-c494-m2fq-59mx",
+          "severity": 2,
+          "versions": "[10.0.0, 10.0.10]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-c494-m2fq-59mx",
+          "severity": 2,
+          "versions": "[9.0.0, 9.0.18]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-c494-m2fq-59mx",
+          "severity": 2,
+          "versions": "[8.0.0, 8.0.29]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-m93f-wj8c-rp8p",
+          "severity": 2,
+          "versions": "[10.0.0, 10.0.10]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-m93f-wj8c-rp8p",
+          "severity": 2,
+          "versions": "[9.0.0, 9.0.18]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-m93f-wj8c-rp8p",
+          "severity": 2,
+          "versions": "[8.0.0, 8.0.29]"
+        }
+      ]
+    },
+    {
+      "id": "microsoft.testplatform.objectmodel",
+      "lockedVersion": "18.10.1",
+      "packageAdvisoryRanges": []
+    },
+    {
+      "id": "microsoft.testplatform.testhost",
+      "lockedVersion": "18.10.1",
+      "packageAdvisoryRanges": []
+    },
+    {
+      "id": "microsoft.windows.sdk.net.ref",
+      "lockedVersion": "10.0.19041.57",
+      "packageAdvisoryRanges": []
+    },
+    {
+      "id": "microsoft.windowsdesktop.app.runtime.win-x64",
+      "lockedVersion": "10.0.12",
+      "packageAdvisoryRanges": [
+        {
+          "url": "https://github.com/advisories/GHSA-r4mw-gxf7-vxr9",
+          "severity": 2,
+          "versions": "[3.0.0, 3.0.2)"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-r4mw-gxf7-vxr9",
+          "severity": 2,
+          "versions": "[3.1.0, 3.1.11)"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-jh2h-qcrw-ghg7",
+          "severity": 2,
+          "versions": "[7.0.0, 7.0.5]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-jh2h-qcrw-ghg7",
+          "severity": 2,
+          "versions": "[6.0.0, 6.0.16]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-485r-rp8v-998v",
+          "severity": 2,
+          "versions": "[7.0.0, 7.0.9)"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-485r-rp8v-998v",
+          "severity": 2,
+          "versions": "[6.0.0, 6.0.20)"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-2c7v-qcjp-4mg2",
+          "severity": 2,
+          "versions": "[3.1.0, 3.1.31]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-2c7v-qcjp-4mg2",
+          "severity": 2,
+          "versions": "[6.0.0, 6.0.11]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-2c7v-qcjp-4mg2",
+          "severity": 2,
+          "versions": "[7.0.0, 7.0.0]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-6qmx-42h2-j8h6",
+          "severity": 2,
+          "versions": "(, 6.0.28]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-6qmx-42h2-j8h6",
+          "severity": 2,
+          "versions": "[8.0.0, 8.0.3]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-6qmx-42h2-j8h6",
+          "severity": 2,
+          "versions": "[7.0.0, 7.0.17]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-8x9c-mqxv-q2pp",
+          "severity": 2,
+          "versions": "[8.0.0, 8.0.26]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-8x9c-mqxv-q2pp",
+          "severity": 2,
+          "versions": "[9.0.0, 9.0.15]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-8x9c-mqxv-q2pp",
+          "severity": 2,
+          "versions": "[10.0.0, 10.0.7]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-2969-4q4w-w5h3",
+          "severity": 2,
+          "versions": "[10.0.0, 10.0.9]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-2969-4q4w-w5h3",
+          "severity": 2,
+          "versions": "[9.0.0, 9.0.17]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-2969-4q4w-w5h3",
+          "severity": 2,
+          "versions": "[8.0.0, 8.0.28]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-jqhp-238x-qhgf",
+          "severity": 2,
+          "versions": "[10.0.0, 10.0.10]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-jqhp-238x-qhgf",
+          "severity": 2,
+          "versions": "[9.0.0, 9.0.18]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-jqhp-238x-qhgf",
+          "severity": 2,
+          "versions": "[8.0.0, 8.0.29]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-gg8c-3338-xw2f",
+          "severity": 2,
+          "versions": "[10.0.0, 10.0.10]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-gg8c-3338-xw2f",
+          "severity": 2,
+          "versions": "[9.0.0, 9.0.18]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-gg8c-3338-xw2f",
+          "severity": 2,
+          "versions": "[8.0.0, 8.0.29]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-fx4q-gjrx-2jw6",
+          "severity": 2,
+          "versions": "[10.0.0, 10.0.10]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-fx4q-gjrx-2jw6",
+          "severity": 2,
+          "versions": "[9.0.0, 9.0.18]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-fx4q-gjrx-2jw6",
+          "severity": 2,
+          "versions": "[8.0.0, 8.0.29]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-vg44-h755-9hw7",
+          "severity": 2,
+          "versions": "[10.0.0, 10.0.10]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-vg44-h755-9hw7",
+          "severity": 2,
+          "versions": "[9.0.0, 9.0.18]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-vg44-h755-9hw7",
+          "severity": 2,
+          "versions": "[8.0.0, 8.0.29]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-9mrh-pw7c-9mqm",
+          "severity": 1,
+          "versions": "[10.0.0, 10.0.10]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-9mrh-pw7c-9mqm",
+          "severity": 1,
+          "versions": "[9.0.0, 9.0.18]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-9mrh-pw7c-9mqm",
+          "severity": 1,
+          "versions": "[8.0.0, 8.0.29]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-gh2h-rhph-h37g",
+          "severity": 2,
+          "versions": "[10.0.0, 10.0.9]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-gh2h-rhph-h37g",
+          "severity": 2,
+          "versions": "[9.0.0, 9.0.17]"
+        },
+        {
+          "url": "https://github.com/advisories/GHSA-gh2h-rhph-h37g",
+          "severity": 2,
+          "versions": "[8.0.0, 8.0.28]"
+        }
+      ]
+    },
+    {
+      "id": "sqlitepclraw.bundle_e_sqlite3",
+      "lockedVersion": "2.1.12",
+      "packageAdvisoryRanges": []
+    },
+    {
+      "id": "sqlitepclraw.core",
+      "lockedVersion": "2.1.12",
+      "packageAdvisoryRanges": []
+    },
+    {
+      "id": "sqlitepclraw.lib.e_sqlite3",
+      "lockedVersion": "2.1.12",
+      "packageAdvisoryRanges": [
+        {
+          "url": "https://github.com/advisories/GHSA-2m69-gcr7-jv3q",
+          "severity": 2,
+          "versions": "(, 2.1.11]"
+        }
+      ]
+    },
+    {
+      "id": "sqlitepclraw.provider.e_sqlite3",
+      "lockedVersion": "2.1.12",
+      "packageAdvisoryRanges": []
+    },
+    {
+      "id": "taglibsharp",
+      "lockedVersion": "2.3.0",
+      "packageAdvisoryRanges": []
+    },
+    {
+      "id": "xunit",
+      "lockedVersion": "2.9.3",
+      "packageAdvisoryRanges": []
+    },
+    {
+      "id": "xunit.abstractions",
+      "lockedVersion": "2.0.3",
+      "packageAdvisoryRanges": []
+    },
+    {
+      "id": "xunit.analyzers",
+      "lockedVersion": "1.18.0",
+      "packageAdvisoryRanges": []
+    },
+    {
+      "id": "xunit.assert",
+      "lockedVersion": "2.9.3",
+      "packageAdvisoryRanges": []
+    },
+    {
+      "id": "xunit.core",
+      "lockedVersion": "2.9.3",
+      "packageAdvisoryRanges": []
+    },
+    {
+      "id": "xunit.extensibility.core",
+      "lockedVersion": "2.9.3",
+      "packageAdvisoryRanges": []
+    },
+    {
+      "id": "xunit.extensibility.execution",
+      "lockedVersion": "2.9.3",
+      "packageAdvisoryRanges": []
+    },
+    {
+      "id": "xunit.runner.visualstudio",
+      "lockedVersion": "4.0.0",
+      "packageAdvisoryRanges": []
+    }
+  ],
+  "scope": "Locked app/test packages plus three actually packaged .NET/Windows SDK download dependencies; ranges are advisory entries, not inferred matches.",
+  "sqliteAdvisory": {
+    "id": "GHSA-2m69-gcr7-jv3q",
+    "cve": "CVE-2025-6965",
+    "affectedRange": "<= 2.1.11",
+    "deployedNuGetVersion": "2.1.12",
+    "affectsPinnedVersion": false,
+    "source": "https://api.github.com/advisories/GHSA-2m69-gcr7-jv3q"
+  },
+  "deployedSqlite": {
+    "version": "3.53.3",
+    "sourceId": "2026-06-26 20:14:12 d4c0e51e4aeb96955b99185ab9cde75c339e2c29c3f3f12428d364a10d782c62",
+    "method": "Read-only strings in GitHub build-37583527114-attempt-1 win-x64 e_sqlite3.dll; compared with upstream release log",
+    "upstream": "https://www.sqlite.org/releaselog/3_53_3.html"
+  },
+  "dotnet": {
+    "runtime": "10.0.12",
+    "latestRelease": "10.0.12",
+    "releaseSecurity": true,
+    "meaning": "The official release records fixes; its CVE list does not establish those CVEs affect this patched release.",
+    "source": "https://builds.dotnet.microsoft.com/dotnet/release-metadata/10.0/releases.json"
+  },
+  "limitations": [
+    "No complete official machine-readable advisories/embedded codec version mapping was available for all BASS addons; absence in NuGet feed is not native decoder clearance.",
+    "No exploit fuzzing, native memory-corruption test, Windows clean-user ACL/reparse race/DLL search proof or binary signature verification acceptance is inferred."
+  ]
+}

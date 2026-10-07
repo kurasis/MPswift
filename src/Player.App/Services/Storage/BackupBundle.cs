@@ -67,9 +67,16 @@ public static class BackupBundle
         var names = new[] { "library.db", "settings.json", "manifest.json" };
         if (zip.Entries.Count != names.Length || names.Any(name => zip.Entries.Count(e => e.FullName == name) != 1)) throw new InvalidDataException("Backup entries are missing, duplicated or unexpected.");
         var manifestEntry = zip.GetEntry("manifest.json")!;
-        if (manifestEntry.Length > 65536) throw new InvalidDataException("Backup manifest is too large.");
+        if (manifestEntry.Length is <= 0 or > 65536) throw new InvalidDataException("Backup manifest size is invalid.");
+        var manifestBytes = new byte[checked((int)manifestEntry.Length)];
+        using (var input = manifestEntry.Open())
+        {
+            try { input.ReadExactly(manifestBytes); }
+            catch (EndOfStreamException error) { throw new InvalidDataException("Backup manifest is truncated.", error); }
+            if (input.ReadByte() >= 0) throw new InvalidDataException("Backup manifest expanded beyond its declared size.");
+        }
         Manifest manifest;
-        using (var input = manifestEntry.Open()) manifest = JsonSerializer.Deserialize<Manifest>(input, new JsonSerializerOptions { MaxDepth = 8 }) ?? throw new InvalidDataException("Backup manifest invalid.");
+        manifest = JsonSerializer.Deserialize<Manifest>(manifestBytes, new JsonSerializerOptions { MaxDepth = 8 }) ?? throw new InvalidDataException("Backup manifest invalid.");
         if (manifest.SchemaVersion != 1 || manifest.Files is null || manifest.Files.Length != 2 || manifest.Files.Any(i => i is null) || names.Take(2).Any(name => manifest.Files.Count(i => i.Path == name) != 1)) throw new InvalidDataException("Backup manifest schema/files invalid.");
         foreach (var item in manifest.Files)
         {
@@ -87,7 +94,7 @@ public static class BackupBundle
         }
         new SettingsFile(stage).Load();
         using var database = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = Path.Combine(stage, "library.db"), Mode = SqliteOpenMode.ReadOnly, Pooling = false }.ToString());
-        database.Open(); DatabaseRecovery.Validate(database);
+        database.Open(); DatabaseRecovery.ConfigureReadLimits(database); DatabaseRecovery.Validate(database);
     }
     private static void Install(string directory, string stage)
     {

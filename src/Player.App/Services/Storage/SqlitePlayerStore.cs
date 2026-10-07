@@ -124,6 +124,7 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
         try
         {
             connection.Open();
+            DatabaseRecovery.ConfigureReadLimits(connection);
             using var version = connection.CreateCommand(); version.CommandText = "PRAGMA user_version";
             var schema = Convert.ToInt32(version.ExecuteScalar(), System.Globalization.CultureInfo.InvariantCulture);
             if (schema > 2) throw new NewerDatabaseSchemaException(schema);

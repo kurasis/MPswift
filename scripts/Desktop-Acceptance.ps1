@@ -20,14 +20,14 @@ try {
 finally {
     if ($null -ne $trace -and -not $traceStopped) {
         try { $loss = Stop-PlayerNetworkTrace $trace; $traceStopped = $true }
-        catch { & logman.exe stop $trace.Name -ets 2>&1 | Out-Null }
+        catch { & (Join-Path ([Environment]::GetFolderPath('System')) 'logman.exe') stop $trace.Name -ets 2>&1 | Out-Null }
     }
 }
 $ended = [DateTimeOffset]::UtcNow
 $traffic = @{}
 if ($null -eq $failure -and $null -ne $trace -and $traceStopped) {
     $xml = Join-Path $workspace.Root 'network.xml'
-    $conversion = & tracerpt.exe $trace.Etl -o $xml -of XML -y 2>&1
+    $conversion = & (Join-Path ([Environment]::GetFolderPath('System')) 'tracerpt.exe') $trace.Etl -o $xml -of XML -y 2>&1
     if ($LASTEXITCODE -ne 0) { $failure = 'Owned ETW conversion failed: ' + ($conversion -join ' ') }
     else {
         foreach ($phase in @('first','restart')) {

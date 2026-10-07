@@ -14,7 +14,7 @@ $letter = $null
 function Invoke-OwnedDiskPart([string[]]$Commands) {
     $script = Join-Path $owned 'owned-diskpart.txt'
     $Commands | Set-Content $script -Encoding ascii
-    $lines = & diskpart.exe /s $script
+    $lines = & (Join-Path ([Environment]::GetFolderPath('System')) 'diskpart.exe') /s $script
     if ($LASTEXITCODE -ne 0) { throw "Owned VHD DiskPart failed: $lines" }
     Write-Host ($lines -join "`n")
 }
