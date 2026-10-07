@@ -53,6 +53,7 @@ internal static class CompletionValidation
         Check(model.Queue.Any(q => q.Id == queuedDuplicate) && model.SourcePlaylistId == source && model.Snapshot.EntryId == originalSnapshot.EntryId, "Duplicate removal changed source/current/queued snapshots.");
         await model.SaveNowAsync();
         model.DeletePlaylist(); model.RemoveQueued(queuedDuplicate); model.SelectedPlaylist = selected;
+        await Idle(); // Queue change notifications deliberately marshal to the dispatcher.
         Check(model.Queue.Select(q => q.Id).SequenceEqual(queue), "Duplicate cleanup lost existing queued snapshots.");
 
         model.Details = Path.Combine(data, "owned diagnostic.flac");

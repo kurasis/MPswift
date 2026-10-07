@@ -700,4 +700,5 @@ Settings include accent, waveform style, startup/session options and local cache
     <data name="DefaultRepeat" xml:space="preserve"><value>Default repeat mode</value></data>
     <data name="DefaultShuffle" xml:space="preserve"><value>Shuffle by default</value></data>
     <data name="PlaybackDefaultsHelp" xml:space="preserve"><value>Used when there is no saved session or session restoration is disabled. A restored session retains its own repeat/shuffle state.</value></data>
+    <data name="EncodedChannelCount" xml:space="preserve"><value>encoded channels: {0}</value></data>
 </root>

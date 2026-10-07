@@ -89,7 +89,7 @@ public partial class MainWindow : Window
         {
             await model.HandleMediaAsync("Pause");
             await model.SaveNowAsync();
-            model.Message = Strings.Get("SleepPaused");
+            if (model.Snapshot.Error is null) model.Message = Strings.Get("SleepPaused");
         }
         catch (Exception error) { model.Message = Strings.Get("SaveFailed"); model.Details = error.Message; }
     }

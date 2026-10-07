@@ -45,3 +45,5 @@ G8 extends the observed matrix to 30 committed profiles plus independently codec
 ## Two-hour M4B/APE follow-up
 
 Two new owned fixtures and a bounded native/production seek/end/source-preservation runner cover AAC-LC M4B and normal APE at 7201 seconds; APE float offsets exceed Int32. Independent FFprobe duration/profile/rate/channel facts and file hashes are recorded before Windows execution. Main CI will retain `long-formats.json`; its result must be observed before these profiles are marked verified. These fixtures do not claim >4 GiB compressed APE, Windows N, physical output or lossy gapless.
+
+The pinned native AAC/MP4 decoder reports stereo PCM for the owned mono M4B. The manifest distinguishes independently encoded mono from decoded stereo; validation requires equal left/right PCM rather than changing the original source facts. UI/diagnostics additionally show encoded metadata channel count when it differs from native decode channels. This is not bit-perfect mono decoding.

@@ -700,4 +700,5 @@ F1: локальная справка
     <data name="DefaultRepeat" xml:space="preserve"><value>Режим повтора по умолчанию</value></data>
     <data name="DefaultShuffle" xml:space="preserve"><value>Случайный порядок по умолчанию</value></data>
     <data name="PlaybackDefaultsHelp" xml:space="preserve"><value>Используется, если нет сохранённой сессии или её восстановление отключено. При восстановлении сессии сохраняется её режим повтора и случайного порядка.</value></data>
+    <data name="EncodedChannelCount" xml:space="preserve"><value>каналов в файле: {0}</value></data>
 </root>

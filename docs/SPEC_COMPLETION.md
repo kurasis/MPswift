@@ -28,3 +28,5 @@ Two additional owned 7201-second M4B/APE fixtures add bounded real native durati
 - **AC-035:** owner intended use and application license, BASS/add-on conditions and GPL/LGPL matching-source/relinking requirements remain distribution decisions. Publishing a development candidate does not approve stable 1.0 or licensing purchases.
 
 P2 extensions (light theme, mini-player, spectrum, module/MIDI/AC3/DTS, chapter UI, installer/ASIO/native DSD) remain optional. This block does not silently introduce them or declare all P0/P1 accepted.
+
+The pinned native AAC/MP4 decoder reports stereo PCM for the owned mono M4B. The manifest distinguishes independently encoded mono from decoded stereo; validation requires equal left/right PCM rather than changing the original source facts. UI/diagnostics additionally show encoded metadata channel count when it differs from native decode channels. This is not bit-perfect mono decoding.

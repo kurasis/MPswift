@@ -40,6 +40,8 @@ public sealed class PreferencesWindow : Window
         var cancel = new Button { Content = Strings.Get("Cancel"), IsCancel = true, Margin = new Thickness(0, 0, 8, 0) };
         cancel.Click += (_, _) => Close(); footer.Children.Add(cancel);
         ApplyButton = new Button { Content = Strings.Apply, IsDefault = true, Style = (Style)FindResource("AccentButton") }; footer.Children.Add(ApplyButton);
+        var validation = new TextBlock { TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 8, 0, 0) };
+        DockPanel.SetDock(validation, Dock.Bottom); root.Children.Add(validation);
         var panel = new StackPanel(); root.Children.Add(new ScrollViewer { Content = panel, VerticalScrollBarVisibility = ScrollBarVisibility.Auto, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled });
         panel.Children.Add(new TextBlock { Text = Strings.Settings, FontSize = 24, FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 0, 0, 8) });
         void Section(string key) => panel.Children.Add(new TextBlock { Text = Strings.Get(key), FontSize = 14, FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 18, 0, 8) });
@@ -130,7 +132,6 @@ public sealed class PreferencesWindow : Window
             finally { diagnostics.IsEnabled = true; }
         };
         Hint(Strings.Get("LocalNotices"));
-        var validation = new TextBlock { TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 8, 0, 0) }; panel.Children.Add(validation);
         ApplyButton.Click += (_, _) => ApplyCompletion = ApplyAsync();
         async Task ApplyAsync()
         {

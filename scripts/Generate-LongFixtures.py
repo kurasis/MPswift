@@ -50,7 +50,7 @@ def main():
         raise RuntimeError('Long audiobook independent profile/duration differs.')
     fixtures = []
     for filename, codec, ch, mode in [('long-markers.ape','APE',2,'markers'),('long-audiobook.m4b','MP4',1,'continuous')]:
-        fixtures.append(dict(path=filename, sha256=sha(output/filename), codec=codec, sampleRate=rate, channels=ch,
+        fixtures.append(dict(path=filename, sha256=sha(output/filename), codec=codec, sampleRate=rate, channels=ch, decodedChannels=2,
                              durationSeconds=duration, signal=mode, markerSeconds=[0,3600,7199] if mode == 'markers' else [],
                              expectedPeakMinimum=.04, expectedPeakMaximum=.2, license='CC0-1.0'))
     manifest = dict(schemaVersion=1, sourceSha256=expected, durationSeconds=duration, fixtures=fixtures,

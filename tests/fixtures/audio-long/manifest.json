@@ -18,7 +18,8 @@
       ],
       "expectedPeakMinimum": 0.04,
       "expectedPeakMaximum": 0.2,
-      "license": "CC0-1.0"
+      "license": "CC0-1.0",
+      "decodedChannels": 2
     },
     {
       "path": "long-audiobook.m4b",
@@ -31,7 +32,9 @@
       "markerSeconds": [],
       "expectedPeakMinimum": 0.04,
       "expectedPeakMaximum": 0.2,
-      "license": "CC0-1.0"
+      "license": "CC0-1.0",
+      "decodedChannels": 2,
+      "decoderChannelPolicy": "Pinned BASS AAC/MP4 produces stereo PCM for this mono AAC-LC fixture; native checks require matching left/right channels."
     }
   ],
   "generator": "Generate-LongFixtures.py",

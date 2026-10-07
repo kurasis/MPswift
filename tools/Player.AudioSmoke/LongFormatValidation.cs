@@ -31,8 +31,10 @@ internal static class LongFormatValidation
             {
                 Check(Bass.ChannelGetInfo(stream, out var info), "Long fixture format unavailable.");
                 var bytes = Bass.ChannelGetLength(stream); var duration = Bass.ChannelBytes2Seconds(stream, bytes);
-                Check(info.Frequency == fixture.GetProperty("sampleRate").GetInt32() && info.Channels == fixture.GetProperty("channels").GetInt32() && info.ChannelType.ToString() == fixture.GetProperty("codec").GetString(),
-                    $"Long format facts differ: {name}; actual {info.Frequency} Hz/{info.Channels} channels/{info.ChannelType}; expected {fixture.GetProperty("sampleRate")}/{fixture.GetProperty("channels")}/{fixture.GetProperty("codec")}; duration {duration:R}.");
+                var encodedChannels = fixture.GetProperty("channels").GetInt32();
+                var decodedChannels = fixture.GetProperty("decodedChannels").GetInt32();
+                Check(info.Frequency == fixture.GetProperty("sampleRate").GetInt32() && info.Channels == decodedChannels && info.ChannelType.ToString() == fixture.GetProperty("codec").GetString(),
+                    $"Long format facts differ: {name}; actual {info.Frequency} Hz/{info.Channels} channels/{info.ChannelType}; expected {fixture.GetProperty("sampleRate")}/{decodedChannels}/{fixture.GetProperty("codec")}; duration {duration:R}.");
                 Check(Math.Abs(duration - fixture.GetProperty("durationSeconds").GetDouble()) < .1, "Long duration truncated or inflated.");
                 var ranges = new List<object>(); var buffer = new float[4096];
                 foreach (var position in new[] { .25, 3600.25, 7199.25 })
@@ -43,16 +45,21 @@ internal static class LongFormatValidation
                     Check(Math.Abs(Bass.ChannelBytes2Seconds(stream, actual) - position) < .01, "Long seek landed on the wrong range.");
                     var read = Bass.ChannelGetData(stream, buffer, buffer.Length * sizeof(float));
                     Check(read == buffer.Length * sizeof(float), "Long bounded range read was short.");
-                    float peak = 0; double energy = 0;
+                    float peak = 0; double energy = 0; float monoUpmixDifference = 0;
                     for (var i = 0; i < read / sizeof(float); i++) { Check(float.IsFinite(buffer[i]), "Non-finite long PCM."); peak = Math.Max(peak, Math.Abs(buffer[i])); energy += buffer[i] * (double)buffer[i]; }
+                    if (encodedChannels == 1 && info.Channels == 2)
+                    {
+                        for (var i = 0; i < read / sizeof(float); i += 2) monoUpmixDifference = Math.Max(monoUpmixDifference, Math.Abs(buffer[i] - buffer[i + 1]));
+                        Check(monoUpmixDifference <= .000001f, "Mono decoder upmix produced different left/right signals.");
+                    }
                     Check(peak >= fixture.GetProperty("expectedPeakMinimum").GetSingle() && peak <= fixture.GetProperty("expectedPeakMaximum").GetSingle(), "Long fixture marker/audio was lost.");
-                    ranges.Add(new { PositionSeconds = position, DecodedByteOffset = actual, Peak = peak, Rms = Math.Sqrt(energy / (read / 4)), SeekAndReadMilliseconds = seekClock.Elapsed.TotalMilliseconds });
+                    ranges.Add(new { PositionSeconds = position, DecodedByteOffset = actual, Peak = peak, Rms = Math.Sqrt(energy / (read / 4)), MonoUpmixMaximumDifference = monoUpmixDifference, SeekAndReadMilliseconds = seekClock.Elapsed.TotalMilliseconds });
                 }
                 Check(Bass.ChannelSetPosition(stream, bytes - buffer.Length * sizeof(float)), "Long tail seek failed.");
                 var tail = Bass.ChannelGetData(stream, buffer, buffer.Length * sizeof(float));
                 Check(tail == buffer.Length * sizeof(float) && Bass.ChannelGetData(stream, buffer, buffer.Length * sizeof(float)) < 0 && Bass.LastError == Errors.Ended, "Long natural end was not reached exactly.");
                 evidence = new { File = name, DurationSeconds = duration, DecodedFloatBytes = bytes, ExceedsInt32DecodedRange = bytes > int.MaxValue,
-                    info.Frequency, info.Channels, Ranges = ranges, NaturalEnd = true, BoundedBufferBytes = buffer.Length * sizeof(float), ElapsedMilliseconds = clock.Elapsed.TotalMilliseconds };
+                    info.Frequency, EncodedChannels = encodedChannels, DecodedChannels = info.Channels, Ranges = ranges, NaturalEnd = true, BoundedBufferBytes = buffer.Length * sizeof(float), ElapsedMilliseconds = clock.Elapsed.TotalMilliseconds };
             }
             finally { Check(Bass.StreamFree(stream), "Long stream disposal failed."); }
             using (var backend = new BassAudioBackend())

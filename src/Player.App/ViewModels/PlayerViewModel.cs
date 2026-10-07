@@ -337,8 +337,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     { if (!_closing && !_dispatcher.HasShutdownStarted) _dispatcher.BeginInvoke(() => { RefreshQueue(); ScheduleSave(false); }, DispatcherPriority.Background); }
     private void RefreshQueue() { Queue.Clear(); foreach (var item in _coordinator.Queue) Queue.Add(item); }
     public Task<AudioDevice[]> GetDevicesAsync() => _player is IAdvancedAudioPlayer advanced ? advanced.GetDevicesAsync() : Task.FromResult(Array.Empty<AudioDevice>());
-    public Task<WaveformCacheUsage?> GetCacheUsageAsync() => GetCacheUsageCoreAsync();
-    private async Task<WaveformCacheUsage?> GetCacheUsageCoreAsync() => _waveforms is IWaveformCacheControl cache ? await cache.GetCacheUsageAsync() : null;
+    public async Task<WaveformCacheUsage?> GetCacheUsageAsync() => _waveforms is IWaveformCacheControl cache ? await cache.GetCacheUsageAsync() : null;
     public Task ClearWaveformCacheAsync() => _waveforms is IWaveformCacheControl cache ? cache.ClearCacheAsync() : Task.CompletedTask;
     public async Task SavePreferencesAsync(PlayerSettings settings)
     {
@@ -368,6 +367,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
             Architecture = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString(),
             Native = nativeVersions, DeployedDecoders = Services.Audio.NativeLibraryBootstrap.DecoderPaths.Select(Path.GetFileName).ToArray(), DecoderErrors = Services.Audio.NativeLibraryBootstrap.DecoderValidationErrors,
             SelectedOutput = WindowSettings.Output ?? new(), Source = snapshot.SourceFormat, ActualOutput = snapshot.OutputFormat,
+            EncodedMetadataChannels = _coordinator.ActiveEntry?.Track.ChannelsHint,
             Processing = WindowSettings.Processing ?? new(), snapshot.Volume, snapshot.Muted, snapshot.State, PositionSeconds = snapshot.Position.TotalSeconds,
             Error = snapshot.Error, Details, Data = app.DataDirectory, Logs = Path.Combine(app.DataDirectory, "Logs"),
             LogDropped = app.DroppedLogRecords, LogError = app.LogError, SourceFilesAreReadOnly = true, Network = "local-only",
@@ -716,6 +716,8 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     {
         Format = snapshot.SourceFormat is { } source ? string.Format(Strings.Culture, Strings.Get("SourceFormat"), source.Codec, source.SampleRate, source.Channels) : "";
         if (snapshot.SourceFormat?.BitDepth is { } bits) Format += " · " + string.Format(Strings.Culture, Strings.Get("SourceBitDepth"), bits);
+        if (_coordinator.ActiveEntry?.Track.ChannelsHint is > 0 and var encoded && snapshot.SourceFormat is { } decoded && encoded != decoded.Channels)
+            Format += " · " + string.Format(Strings.Culture, Strings.Get("EncodedChannelCount"), encoded);
         if (snapshot.OutputFormat is { } output) Format += " · " + string.Format(Strings.Culture, Strings.Get("OutputFormat"), output.SampleRate, output.Channels);
     }
     private async Task SaveListeningAfterAsync(Task preceding, ListeningEvent occurrence) { await preceding; await ObserveAsync(_index!.RecordListeningAsync(occurrence)); }
