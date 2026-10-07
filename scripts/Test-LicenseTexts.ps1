@@ -4,7 +4,7 @@ Set-StrictMode -Version Latest
 $root = Split-Path $PSScriptRoot -Parent
 $original = Join-Path $root 'docs/licenses'
 $records = @(& "$PSScriptRoot/Verify-LicenseTexts.ps1" -Directory $original)
-if ($records.Count -ne 5) { throw 'Expected all five independently pinned license texts.' }
+if ($records.Count -ne 6) { throw 'Expected all six independently pinned license texts.' }
 $temporary = Join-Path ([IO.Path]::GetTempPath()) ('mpswift-license-test-' + [guid]::NewGuid().ToString('N'))
 try {
     Copy-Item $original $temporary -Recurse

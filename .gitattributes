@@ -1,2 +1,6 @@
 # Preserve upstream notice bytes and whitespace exactly, including on Windows checkouts.
 docs/licenses/** -text -whitespace
+
+# Preserve original upstream review terms exactly on every platform.
+docs/license-review/*.txt -text
+docs/license-review/*.rtf -text

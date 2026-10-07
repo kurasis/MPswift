@@ -345,3 +345,13 @@ Source run 37600106914 verified the generic-read directory fix, EN/RU WPF and 24
 ## Security completion: stream inputs (2026-10-07)
 
 The approved mutable-file guard and held restore/rollback implementation are described in [the completion report](SECURITY_COMPLETION_2026-10-07.md). First Windows run 37622947015 rejected a missing Win32 rename terminator; the correction retains exact original assertions and adds 64 repeated Unicode destinations. Linux now passes 284 tests; cross-target Release compilation has zero warnings/errors. Production stream read pins now survive native decoder lifetime; verified BASSWV callbacks pin exact main/correction inputs, and correction facts invalidate waveform cache entries. Remote link hops are rejected before target metadata access. [Implementation, regression controls and explicit limits](STREAM_INPUT_CONTINUITY_2026-10-07.md). Exact-source Windows/native/package observations remain required; physical/manual, publisher and rights/source gates remain open.
+
+
+## Corresponding-source preparation (2026-10-07)
+
+Complete pinned TagLibSharp source/archive inventory and reviewed netstandard2.0 rebuild are prepared; a separate Linux test copy passes 284 tests after replacing its library with the rebuilt DLL. No runtime dependency, owner license or app ZIP policy is changed. [Repeatable preparation and exact limits](TAGLIB_SOURCE_PREPARATION_2026-10-07.md).
+
+
+## Completion compatibility checkpoint (2026-10-07)
+
+Run 37625963338 passes 284 tests on each OS, actual codec/long/mixer/stress and WavPack correction-waveform cache checks. The unchanged real Windows ACL test exposed access-denied exception classification; native guards now preserve UnauthorizedAccessException. Direct public integer-handle release, exact-entry lifetime cleanup and six pinned upstream license texts are included in the next source run. Local configured locked Release build/tests pass (284 tests, zero warnings/errors). A separately requested latest-all analyzer exploration is not clean: 558 diagnostics include broad API/style/async rules and ownership-transfer/PInvoke findings. Public types, JSON-instantiated models and legitimate bounded/whitelisted SQL are retained; no analyzer suppression or dependency change is made to force that optional exploration green. New native guards restrict imports to System32 and callback locks use private gates. Exact-source CI/package observation remains pending.

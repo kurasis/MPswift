@@ -1,0 +1,70 @@
+{
+  "source": {
+    "commit": "b5ae84f2e84087bf160bb0471420200dd2b5d809",
+    "url": "https://codeload.github.com/mono/taglib-sharp/zip/b5ae84f2e84087bf160bb0471420200dd2b5d809",
+    "archiveBytes": 102677407,
+    "archiveSha256": "ab6fab7e22c7423e428f591d7525a38ca283d217a49f9772eb9a29cd682c175d",
+    "files": 606
+  },
+  "selectedBuildMaterial": [
+    {
+      "path": "taglib-sharp-b5ae84f2e84087bf160bb0471420200dd2b5d809/AUTHORS",
+      "bytes": 717,
+      "sha256": "90da58ec1980154bd38d9991b314dc2db9a3e8526df77ccdf8b936871231db41"
+    },
+    {
+      "path": "taglib-sharp-b5ae84f2e84087bf160bb0471420200dd2b5d809/COPYING",
+      "bytes": 26432,
+      "sha256": "6095e9ffa777dd22839f7801aa845b31c9ed07f3d6bf8a26dc5d2dec8ccc0ef3"
+    },
+    {
+      "path": "taglib-sharp-b5ae84f2e84087bf160bb0471420200dd2b5d809/Directory.Build.props",
+      "bytes": 967,
+      "sha256": "0d68b8fb745f6c69b883f638719ef01c7aef108990a877d246f68cefbc5f76b0"
+    },
+    {
+      "path": "taglib-sharp-b5ae84f2e84087bf160bb0471420200dd2b5d809/Directory.Build.targets",
+      "bytes": 21,
+      "sha256": "8ba116338d3f1da44239d5c727a6bfec09f781567c99fe8f5c75f92daee29479"
+    },
+    {
+      "path": "taglib-sharp-b5ae84f2e84087bf160bb0471420200dd2b5d809/src/TaglibSharp/TaglibSharp.csproj",
+      "bytes": 3134,
+      "sha256": "becc71872a061e3a32798f9a4f7842bae2079dab0d8cde13fadc80678a369078"
+    },
+    {
+      "path": "taglib-sharp-b5ae84f2e84087bf160bb0471420200dd2b5d809/taglib-sharp.snk",
+      "bytes": 596,
+      "sha256": "a201e2950a33883b01d58119ccb9137f5b86332ce050faa7bb169a031171eb78"
+    }
+  ],
+  "sdk": "10.0.401",
+  "framework": "netstandard2.0",
+  "buildWarnings": 0,
+  "buildErrors": 0,
+  "assemblyIdentity": "TagLibSharp, Version=2.3.0.0, Culture=neutral, PublicKeyToken=db62eba44689b5b0",
+  "nugetDllSha256": "dad93b152d55cf6a58b2037bcf9dd34b45d87761fe5ed61a232b3d4641d2a5d3",
+  "rebuiltDllSha256": "1740a1c14255ee05b41d279cb85afab174d9b006bbeb4969cbf73de2ba69de2b",
+  "relinkedManagedTests": {
+    "trxSha256": "1ad1b3da3e213051cda8202ee63578c8aaa895e679a85f23e48b7346aabecf83",
+    "counters": {
+      "total": "284",
+      "executed": "284",
+      "passed": "284",
+      "failed": "0",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    }
+  },
+  "limits": "Owned Linux test output only; not bit-for-bit NuGet reproduction, Windows relinking evidence, written source offer or full distribution/legal acceptance"
+}

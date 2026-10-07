@@ -103,6 +103,7 @@ internal static class RestoreFileTransaction
             {
                 var code = Marshal.GetLastPInvokeError(); handle.Dispose();
                 if (code == 2) return null;
+                if (code == 5) throw new UnauthorizedAccessException("Cannot retain original restore file; originals preserved.", new Win32Exception(code));
                 throw new IOException("Cannot retain original restore file; originals preserved.", new Win32Exception(code));
             }
             try { DataFileLease.Check(handle); return new(path, new FileStream(handle, FileAccess.Read), false); }
@@ -164,9 +165,15 @@ internal static class RestoreFileTransaction
             finally { if (!_closed) { Stream.Dispose(); _closed = true; } }
         }
     }
-    private static IOException Failure(string message) => new(message, new Win32Exception(Marshal.GetLastPInvokeError()));
+    private static Exception Failure(string message)
+    {
+        var code = Marshal.GetLastPInvokeError();
+        return code == 5 ? new UnauthorizedAccessException(message, new Win32Exception(code)) : new IOException(message, new Win32Exception(code));
+    }
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("kernel32.dll", EntryPoint = "CreateFileW", CharSet = CharSet.Unicode, SetLastError = true)]
     private static extern SafeFileHandle CreateFile(string path, uint access, uint share, nint security, uint creation, uint flags, nint template);
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool SetFileInformationByHandle(SafeFileHandle file, int informationClass, nint information, uint size);

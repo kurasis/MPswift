@@ -57,10 +57,13 @@ internal static class StreamLifetimeValidation
         var renamedHandle = BassMixerGraph.OpenSource(new AudioRequest(Guid.NewGuid(), renamed)).Handle;
         try { Check(Compare(renamedHandle, reference) == 0, "A renamed WavPack input bypassed correction handling."); }
         finally { Check(NativeStreamPins.Free(renamedHandle), "Renamed source release failed."); }
+        var external = BassMixerGraph.OpenSource(new AudioRequest(Guid.NewGuid(), wv)).Handle;
+        Check(Bass.StreamFree(external), "Direct public integer-handle release failed.");
+        using (File.Open(wvc, FileMode.Open, FileAccess.ReadWrite, FileShare.None)) { }
         Check(NativeStreamPins.Count == 0, "Callback/source pins leaked after release.");
         return new { Status = "production-stream-lifetime-passed", WavWritesAndReplacementDenied = true,
             WavPackMainAndCorrectionWritesDenied = true, CorrectionReplacementDenied = true,
-            CallbacksSurviveCollection = true, MissingCorrectionSelectionFrozen = true, RenamedWavPackDetected = true,
+            CallbacksSurviveCollection = true, MissingCorrectionSelectionFrozen = true, RenamedWavPackDetected = true, DirectPublicHandleReleasePreserved = true,
             CorrectedMaximumPcmError = correctedError, UncorrectedMaximumPcmError = lossyError, SourceHandlesReleased = true };
     }
     private static float Compare(int source, string reference)

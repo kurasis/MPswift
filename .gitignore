@@ -15,3 +15,7 @@ native/win-x64/*
 *.db-wal
 *.db-shm
 *.peaks
+
+# Generated Python review helpers
+__pycache__/
+*.pyc

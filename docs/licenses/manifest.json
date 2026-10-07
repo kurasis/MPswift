@@ -63,6 +63,18 @@
       "sourceCommit": "b5ae84f2e84087bf160bb0471420200dd2b5d809",
       "sha256": "90da58ec1980154bd38d9991b314dc2db9a3e8526df77ccdf8b936871231db41",
       "bytes": 717
+    },
+    {
+      "path": "cswinrt/CsWinRT-LICENSE.txt",
+      "fileName": "CsWinRT-LICENSE.txt",
+      "packages": [
+        "Microsoft.Windows.SDK.NET.Ref/10.0.19041.57"
+      ],
+      "component": "WinRT.Runtime.dll",
+      "sourceUrl": "https://raw.githubusercontent.com/microsoft/CsWinRT/8649ee3eeb2445ca2a36d80d878ef60b96a6c65d/LICENSE",
+      "sourceCommit": "8649ee3eeb2445ca2a36d80d878ef60b96a6c65d",
+      "sha256": "9906940f61b1f0b533fa7d99baf55178b2808fbe113ea51dfbfad8572ccd5f2b",
+      "bytes": 1162
     }
   ]
 }

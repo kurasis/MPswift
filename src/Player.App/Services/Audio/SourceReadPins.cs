@@ -11,8 +11,10 @@ internal sealed class SourceReadPins : IDisposable
     public LocalReadLease Main { get; }
     private LocalReadLease? Correction { get; }
     private readonly FileProcedures _procedures;
+    private readonly object _mainGate = new(), _correctionGate = new();
     private bool _disposed;
     private int _primaryClosed, _correctionClosed, _correctionUsed;
+    internal Action? FileClosed { get; set; }
     public bool UsesCallbacks { get; }
     public bool InputsClosed => Volatile.Read(ref _primaryClosed) != 0 && (Volatile.Read(ref _correctionUsed) == 0 || Volatile.Read(ref _correctionClosed) != 0);
     public string CorrectionSignature => !UsesCallbacks ? "" : Correction is null ? "wvc:absent" :
@@ -58,7 +60,7 @@ internal sealed class SourceReadPins : IDisposable
         try
         {
             var file = Input(user); if (file is null || offset < 0 || offset > file.Length) return false;
-            lock (file) file.Position = offset;
+            lock (user == 0 ? _mainGate : _correctionGate) file.Position = offset;
             return true;
         }
         catch (Exception) { return false; }
@@ -71,7 +73,7 @@ internal sealed class SourceReadPins : IDisposable
         {
             rented = ArrayPool<byte>.Shared.Rent(Math.Min(bytes, 65536));
             var file = Input(user); if (file is null) return 0;
-            lock (file)
+            lock (user == 0 ? _mainGate : _correctionGate)
             {
                 var copied = 0;
                 while (copied < bytes)
@@ -87,10 +89,13 @@ internal sealed class SourceReadPins : IDisposable
         finally { if (rented is not null) ArrayPool<byte>.Shared.Return(rented); }
     }
     private void CloseInput(nint user)
-    { if (user == 0) Interlocked.Exchange(ref _primaryClosed, 1); else Interlocked.Exchange(ref _correctionClosed, 1); }
+    {
+        if (user == 0) Interlocked.Exchange(ref _primaryClosed, 1); else Interlocked.Exchange(ref _correctionClosed, 1);
+        FileClosed?.Invoke();
+    }
     public void Dispose()
     {
-        if (_disposed) return; _disposed = true;
+        if (_disposed) return; _disposed = true; FileClosed = null;
         Correction?.Dispose(); Main.Dispose();
     }
     [UnmanagedFunctionPointer(CallingConvention.Winapi)]

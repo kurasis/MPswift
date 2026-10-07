@@ -1,0 +1,38 @@
+{
+  "reviewedAt": "2026-10-07",
+  "distributionApproved": false,
+  "sdkPackage": "Microsoft.Windows.SDK.NET.Ref/10.0.19041.57",
+  "winrtRuntime": {
+    "fileVersion": "2.2.0.48161",
+    "productVersion": "2.2.0.48161+8649ee3eeb2445ca2a36d80d878ef60b96a6c65d",
+    "sha256": "bcf3a14e8712a90837fc5c0d8c8a24696af2bd7f74e9767597ec81ededfb23db",
+    "upstreamCommit": "8649ee3eeb2445ca2a36d80d878ef60b96a6c65d"
+  },
+  "files": [
+    {
+      "path": "Windows-SDK-license.rtf",
+      "sourceUrl": "https://download.microsoft.com/download/0/F/F/0FF2B061-47DD-4F55-89B6-FD1D8C44F14D/sdk_license.rtf",
+      "bytes": 246945,
+      "sha256": "dd07eb178e00c6bba4148457fc00ff77cd4887eb521d504186fe59c9ec8bbe62"
+    },
+    {
+      "path": "../licenses/cswinrt/CsWinRT-LICENSE.txt",
+      "sourceUrl": "https://raw.githubusercontent.com/microsoft/CsWinRT/8649ee3eeb2445ca2a36d80d878ef60b96a6c65d/LICENSE",
+      "bytes": 1162,
+      "sha256": "9906940f61b1f0b533fa7d99baf55178b2808fbe113ea51dfbfad8572ccd5f2b"
+    }
+  ],
+  "redist": {
+    "url": "https://learn.microsoft.com/en-us/legal/windows-sdk/redist",
+    "resolvedFrom": "https://go.microsoft.com/fwlink/?LinkId=524842",
+    "snapshotSha256": "39d660ff8965d73ceaceba75f93d8cf8a87d902080ff50ebbc20309b0a4cd6b3",
+    "declaredUpdate": "2024-10-21",
+    "listedPackage": "Microsoft.Windows.SDK.NET.Ref",
+    "listedDeployedPaths": [
+      "./lib/net8.0/Microsoft.Windows.SDK.NET.dll",
+      "./lib/net8.0//WinRT.Runtime.dll"
+    ],
+    "condition": "Unmodified files for programs enabling WinRT APIs, subject to SDK license terms"
+  },
+  "scope": "SDK terms review plus exact CsWinRT component notice preparation; not an unconditional grant, binary-source proof or owner license choice"
+}

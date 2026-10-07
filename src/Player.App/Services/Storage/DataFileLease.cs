@@ -38,6 +38,7 @@ internal sealed class DataFileLease : IDisposable
         {
             var code = Marshal.GetLastPInvokeError(); handle.Dispose();
             if (!create && code == 2) return null;
+            if (code == 5) throw new UnauthorizedAccessException("Cannot pin application data file.", new Win32Exception(code));
             throw new IOException("Cannot pin application data file.", new Win32Exception(code));
         }
         try
@@ -69,6 +70,7 @@ internal sealed class DataFileLease : IDisposable
         {
             var code = Marshal.GetLastPInvokeError();
             if (code == 2) return true;
+            if (code == 5) throw new UnauthorizedAccessException("Cannot open owned data for cleanup.", new Win32Exception(code));
             throw new IOException("Cannot open owned data for cleanup.", new Win32Exception(code));
         }
         if (Identify(handle) != identity) return false;
@@ -87,10 +89,13 @@ internal sealed class DataFileLease : IDisposable
         public uint Attributes; public System.Runtime.InteropServices.ComTypes.FILETIME Creation, Access, Write;
         public uint VolumeSerial, SizeHigh, SizeLow, Links, IndexHigh, IndexLow;
     }
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("kernel32.dll", EntryPoint = "CreateFileW", CharSet = CharSet.Unicode, SetLastError = true)]
     private static extern SafeFileHandle CreateFile(string path, uint access, uint share, nint security, uint creation, uint flags, nint template);
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)] private static extern bool GetFileInformationByHandle(SafeFileHandle handle, out FileInformation info);
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)] private static extern bool SetFileInformationByHandle(SafeFileHandle handle, int informationClass, nint information, uint size);
 }

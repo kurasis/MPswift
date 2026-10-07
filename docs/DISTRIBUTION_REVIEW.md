@@ -36,3 +36,15 @@ Pinned TagLib release source reference: https://github.com/mono/taglib-sharp/tre
 ```
 
 The two supplemental LICENSE/NOTICE copies for each SQLitePCLRaw package deliberately retain the whole upstream NOTICE. Per-package inventory points to source URLs/hashes instead of inventing missing NuGet files. Package manifest/checksums cover all retained texts. These checks prove provenance and completeness of the selected text set; they do not infer full legal clearance from a successful build.
+
+
+## Source/build preparation follow-up (2026-10-07)
+
+[Exact TagLib source preparation](TAGLIB_SOURCE_PREPARATION_2026-10-07.md) now retains the complete pinned upstream archive in an owned review directory, inventories it, rebuilds the reviewed library with zero warnings/errors and passes 284 MPswift tests with the rebuilt DLL in a separate test copy. This closes source identification/preparation and the observed Linux replacement check; exact NuGet build correspondence, Windows replacement and a source distribution mechanism remain open. The shipped dependency is unchanged.
+
+
+## Windows SDK/component terms preparation (2026-10-07)
+
+The actual SDK targeting package is `Microsoft.Windows.SDK.NET.Ref/10.0.19041.57`. Its `WinRT.Runtime.dll` PE identifies `2.2.0.48161+8649ee3eeb2445ca2a36d80d878ef60b96a6c65d`; the exact Microsoft CsWinRT commit's MIT LICENSE and the package-declared Microsoft SDK RTF terms are retained unchanged in [license review material](license-review/manifest.json), with source URLs/byte hashes. This identifies a component's declared provenance, not reproducible whole-package source equivalence.
+
+The official [SDK REDIST list](https://learn.microsoft.com/en-us/legal/windows-sdk/redist), reached from the SDK terms, explicitly lists the `Microsoft.Windows.SDK.NET.Ref` package and its deployed `lib/net8.0/Microsoft.Windows.SDK.NET.dll` and `WinRT.Runtime.dll` files for unmodified use enabling WinRT APIs. Thus the formerly unlocated REDIST material and runtime-component license text are now identified and retained. This is subject to the SDK's distribution conditions (including notices/copyright, functionality and applicable end-user/distributor terms); owner/distribution acceptance remains required. CsWinRT's MIT declaration does not replace the package's SDK terms. The exact CsWinRT MIT component notice now ships alongside the SDK package declaration through the existing checksum-verified supplemental notice mechanism; it is labeled as WinRT.Runtime.dll component material. The original SDK RTF terms remain review material. No application license is selected.
