@@ -1,5 +1,9 @@
 # Implementation checkpoint
 
+## Conservative code audit (2026-10-07)
+
+Baseline locked build/SDK checks passed at `215c65003179` with 184 managed tests. The conservative audit replaces quadratic playback-order lookups with local ID sets/maps while preserving the exact candidate sequence, fixes sibling-cover cache identity and bounded single-handle settings reads, preserves both recovery failure causes, removes a confirmed private unused helper and write-only legacy cursor calculation, and refreshes stale setup/cache documentation. Public signatures, saved schemas, DSP policy, pinned packages/locks and intentional historical evidence are retained. The local post-change locked build passes with zero warnings/errors and 196 managed tests; Windows smoke adds real equal-size/equal-time red/blue cover selection/cache checks. The unchanged main workflow gates native/WPF/extracted-package validation and separate ZIP publication. [Findings, priorities, evidence and deferred questions](CODE_AUDIT_2026-10-07.md).
+
 ## Playlist tab management, dragging and waveform energy (2026-10-06)
 
 Playlist tabs now expose a compact localized right-click/keyboard context menu for rename, duplicate, delete, left/right movement, sort and M3U8 export. Popup actions retain the clicked tab even if selection changes. Dragging tabs uses a private owner-checked payload, before/after insertion markers, threshold handling, horizontal edge scrolling and persisted collection movement; self/foreign/outside drops do not change order. Folder/file drops and track-row dragging retain their separate routes. Moving tabs preserves selected/source/queue identities and never prepares or starts another track.

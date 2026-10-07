@@ -1,5 +1,9 @@
 # Test evidence — Stages A–G
 
+## Conservative audit regression checks (2026-10-07)
+
+Before edits, locked Release compilation and 184 tests passed; SDK analyzer and targeted IDE0005/IDE0051 verification returned success. A new semantic-backup rejection regression failed on the original code (InvalidDataException escaped without the primary failure). After the fixes, locked compilation has zero warnings/errors and all 196 managed tests pass. Added cases preserve shuffle bag/occurrence order under eligibility/source/restore changes and 10k-entry updates, retain BOM encodings through backup/save, enforce the inclusive 64 KiB limit, and preserve both original settings files and recovery causes. Existing Windows smoke checks actual equal-facts sibling PNG pixels/cache identity in EN/RU and the extracted app. Hosted results remain source/run-specific; the main workflow requires their success before publishing. [Audit and remaining limits](CODE_AUDIT_2026-10-07.md), [raw managed timing/ownership and dependency snapshot](evidence/code-audit-managed-2026-10-07.json).
+
 ## Playlist tab interaction and waveform envelope (2026-10-06)
 
 Local locked Release compilation passes with zero warnings/errors and **184 managed tests**. Energy regressions cover sparse full-scale transients, unequal/opposite-phase channels, chunk continuity, partial bucket weighting, silence, misaligned CUE energy slicing, invalid RMS and v2 cache round-trip/old-format refusal. Peak extrema are still retained.

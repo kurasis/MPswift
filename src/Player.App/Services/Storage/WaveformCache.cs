@@ -4,7 +4,7 @@ using Player.Core.Waveforms;
 
 namespace Player.App.Services.Storage;
 
-/// <summary>Versioned completed peaks only. All sizes validated before allocation.</summary>
+/// <summary>Versioned completed extrema/RMS cache. All sizes validated before allocation.</summary>
 public sealed class WaveformCache(string directory, long budgetBytes = 512L * 1024 * 1024)
 {
     private const int HeaderBytes = 104;

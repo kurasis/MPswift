@@ -8,7 +8,6 @@ public sealed class PlaybackCoordinator : IAsyncDisposable
     private PlaylistEntry[] _entries = [];
     private readonly PlaybackOrder _order;
     private PlaylistEntry? _cursor;
-    private int _removedCursorIndex;
     private long _intent;
     private long _handledEnd = -1;
     private bool _disposed;
@@ -53,8 +52,6 @@ public sealed class PlaybackCoordinator : IAsyncDisposable
         if (array.Select(e => e.Id).Distinct().Count() != array.Length) throw new ArgumentException("Entry IDs must be unique.");
         lock (_gate)
         {
-            var oldIndex = Array.FindIndex(_entries, e => e.Id == _cursor?.Id);
-            if (oldIndex >= 0 && array.All(e => e.Id != _cursor?.Id)) _removedCursorIndex = Math.Min(oldIndex, array.Length);
             _entries = array;
             if (_cursor is { } active && array.FirstOrDefault(e => e.Id == active.Id) is { } updated) _cursor = updated;
             _order.SetSource(array);

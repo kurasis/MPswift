@@ -130,7 +130,6 @@ public sealed class MediaImportService : IMediaImportService
         }
     }
     private static string Identity(MediaTrack track) => track.CueDocument is null ? track.Path : track.CueDocument + "|" + track.CueNumber;
-    private static string? Bounded(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Length <= 4096 ? value : value[..4096];
 
     private static IEnumerable<string> Enumerate(string[] paths, Action<string> error, CancellationToken token)
     {

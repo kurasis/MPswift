@@ -1,0 +1,75 @@
+{
+  "date": "2026-10-07",
+  "baselineSourceCommit": "215c650031790f7774e6c400c3e3372969365ac8",
+  "scope": "Linux managed algorithm/ownership probes; not native output, Windows UI performance or listening acceptance",
+  "benchmark": {
+    "warmupEntries": 64,
+    "sampleCountPerOperation": 3,
+    "baseline": {
+      "Count": 10000,
+      "SetSourceMilliseconds": [
+        468.2629,
+        349.4082,
+        331.8782
+      ],
+      "CandidatesMilliseconds": [
+        61.8556,
+        58.0802,
+        94.77
+      ],
+      "RestoreMilliseconds": [
+        150.6836,
+        108.4165,
+        109.2601
+      ],
+      "CandidateIdentityHash": "9650CACF4469CB7D434D463E507938CBFD878F0897BA3BEF72BB3E57A68FA318"
+    },
+    "after": {
+      "Count": 10000,
+      "SetSourceMilliseconds": [
+        3.6498,
+        4.5735,
+        1.4805
+      ],
+      "CandidatesMilliseconds": [
+        6.2399,
+        2.8792,
+        0.881
+      ],
+      "RestoreMilliseconds": [
+        1.4632,
+        2.6009,
+        1.4171
+      ],
+      "CandidateIdentityHash": "9650CACF4469CB7D434D463E507938CBFD878F0897BA3BEF72BB3E57A68FA318"
+    },
+    "candidateIdentityOrderUnchanged": true,
+    "afterPlaybackOrderSourceSha256": "0c9d21bb896274748b1b94bcc796b6032cd20b79f0b3359b236ee07ab0040437"
+  },
+  "retainedDspOwnershipFinding": {
+    "SettingsChangesWithoutProcess": 1000,
+    "RetainedPreviousProcessors": 999,
+    "Scope": "Managed processor ownership only; no native output or listening"
+  },
+  "dependencyAudit": {
+    "version": 1,
+    "parameters": "--vulnerable --include-transitive",
+    "sources": [
+      "https://api.nuget.org/v3/index.json"
+    ],
+    "projects": [
+      {
+        "path": "src/Player.Core/Player.Core.csproj"
+      },
+      {
+        "path": "src/Player.App/Player.App.csproj"
+      },
+      {
+        "path": "tests/Player.Core.Tests/Player.Core.Tests.csproj"
+      },
+      {
+        "path": "tools/Player.AudioSmoke/Player.AudioSmoke.csproj"
+      }
+    ]
+  }
+}
