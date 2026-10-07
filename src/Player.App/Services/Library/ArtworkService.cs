@@ -23,7 +23,7 @@ public sealed class ArtworkService
                 token.ThrowIfCancellationRequested(); source = BassSmokeSession.ValidateSourcePath(source); var facts = new FileInfo(source);
                 var directory = Path.GetDirectoryName(source)!; var sibling = new[] { "cover.jpg", "folder.jpg", "cover.png", "folder.png" }.Select(n => Path.Combine(directory, n)).FirstOrDefault(File.Exists);
                 var siblingFacts = sibling is null ? null : new FileInfo(sibling);
-                var key = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(source.ToUpperInvariant() + "|" + facts.Length + "|" + facts.LastWriteTimeUtc.Ticks + "|" + siblingFacts?.Length + "|" + siblingFacts?.LastWriteTimeUtc.Ticks)));
+                var key = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(source.ToUpperInvariant() + "|" + facts.Length + "|" + facts.LastWriteTimeUtc.Ticks + "|" + sibling?.ToUpperInvariant() + "|" + siblingFacts?.Length + "|" + siblingFacts?.LastWriteTimeUtc.Ticks)));
                 if (_cache.TryGetValue(key, out var cached)) { _lru.Remove(key); _lru.AddLast(key); return cached; }
                 byte[]? encoded = null;
                 try
