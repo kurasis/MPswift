@@ -9,7 +9,7 @@
     "src/Player.App/Services/Storage/DatabaseRecovery.cs": "f742d4058a175d157bad2a6ef983afffa914bffd664366d576126a0abb32d8ab",
     "src/Player.App/Services/Storage/BackupBundle.cs": "0a5368595d1e236f3bc79b4680b7e13234a3ae1cc0b4048f4e704171480bd131",
     "tests/Player.Core.Tests/FileContinuityTests.cs": "ecbdaba423627a006a67beb946412455a188b3cfebe4b70167f9b7118acfba29",
-    "tools/Player.AudioSmoke/CacheFileSecurityValidation.cs": "85f82d80323d9b9d111a135808e671bdbef51d93991f98a82d67a1bbbe2f0b11",
+    "tools/Player.AudioSmoke/CacheFileSecurityValidation.cs": "ed2c83fb514448bd21e11d992366a99543ec6c7eef44a22a12e991149217ea2d",
     "tools/Player.AudioSmoke/RestrictedFileSecurityValidation.cs": "91a1c7d883e6b4707ba809ae429f1d33aed05e29633ab4856b4e464f3b61a068"
   },
   "counters": {
@@ -30,7 +30,7 @@
     "inProgress": "0",
     "pending": "0"
   },
-  "trxSha256": "01a70f8fb942838ce2e8583dceefae095384b6703181b0dcf19cb5ad9f20e69e",
+  "trxSha256": "c65a0683981b776375bf4cb49d89f482a55a57e1dc69c7deac0af68aae46b73e",
   "regressions": [
     {
       "test": "Player.Core.Tests.FileContinuityTests.LinkedCacheReadDoesNotTouchTargetAndRegenerationReplacesOnlyLink",
@@ -60,5 +60,82 @@
     "failure": "LinkedCacheReadDoesNotTouchTargetAndRegenerationReplacesOnlyLink: cache returned a valid linked WaveformData instead of null",
     "compatibilityPass": "BackupRejectsDanglingFileLinkWithoutCreatingItsTarget"
   },
-  "windowsNativeControls": "await this source CI; Linux results do not establish them"
+  "windowsNativeControls": "await this source CI; Linux results do not establish them",
+  "correctionParentCommit": "837185b62cf09c3bdb695457795f770f0b6ccaec",
+  "firstWindowsObservation": {
+    "sourceCommit": "837185b62cf09c3bdb695457795f770f0b6ccaec",
+    "runUrl": "https://github.com/kurasis/MPswift/actions/runs/37609245602",
+    "runConclusion": "failure",
+    "jobs": [
+      {
+        "id": 112752193123,
+        "name": "build (ubuntu-24.04)",
+        "html_url": "https://github.com/kurasis/MPswift/actions/runs/37609245602/job/112752193123",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 112752193368,
+        "name": "build (windows-2022)",
+        "html_url": "https://github.com/kurasis/MPswift/actions/runs/37609245602/job/112752193368",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "id": 112753719929,
+        "name": "Publish separate Windows ZIP prerelease",
+        "html_url": "https://github.com/kurasis/MPswift/actions/runs/37609245602/job/112753719929",
+        "status": "completed",
+        "conclusion": "skipped"
+      }
+    ],
+    "tests": {
+      "evidence-windows-2022": [
+        {
+          "total": "263",
+          "executed": "263",
+          "passed": "263",
+          "failed": "0",
+          "error": "0",
+          "timeout": "0",
+          "aborted": "0",
+          "inconclusive": "0",
+          "passedButRunAborted": "0",
+          "notRunnable": "0",
+          "notExecuted": "0",
+          "disconnected": "0",
+          "warning": "0",
+          "completed": "0",
+          "inProgress": "0",
+          "pending": "0"
+        }
+      ],
+      "evidence-ubuntu-24.04": [
+        {
+          "total": "263",
+          "executed": "263",
+          "passed": "263",
+          "failed": "0",
+          "error": "0",
+          "timeout": "0",
+          "aborted": "0",
+          "inconclusive": "0",
+          "passedButRunAborted": "0",
+          "notRunnable": "0",
+          "notExecuted": "0",
+          "disconnected": "0",
+          "warning": "0",
+          "completed": "0",
+          "inProgress": "0",
+          "pending": "0"
+        }
+      ]
+    },
+    "failure": "New test assumed Windows symbolic path touch modified target; native suite stopped on the incorrect positive-control assertion. No ZIP published."
+  },
+  "officialRuntimeSource": {
+    "url": "https://github.com/dotnet/runtime/blob/v10.0.12/src/libraries/System.Private.CoreLib/src/System/IO/FileSystem.Windows.cs#L220",
+    "sha256": "9dd09472fd38378e69daf995eab1d5a4024e2852cd1ff7c604a9379804168e45",
+    "observation": "OpenHandleToWriteAttributes uses FILE_FLAG_OPEN_REPARSE_POINT; path-based setters change the symbolic-link object on Windows."
+  }
 }

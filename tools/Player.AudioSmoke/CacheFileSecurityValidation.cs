@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
 using Player.App.Services.Storage;
 using Player.Core.Waveforms;
 
@@ -30,10 +31,17 @@ internal static class CacheFileSecurityValidation
         var cache = new WaveformCache(Path.Combine(Root, "cache"));
         for (var i = 0; i < 2; i++)
         {
-            var bytes = File.ReadAllBytes(Target(i)); var time = File.GetLastWriteTimeUtc(Target(i));
+            var bytes = File.ReadAllBytes(Target(i)); var time = ReadTime(Target(i));
             // Positive control executes the former path-based touch on owned files, then restores their timestamp.
             File.SetLastWriteTimeUtc(Entry(i), time.AddHours(1));
-            if (File.GetLastWriteTimeUtc(Target(i)) != time.AddHours(1)) throw new InvalidOperationException("Legacy cache touch control did not follow the linked file.");
+            if (i == 0)
+            {
+                // .NET 10 Windows opens OPEN_REPARSE_POINT for path setters: it updates the symlink object.
+                if (ReadTime(Target(i)) != time || ReadTime(Entry(i), followLink: false) != time.AddHours(1))
+                    throw new InvalidOperationException("Legacy symbolic-link touch did not update only the link object.");
+            }
+            else if (ReadTime(Target(i)) != time.AddHours(1))
+                throw new InvalidOperationException("Legacy hardlink touch did not change the shared file object.");
             File.SetLastWriteTimeUtc(Target(i), time);
             if (cache.Read(Key(i)) is not null) throw new InvalidOperationException("A linked cache entry was trusted.");
             CheckTarget();
@@ -43,24 +51,36 @@ internal static class CacheFileSecurityValidation
             using (File.Open(Entry(i), FileMode.Open, FileAccess.ReadWrite, FileShare.None)) { }
             void CheckTarget()
             {
-                if (!File.ReadAllBytes(Target(i)).AsSpan().SequenceEqual(bytes) || File.GetLastWriteTimeUtc(Target(i)) != time)
+                if (!File.ReadAllBytes(Target(i)).AsSpan().SequenceEqual(bytes) || ReadTime(Target(i)) != time)
                     throw new InvalidOperationException("Cache access changed unrelated file bytes or timestamp.");
             }
         }
-        var clearBytes = File.ReadAllBytes(Target(2)); var clearTime = File.GetLastWriteTimeUtc(Target(2));
+        var clearBytes = File.ReadAllBytes(Target(2)); var clearTime = ReadTime(Target(2));
         cache.Write(Key(3), Data);
         var old = new DateTime(2020, 1, 2, 3, 4, 5, DateTimeKind.Utc);
         File.SetLastWriteTimeUtc(Entry(3), old);
-        if (cache.Read(Key(3)) is null || File.GetLastWriteTimeUtc(Entry(3)) <= old) throw new InvalidOperationException("Handle-based LRU touch failed.");
+        if (cache.Read(Key(3)) is null || ReadTime(Entry(3)) <= old) throw new InvalidOperationException("Handle-based LRU touch failed.");
         cache.Clear();
         if (cache.GetUsage().Files != 0 || !File.Exists(Target(0)) || !File.Exists(Target(1)) ||
-            !File.ReadAllBytes(Target(2)).AsSpan().SequenceEqual(clearBytes) || File.GetLastWriteTimeUtc(Target(2)) != clearTime)
+            !File.ReadAllBytes(Target(2)).AsSpan().SequenceEqual(clearBytes) || ReadTime(Target(2)) != clearTime)
             throw new InvalidOperationException("Cache clearing changed unrelated targets.");
         return new { SymbolicCacheLinkIgnored = true, HardlinkedCacheIgnored = true, OutsideBytesAndTimestampsPreserved = true,
-            RegenerationReplacesEntryOnly = true, HandleBasedLruTouch = true, LegacyPathTouchPositiveControl = true, ReleasedReadHandles = true, LinkedEntryClearPreservesTarget = true };
+            RegenerationReplacesEntryOnly = true, HandleBasedLruTouch = true, LegacySymbolicTouchUpdatesLinkOnly = true,
+            LegacyHardlinkTouchChangesFileObject = true, ReleasedReadHandles = true, LinkedEntryClearPreservesTarget = true };
+    }
+
+    private static DateTime ReadTime(string path, bool followLink = true)
+    {
+        using var handle = followLink ? File.OpenHandle(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete)
+            : CreateFile(path, 0x80000000, 7, 0, 3, 0x00200000, 0);
+        if (handle.IsInvalid) throw new IOException("Cannot inspect owned timestamp control.");
+        // Handle metadata avoids stale per-name directory metadata for NTFS hardlinks.
+        return File.GetLastWriteTimeUtc(handle);
     }
 
     [DllImport("kernel32.dll", EntryPoint = "CreateHardLinkW", CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool CreateHardLink(string link, string target, nint security);
+    [DllImport("kernel32.dll", EntryPoint = "CreateFileW", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern SafeFileHandle CreateFile(string path, uint access, uint share, nint security, uint creation, uint flags, nint template);
 }
