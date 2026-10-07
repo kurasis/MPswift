@@ -14,13 +14,13 @@ public sealed class DatabaseSnapshotCopyTests : IDisposable
     {
         using var source = Open("source.db");
         Fill(source);
-        var original = SHA256.HashData(File.ReadAllBytes(source.DataSource));
+        var original = ReadLiveHash(source.DataSource);
         using var destination = Open("copy.db");
         Assert.True(DatabaseSnapshotCopy.Copy(source, destination) > 1);
         Assert.Equal(1024L, Scalar(destination, "SELECT COUNT(*) FROM Payload"));
         Assert.Equal(16L * 1024 * 1024, Scalar(destination, "SELECT SUM(length(Bytes)) FROM Payload"));
         Assert.Equal(1024L, Scalar(destination, "SELECT COUNT(*) FROM Payload WHERE Bytes=zeroblob(16384)"));
-        Assert.Equal(original, SHA256.HashData(File.ReadAllBytes(source.DataSource)));
+        Assert.Equal(original, ReadLiveHash(source.DataSource));
         source.Close(); destination.Close();
         using var exclusiveSource = File.Open(source.DataSource, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
         using var exclusiveDestination = File.Open(destination.DataSource, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
@@ -32,7 +32,7 @@ public sealed class DatabaseSnapshotCopyTests : IDisposable
     public void DeadlineOrCancellationAfterAnActualStepRollsBackIncompleteDestination(bool cancel)
     {
         using var source = Open("source.db"); Fill(source);
-        var original = SHA256.HashData(File.ReadAllBytes(source.DataSource));
+        var original = ReadLiveHash(source.DataSource);
         using var destination = Open("copy.db");
         Execute(destination, "CREATE TABLE Retained(Value INTEGER); INSERT INTO Retained VALUES(42)");
         using var cancellation = new CancellationTokenSource();
@@ -43,7 +43,7 @@ public sealed class DatabaseSnapshotCopyTests : IDisposable
         Assert.True(clock.Reads >= 3);
         Assert.Equal(42L, Scalar(destination, "SELECT Value FROM Retained"));
         Assert.Equal(0L, Scalar(destination, "SELECT COUNT(*) FROM sqlite_schema WHERE name='Payload'"));
-        Assert.Equal(original, SHA256.HashData(File.ReadAllBytes(source.DataSource)));
+        Assert.Equal(original, ReadLiveHash(source.DataSource));
         Assert.True(DatabaseSnapshotCopy.Copy(source, destination) > 1);
         Assert.Equal(1024L, Scalar(destination, "SELECT COUNT(*) FROM Payload"));
     }
@@ -114,6 +114,12 @@ public sealed class DatabaseSnapshotCopyTests : IDisposable
     {
         var connection = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = Path.Combine(_directory, name), Pooling = false, DefaultTimeout = 1 }.ToString());
         connection.Open(); return connection;
+    }
+    private static byte[] ReadLiveHash(string path)
+    {
+        // SQLite already owns a writable handle; a test read must permit that existing writer.
+        using var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        return SHA256.HashData(file);
     }
     private static void Fill(SqliteConnection connection) => Execute(connection, """
         PRAGMA journal_mode=DELETE;

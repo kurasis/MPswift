@@ -80,8 +80,9 @@ try {
         foreach ($argument in @('--ui-smoke', $fixture, $tagged)) { $start.ArgumentList.Add($argument) }
         $process = [Diagnostics.Process]::Start($start)
         if (-not $process.WaitForExit(120000)) { $process.Kill(); $process.WaitForExit(); throw 'Rebuilt-library WPF check timed out.' }
-        if ($process.ExitCode -ne 0) { throw 'Rebuilt-library WPF check failed.' }
         $reportPath = Join-Path $working 'artifacts/smoke/ui.json'
+        if (Test-Path -LiteralPath $reportPath) { Copy-Item -LiteralPath $reportPath (Join-Path $root "artifacts/smoke/taglib-replacement-ui-$language.json") }
+        if ($process.ExitCode -ne 0) { throw 'Rebuilt-library WPF check failed; retained UI report identifies the actual assertion.' }
         $ui = Get-Content $reportPath -Raw | ConvertFrom-Json
         if ($ui.Status -ne 'ui-smoke-passed' -or $ui.BindingErrors -ne 0 -or -not $ui.UnicodeMetadata -or -not $ui.MetadataHandleReleased -or
             $ui.TagLibAssembly.Identity -cne $identity -or $ui.TagLibAssembly.Sha256 -cne $rebuiltHash -or $ui.TagLibAssembly.RelativePath -cne 'TagLibSharp.dll') { throw 'Real WPF did not confirm the rebuilt TagLib assembly and metadata behavior.' }
@@ -92,6 +93,9 @@ try {
     if ((Hash $pinnedDll) -cne $originalHash -or (Hash $fixture) -cne $fixtureHash -or (Hash $tagged) -cne $taggedHash) { throw 'Original application or owned fixtures changed.' }
     $result.Wpf = $uiResults; $result.OriginalDllAndFixturesUnchanged = $true
     $result.Status = 'taglib-windows-replacement-passed'
+} catch {
+    $result.Failure = $_.Exception.Message
+    throw
 } finally {
     if ($process) { if (-not $process.HasExited) { $process.Kill(); $process.WaitForExit() }; $process.Dispose() }
     New-Item (Join-Path $root 'artifacts/smoke') -ItemType Directory -Force | Out-Null
