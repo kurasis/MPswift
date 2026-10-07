@@ -89,9 +89,47 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+  taglib-replacement:
+    name: Windows rebuilt TagLib replacement proof
+    runs-on: windows-2022
+    timeout-minutes: 25
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_NOLOGO: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+          cache: true
+          cache-dependency-path: |
+            **/packages.lock.json
+            scripts/fixtures/taglib-source-packages.lock.json
+      - name: Provision pinned native dependencies and compile application
+        shell: pwsh
+        run: |
+          ./scripts/Setup-Native.ps1
+          dotnet restore Player.sln --locked-mode
+          if ($LASTEXITCODE -ne 0) { throw 'Locked application restore failed.' }
+          dotnet build Player.sln -c Release --no-restore
+          if ($LASTEXITCODE -ne 0) { throw 'Application build failed.' }
+      - name: Verify rebuilt TagLib in actual Windows WPF
+        shell: pwsh
+        run: ./scripts/Test-TagLibReplacement.ps1
+      - name: Retain source replacement evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: evidence-taglib-replacement
+          path: |
+            artifacts/smoke/taglib-replacement*.json
+            artifacts/taglib-replacement-*/test-results/*.trx
+          if-no-files-found: warn
+          retention-days: 14
+
   publish:
     name: Publish separate Windows ZIP prerelease
-    needs: build
+    needs: [build, taglib-replacement]
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-24.04
     timeout-minutes: 10

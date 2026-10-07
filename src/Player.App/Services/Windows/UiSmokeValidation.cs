@@ -190,6 +190,11 @@ public sealed class UiSmokeValidation : TraceListener
             DesktopAcceptance = desktop,
             CompleteBackupRestore = backupRestore, StorageArtwork = storageArtwork, SearchPerformance = searchPerformance,
             Status = "ui-smoke-passed", Environment = System.Runtime.InteropServices.RuntimeInformation.OSDescription,
+            TagLibAssembly = new {
+                Identity = typeof(TagLib.File).Assembly.GetName().FullName,
+                RelativePath = Path.GetRelativePath(AppContext.BaseDirectory, typeof(TagLib.File).Assembly.Location),
+                Sha256 = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(typeof(TagLib.File).Assembly.Location)))
+            },
             ImportedEntries = model.Entries.Count, DistinctEntryIds = true, SharedTrackIdentity = true,
             ImportDidNotAutoplay = true, NativePreparation = true, DurationSeconds = model.DurationSeconds,
             SeekPositionSeconds = model.SeekPosition, SearchLeavesSourceUnchanged = true, BindingErrors = _bindingErrors.Count,

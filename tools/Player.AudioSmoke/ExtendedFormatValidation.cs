@@ -166,5 +166,6 @@ public static class ExtendedFormatValidation
     [DllImport("basswma.dll", CharSet = CharSet.Unicode)] private static extern uint BASS_WMA_EncodeOpenFile(uint frequency, uint channels, uint flags, uint bitrate, string file);
     [DllImport("basswma.dll")] [return: MarshalAs(UnmanagedType.Bool)] private static extern bool BASS_WMA_EncodeWrite(uint handle, nint buffer, uint length);
     [DllImport("basswma.dll")] [return: MarshalAs(UnmanagedType.Bool)] private static extern bool BASS_WMA_EncodeClose(uint handle);
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("kernel32.dll", SetLastError = true)] [return: MarshalAs(UnmanagedType.Bool)] private static extern bool DeviceIoControl(SafeFileHandle file, uint code, nint input, uint inputBytes, nint output, uint outputBytes, out uint returned, nint overlapped);
 }

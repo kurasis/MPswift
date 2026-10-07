@@ -99,7 +99,10 @@ public sealed class MediaSessionService : IDisposable
         [PreserveSig] int GetTrustLevel(out int trustLevel);
         [PreserveSig] int GetForWindow(nint window, ref Guid iid, out nint controls);
     }
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("combase.dll", CharSet = CharSet.Unicode)] private static extern int WindowsCreateString(string source, int length, out nint value);
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("combase.dll")] private static extern int WindowsDeleteString(nint value);
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("combase.dll")] private static extern int RoGetActivationFactory(nint name, ref Guid iid, [MarshalAs(UnmanagedType.Interface)] out ISystemMediaTransportControlsInterop factory);
 }

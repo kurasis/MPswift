@@ -16,6 +16,7 @@ namespace Player.App.Services.Windows;
 /// <summary>Owned 100k SQLite metadata dataset; actual production query/page WPF rendering and real playlist scroll.</summary>
 public static class PerformanceValidation
 {
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool GetPhysicallyInstalledSystemMemory(out ulong totalMemoryKiB);

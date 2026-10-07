@@ -1,5 +1,9 @@
 # Implementation checkpoint
 
+## Ownership and source-replacement follow-up (2026-10-07)
+
+Baseline `9205d3f96a38`, build **0.2.86-dev.1**, main run 37635304638 passed all gates and 284 tests per OS; its downloaded ZIP was independently verified. The follow-up fixes worker cleanup after held-file release failures, adds two real-store regression controls and explicitly scopes 34 system imports to System32. Local normal locked Release checks pass **286 tests**, zero failures/skips/warnings/errors. A separate mandatory Windows job rebuilds pinned TagLibSharp source and checks the loaded DLL during EN/RU WPF workflows; the prior Core-only copied-DLL test did not load TagLibSharp. Strict latest-all remains failing; full inventory replaces the partial 558-diagnostic count. [Findings and verification scope](ANALYZER_FOLLOWUP_2026-10-07.md). Source-specific Windows/package/replacement observation is pending. [Reviewed SQLite copy proposal](SQLITE_SNAPSHOT_PLAN_2026-10-07.md) adds no unapproved production limits. Physical/manual, rights/signing and exact binary/source distribution gates remain open.
+
 ## Observed security completion (2026-10-07)
 
 Latest verified implementation: `c91618e7c6b5`, **0.2.85-dev.1**, [successful main run 37632708722](https://github.com/kurasis/MPswift/actions/runs/37632708722). Linux and Windows each pass 284 tests; all 216 bounded parser cases and restricted mutable-file/stream controls pass. EN/RU and extracted WPF have zero binding errors; actual rollback, ACL, disk-full, migration-kill, correction-cache and three exact lossy-profile joins pass. The GitHub ZIP, compiled/source versions and 578-file/13-native inventory were downloaded and independently verified. [Findings and exact observed evidence](SECURITY_COMPLETION_2026-10-07.md#observed-completion). This closes the pending checks below for that source; [remaining engineering/hardware/licensing gates](REMAINING_WORK.md) stay open. Documentation-only follow-up source still receives its own normal CI and versioned ZIP.
@@ -281,7 +285,7 @@ The approved mutable-file guard and held restore/rollback implementation are des
 
 ## Corresponding-source preparation (2026-10-07)
 
-Complete pinned TagLibSharp source/archive inventory and reviewed netstandard2.0 rebuild are prepared; a separate Linux test copy passes 284 tests after replacing its library with the rebuilt DLL. No runtime dependency, owner license or app ZIP policy is changed. [Repeatable preparation and exact limits](TAGLIB_SOURCE_PREPARATION_2026-10-07.md).
+Complete pinned TagLibSharp source/archive inventory and reviewed netstandard2.0 rebuild are prepared; a separate Linux Core-test copy passes 284 tests with a rebuilt DLL present, but Core does not load TagLibSharp. Actual loaded-library replacement needs the new Windows WPF gate. No runtime dependency, owner license or app ZIP policy is changed. [Repeatable preparation and exact limits](TAGLIB_SOURCE_PREPARATION_2026-10-07.md).
 
 
 ## Completion compatibility checkpoint (2026-10-07)

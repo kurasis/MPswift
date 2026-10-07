@@ -236,5 +236,6 @@ internal static class ParserSecurityValidation
         foreach (var file in Directory.GetFiles(source)) if (!file.EndsWith(".pdb", StringComparison.OrdinalIgnoreCase)) File.Copy(file, Path.Combine(destination, Path.GetFileName(file)));
         foreach (var directory in Directory.GetDirectories(source)) CopyDirectory(directory, Path.Combine(destination, Path.GetFileName(directory)));
     }
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("kernel32.dll")] private static extern uint SetErrorMode(uint mode);
 }

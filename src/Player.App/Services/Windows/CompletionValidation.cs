@@ -115,6 +115,7 @@ internal static class CompletionValidation
             RedactedPreviewAndActualClipboard = true, RestoreOnWithoutPositionAndOff = true, RatingsPreserved = true,
             PowerPolicy = "owned paused-source software workflow passed; physical sleep/resume remains not-run" };
     }
+    [System.Runtime.InteropServices.DefaultDllImportSearchPaths(System.Runtime.InteropServices.DllImportSearchPath.System32)]
     [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
     private static extern nint SendMessage(nint window, uint message, nint parameter, nint data);
     private static byte[] ReadSharedBytes(string path)

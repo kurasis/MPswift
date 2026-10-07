@@ -102,6 +102,7 @@ public sealed class MetadataGuardTests : IDisposable
     {
         if (OperatingSystem.IsWindows()) Assert.True(DeviceIoControl(file.SafeFileHandle, 0x900c4, 0, 0, 0, 0, out _, 0));
     }
+    [System.Runtime.InteropServices.DefaultDllImportSearchPaths(System.Runtime.InteropServices.DllImportSearchPath.System32)]
     [System.Runtime.InteropServices.DllImport("kernel32.dll", SetLastError = true)]
     [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
     private static extern bool DeviceIoControl(Microsoft.Win32.SafeHandles.SafeFileHandle file, uint code, nint input, uint inputBytes, nint output, uint outputBytes, out uint returned, nint overlapped);

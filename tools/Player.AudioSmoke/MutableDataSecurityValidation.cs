@@ -75,6 +75,7 @@ internal static class MutableDataSecurityValidation
             HeldInstalledAndOriginalMutationsDenied = true, SameHandleRollbackPassed = true, SameHandleCommitPassed = true, HandlesReleased = true,
             ReplacementIdentityCleanupRefused = true, OwnedIdentityCleanupPassed = true, SameHandleUnicodePublicationPassed = true };
     }
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("kernel32.dll", EntryPoint = "CreateHardLinkW", CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)] private static extern bool CreateHardLink(string path, string existing, nint security);
 }

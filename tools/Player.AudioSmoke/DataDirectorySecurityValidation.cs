@@ -73,6 +73,7 @@ internal static class DataDirectorySecurityValidation
         if (handle.IsInvalid) { handle.Dispose(); throw new IOException("Cannot open owned reparse object for write."); }
         return handle; // Positive controls open without changing reparse data or file bytes.
     }
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("kernel32.dll", EntryPoint = "CreateFileW", CharSet = CharSet.Unicode, SetLastError = true)]
     private static extern SafeFileHandle CreateFile(string path, uint access, uint share, nint security, uint creation, uint flags, nint template);
 }

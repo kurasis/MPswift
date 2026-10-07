@@ -24,9 +24,12 @@ namespace Player.App.Services.Windows;
 /// <summary>Actual WPF automation/focus/layout and declared DPI policy; physical desktop gates stay separate.</summary>
 internal static class DesktopAcceptanceValidation
 {
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("user32.dll")] private static extern nint GetThreadDpiAwarenessContext();
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)] private static extern bool AreDpiAwarenessContextsEqual(nint first, nint second);
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("user32.dll")] private static extern uint GetDpiForWindow(nint window);
     private static void Check(bool value, string detail) { if (!value) throw new InvalidOperationException(detail); }
     public static async Task<object> RunOwnedAsync(MainWindow window, PlayerViewModel model, string phase)

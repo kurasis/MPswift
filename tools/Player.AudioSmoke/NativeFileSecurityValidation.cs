@@ -79,8 +79,11 @@ internal static class NativeFileSecurityValidation
     }
     private static string ModulePath(nint module)
     { var path = new StringBuilder(32768); if (GetModuleFileName(module, path, path.Capacity) == 0) throw new IOException("Cannot inspect loaded module path."); return path.ToString(); }
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("kernel32.dll", EntryPoint = "GetModuleHandleW", CharSet = CharSet.Unicode)] private static extern nint GetModuleHandle(string name);
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("kernel32.dll", EntryPoint = "GetModuleFileNameW", CharSet = CharSet.Unicode)] private static extern uint GetModuleFileName(nint module, StringBuilder path, int size);
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("kernel32.dll", EntryPoint = "CreateHardLinkW", CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)] private static extern bool CreateHardLink(string path, string target, nint security);
 }

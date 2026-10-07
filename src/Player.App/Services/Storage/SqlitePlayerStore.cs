@@ -223,11 +223,16 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
         catch (Exception error) { failure = error; }
         finally
         {
-            try { _connection?.Dispose(); } catch (Exception error) { failure = error; }
-            if (_fileLeases is not null) foreach (var file in _fileLeases) file.Dispose();
-            try { _ownership?.Dispose(); } catch (Exception error) { failure = failure is null ? error : new AggregateException(failure, error); }
-            try { _directoryLease?.Dispose(); } catch (Exception error) { failure = failure is null ? error : new AggregateException(failure, error); }
-            _work.Dispose();
+            void Release(IDisposable? resource)
+            {
+                try { resource?.Dispose(); }
+                catch (Exception error) { failure = failure is null ? error : new AggregateException(failure, error); }
+            }
+            Release(_connection);
+            if (_fileLeases is not null) foreach (var file in _fileLeases) Release(file);
+            Release(_ownership);
+            Release(_directoryLease);
+            Release(_work);
         }
         // Reopen is permitted only after both SQLite and the ownership handle are released.
         if (failure is null) _exit.TrySetResult(); else _exit.TrySetException(failure);
