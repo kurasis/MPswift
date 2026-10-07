@@ -36,6 +36,7 @@ public sealed class NativeDecodeContext : IDisposable
             {
                 _plugins!.Dispose();
                 if (!Bass.Free()) throw new AudioBackendException(AudioErrorCategory.Dependency, "BASS_Free failed.", (int)Bass.LastError);
+                NativeStreamPins.ReleaseAfterEngineFree();
                 _plugins = null;
             }
             _references--; _disposed = true;

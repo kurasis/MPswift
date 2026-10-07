@@ -40,7 +40,7 @@ internal static class RestrictedFileSecurityValidation
                         using var identity = WindowsIdentity.GetCurrent();
                         if (new WindowsPrincipal(identity).IsInRole(WindowsBuiltInRole.Administrator)) throw new InvalidOperationException("File test still has an enabled Administrator group.");
                         return new { Status = "restricted-file-security-passed", AdministratorGroupDisabled = true, MaximumPrivilegesDisabled = true,
-                            Scope = "Synchronous filesystem/loader operations under an impersonated restricted token; not a process sandbox", Checks = NativeFileSecurityValidation.Run(fixture), DataDirectories = DataDirectorySecurityValidation.Run(), CacheFiles = CacheFileSecurityValidation.Run(), MutableData = MutableDataSecurityValidation.Run() };
+                            Scope = "Synchronous filesystem/loader operations under an impersonated restricted token; not a process sandbox", Checks = NativeFileSecurityValidation.Run(fixture), DataDirectories = DataDirectorySecurityValidation.Run(), CacheFiles = CacheFileSecurityValidation.Run(), MutableData = MutableDataSecurityValidation.Run(), StreamLifetime = StreamLifetimeValidation.Run(fixture) };
                     });
             }
             finally { Marshal.FreeHGlobal(memory); }

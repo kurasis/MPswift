@@ -34,7 +34,10 @@ public sealed class BassWaveformService : IWaveformService, IWaveformCacheContro
             cancellationToken.ThrowIfCancellationRequested();
             path = LocalFileAccess.ValidateFile(path);
             var file = new FileInfo(path);
+            string correction;
+            using (var inputs = SourceReadPins.Open(path)) correction = inputs.CorrectionSignature;
             var decoder = Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "native", "manifest.json"))));
+            if (correction.Length != 0) decoder += "|" + correction;
             var key = WaveformCache.Fingerprint(path, file.Length, file.LastWriteTimeUtc.Ticks, decoder);
             Task<WaveformData> task;
             Job shared;
@@ -46,7 +49,7 @@ public sealed class BassWaveformService : IWaveformService, IWaveformCacheContro
                     _active?.Cancellation.Cancel();
                     if (_jobs.TryTake(out var pending))
                     { pending.Cancellation.Cancel(); pending.Completion.TrySetCanceled(); _inflight.Remove(pending.Key); pending.Cancellation.Dispose(); }
-                    job = new Job(path, key, file.Length, file.LastWriteTimeUtc.Ticks, refresh, _cache.Epoch);
+                    job = new Job(path, key, file.Length, file.LastWriteTimeUtc.Ticks, correction, refresh, _cache.Epoch);
                     _inflight[key] = job;
                     if (!_jobs.TryAdd(job)) throw new IOException("Waveform worker queue is unavailable.");
                 }
@@ -74,6 +77,8 @@ public sealed class BassWaveformService : IWaveformService, IWaveformCacheContro
                         job.Cancellation.Token.ThrowIfCancellationRequested();
                         var file = new FileInfo(job.Path);
                         if (file.Length != job.Size || file.LastWriteTimeUtc.Ticks != job.Modified) throw new IOException("Source changed during waveform analysis.");
+                        using (var inputs = SourceReadPins.Open(job.Path))
+                            if (inputs.CorrectionSignature != job.Correction) throw new IOException("WavPack correction changed during waveform analysis.");
                         // A cache write failure must not discard a valid in-memory waveform.
                         try { _cache.WriteIfCurrent(job.Key, data, job.CacheEpoch); } catch (Exception error) when (error is IOException or UnauthorizedAccessException) { }
                     }
@@ -91,8 +96,9 @@ public sealed class BassWaveformService : IWaveformService, IWaveformCacheContro
     private WaveformData Decode(Job job)
     {
         using var context = new NativeDecodeContext();
-        using var read = LocalReadLease.Open(job.Path);
-        var stream = Bass.CreateStream(read.Path, 0, 0, BassFlags.Decode | BassFlags.Float | BassFlags.Prescan);
+        using var read = SourceReadPins.Open(job.Path);
+        if (read.CorrectionSignature != job.Correction) throw new IOException("WavPack correction changed before waveform decoding.");
+        var stream = read.CreateDecoder();
         if (stream == 0) throw new IOException("Waveform decoder could not open source: " + Bass.LastError);
         try
         {
@@ -134,12 +140,13 @@ public sealed class BassWaveformService : IWaveformService, IWaveformCacheContro
         }
         return new(_exit.Task);
     }
-    private sealed class Job(string path, string key, long size, long modified, bool refresh, long cacheEpoch)
+    private sealed class Job(string path, string key, long size, long modified, string correction, bool refresh, long cacheEpoch)
     {
         public string Path { get; } = path;
         public string Key { get; } = key;
         public long Size { get; } = size;
         public long Modified { get; } = modified;
+        public string Correction { get; } = correction;
         public bool Refresh { get; } = refresh;
         public long CacheEpoch { get; } = cacheEpoch;
         public CancellationTokenSource Cancellation { get; } = new();

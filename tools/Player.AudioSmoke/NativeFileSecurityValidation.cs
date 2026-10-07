@@ -16,6 +16,9 @@ internal static class NativeFileSecurityValidation
         // The lab creates links before disabling privileges; consuming an existing link needs no symlink-creation right.
         File.CreateSymbolicLink(Path.Combine(Environment.CurrentDirectory, "source-link.wav"), source);
         Directory.CreateSymbolicLink(Path.Combine(Environment.CurrentDirectory, "directory-link"), directory);
+        File.CreateSymbolicLink(Path.Combine(Environment.CurrentDirectory, "remote-file-link.wav"), @"\\mpswift-test.invalid\owned\unavailable.wav");
+        File.CreateSymbolicLink(Path.Combine(Environment.CurrentDirectory, "remote-file-chain.wav"), Path.Combine(Environment.CurrentDirectory, "remote-file-link.wav"));
+        Directory.CreateSymbolicLink(Path.Combine(Environment.CurrentDirectory, "remote-directory-link"), @"\\mpswift-test.invalid\owned");
     }
     public static object Run(string fixture)
     {
@@ -63,10 +66,16 @@ internal static class NativeFileSecurityValidation
         using (var lease = LocalReadLease.Open(Path.Combine(directoryLink, "source.wav"))) Check(lease.Path == source, "Local directory link did not resolve to its pinned target.");
         MustRefuse(() => { using var native = LocalReadLease.Open(Path.Combine(directoryLink, "source.wav"), executable: true); }, "Executable directory link was accepted.");
         Directory.Delete(directoryLink);
+        foreach (var path in new[] { "remote-file-link.wav", "remote-file-chain.wav", @"remote-directory-link\nested\unavailable.wav" })
+        {
+            try { LocalFileAccess.ValidateFile(Path.Combine(Environment.CurrentDirectory, path)); }
+            catch (ArgumentException) { continue; } // LocalMediaPath must reject the target before a target metadata lookup.
+            throw new InvalidOperationException("Remote link target was not rejected by local-path policy.");
+        }
         return new { Status = "native-file-security-passed", DelayedDecoderPins = delayed.Count, DelayedDecoderWritesDenied = true,
             ApprovedModulePaths = true, SystemDependenciesFromSystem32 = true, InertCwdAndNativeDirectoryShadowsIgnored = true,
             SourceWritesAndReplacementsDenied = true, DirectoryReplacementDenied = true, HardlinkAliasWritesDenied = true,
-            NativeLinksRejected = true, LocalMediaLinksPreserved = true, ReadLeaseReleased = true };
+            NativeLinksRejected = true, LocalMediaLinksPreserved = true, RemoteLinkChainsRejectedByPathPolicy = true, ReadLeaseReleased = true };
     }
     private static string ModulePath(nint module)
     { var path = new StringBuilder(32768); if (GetModuleFileName(module, path, path.Capacity) == 0) throw new IOException("Cannot inspect loaded module path."); return path.ToString(); }

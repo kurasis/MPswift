@@ -43,7 +43,7 @@ public sealed class BassAudioBackend : IAudioBackend, IAdvancedAudioBackend
                 (_context.DecoderErrors.TryGetValue("basswma", out var detail) ? detail : error.Message), error.NativeCode);
         }
         _preparedHandle = opened.Handle; _info = opened.Info; _request = request; _position = TimeSpan.Zero;
-        if (_graph is not null) { Bass.StreamFree(_preparedHandle); _preparedHandle = 0; _info = _graph.Load(request); }
+        if (_graph is not null) { NativeStreamPins.Free(_preparedHandle); _preparedHandle = 0; _info = _graph.Load(request); }
         return _info;
     }
     public void Play()
@@ -90,7 +90,7 @@ public sealed class BassAudioBackend : IAudioBackend, IAdvancedAudioBackend
         {
             Check(BassWasapi.GetInfo(out var info), "Read negotiated output format");
             _graph = new(info.Frequency, info.Channels, _processing);
-            if (_preparedHandle != 0) { Check(Bass.StreamFree(_preparedHandle), "Free initial decoder"); _preparedHandle = 0; }
+            if (_preparedHandle != 0) { Check(NativeStreamPins.Free(_preparedHandle), "Free initial decoder"); _preparedHandle = 0; }
             if (_request is not null) _graph.Load(_request, _position);
             _output = new(info.Frequency, info.Channels, (_settings.Exclusive ? "WASAPI exclusive" : "WASAPI shared") + " / float mixer / final saturation protection");
         }
@@ -187,7 +187,7 @@ public sealed class BassAudioBackend : IAudioBackend, IAdvancedAudioBackend
         if (_request is null && _prepared is null && _preparedHandle == 0 && !_running) return;
         FlushOutput();
         _graph?.Clear();
-        if (_preparedHandle != 0) { Check(Bass.StreamFree(_preparedHandle), "Free prepared source"); _preparedHandle = 0; }
+        if (_preparedHandle != 0) { Check(NativeStreamPins.Free(_preparedHandle), "Free prepared source"); _preparedHandle = 0; }
         _request = null; _prepared = null; _info = null; _position = TimeSpan.Zero; Interlocked.Exchange(ref _callbackError, 0);
     }
     public void Dispose()

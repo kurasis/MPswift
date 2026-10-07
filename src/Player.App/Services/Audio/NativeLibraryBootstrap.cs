@@ -105,6 +105,14 @@ public static class NativeLibraryBootstrap
             if (!Handles.ContainsKey(key)) Handles.Add(key, LoadRestricted(path));
         }
     }
+    internal static nint DecoderExport(string name, string export)
+    {
+        lock (Gate)
+        {
+            if (!_configured || !Handles.TryGetValue(name, out var handle)) throw new DllNotFoundException("Approved decoder is unavailable: " + name);
+            return NativeLibrary.GetExport(handle, export);
+        }
+    }
     private static nint LoadRestricted(string path) => NativeLibrary.Load(path, typeof(NativeLibraryBootstrap).Assembly,
         DllImportSearchPath.System32); // BASS is already resident; external dependencies come only from System32.
 

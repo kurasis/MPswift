@@ -11,18 +11,20 @@ public static class LocalFileAccess
         var path = LocalMediaPath.Parse(input).Value;
         ValidateDrive(path);
         ValidateParents(new FileInfo(path).Directory, new HashSet<string>(StringComparer.OrdinalIgnoreCase), 0);
-        var attributes = File.GetAttributes(path);
-        if ((attributes & (FileAttributes.Offline | RecallAttributes)) != 0) throw new IOException("The file requires offline/cloud hydration.");
-        if ((attributes & FileAttributes.Directory) != 0) throw new IOException("An audio file is required.");
-        if ((attributes & FileAttributes.ReparsePoint) != 0)
+        var links = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        while (true)
         {
-            var target = new FileInfo(path).ResolveLinkTarget(true) ?? throw new IOException("Unresolved file reparse point.");
+            var attributes = File.GetAttributes(path);
+            if ((attributes & (FileAttributes.Offline | RecallAttributes)) != 0) throw new IOException("The file requires offline/cloud hydration.");
+            if ((attributes & FileAttributes.Directory) != 0) throw new IOException("An audio file is required.");
+            if ((attributes & FileAttributes.ReparsePoint) == 0) return path;
+            if (links.Count >= 32 || !links.Add(path)) throw new IOException("File reparse traversal limit or loop.");
+            // Resolve one hop and reject a remote target before reading any metadata through it.
+            var target = new FileInfo(path).ResolveLinkTarget(false) ?? throw new IOException("Unresolved file reparse point.");
             path = LocalMediaPath.Parse(target.FullName).Value;
             ValidateDrive(path);
             ValidateParents(new FileInfo(path).Directory, new HashSet<string>(StringComparer.OrdinalIgnoreCase), 0);
-            if ((File.GetAttributes(path) & (FileAttributes.Offline | RecallAttributes)) != 0) throw new IOException("The link target is unavailable offline.");
         }
-        return path;
     }
     public static void ValidateDirectory(string input)
     {
@@ -36,19 +38,20 @@ public static class LocalFileAccess
     }
     private static void ValidateParents(DirectoryInfo? directory, HashSet<string> links, int depth)
     {
-        while (directory is not null)
+        if (directory is not null)
         {
             if (++depth > 256) throw new IOException("Directory/reparse traversal limit reached.");
+            // Check ancestors first so an untrusted directory link cannot redirect a child metadata query.
+            ValidateParents(directory.Parent, links, depth);
             var attributes = directory.Attributes;
             if ((attributes & (FileAttributes.Offline | RecallAttributes)) != 0) throw new IOException("The directory is unavailable offline.");
             if ((attributes & FileAttributes.ReparsePoint) != 0)
             {
                 if (!links.Add(directory.FullName)) throw new IOException("Reparse loop detected.");
-                var target = directory.ResolveLinkTarget(true) ?? throw new IOException("Unresolved directory reparse point.");
+                var target = directory.ResolveLinkTarget(false) ?? throw new IOException("Unresolved directory reparse point.");
                 ValidateDrive(target.FullName.TrimEnd('\\') + "\\local-validation");
                 ValidateParents(new DirectoryInfo(target.FullName), links, depth);
             }
-            directory = directory.Parent;
         }
     }
 }

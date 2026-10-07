@@ -47,11 +47,37 @@ public static class WaveformValidation
         using (File.Open(longPath, FileMode.Open, FileAccess.Read, FileShare.None)) { }
         Check(await player.SeekAsync(TimeSpan.FromSeconds(1)), "Canceling analysis freed the production context.");
         Check(hash.AsSpan().SequenceEqual(Hash(source)) && longHash.AsSpan().SequenceEqual(Hash(longPath)), "Waveform analysis modified media.");
+        var correction = await CorrectionCacheAsync(output);
         return new { Status = "waveform-passed", SourceUnchanged = true, IndependentDecoder = true, GainAndMuteIndependent = true,
             OppositePhasePeaksPreserved = true, CacheRoundTrip = true, CorruptCacheRegenerated = true,
             ShortBuckets = shortData.Minimum.Length, LongDurationSeconds = longData.DurationSeconds, LongBuckets = longData.Minimum.Length,
             LongFramesPerBucket = longData.FramesPerBucket, PeakPayloadBytes = longData.Minimum.Length * 8,
-            CancellationAndHandleRelease = true, DeviceOutput = "not-run", FixtureLicense = "CC0-1.0" };
+            CancellationAndHandleRelease = true, CorrectionCache = correction, DeviceOutput = "not-run", FixtureLicense = "CC0-1.0" };
+    }
+    private static async Task<object> CorrectionCacheAsync(string output)
+    {
+        var fixtures = Path.Combine(Environment.CurrentDirectory, "tests", "fixtures", "audio-extended");
+        var main = Path.Combine(output, "owned-hybrid.wv"); var sidecar = Path.ChangeExtension(main, ".wvc");
+        File.Copy(Path.Combine(fixtures, "hybrid-corrected.wv"), main);
+        var mainHash = Hash(main);
+        var cacheDirectory = Path.Combine(output, "correction-cache");
+        await using var analyzer = new BassWaveformService(new WaveformCache(cacheDirectory));
+        var without = await analyzer.AnalyzeAsync(main, null, CancellationToken.None);
+        Check(Directory.GetFiles(cacheDirectory, "*.peaks").Length == 1, "Uncorrected waveform cache missing.");
+        File.Copy(Path.Combine(fixtures, "hybrid-corrected.wvc"), sidecar);
+        var with = await analyzer.AnalyzeAsync(main, null, CancellationToken.None);
+        Check(Directory.GetFiles(cacheDirectory, "*.peaks").Length == 2, "Correction appearance reused the uncorrected cache key.");
+        Check(!without.Minimum.SequenceEqual(with.Minimum) || !without.Maximum.SequenceEqual(with.Maximum), "Correction appearance did not change actual decoded peaks.");
+        var modified = File.GetLastWriteTimeUtc(sidecar).AddSeconds(2);
+        File.SetLastWriteTimeUtc(sidecar, modified);
+        var changed = await analyzer.AnalyzeAsync(main, null, CancellationToken.None);
+        Check(Directory.GetFiles(cacheDirectory, "*.peaks").Length == 3 && changed.Minimum.SequenceEqual(with.Minimum) && changed.Maximum.SequenceEqual(with.Maximum), "Correction timestamp did not invalidate its cache entry.");
+        File.Delete(sidecar);
+        var removed = await analyzer.AnalyzeAsync(main, null, CancellationToken.None);
+        Check(Directory.GetFiles(cacheDirectory, "*.peaks").Length == 3 && removed.Minimum.SequenceEqual(without.Minimum) && removed.Maximum.SequenceEqual(without.Maximum), "Correction removal did not recover the uncorrected cache entry.");
+        using (File.Open(main, FileMode.Open, FileAccess.ReadWrite, FileShare.None)) { }
+        Check(mainHash.AsSpan().SequenceEqual(Hash(main)), "Correction waveform checks modified the main audio file.");
+        return new { AppearanceInvalidates = true, ModificationInvalidates = true, RemovalRecoversAbsentEntry = true, ActualDecodedPeaksDiffer = true, MainSourceUnchanged = true, HandlesReleased = true };
     }
     private static void GenerateLong(string path)
     {

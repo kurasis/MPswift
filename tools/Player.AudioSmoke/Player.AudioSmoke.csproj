@@ -20,6 +20,8 @@
     <Compile Include="../../src/Player.App/Services/Audio/NativeDecoderPlugins.cs" Link="Audio/NativeDecoderPlugins.cs" />
     <Compile Include="../../src/Player.App/Services/Audio/LocalFileAccess.cs" Link="Audio/LocalFileAccess.cs" />
     <Compile Include="../../src/Player.App/Services/Audio/LocalReadLease.cs" Link="Audio/LocalReadLease.cs" />
+    <Compile Include="../../src/Player.App/Services/Audio/SourceReadPins.cs" Link="Audio/SourceReadPins.cs" />
+    <Compile Include="../../src/Player.App/Services/Audio/NativeStreamPins.cs" Link="Audio/NativeStreamPins.cs" />
     <Compile Include="../../src/Player.App/Services/Audio/NativeDecodeContext.cs" Link="Audio/NativeDecodeContext.cs" />
     <Compile Include="../../src/Player.App/Services/Waveforms/BassWaveformService.cs" Link="Waveforms/BassWaveformService.cs" />
     <Compile Include="../../src/Player.App/Services/Storage/SettingsFile.cs" Link="Storage/SettingsFile.cs" />

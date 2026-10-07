@@ -28,14 +28,15 @@ public sealed class BassMixerGraph : IDisposable
     }
     public static (int Handle, AudioSourceInfo Info, double Start) OpenSource(AudioRequest request)
     {
-        LocalReadLease lease;
-        try { lease = LocalReadLease.Open(request.Path); }
+        SourceReadPins? read;
+        try { read = SourceReadPins.Open(request.Path); }
         catch (Exception e) when (e is IOException or ArgumentException or UnauthorizedAccessException) { throw new AudioBackendException(AudioErrorCategory.FileUnavailable, e.Message); }
-        using var read = lease;
-        var handle = Bass.CreateStream(read.Path, 0, 0, BassFlags.Decode | BassFlags.Float | BassFlags.Prescan);
-        if (handle == 0) throw Error("Open decoder");
+        var handle = 0;
         try
         {
+            handle = read.CreateDecoder();
+            if (handle == 0) throw Error("Open decoder");
+            NativeStreamPins.Attach(handle, read); read = null;
             Check(Bass.ChannelGetInfo(handle, out var info), "Read source format");
             var length = Bass.ChannelGetLength(handle); var seconds = length >= 0 ? Bass.ChannelBytes2Seconds(handle, length) : -1;
             if (!double.IsFinite(seconds) || seconds <= 0) throw new AudioBackendException(AudioErrorCategory.Decoder, "A finite source duration is required by the mixer.");
@@ -46,7 +47,8 @@ public sealed class BassMixerGraph : IDisposable
             Check(Bass.ChannelSetPosition(handle, Bass.ChannelSeconds2Bytes(handle, start)), "Seek logical source start");
             return (handle, source, start);
         }
-        catch { Bass.StreamFree(handle); throw; }
+        catch { if (handle != 0) NativeStreamPins.Free(handle); throw; }
+        finally { read?.Dispose(); }
     }
     public AudioSourceInfo Load(AudioRequest request, TimeSpan relativePosition = default)
     {
@@ -62,7 +64,7 @@ public sealed class BassMixerGraph : IDisposable
             Attach(_current, 0, Math.Max(0, _currentEnd - _currentStart));
             return opened.Info;
         }
-        catch { if (_current?.Handle != opened.Handle) Bass.StreamFree(opened.Handle); throw; }
+        catch { if (_current?.Handle != opened.Handle) NativeStreamPins.Free(opened.Handle); throw; }
         finally { Unlock(); }
     }
     public void Seek(TimeSpan position)
@@ -91,14 +93,14 @@ public sealed class BassMixerGraph : IDisposable
         {
             // Owner invalidation after read-ahead reaches a transition is handled by flushing/seeking in the backend.
             Free(ref _next);
-            if (_current is null) { if (incoming is not null) Bass.StreamFree(incoming.Handle); return false; }
+            if (_current is null) { if (incoming is not null) NativeStreamPins.Free(incoming.Handle); return false; }
             if (BassMix.ChannelGetMixer(_current.Handle) != 0) Check(BassMix.ChannelSetEnvelope(_current.Handle, MixEnvelope.Volume, [], 0), "Clear outgoing envelope");
             if (incoming is null) return true;
             var contiguous = _current.Request.Segment is { End: { } end } && incoming.Request.Segment is { } segment && end == segment.Start && string.Equals(_current.Request.Path, incoming.Request.Path, StringComparison.OrdinalIgnoreCase);
             var overlap = AudioProcessingSettings.Overlap(_settings.CrossfadeSeconds, _current.Info.Duration!.Value, incoming.Info.Duration!.Value, contiguous, repeatOne);
             var now = MixPosition(); var overlapBytes = MixBytes(overlap);
             _nextStart = _currentEnd - overlapBytes;
-            if (now > _nextStart) { Bass.StreamFree(incoming.Handle); return false; }
+            if (now > _nextStart) { NativeStreamPins.Free(incoming.Handle); return false; }
             _next = incoming; Attach(incoming, _nextStart - now, MixBytes(incoming.Info.Duration.Value.TotalSeconds));
             if (overlapBytes > 0)
             {
@@ -116,7 +118,7 @@ public sealed class BassMixerGraph : IDisposable
             }
             return true;
         }
-        catch { if (_next?.Handle == incoming?.Handle) Free(ref _next); else if (incoming is not null) Bass.StreamFree(incoming.Handle); if (_current is not null && BassMix.ChannelGetMixer(_current.Handle) != 0) BassMix.ChannelSetEnvelope(_current.Handle, MixEnvelope.Volume, [], 0); throw; }
+        catch { if (_next?.Handle == incoming?.Handle) Free(ref _next); else if (incoming is not null) NativeStreamPins.Free(incoming.Handle); if (_current is not null && BassMix.ChannelGetMixer(_current.Handle) != 0) BassMix.ChannelSetEnvelope(_current.Handle, MixEnvelope.Volume, [], 0); throw; }
         finally { Unlock(); }
     }
     public bool TransitionDecoded => _next is not null && MixPosition() >= _nextStart;
@@ -158,7 +160,7 @@ public sealed class BassMixerGraph : IDisposable
     public void Clear() { Lock(); try { ClearSources(); } finally { Unlock(); } }
     private void ClearSources() { Free(ref _next); Free(ref _tail); Free(ref _current); }
     private static void Free(ref Source? source)
-    { if (source is null) return; var handle = source.Handle; source = null; Check(Bass.StreamFree(handle), "Free source"); }
+    { if (source is null) return; var handle = source.Handle; source = null; Check(NativeStreamPins.Free(handle), "Free source"); }
     private void Attach(Source source, long delay, long length)
     {
         if (length <= 0) return; // Seeking to exact EOF must never attach an unlimited stream.
@@ -169,7 +171,7 @@ public sealed class BassMixerGraph : IDisposable
     private long MixPosition() { var value = Bass.ChannelGetPosition(_mixer); if (value < 0) throw Error("Read mixer position"); return value; }
     private void Lock() => Check(Bass.ChannelLock(_mixer, true), "Lock mixer");
     private void Unlock() => Check(Bass.ChannelLock(_mixer, false), "Unlock mixer");
-    public void Dispose() { Clear(); Check(Bass.StreamFree(_mixer), "Free mixer"); }
+    public void Dispose() { Clear(); Check(NativeStreamPins.Free(_mixer), "Free mixer"); }
     private static void Check(bool ok, string operation) { if (!ok) throw Error(operation); }
     private static AudioBackendException Error(string operation) { var error = Bass.LastError; return new(AudioErrorCategory.Decoder, $"{operation}: {error} ({(int)error}).", (int)error); }
 }

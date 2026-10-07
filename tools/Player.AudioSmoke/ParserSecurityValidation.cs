@@ -43,6 +43,8 @@ internal static class ParserSecurityValidation
             foreach (var directory in new[] { root, Path.Combine(toolRoot, "native", "win-x64") })
                 foreach (var name in new[] { "winmm.dll", "msacm32.dll", "shlwapi.dll", "msvcrt.dll" }) File.WriteAllText(Path.Combine(directory, name), "owned inert DLL shadow");
             var leaseSource = Path.Combine(root, "lease-control.wav"); File.Copy(Path.Combine(fixtures, sources[0]), leaseSource);
+            foreach (var (name, destination) in new[] { ("hybrid-corrected.wv", "lifetime.wv"), ("hybrid-corrected.wvc", "lifetime.wvc"), ("source-pcm16.wav", "lifetime-reference.wav") })
+                File.Copy(Path.Combine(fixtures, "audio-extended", name), Path.Combine(root, destination));
             var requestPath = Path.Combine(root, "request.json");
             File.WriteAllText(requestPath, JsonSerializer.Serialize(new Request("timeout-control", leaseSource)));
             try
