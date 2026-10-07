@@ -23,6 +23,7 @@ internal static class RestrictedFileSecurityValidation
         DataDirectorySecurityValidation.PrepareLinks();
         CacheFileSecurityValidation.PrepareLinks();
         MutableDataSecurityValidation.PrepareLinks();
+        StreamLifetimeValidation.PrepareLinks();
         if (!OpenProcessToken(GetCurrentProcess(), 2 | 8, out var original)) throw new Win32Exception(Marshal.GetLastPInvokeError());
         using (original)
         {

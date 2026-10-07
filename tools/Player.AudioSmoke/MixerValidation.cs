@@ -48,11 +48,12 @@ internal static class MixerValidation
             Require(graph.ReadPosition(0).Transition is null && graph.ActiveEntryId == b.EntryId, "Seeking overlap retained the outgoing item.");
             foreach (var path in new[] { left, right, whole }) using (File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) { }
             for (var i = 0; i < hashes.Length; i++) Require(hashes[i] == Hash(new[] { left, right, whole }[i]), "Mixer changed source audio.");
+            var lossyProfiles = LossyMixerValidation.Run();
             return new { Status = "mixer-passed", Environment = RuntimeInformation.OSDescription, SplitFrames = frames, SampleRate = rate, Channels = 2,
                 LosslessMaximumSampleError = maximumError, CueMaximumSampleError = cueError, AddedOrDuplicatedFrames = 0,
                 PersistentGraph = true, PreparedNext = true, CrossfadeIncomingTimeline = true, SeekCancelsOverlap = true, SourceUnchanged = true,
                 Capture = "stage-d-mixer/lossless-capture.f32", CueCapture = "stage-d-mixer/cue-capture.f32", CaptureEncoding = "IEEE float32 LE interleaved stereo",
-                CapturePath = "production mixer callback PCM; no endpoint/system latency", WasapiOutputCapture = "not-run", Listening = "not-run", LossyGapless = "not-claimed", FixtureLicense = "CC0-1.0" };
+                CapturePath = "production mixer callback PCM; no endpoint/system latency", WasapiOutputCapture = "not-run", Listening = "not-run", LossyProfiles = lossyProfiles, LossyGapless = "not-claimed-universally", FixtureLicense = "CC0-1.0" };
         }
     }
     private static void Write(string path, short[] samples, int rate)

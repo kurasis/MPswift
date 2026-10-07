@@ -98,7 +98,7 @@ internal static class RestoreFileTransaction
                 try { return new(path, new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read), false); }
                 catch (FileNotFoundException) { return null; }
             }
-            var handle = CreateFile(path, 0x80010000, 1, 0, 3, 0x00200000, 0); // Hold the original entry, including a file link, for same-handle rename.
+            var handle = CreateFile(path, 0x80010000, 1, 0, 3, 0x02200000, 0); // Inspect directory/link entries themselves before any same-handle mutation.
             if (handle.IsInvalid)
             {
                 var code = Marshal.GetLastPInvokeError(); handle.Dispose();

@@ -6,6 +6,12 @@ namespace Player.AudioSmoke;
 
 internal static class StreamLifetimeValidation
 {
+    public static void PrepareLinks()
+    {
+        var root = Environment.CurrentDirectory;
+        File.Copy(Path.Combine(root, "lifetime.wv"), Path.Combine(root, "linked-lifetime.wv"));
+        File.CreateSymbolicLink(Path.Combine(root, "linked-lifetime.wvc"), Path.Combine(root, "lifetime.wvc"));
+    }
     public static object Run(string source)
     {
         using var context = new NativeDecodeContext();
@@ -59,11 +65,18 @@ internal static class StreamLifetimeValidation
         finally { Check(NativeStreamPins.Free(renamedHandle), "Renamed source release failed."); }
         var external = BassMixerGraph.OpenSource(new AudioRequest(Guid.NewGuid(), wv)).Handle;
         Check(Bass.StreamFree(external), "Direct public integer-handle release failed.");
+        var linked = BassMixerGraph.OpenSource(new AudioRequest(Guid.NewGuid(), Path.Combine(Environment.CurrentDirectory, "linked-lifetime.wv"))).Handle;
+        try
+        {
+            MustRefuse(() => { using var writer = File.OpenWrite(wvc); }, "A local correction link bypassed target read sharing.");
+            Check(Compare(linked, reference) == 0, "Local correction link did not preserve exact PCM.");
+        }
+        finally { Check(NativeStreamPins.Free(linked), "Linked correction source release failed."); }
         using (File.Open(wvc, FileMode.Open, FileAccess.ReadWrite, FileShare.None)) { }
         Check(NativeStreamPins.Count == 0, "Callback/source pins leaked after release.");
         return new { Status = "production-stream-lifetime-passed", WavWritesAndReplacementDenied = true,
             WavPackMainAndCorrectionWritesDenied = true, CorrectionReplacementDenied = true,
-            CallbacksSurviveCollection = true, MissingCorrectionSelectionFrozen = true, RenamedWavPackDetected = true, DirectPublicHandleReleasePreserved = true,
+            CallbacksSurviveCollection = true, MissingCorrectionSelectionFrozen = true, RenamedWavPackDetected = true, DirectPublicHandleReleasePreserved = true, LocalCorrectionLinksPreserved = true,
             CorrectedMaximumPcmError = correctedError, UncorrectedMaximumPcmError = lossyError, SourceHandlesReleased = true };
     }
     private static float Compare(int source, string reference)

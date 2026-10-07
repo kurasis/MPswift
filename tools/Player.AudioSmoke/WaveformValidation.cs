@@ -57,6 +57,11 @@ public static class WaveformValidation
     private static async Task<object> CorrectionCacheAsync(string output)
     {
         var fixtures = Path.Combine(Environment.CurrentDirectory, "tests", "fixtures", "audio-extended");
+        if (new[] { "hybrid-corrected.wv", "hybrid-corrected.wvc" }.Any(name => !File.Exists(Path.Combine(fixtures, name))))
+        {
+            if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") == "true") throw new FileNotFoundException("CI correction fixtures are required.");
+            return new { Status = "not-run", Reason = "Optional repository correction fixtures are unavailable in this working directory." };
+        }
         var main = Path.Combine(output, "owned-hybrid.wv"); var sidecar = Path.ChangeExtension(main, ".wvc");
         File.Copy(Path.Combine(fixtures, "hybrid-corrected.wv"), main);
         var mainHash = Hash(main);

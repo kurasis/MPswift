@@ -1,0 +1,211 @@
+{
+  "run": "37625963338",
+  "sourceCommit": "4266aeffab97d40a8582ba79072ed409ab4bfda1",
+  "sourcePCMFrames": 144000,
+  "sourcePCMRate": 48000,
+  "ffprobeVersion": "ffprobe version 7.1.5-0+deb13u1 Copyright (c) 2007-2026 the FFmpeg developers",
+  "rows": [
+    {
+      "fixture": "audio/mp3-cbr.mp3",
+      "sha256": "0486fe8948b1d6a3f96552b8fada48593c179e43663475fa1619cbd0310576d7",
+      "nativeDecodedFrames": 144000,
+      "expectedSourceFrames": 144000,
+      "extraFrames": 0,
+      "nativeRate": 48000,
+      "nativeChannels": 2,
+      "ffprobeCodec": "mp3",
+      "ffprobeProfile": null,
+      "ffprobeDuration": "3.024000",
+      "firstPacketSideData": [
+        {
+          "side_data_type": "Skip Samples",
+          "skip_samples": 1105,
+          "discard_padding": 0,
+          "skip_reason": 0,
+          "discard_reason": 0
+        }
+      ],
+      "lastPacketSideData": [
+        {
+          "side_data_type": "Skip Samples",
+          "skip_samples": 0,
+          "discard_padding": 47,
+          "skip_reason": 0,
+          "discard_reason": 0
+        }
+      ],
+      "encodedPacketFrames": 145152,
+      "independentSkippedOrDiscardedFrames": 1152,
+      "independentTrimmedFrames": 144000
+    },
+    {
+      "fixture": "audio/mp3-vbr.mp3",
+      "sha256": "f95d3c7358817ce0a63cf3dc9c9e15d2599f873d9d569bb1c89eee1cfa9b8fa2",
+      "nativeDecodedFrames": 144000,
+      "expectedSourceFrames": 144000,
+      "extraFrames": 0,
+      "nativeRate": 48000,
+      "nativeChannels": 2,
+      "ffprobeCodec": "mp3",
+      "ffprobeProfile": null,
+      "ffprobeDuration": "3.024000",
+      "firstPacketSideData": [
+        {
+          "side_data_type": "Skip Samples",
+          "skip_samples": 1105,
+          "discard_padding": 0,
+          "skip_reason": 0,
+          "discard_reason": 0
+        }
+      ],
+      "lastPacketSideData": [
+        {
+          "side_data_type": "Skip Samples",
+          "skip_samples": 0,
+          "discard_padding": 47,
+          "skip_reason": 0,
+          "discard_reason": 0
+        }
+      ],
+      "encodedPacketFrames": 145152,
+      "independentSkippedOrDiscardedFrames": 1152,
+      "independentTrimmedFrames": 144000
+    },
+    {
+      "fixture": "audio/opus.opus",
+      "sha256": "e4c50d3748d2b62d7a9008726346e8a953cb877ee373538ec81bfe3d0896421a",
+      "nativeDecodedFrames": 144000,
+      "expectedSourceFrames": 144000,
+      "extraFrames": 0,
+      "nativeRate": 48000,
+      "nativeChannels": 2,
+      "ffprobeCodec": "opus",
+      "ffprobeProfile": null,
+      "ffprobeDuration": "3.006500",
+      "firstPacketSideData": [
+        {
+          "side_data_type": "Skip Samples",
+          "skip_samples": 312,
+          "discard_padding": 0,
+          "skip_reason": 0,
+          "discard_reason": 0
+        }
+      ],
+      "lastPacketSideData": [
+        {
+          "side_data_type": "Skip Samples",
+          "skip_samples": 0,
+          "discard_padding": 648,
+          "skip_reason": 0,
+          "discard_reason": 0
+        }
+      ],
+      "opusPreSkip": 312,
+      "opusFinalGranule": 144312,
+      "independentTrimmedFrames": 144000
+    },
+    {
+      "fixture": "audio/aac-lc.aac",
+      "sha256": "8a4291d2f0ee031e1218f156e385b4fec13fa3c96da4693547c1406345a1ef39",
+      "nativeDecodedFrames": 144384,
+      "expectedSourceFrames": 144000,
+      "extraFrames": 384,
+      "nativeRate": 48000,
+      "nativeChannels": 2,
+      "ffprobeCodec": "aac",
+      "ffprobeProfile": "LC",
+      "ffprobeDuration": "3.029919",
+      "firstPacketSideData": [],
+      "lastPacketSideData": []
+    },
+    {
+      "fixture": "audio/aac-lc.m4a",
+      "sha256": "2a1942fb07f64ef11eff75b94c46b9e33c6d4fc784be2f5544dd2dc97cc41d18",
+      "nativeDecodedFrames": 145024,
+      "expectedSourceFrames": 144000,
+      "extraFrames": 1024,
+      "nativeRate": 48000,
+      "nativeChannels": 2,
+      "ffprobeCodec": "aac",
+      "ffprobeProfile": "LC",
+      "ffprobeDuration": "3.000000",
+      "firstPacketSideData": [
+        {
+          "side_data_type": "Skip Samples",
+          "skip_samples": 1024,
+          "discard_padding": 0,
+          "skip_reason": 0,
+          "discard_reason": 0
+        }
+      ],
+      "lastPacketSideData": []
+    },
+    {
+      "fixture": "audio/audiobook.m4b",
+      "sha256": "f3107688d080c55b22e4dbc42397f955906995fed51776c1947b6457c2823c85",
+      "nativeDecodedFrames": 145024,
+      "expectedSourceFrames": 144000,
+      "extraFrames": 1024,
+      "nativeRate": 48000,
+      "nativeChannels": 2,
+      "ffprobeCodec": "aac",
+      "ffprobeProfile": "LC",
+      "ffprobeDuration": "3.000000",
+      "firstPacketSideData": [
+        {
+          "side_data_type": "Skip Samples",
+          "skip_samples": 1024,
+          "discard_padding": 0,
+          "skip_reason": 0,
+          "discard_reason": 0
+        }
+      ],
+      "lastPacketSideData": []
+    },
+    {
+      "fixture": "audio-extended/he-aac.m4a",
+      "sha256": "90ffbe98156bf4f54d02fc06db4f83e71b9b6bbd45aac3b14a51d4a15c6f5f3d",
+      "nativeDecodedFrames": 146752,
+      "expectedSourceFrames": 144000,
+      "extraFrames": 2752,
+      "nativeRate": 48000,
+      "nativeChannels": 2,
+      "ffprobeCodec": "aac",
+      "ffprobeProfile": "HE-AAC",
+      "ffprobeDuration": "3.114667",
+      "firstPacketSideData": [
+        {
+          "side_data_type": "Skip Samples",
+          "skip_samples": 2048,
+          "discard_padding": 0,
+          "skip_reason": 0,
+          "discard_reason": 0
+        }
+      ],
+      "lastPacketSideData": []
+    },
+    {
+      "fixture": "audio-extended/he-aac-v2.m4a",
+      "sha256": "354f29e1bf4777243995d45b2bfc8a11524ff9b1d97699b0357b5fbdb14ac9f4",
+      "nativeDecodedFrames": 147776,
+      "expectedSourceFrames": 144000,
+      "extraFrames": 3776,
+      "nativeRate": 48000,
+      "nativeChannels": 2,
+      "ffprobeCodec": "aac",
+      "ffprobeProfile": "HE-AACv2",
+      "ffprobeDuration": "3.157333",
+      "firstPacketSideData": [
+        {
+          "side_data_type": "Skip Samples",
+          "skip_samples": 3072,
+          "discard_padding": 0,
+          "skip_reason": 0,
+          "discard_reason": 0
+        }
+      ],
+      "lastPacketSideData": []
+    }
+  ],
+  "scope": "Existing owned CC0 profiles: actual Windows native EOF decoded frame counts plus independent local encoded skip/padding/container facts. Not mixer-boundary alignment, universal profile support or endpoint gapless proof. AAC examples do not match source presentation frame counts; playback trimming is unchanged."
+}
