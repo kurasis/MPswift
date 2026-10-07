@@ -10,6 +10,18 @@ public sealed class RestoreTransactionTests : IDisposable
     private string Db => Path.Combine(_root, "library.db");
     private string Settings => Path.Combine(_root, "settings.json");
     [Fact]
+    public void RepeatedUnicodePublicationsUseExactlyTheRequestedNames()
+    {
+        for (var i = 0; i < 64; i++)
+        {
+            var destination = Path.Combine(_root, "Архив-" + new string('x', i) + ".zip");
+            RestoreFileTransaction.PublishNew(destination, stream => stream.WriteByte((byte)i));
+            Assert.Equal(new[] { (byte)i }, File.ReadAllBytes(destination));
+        }
+        Assert.Equal(64, Directory.GetFiles(_root).Length);
+        Assert.Empty(Directory.GetFiles(_root, "*.partial-*"));
+    }
+    [Fact]
     public void FailedArchivePublicationRemovesItsOwnedPartialAndPreservesExistingDestination()
     {
         var destination = Path.Combine(_root, "backup.zip");

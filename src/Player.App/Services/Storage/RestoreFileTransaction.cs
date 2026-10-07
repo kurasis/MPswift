@@ -114,12 +114,16 @@ internal static class RestoreFileTransaction
             {
                 var bytes = Encoding.Unicode.GetBytes(Path.GetFullPath(destination));
                 // FILE_RENAME_INFO on the supported x64 Windows target: BOOLEAN, padding, HANDLE, DWORD, WCHAR[].
-                var buffer = Marshal.AllocHGlobal(20 + bytes.Length);
+                // Win32 converts the DOS destination to an NT path as a NUL-terminated string.
+                // FileNameLength excludes the terminator; keep it inside the allocated input buffer.
+                var size = checked(20 + bytes.Length + sizeof(char));
+                var buffer = Marshal.AllocHGlobal(size);
                 try
                 {
                     Marshal.WriteInt64(buffer, 0, 0); Marshal.WriteIntPtr(buffer, 8, 0);
                     Marshal.WriteInt32(buffer, 16, bytes.Length); Marshal.Copy(bytes, 0, buffer + 20, bytes.Length);
-                    if (!SetFileInformationByHandle(Stream.SafeFileHandle, 3, buffer, checked((uint)(20 + bytes.Length))))
+                    Marshal.WriteInt16(buffer, 20 + bytes.Length, 0);
+                    if (!SetFileInformationByHandle(Stream.SafeFileHandle, 3, buffer, checked((uint)size)))
                         throw Failure("Cannot rename held restore file");
                 }
                 finally { Marshal.FreeHGlobal(buffer); }
