@@ -40,7 +40,7 @@ The two supplemental LICENSE/NOTICE copies for each SQLitePCLRaw package deliber
 
 ## Source/build preparation follow-up (2026-10-07)
 
-[Exact TagLib source preparation](TAGLIB_SOURCE_PREPARATION_2026-10-07.md) now retains the complete pinned upstream archive in an owned review directory, inventories it, rebuilds the reviewed library with zero warnings/errors and passes 284 Core tests in a separate copy. Core does not load TagLibSharp, so that old result does not prove library replacement. A new guarded Windows job rebuilds the library with a locked restore and verifies the actually loaded DLL during real EN/RU WPF metadata workflows. Its observation is pending this source CI; exact NuGet build correspondence and a source distribution mechanism remain open. The shipped dependency is unchanged.
+[Exact TagLib source preparation](TAGLIB_SOURCE_PREPARATION_2026-10-07.md) now retains the complete pinned upstream archive in an owned review directory, inventories it, rebuilds the reviewed library with zero warnings/errors and passes 284 Core tests in a separate copy. Core does not load TagLibSharp, so that old result does not prove library replacement. A new guarded Windows job rebuilds the library with a locked restore and verifies the actually loaded DLL during real EN/RU WPF metadata workflows. [Its actual Windows EN/RU observation now passes](TAGLIB_SOURCE_PREPARATION_2026-10-07.md#observed-windows-replacement-2026-10-07); exact NuGet build correspondence and a source distribution mechanism remain open. The shipped dependency is unchanged.
 
 
 ## Windows SDK/component terms preparation (2026-10-07)

@@ -64,7 +64,8 @@
       "completed": "0",
       "inProgress": "0",
       "pending": "0"
-    }
+    },
+    "scopeCorrection": "Historical field name retained: Core does not reference/load TagLibSharp. Copied-DLL tests prove Core regression continuity only; actual library replacement is covered by the separate Windows WPF report."
   },
-  "limits": "Owned Linux test output only; not bit-for-bit NuGet reproduction, Windows relinking evidence, written source offer or full distribution/legal acceptance"
+  "limits": "Owned Linux Core regression output only; TagLibSharp was not loaded by these tests. Not NuGet binary reproduction, written source offer or distribution/legal acceptance."
 }

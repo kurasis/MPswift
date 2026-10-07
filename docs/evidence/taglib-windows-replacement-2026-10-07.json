@@ -1,0 +1,55 @@
+{
+  "observedDateUtc": "2026-10-07",
+  "runUrl": "https://github.com/kurasis/MPswift/actions/runs/37645373218",
+  "jobUrl": "https://github.com/kurasis/MPswift/actions/runs/37645373218/job/112874625165",
+  "replacementReportSha256": "9f296054402a6e0298b04686b128ad64e5038128eabef8d61f0d7f672e434a1a",
+  "replacement": {
+    "Status": "taglib-windows-replacement-passed",
+    "SourceCommit": "ddc5ca05802919058f528557b8e9f5fd830fb1ac",
+    "Windows": "Microsoft Windows NT 10.0.20348.0",
+    "Scope": "Owned build-output copies; real EN/RU WPF metadata/native workflow; no shipped dependency replacement",
+    "CoreTestsExerciseTagLib": false,
+    "SourceDistributionApproved": false,
+    "UpstreamCommit": "b5ae84f2e84087bf160bb0471420200dd2b5d809",
+    "SourceArchiveSha256": "ab6fab7e22c7423e428f591d7525a38ca283d217a49f9772eb9a29cd682c175d",
+    "SourceInventorySha256": "a34580b6959c4a61c030249821b0fc799c876ce669f73ead494365bad616a529",
+    "SourcePackagesLockSha256": "e8213dd837c889188707359c5845881bb8980bae988b3736177614e58aa52a41",
+    "Sdk": "10.0.401",
+    "AssemblyIdentity": "TagLibSharp, Version=2.3.0.0, Culture=neutral, PublicKeyToken=db62eba44689b5b0",
+    "OriginalDllSha256": "dad93b152d55cf6a58b2037bcf9dd34b45d87761fe5ed61a232b3d4641d2a5d3",
+    "RebuiltDllSha256": "23a1a4539aa39f0f11223fed78f52c4dc66076ff5ad3f8e509abb0aea695a73f",
+    "CoreTests": {
+      "Failed": 0,
+      "TrxSha256": "0302ce25b1046c494a369c6d0a93ab42b9e290d4678cda895d828836145c82e9",
+      "Skipped": 0,
+      "Passed": 286,
+      "Total": 286
+    },
+    "Wpf": [
+      {
+        "BindingErrors": 0,
+        "ReportSha256": "484fdd89b870879092924a2bd1db58f31b6f26c87b654086b8200bf194eacae6",
+        "Language": "en",
+        "LoadedTagLib": {
+          "Identity": "TagLibSharp, Version=2.3.0.0, Culture=neutral, PublicKeyToken=db62eba44689b5b0",
+          "RelativePath": "TagLibSharp.dll",
+          "Sha256": "23a1a4539aa39f0f11223fed78f52c4dc66076ff5ad3f8e509abb0aea695a73f"
+        },
+        "Status": "ui-smoke-passed"
+      },
+      {
+        "BindingErrors": 0,
+        "ReportSha256": "2013915347e723e42795ae2d8f60eb162ff3001741bae24fb1acab04b7d738e5",
+        "Language": "ru",
+        "LoadedTagLib": {
+          "Identity": "TagLibSharp, Version=2.3.0.0, Culture=neutral, PublicKeyToken=db62eba44689b5b0",
+          "RelativePath": "TagLibSharp.dll",
+          "Sha256": "23a1a4539aa39f0f11223fed78f52c4dc66076ff5ad3f8e509abb0aea695a73f"
+        },
+        "Status": "ui-smoke-passed"
+      }
+    ],
+    "OriginalDllAndFixturesUnchanged": true
+  },
+  "scope": "Successful isolated Windows replacement job; ordinary build/package jobs are independently mandatory. Core tests do not load TagLib; real EN/RU WPF loaded-library identity/hash is the compatibility evidence."
+}
