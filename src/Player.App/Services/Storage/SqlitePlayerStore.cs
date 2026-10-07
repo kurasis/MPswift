@@ -125,6 +125,8 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
         {
             connection.Open();
             DatabaseRecovery.ConfigureReadLimits(connection);
+            using var validationBudget = new DatabaseValidationBudget(connection);
+            DatabaseRecovery.ValidateSchemaSize(connection);
             using var version = connection.CreateCommand(); version.CommandText = "PRAGMA user_version";
             var schema = Convert.ToInt32(version.ExecuteScalar(), System.Globalization.CultureInfo.InvariantCulture);
             if (schema > 2) throw new NewerDatabaseSchemaException(schema);
@@ -170,7 +172,11 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
         lock (_gate)
         {
             if (_closing) throw new ObjectDisposedException(nameof(SqlitePlayerStore));
-            if (!_work.TryAdd(() => { try { completion.TrySetResult(action()); } catch (Exception error) { completion.TrySetException(error); } }))
+            if (!_work.TryAdd(() =>
+            {
+                try { using var budget = new DatabaseValidationBudget(Open()); completion.TrySetResult(action()); }
+                catch (Exception error) { completion.TrySetException(error); }
+            }))
                 completion.TrySetException(new IOException("Database work queue is full. Retry after the current operation."));
         }
         return completion.Task;

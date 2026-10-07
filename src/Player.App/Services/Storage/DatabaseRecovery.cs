@@ -13,6 +13,9 @@ public static class DatabaseRecovery
         // retain 1 MiB for row headers while refusing huge cells before native/managed allocation.
         const int maximumRowBytes = 49 * 1024 * 1024;
         SQLitePCL.raw.sqlite3_limit(connection.Handle!, SQLitePCL.raw.SQLITE_LIMIT_LENGTH, maximumRowBytes);
+        SQLitePCL.raw.sqlite3_limit(connection.Handle!, SQLitePCL.raw.SQLITE_LIMIT_SQL_LENGTH, 1024 * 1024);
+        SQLitePCL.raw.sqlite3_limit(connection.Handle!, SQLitePCL.raw.SQLITE_LIMIT_COLUMN, 256);
+        SQLitePCL.raw.sqlite3_limit(connection.Handle!, SQLitePCL.raw.SQLITE_LIMIT_EXPR_DEPTH, 100);
     }
     /// <summary>Explicit user-selected restore only. Validate first; retain the old main/WAL/SHM files.</summary>
     public static void Restore(string destination, string backup)
@@ -44,6 +47,8 @@ public static class DatabaseRecovery
     }
     internal static void Validate(SqliteConnection source)
     {
+        using var budget = new DatabaseValidationBudget(source);
+        ValidateSchemaSize(source);
         using var command = source.CreateCommand();
         command.CommandText = "PRAGMA user_version";
         if (Convert.ToInt32(command.ExecuteScalar(), System.Globalization.CultureInfo.InvariantCulture) is not (1 or 2)) throw new InvalidDataException("Backup schema is not supported.");
@@ -53,5 +58,13 @@ public static class DatabaseRecovery
         using (var reader = command.ExecuteReader()) if (reader.Read()) throw new InvalidDataException("Backup has invalid references.");
         command.CommandText = "SELECT COUNT(*) FROM Playlists";
         if (Convert.ToInt64(command.ExecuteScalar(), System.Globalization.CultureInfo.InvariantCulture) is < 1 or > 100) throw new InvalidDataException("Backup has invalid playlist dimensions.");
+    }
+    internal static void ValidateSchemaSize(SqliteConnection connection)
+    {
+        using var command = connection.CreateCommand(); command.CommandText = "SELECT name, length(sql) FROM sqlite_schema LIMIT 129";
+        using var reader = command.ExecuteReader(); var count = 0;
+        while (reader.Read())
+            if (++count > 128 || reader.GetString(0).Length > 256 || !reader.IsDBNull(1) && reader.GetInt64(1) > 65536)
+                throw new InvalidDataException("Database schema exceeds validation bounds; original data preserved.");
     }
 }

@@ -63,6 +63,7 @@ public static class BackupBundle
     {
         using var file = File.OpenRead(archive);
         if (file.Length > MaximumDatabaseBytes + 1048576) throw new InvalidDataException("Backup archive is too large.");
+        BackupZipDirectory.Validate(file); // Bound central-directory work before ZipArchive materializes its entries.
         using var zip = new ZipArchive(file, ZipArchiveMode.Read);
         var names = new[] { "library.db", "settings.json", "manifest.json" };
         if (zip.Entries.Count != names.Length || names.Any(name => zip.Entries.Count(e => e.FullName == name) != 1)) throw new InvalidDataException("Backup entries are missing, duplicated or unexpected.");

@@ -69,6 +69,8 @@ Official .NET 10 release metadata identifies deployed runtime 10.0.12 as the lat
 
 ## Residual work in an isolated environment
 
+The owner subsequently authorized native-parser, file/DLL and resource follow-up. [Implemented changes, scoped tests and remaining boundaries](SECURITY_FOLLOWUP_2026-10-07.md) supersede those three implementation items; the limitations below are the original audit checkpoint.
+
 - Arbitrary-workstation invocation of diagnostic scripts remains unsuitable. The approved UI-smoke marker is an accidental/shortcut misuse guard, not authentication against a malicious process already running as the same user; deliberate synthetic validation still modifies its isolated clipboard and requires a disposable session.
 - Windows standard-user ACL/reparse/hardlink races and transitive native DLL dependency search; do not run planted executables on a real workstation. Current same-user-writable package/data locations are not a security boundary against code already running as that user.
 - Native audio/image/database fuzzing under resource limits and disposable VM/worker. Current malformed-tag/image/archive tests do not establish memory-corruption safety for every native parser.

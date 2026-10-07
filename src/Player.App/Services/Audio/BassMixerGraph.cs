@@ -28,10 +28,11 @@ public sealed class BassMixerGraph : IDisposable
     }
     public static (int Handle, AudioSourceInfo Info, double Start) OpenSource(AudioRequest request)
     {
-        string path;
-        try { path = BassSmokeSession.ValidateSourcePath(request.Path); }
+        LocalReadLease lease;
+        try { lease = LocalReadLease.Open(request.Path); }
         catch (Exception e) when (e is IOException or ArgumentException or UnauthorizedAccessException) { throw new AudioBackendException(AudioErrorCategory.FileUnavailable, e.Message); }
-        var handle = Bass.CreateStream(path, 0, 0, BassFlags.Decode | BassFlags.Float | BassFlags.Prescan);
+        using var read = lease;
+        var handle = Bass.CreateStream(read.Path, 0, 0, BassFlags.Decode | BassFlags.Float | BassFlags.Prescan);
         if (handle == 0) throw Error("Open decoder");
         try
         {

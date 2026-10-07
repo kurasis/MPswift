@@ -16,6 +16,9 @@ public sealed class NativeDecoderPlugins : IDisposable
             foreach (var pair in NativeLibraryBootstrap.DecoderValidationErrors) Errors[pair.Key] = pair.Value;
             foreach (var path in NativeLibraryBootstrap.DecoderPaths)
             {
+                try { NativeLibraryBootstrap.PrepareDecoder(path); }
+                catch (Exception error) when (error is DllNotFoundException or BadImageFormatException)
+                { Errors[System.IO.Path.GetFileName(path)] = error.Message; continue; }
                 var handle = Bass.PluginLoad(path);
                 if (handle == 0)
                 {

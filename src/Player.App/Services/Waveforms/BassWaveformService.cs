@@ -91,7 +91,8 @@ public sealed class BassWaveformService : IWaveformService, IWaveformCacheContro
     private WaveformData Decode(Job job)
     {
         using var context = new NativeDecodeContext();
-        var stream = Bass.CreateStream(job.Path, 0, 0, BassFlags.Decode | BassFlags.Float | BassFlags.Prescan);
+        using var read = LocalReadLease.Open(job.Path);
+        var stream = Bass.CreateStream(read.Path, 0, 0, BassFlags.Decode | BassFlags.Float | BassFlags.Prescan);
         if (stream == 0) throw new IOException("Waveform decoder could not open source: " + Bass.LastError);
         try
         {

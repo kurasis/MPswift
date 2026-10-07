@@ -8,7 +8,7 @@ using Player.Core.Playback;
 var json = new JsonSerializerOptions { WriteIndented = true };
 void Report(object result) => Console.WriteLine(JsonSerializer.Serialize(result, json));
 
-if (args.Length == 0 || args[0] is not ("--generate-fixture" or "--probe" or "--decode" or "--play" or "--formats" or "--extended-formats" or "--long-formats" or "--missing-wma" or "--engine" or "--engine-play" or "--waveform" or "--mixer" or "--stress") ||
+if (args.Length == 0 || args[0] is not ("--generate-fixture" or "--probe" or "--decode" or "--play" or "--formats" or "--extended-formats" or "--long-formats" or "--missing-wma" or "--engine" or "--engine-play" or "--waveform" or "--mixer" or "--stress" or "--security-suite" or "--security-worker") ||
     args.Length != (args[0] == "--probe" ? 1 : 2))
 {
     Console.Error.WriteLine("Usage: Player.AudioSmoke --generate-fixture <new.wav> | --probe | --decode <local-file> | --play <local-file> | --formats <fixture-directory> | --engine <local-file> | --engine-play <local-file>");
@@ -27,6 +27,8 @@ try
         Report(new { Status = "not-run", Reason = "BASS/WASAPI smoke requires Windows x64.", Environment = RuntimeInformation.OSDescription });
         return 3;
     }
+    if (args[0] == "--security-suite") { Report(await ParserSecurityValidation.RunAsync(args[1])); return 0; }
+    if (args[0] == "--security-worker") { Report(await ParserSecurityValidation.WorkerAsync(args[1])); return 0; }
     var versions = NativeLibraryBootstrap.LoadAndVerify();
     if (args[0] == "--long-formats") { Report(LongFormatValidation.Run(args[1])); return 0; }
     if (args[0] == "--missing-wma")

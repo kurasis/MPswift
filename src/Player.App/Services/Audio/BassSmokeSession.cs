@@ -30,7 +30,8 @@ public sealed class BassSmokeSession : IDisposable
         ObjectDisposedException.ThrowIf(_disposed, this);
         if (_source != 0) throw new InvalidOperationException("Use one source per smoke session.");
         var path = ValidateSourcePath(filePath);
-        _source = Bass.CreateStream(path, 0, 0, BassFlags.Decode | BassFlags.Float | BassFlags.Prescan);
+        using var lease = LocalReadLease.Open(path);
+        _source = Bass.CreateStream(lease.Path, 0, 0, BassFlags.Decode | BassFlags.Float | BassFlags.Prescan);
         if (_source == 0) throw Error("BASS_StreamCreateFile");
         Check(Bass.ChannelGetInfo(_source, out var info), "BASS_ChannelGetInfo");
         var length = Bass.ChannelGetLength(_source);

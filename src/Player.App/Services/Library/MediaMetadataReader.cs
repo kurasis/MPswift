@@ -16,8 +16,9 @@ public static class MediaMetadataReader
         BassSmokeSession.ValidateSourcePath(path);
         try
         {
-            Player.Core.Media.MetadataReadGuard.Validate(path);
-            using var file = TagLib.File.Create(path, TagLib.ReadStyle.Average); var tag = file.Tag;
+            using var read = LocalReadLease.Open(path);
+            Player.Core.Media.MetadataReadGuard.Validate(read.Path);
+            using var file = TagLib.File.Create(read.Path, TagLib.ReadStyle.Average); var tag = file.Tag;
             return track with
             {
                 Title = Bounded(tag.Title) ?? track.Title, Artist = Join(tag.Performers), Album = Bounded(tag.Album), AlbumArtist = Join(tag.AlbumArtists),
