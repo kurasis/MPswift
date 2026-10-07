@@ -18,8 +18,14 @@ public sealed class SettingsFile(string directory)
     }
     private static PlayerSettings Read(string path)
     {
-        if (new FileInfo(path).Length > 65536) throw new InvalidDataException("Settings file is too large; original preserved.");
-        var value = JsonSerializer.Deserialize<PlayerSettings>(File.ReadAllText(path)) ?? throw new InvalidDataException("Invalid settings; original preserved.");
+        using var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+        var length = file.Length;
+        if (length > 65536) throw new InvalidDataException("Settings file is too large; original preserved.");
+        var bytes = new byte[checked((int)length)]; file.ReadExactly(bytes);
+        if (file.ReadByte() >= 0) throw new InvalidDataException("Settings changed while reading; original preserved.");
+        // Keep File.ReadAllText's BOM detection, including existing UTF-16/UTF-32 files.
+        using var reader = new StreamReader(new MemoryStream(bytes, false));
+        var value = JsonSerializer.Deserialize<PlayerSettings>(reader.ReadToEnd()) ?? throw new InvalidDataException("Invalid settings; original preserved.");
         if (value.SchemaVersion != 1) throw new SettingsCompatibilityException(value.SchemaVersion);
         return value.Validate();
     }
@@ -31,7 +37,7 @@ public sealed class SettingsFile(string directory)
         catch (Exception error) when (error is JsonException or InvalidDataException)
         {
             try { LoadBackup(); }
-            catch (Exception backupError) when (backupError is IOException or UnauthorizedAccessException or JsonException)
+            catch (Exception backupError) when (backupError is IOException or UnauthorizedAccessException or JsonException or InvalidDataException)
             { throw new IOException("Settings and their previous backup are unavailable; originals preserved.", new AggregateException(error, backupError)); }
             if (!chooseRecovery(error)) throw;
             RestoreBackup();
