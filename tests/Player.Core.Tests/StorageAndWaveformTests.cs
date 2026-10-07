@@ -105,8 +105,13 @@ public sealed class StorageAndWaveformTests : IDisposable
         var entry = Entry(); var state = State(entry); var backup = Path.Combine(_directory, "backup.db");
         await using (var store = new SqlitePlayerStore(Database)) { await store.LoadAsync(); await store.SaveAsync(state, true); await store.BackupAsync(backup); }
         File.WriteAllText(Database, "preserve corrupted original");
+        var companions = new[] { "-wal", "-shm" }.Where(suffix => File.Exists(Database + suffix))
+            .ToDictionary(suffix => suffix, suffix => File.ReadAllBytes(Database + suffix));
         DatabaseRecovery.Restore(Database, backup);
-        Assert.Equal("preserve corrupted original", File.ReadAllText(Directory.GetFiles(_directory, "library.db.preserved-*").Single()));
+        var preserved = Assert.Single(Directory.GetFiles(_directory, "library.db.preserved-*")
+            .Where(path => !path.EndsWith("-wal", StringComparison.Ordinal) && !path.EndsWith("-shm", StringComparison.Ordinal)));
+        Assert.Equal("preserve corrupted original", File.ReadAllText(preserved));
+        foreach (var (suffix, bytes) in companions) Assert.Equal(bytes, File.ReadAllBytes(preserved + suffix));
         await using var restored = new SqlitePlayerStore(Database);
         Assert.Equal(entry, (await restored.LoadAsync()).Playlists[0].Entries[0]);
     }
