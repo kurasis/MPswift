@@ -1,0 +1,8 @@
+{
+  "SymbolicTargetUnchanged": true,
+  "BytesUnchanged": true,
+  "HardlinkObjectChanged": true,
+  "Framework": ".NET 10.0.12",
+  "scope": "Owned Linux .NET path-setter control, not a Windows production acceptance test",
+  "source": ".NET 10.0.12 pal_time.c uses AT_SYMLINK_NOFOLLOW for path setters; hardlinks name one shared object"
+}

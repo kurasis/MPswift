@@ -58,7 +58,8 @@
     "failed": 1,
     "passed": 1,
     "failure": "LinkedCacheReadDoesNotTouchTargetAndRegenerationReplacesOnlyLink: cache returned a valid linked WaveformData instead of null",
-    "compatibilityPass": "BackupRejectsDanglingFileLinkWithoutCreatingItsTarget"
+    "compatibilityPass": "BackupRejectsDanglingFileLinkWithoutCreatingItsTarget",
+    "interpretation": "Original first assertion observed linked cache acceptance only; symbolic target timestamps were not shown to change. The separate actual .NET control proves hardlink metadata sharing and no-follow symbolic setters."
   },
   "windowsNativeControls": "await this source CI; Linux results do not establish them",
   "correctionParentCommit": "837185b62cf09c3bdb695457795f770f0b6ccaec",
@@ -137,5 +138,13 @@
     "url": "https://github.com/dotnet/runtime/blob/v10.0.12/src/libraries/System.Private.CoreLib/src/System/IO/FileSystem.Windows.cs#L220",
     "sha256": "9dd09472fd38378e69daf995eab1d5a4024e2852cd1ff7c604a9379804168e45",
     "observation": "OpenHandleToWriteAttributes uses FILE_FLAG_OPEN_REPARSE_POINT; path-based setters change the symbolic-link object on Windows."
+  },
+  "linuxTimestampControl": {
+    "SymbolicTargetUnchanged": true,
+    "BytesUnchanged": true,
+    "HardlinkObjectChanged": true,
+    "Framework": ".NET 10.0.12",
+    "scope": "Owned Linux .NET path-setter control, not a Windows production acceptance test",
+    "source": ".NET 10.0.12 pal_time.c uses AT_SYMLINK_NOFOLLOW for path setters; hardlinks name one shared object"
   }
 }
