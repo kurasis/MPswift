@@ -77,8 +77,7 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
     public Task SaveAsync(LibraryState state, bool playlistsChanged)
     {
         state.Validate();
-        var sessionJson = JsonSerializer.Serialize(state.Session);
-        if (sessionJson.Length > 16 * 1024 * 1024) throw new InvalidDataException("Saved queue/history exceeds the session size limit. Remove some queued items before saving.");
+        var sessionJson = SessionJson.Serialize(state.Session);
         return Queue(() =>
         {
             var connection = Open();

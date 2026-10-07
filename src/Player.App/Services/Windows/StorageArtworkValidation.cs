@@ -102,7 +102,11 @@ public static class StorageArtworkValidation
             {
                 var rejected = false;
                 try { Directory.Move(path, path + "-moved"); } catch (IOException) { rejected = true; }
-                if (!rejected) throw new InvalidOperationException("Backup directory changed during its production operation.");
+                if (!rejected)
+                {
+                    Directory.Move(path + "-moved", path);
+                    throw new InvalidOperationException("Backup directory changed during its production operation.");
+                }
             }
             return store.BackupAsync(destination);
         }

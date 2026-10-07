@@ -35,7 +35,7 @@ internal sealed class LocalReadLease : IDisposable
             lease = new(new FileStream(handle, FileAccess.Read), resolved);
             for (var directory = new DirectoryInfo(System.IO.Path.GetDirectoryName(resolved)!); directory is not null; directory = directory.Parent)
             {
-                var pinned = CreateFile(directory.FullName, 0x80, 3, 0, 3, 0x02200000, 0); // Read attributes, no delete sharing/link following.
+                var pinned = CreateFile(directory.FullName, 0x80000000, 3, 0, 3, 0x02200000, 0); // Generic read, no delete sharing/link following.
                 if (pinned.IsInvalid) { pinned.Dispose(); throw Failure("Cannot pin local directory"); }
                 lease._directories.Add(pinned);
                 Check(pinned, true, false);

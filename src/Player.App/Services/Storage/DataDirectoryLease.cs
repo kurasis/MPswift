@@ -63,7 +63,7 @@ internal sealed class DataDirectoryLease : IDisposable
             if (allowLinks && (information.Attributes & 0x400) != 0)
             {
                 // Reparse data can also be changed in place. Hold a share-read-only handle on the link itself.
-                var link = CreateFile(directory.FullName, 0x80, 1, 0, 3, 0x02200000, 0);
+                var link = CreateFile(directory.FullName, 0x80000000, 1, 0, 3, 0x02200000, 0);
                 if (link.IsInvalid) { link.Dispose(); throw Failure("Cannot pin data directory link"); }
                 _handles.Add(link);
             }
@@ -73,8 +73,9 @@ internal sealed class DataDirectoryLease : IDisposable
     }
     private SafeFileHandle Pin(string path, bool followLinks)
     {
-        // Read attributes, share read/write but never delete; open directory/reparse object.
-        var handle = CreateFile(path, 0x80, 3, 0, 3, followLinks ? 0x02000000u : 0x02200000u, 0);
+        // Generic read includes FILE_LIST_DIRECTORY: attribute-only handles do not enforce sharing.
+        // Share read/write but never delete; open directory/reparse object.
+        var handle = CreateFile(path, 0x80000000, 3, 0, 3, followLinks ? 0x02000000u : 0x02200000u, 0);
         if (handle.IsInvalid) { handle.Dispose(); throw Failure("Cannot pin data directory"); }
         _handles.Add(handle);
         return handle;
