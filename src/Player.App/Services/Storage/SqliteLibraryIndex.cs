@@ -116,7 +116,8 @@ public sealed partial class SqlitePlayerStore
         if (migrate)
         {
             var backupPath = _path + ".pre-schema2-" + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + "-" + Guid.NewGuid().ToString("N") + ".db";
-            using var backup = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = backupPath, Pooling = false }.ToString()); backup.Open(); connection.BackupDatabase(backup);
+            using var reserved = new FileStream(backupPath, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.ReadWrite);
+            using var backup = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = backupPath, Mode = SqliteOpenMode.ReadWrite, Pooling = false }.ToString()); backup.Open(); connection.BackupDatabase(backup);
         }
         using var transaction = connection.BeginTransaction();
         Execute(connection, transaction, """

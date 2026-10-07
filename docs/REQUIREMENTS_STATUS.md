@@ -1,5 +1,9 @@
 # Requirement and acceptance status
 
+## File continuity follow-up (2026-10-07)
+
+Baseline `bb8ef75fa034`/`0.2.73-dev.1` main run 37605822384 passed 258 tests on each OS, all 216 parser cases, EN/RU/extracted WPF and package verification. This follow-up uses one validated handle for cache reads/LRU touches, rejects linked Windows cache entries, reserves new SQLite backup/recovery destinations atomically and gates temporary cleanup on successful creation. Baseline linked-cache regression failed; corrected locked Release checks pass **263 tests**, zero failures/skips/warnings/errors. Public APIs, formats, source audio and pinned dependencies remain intact. New restricted-token Windows link/timestamp controls and existing native/WPF/package checks await this source CI. [Finding, hardening distinction and residual boundaries](FILE_CONTINUITY_2026-10-07.md).
+
 ## Current checkpoint (2026-10-07)
 
 Baseline `f689fdc038c8`, build `0.2.72-dev.1`: [main run 37601643993](https://github.com/kurasis/MPswift/actions/runs/37601643993) passed all three jobs, 249 tests on each OS, 216 bounded parser cases, EN/RU/extracted WPF and package checks. Independently downloaded ZIP digest and complete 577-file/13-native inventory were verified. [Source-specific evidence](evidence/security-deepening-windows.json). Older sections below are historical source checkpoints; their pre-CI pending notes are superseded by later observed results, not current blockers.

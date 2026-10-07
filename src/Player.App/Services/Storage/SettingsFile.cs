@@ -56,14 +56,16 @@ public sealed class SettingsFile(string directory)
         var settings = Read(path + ".bak");
         var temporary = path + ".restore-" + Guid.NewGuid().ToString("N");
         var preserved = path + ".preserved-" + Guid.NewGuid().ToString("N");
+        var ownsTemporary = false;
         try
         {
-            Export(temporary, settings);
+            using (var file = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+            { ownsTemporary = true; JsonSerializer.Serialize(file, settings); file.Flush(true); }
             if (File.Exists(path)) { File.Replace(temporary, path, preserved); return preserved; }
             File.Move(temporary, path);
             return null; // No original existed to preserve.
         }
-        finally { if (File.Exists(temporary)) File.Delete(temporary); }
+        finally { if (ownsTemporary && File.Exists(temporary)) File.Delete(temporary); }
     }
     public static void Export(string path, PlayerSettings settings)
     {
@@ -79,14 +81,15 @@ public sealed class SettingsFile(string directory)
         using var lease = DataDirectoryLease.Create(Path.GetDirectoryName(_path)!);
         var path = Path.Combine(lease.DirectoryPath, "settings.json");
         var temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
+        var ownsTemporary = false;
         try
         {
             using (var file = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
-            { JsonSerializer.Serialize(file, settings); file.Flush(true); }
+            { ownsTemporary = true; JsonSerializer.Serialize(file, settings); file.Flush(true); }
             if (File.Exists(path)) File.Replace(temporary, path, path + ".bak");
             else File.Move(temporary, path);
         }
-        finally { if (File.Exists(temporary)) File.Delete(temporary); }
+        finally { if (ownsTemporary && File.Exists(temporary)) File.Delete(temporary); }
     }
 }
 

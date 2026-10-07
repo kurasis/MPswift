@@ -111,7 +111,9 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
         destination = Path.Combine(lease.DirectoryPath, Path.GetFileName(destination));
         if (File.Exists(destination)) throw new IOException("Choose a new backup filename; existing files are never overwritten.");
         var connection = Open();
-        using var backup = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = destination, Mode = SqliteOpenMode.ReadWriteCreate, Pooling = false }.ToString());
+        // Reserve atomically, retaining the name while native SQLite opens/copies the same empty file.
+        using var reserved = new FileStream(destination, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.ReadWrite);
+        using var backup = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = destination, Mode = SqliteOpenMode.ReadWrite, Pooling = false }.ToString());
         backup.Open(); connection.BackupDatabase(backup); return true;
     });
     private SqliteConnection Open()

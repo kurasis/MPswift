@@ -21,6 +21,7 @@ public static class BackupBundle
         destination = Path.Combine(destinationLease.DirectoryPath, Path.GetFileName(destination));
         var stage = Path.Combine(Path.GetDirectoryName(destination)!, ".player-backup-" + Guid.NewGuid().ToString("N"));
         var temporary = destination + ".partial-" + Guid.NewGuid().ToString("N");
+        var ownsTemporary = false;
         if (File.Exists(destination) || Directory.Exists(destination)) throw new IOException("Choose a new backup filename; existing files are never overwritten.");
         var stageLease = DataDirectoryLease.Create(stage);
         try
@@ -34,6 +35,7 @@ public static class BackupBundle
                 if (items[1].Bytes > 65536) throw new IOException("Backup settings exceed the 64 KiB limit; original data preserved.");
                 using (var file = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
                 {
+                    ownsTemporary = true;
                     using (var zip = new ZipArchive(file, ZipArchiveMode.Create, true))
                     {
                         foreach (var item in items) zip.CreateEntryFromFile(Path.Combine(stage, item.Path), item.Path, CompressionLevel.Optimal);
@@ -45,7 +47,7 @@ public static class BackupBundle
                 File.Move(temporary, destination);
             });
         }
-        finally { stageLease.Dispose(); if (File.Exists(temporary)) File.Delete(temporary); Directory.Delete(stage, true); }
+        finally { stageLease.Dispose(); if (ownsTemporary && File.Exists(temporary)) File.Delete(temporary); Directory.Delete(stage, true); }
     }
     public static async Task RestoreAsync(string directory, string archive)
     {

@@ -35,10 +35,15 @@ public static class DatabaseRecovery
         var temporary = destination + ".restore-" + Guid.NewGuid().ToString("N");
         var preserved = destination + ".preserved-" + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + "-" + Guid.NewGuid().ToString("N");
         var moved = new List<(string Original, string Preserved)>();
+        var ownsTemporary = false;
         try
         {
-            using (var target = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = temporary, Mode = SqliteOpenMode.ReadWriteCreate, Pooling = false }.ToString()))
-            { target.Open(); source.BackupDatabase(target); }
+            using (var reserved = new FileStream(temporary, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.ReadWrite))
+            {
+                ownsTemporary = true;
+                using var target = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = temporary, Mode = SqliteOpenMode.ReadWrite, Pooling = false }.ToString());
+                target.Open(); source.BackupDatabase(target);
+            }
             foreach (var suffix in new[] { "", "-wal", "-shm" })
                 if (File.Exists(destination + suffix)) { File.Move(destination + suffix, preserved + suffix); moved.Add((destination + suffix, preserved + suffix)); }
             File.Move(temporary, destination);
@@ -48,7 +53,7 @@ public static class DatabaseRecovery
             foreach (var (original, retained) in moved.AsEnumerable().Reverse()) if (!File.Exists(original)) File.Move(retained, original);
             throw;
         }
-        finally { if (File.Exists(temporary)) File.Delete(temporary); }
+        finally { if (ownsTemporary && File.Exists(temporary)) File.Delete(temporary); }
     }
     internal static void Validate(SqliteConnection source)
     {

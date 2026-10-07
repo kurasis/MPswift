@@ -10,6 +10,8 @@ Current baseline: `f689fdc038c8`, development build `0.2.72-dev.1`; 249 tests pe
 - Configured diagnostic paths now cover plain/default-JSON/slash representations and log Operation; arbitrary secrets/unconfigured paths can remain. The current prefix correction requires its own CI.
 - Publisher signing remains absent; hashes are integrity checks relative to trusted metadata. Licensing, actual clean Windows 11, devices/Narrator/physical DPI and two-hour real output remain release gates.
 
+Cache reads/LRU touches now use the same validated handle, and linked Windows cache entries regenerate without touching outside targets. New SQLite backup/recovery outputs are reserved atomically; failed creation no longer authorizes deleting a pre-existing temporary entry. These narrow corrections require their own Windows CI and preserve the remaining main-data-file/streaming/stage-cleanup boundaries. [Exact scope](FILE_CONTINUITY_2026-10-07.md).
+
 ## Historical checkpoints
 
 - Stage F Windows integration passed at `39a8a25`. Stage G4–G7 passes 115 tests on Linux/Windows, 21 native profiles, complete ZIP restore, storage/artwork and measured search/scroll plus extracted apphost checks at `a00ee6c`; full file audits and negative integrity checks pass. The final software-routed WPF dropdown-Escape regression also passed. This is not version 1.0.

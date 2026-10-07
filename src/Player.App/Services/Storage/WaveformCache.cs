@@ -1,5 +1,8 @@
+using System.ComponentModel;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using Microsoft.Win32.SafeHandles;
 using Player.Core.Waveforms;
 
 namespace Player.App.Services.Storage;
@@ -45,7 +48,7 @@ public sealed class WaveformCache(string directory, long budgetBytes = 512L * 10
         {
             using var lease = DataDirectoryLease.Open(directory);
             path = PathFor(key, lease.DirectoryPath);
-            using var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+            using var file = OpenCacheRead(path);
             if (file.Length is < HeaderBytes || file.Length > HeaderBytes + WaveformData.MaximumBuckets * 12L) return null;
             using var reader = new BinaryReader(file);
             if (reader.ReadUInt32() != 0x4b505657 || reader.ReadInt32() != 2) return null;
@@ -65,7 +68,7 @@ public sealed class WaveformCache(string directory, long budgetBytes = 512L * 10
             using var peaks = new BinaryReader(new MemoryStream(payload, false));
             for (var i = 0; i < count; i++) { minimum[i] = peaks.ReadSingle(); maximum[i] = peaks.ReadSingle(); if (rms is not null) rms[i] = peaks.ReadSingle(); }
             var data = new WaveformData(rate, channels, framesPerBucket, totalFrames, minimum, maximum, rms); data.Validate();
-            File.SetLastWriteTimeUtc(path, DateTime.UtcNow); return data;
+            File.SetLastWriteTimeUtc(file.SafeFileHandle, DateTime.UtcNow); return data;
         }
         catch (Exception error) when (error is IOException or UnauthorizedAccessException or ArgumentException or InvalidDataException) { return null; }
     }
@@ -77,6 +80,7 @@ public sealed class WaveformCache(string directory, long budgetBytes = 512L * 10
     {
         data.Validate(); using var lease = DataDirectoryLease.Create(directory);
         var path = PathFor(key, lease.DirectoryPath); var temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
+        var ownsTemporary = false;
         try
         {
             using var payload = new MemoryStream(data.Minimum.Length * (data.Rms is null ? 8 : 12));
@@ -85,6 +89,7 @@ public sealed class WaveformCache(string directory, long budgetBytes = 512L * 10
             var bytes = payload.ToArray();
             using (var file = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
             {
+                ownsTemporary = true;
                 using var writer = new BinaryWriter(file, System.Text.Encoding.UTF8, true);
                 using var header = new MemoryStream(72);
                 using (var fields = new BinaryWriter(header, System.Text.Encoding.UTF8, true))
@@ -98,7 +103,7 @@ public sealed class WaveformCache(string directory, long budgetBytes = 512L * 10
             }
             File.Move(temporary, path, true); Evict();
         }
-        finally { if (File.Exists(temporary)) File.Delete(temporary); }
+        finally { if (ownsTemporary && File.Exists(temporary)) File.Delete(temporary); }
     }
     public void Clear()
     {
@@ -117,4 +122,41 @@ public sealed class WaveformCache(string directory, long budgetBytes = 512L * 10
         var size = files.Sum(f => f.Length);
         foreach (var file in files) { if (size <= _budgetBytes) break; size -= file.Length; file.Delete(); }
     }
+
+    private static FileStream OpenCacheRead(string path)
+    {
+        if (!OperatingSystem.IsWindows())
+        {
+            // Linux storage tests use normal files; this check is not a portable race-proof sandbox.
+            if ((File.GetAttributes(path) & FileAttributes.ReparsePoint) != 0) throw new IOException("A cache file cannot be a link.");
+            return new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+        }
+        // Read data and update LRU attributes on this same handle. Do not follow a replaced file link.
+        var handle = CreateFile(path, 0x80000100, 1, 0, 3, 0x00200000, 0);
+        if (handle.IsInvalid)
+        {
+            var error = new IOException("Cannot open local cache file.", new Win32Exception(Marshal.GetLastPInvokeError()));
+            handle.Dispose(); throw error;
+        }
+        try
+        {
+            if (!GetFileInformationByHandle(handle, out var info)) throw new IOException("Cannot inspect cache file.", new Win32Exception(Marshal.GetLastPInvokeError()));
+            const uint unavailable = 0x10 | 0x400 | 0x1000 | 0x40000 | 0x400000;
+            if ((info.Attributes & unavailable) != 0 || info.Links != 1) throw new IOException("A cache file must be local, unlinked and available.");
+            return new FileStream(handle, FileAccess.Read);
+        }
+        catch { handle.Dispose(); throw; }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct FileInformation
+    {
+        public uint Attributes; public System.Runtime.InteropServices.ComTypes.FILETIME Creation, Access, Write;
+        public uint VolumeSerial, SizeHigh, SizeLow, Links, IndexHigh, IndexLow;
+    }
+    [DllImport("kernel32.dll", EntryPoint = "CreateFileW", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern SafeFileHandle CreateFile(string path, uint access, uint share, nint security, uint creation, uint flags, nint template);
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool GetFileInformationByHandle(SafeFileHandle handle, out FileInformation information);
 }
