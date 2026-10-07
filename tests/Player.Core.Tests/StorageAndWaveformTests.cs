@@ -108,8 +108,8 @@ public sealed class StorageAndWaveformTests : IDisposable
         var companions = new[] { "-wal", "-shm" }.Where(suffix => File.Exists(Database + suffix))
             .ToDictionary(suffix => suffix, suffix => File.ReadAllBytes(Database + suffix));
         DatabaseRecovery.Restore(Database, backup);
-        var preserved = Assert.Single(Directory.GetFiles(_directory, "library.db.preserved-*")
-            .Where(path => !path.EndsWith("-wal", StringComparison.Ordinal) && !path.EndsWith("-shm", StringComparison.Ordinal)));
+        var preserved = Assert.Single(Directory.GetFiles(_directory, "library.db.preserved-*"),
+            path => !path.EndsWith("-wal", StringComparison.Ordinal) && !path.EndsWith("-shm", StringComparison.Ordinal));
         Assert.Equal("preserve corrupted original", File.ReadAllText(preserved));
         foreach (var (suffix, bytes) in companions) Assert.Equal(bytes, File.ReadAllBytes(preserved + suffix));
         await using var restored = new SqlitePlayerStore(Database);
