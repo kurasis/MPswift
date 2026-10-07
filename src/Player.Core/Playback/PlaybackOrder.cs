@@ -27,7 +27,8 @@ public sealed class PlaybackOrder
         if (index >= 0 && entries.All(e => e.Id != _cursor)) _removed = Math.Min(index, entries.Length);
         var previous = _source.Select(e => e.Id).ToHashSet();
         _source = entries;
-        _remaining.RemoveAll(id => !Eligible().Any(e => e.Id == id));
+        var eligible = Eligible().Select(e => e.Id).ToHashSet();
+        _remaining.RemoveAll(id => !eligible.Contains(id));
         if (_shuffle)
             foreach (var entry in Eligible().Where(e => !previous.Contains(e.Id) && e.Id != _cursor))
                 _remaining.Insert(_random.Next(_remaining.Count + 1), entry.Id);
@@ -51,7 +52,10 @@ public sealed class PlaybackOrder
         if (_shuffle)
         {
             if (_remaining.Count == 0 && Repeat == RepeatMode.All) Refill(active?.Id);
-            following = _remaining.Select(id => _source.FirstOrDefault(e => e.Id == id)).OfType<PlaylistEntry>().ToArray();
+            var byId = new Dictionary<Guid, PlaylistEntry>();
+            // Preserve the first occurrence, as the previous FirstOrDefault lookup did.
+            foreach (var entry in _source) byId.TryAdd(entry.Id, entry);
+            following = _remaining.Select(id => byId.GetValueOrDefault(id)).OfType<PlaylistEntry>().ToArray();
         }
         else
         {
@@ -98,7 +102,8 @@ public sealed class PlaybackOrder
             state.HistoryIndex < -1 || state.HistoryIndex >= state.History.Length || state.Queue.Any(q => q.Id == Guid.Empty || q.Entry.Id == Guid.Empty) || state.Queue.Select(q => q.Id).Distinct().Count() != state.Queue.Length || state.Remaining.Distinct().Count() != state.Remaining.Length)
             throw new InvalidDataException("Invalid playback order state.");
         Repeat = state.Repeat; _shuffle = state.Shuffle; _queue.Clear(); _queue.AddRange(state.Queue);
-        _remaining.Clear(); _remaining.AddRange(state.Remaining.Where(id => _source.Any(e => e.Id == id && IsEligible(e))));
+        var eligible = Eligible().Select(e => e.Id).ToHashSet();
+        _remaining.Clear(); _remaining.AddRange(state.Remaining.Where(eligible.Contains));
         _history.Clear(); _history.AddRange(state.History); _historyIndex = state.HistoryIndex; _cursor = state.PlaylistCursorId; _removed = Math.Clamp(state.RemovedCursorIndex, 0, _source.Length);
     }
     private IEnumerable<PlaylistEntry> Eligible() => _source.Where(IsEligible);
