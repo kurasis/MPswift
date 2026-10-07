@@ -288,3 +288,8 @@ Run 37625963338 passes 284 tests on each OS, actual codec/long/mixer/stress and 
 ## Lossy profile and large-input investigation (2026-10-07)
 
 [Known profile observations](LOSSY_PROFILE_OBSERVATION_2026-10-07.md) now match actual Windows native EOF frame counts to independent MP3 skip/padding and Opus pre-skip/granule facts. Three exact-profile production mixer regressions are added; AAC presentation trim remains unimplemented and no universal/endpoint gapless claim is made. Available legacy APE encoder source uses 32-bit seek offsets, and official modern source pages returned HTTP 406; encoded >4 GiB APE remains unverified. Windows directory-occupied recovery keeps the existing IOException contract through no-follow directory entry inspection; genuine ACL denial keeps UnauthorizedAccessException.
+
+
+## Native sharing-control checkpoint (2026-10-07)
+
+Run 37629728524 passed 284 tests on both OSs, EN/RU WPF, actual ACL/lock/backup recovery, crash/migration/read-only/full-disk/watcher controls and all three known lossy mixer joins (maximum PCM error zero). Restricted native testing rejected the positive writer because it requested exclusive sharing against a held reader. Positive/negative writer probes now both grant ReadWrite/Delete sharing to isolate the guard's policy. Their source bytes remain untouched. Windows CI compiles the locked tool and runs the unchanged mandatory bounded security suite before lengthy managed/native UI checks, so filesystem/control failures surface sooner; all original release gates and permissions are retained.

@@ -19,7 +19,7 @@ internal static class StreamLifetimeValidation
         var wav = BassMixerGraph.OpenSource(new AudioRequest(Guid.NewGuid(), source)).Handle;
         try
         {
-            MustRefuse(() => { using var writer = File.OpenWrite(source); }, "Production WAV stream allowed writes.");
+            MustRefuse(() => { using var writer = File.Open(source, FileMode.Open, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete); }, "Production WAV stream allowed writes.");
             MustRefuse(() => File.Move(source, source + ".moved"), "Production WAV stream allowed replacement.");
             GC.Collect(); GC.WaitForPendingFinalizers();
             Check(Bass.ChannelSetPosition(wav, 0), "Pinned source seek failed.");
@@ -49,8 +49,8 @@ internal static class StreamLifetimeValidation
         float correctedError;
         try
         {
-            MustRefuse(() => { using var writer = File.OpenWrite(wv); }, "Production WavPack main file allowed writes.");
-            MustRefuse(() => { using var writer = File.OpenWrite(wvc); }, "Production WavPack correction allowed writes.");
+            MustRefuse(() => { using var writer = File.Open(wv, FileMode.Open, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete); }, "Production WavPack main file allowed writes.");
+            MustRefuse(() => { using var writer = File.Open(wvc, FileMode.Open, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete); }, "Production WavPack correction allowed writes.");
             MustRefuse(() => File.Move(wvc, wvc + ".moved"), "Production WavPack correction allowed replacement.");
             GC.Collect(); GC.WaitForPendingFinalizers();
             correctedError = Compare(corrected, reference);
@@ -68,7 +68,7 @@ internal static class StreamLifetimeValidation
         var linked = BassMixerGraph.OpenSource(new AudioRequest(Guid.NewGuid(), Path.Combine(Environment.CurrentDirectory, "linked-lifetime.wv"))).Handle;
         try
         {
-            MustRefuse(() => { using var writer = File.OpenWrite(wvc); }, "A local correction link bypassed target read sharing.");
+            MustRefuse(() => { using var writer = File.Open(wvc, FileMode.Open, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete); }, "A local correction link bypassed target read sharing.");
             Check(Compare(linked, reference) == 0, "Local correction link did not preserve exact PCM.");
         }
         finally { Check(NativeStreamPins.Free(linked), "Linked correction source release failed."); }

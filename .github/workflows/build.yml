@@ -30,6 +30,18 @@ jobs:
       - name: Provision pinned development native dependencies
         shell: pwsh
         run: ./scripts/Setup-Native.ps1
+      - name: Compile locked native security harness
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          dotnet restore tools/Player.AudioSmoke/Player.AudioSmoke.csproj --locked-mode
+          if ($LASTEXITCODE -ne 0) { throw 'Locked security-tool restore failed.' }
+          dotnet build tools/Player.AudioSmoke/Player.AudioSmoke.csproj -c Release --no-restore
+          if ($LASTEXITCODE -ne 0) { throw 'Security-tool build failed.' }
+      - name: Isolated bounded decoder mutation and file/DLL security checks
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/Security-Smoke.ps1
       - name: Locked restore, build and core tests
         shell: pwsh
         run: ./scripts/Build.ps1
@@ -37,10 +49,6 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: ./scripts/Smoke.ps1 -SkipBuild
-      - name: Isolated bounded decoder mutation and file/DLL security checks
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: ./scripts/Security-Smoke.ps1
       - name: Audit local portable development candidate
         shell: pwsh
         run: ./scripts/Package-Candidate.ps1 -SkipBuild

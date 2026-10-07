@@ -45,18 +45,18 @@ internal static class NativeFileSecurityValidation
         var renamed = directory + "-renamed";
         using (var lease = LocalReadLease.Open(source))
         {
-            MustRefuse(() => { using var writer = File.OpenWrite(source); }, "Read lease permitted source writes.");
+            MustRefuse(() => { using var writer = File.Open(source, FileMode.Open, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete); }, "Read lease permitted source writes.");
             MustRefuse(() =>
             { try { File.Move(source, source + ".moved"); } finally { if (File.Exists(source + ".moved")) File.Move(source + ".moved", source); } }, "Read lease permitted source replacement.");
             MustRefuse(() =>
             { try { Directory.Move(directory, renamed); } finally { if (Directory.Exists(renamed)) Directory.Move(renamed, directory); } }, "Read lease permitted directory replacement.");
         }
-        using (File.OpenWrite(source)) { } // No writes: disposal must release the lease.
+        using (File.Open(source, FileMode.Open, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete)) { } // No writes: disposal must release the lease.
         var alias = Path.Combine(directory, "alias.wav");
         if (!CreateHardLink(alias, source, 0)) throw new IOException("Owned hardlink control could not be created.");
         MustRefuse(() => { using var native = LocalReadLease.Open(alias, executable: true); }, "Executable hardlink was accepted.");
         using (var lease = LocalReadLease.Open(source))
-            MustRefuse(() => { using var writer = File.OpenWrite(alias); }, "A hardlink alias bypassed source read sharing.");
+            MustRefuse(() => { using var writer = File.Open(alias, FileMode.Open, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete); }, "A hardlink alias bypassed source read sharing.");
         File.Delete(alias);
         var link = Path.Combine(Environment.CurrentDirectory, "source-link.wav");
         using (var lease = LocalReadLease.Open(link)) Check(string.Equals(lease.Path, source, StringComparison.OrdinalIgnoreCase), "Local media link did not resolve to its pinned target.");

@@ -26,10 +26,10 @@ internal static class MutableDataSecurityValidation
         var regular = Path.Combine(root, "regular.db"); File.WriteAllText(regular, "owned regular bytes");
         using (var pin = DataFileLease.OpenExisting(regular, writableSharing: true))
         {
-            using (File.OpenWrite(regular)) { } // SQLite must retain write compatibility; this control writes no bytes.
+            using (File.Open(regular, FileMode.Open, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete)) { } // Model SQLite-compatible sharing; no bytes written.
             MustFail(() => File.Move(regular, regular + ".moved"));
         }
-        using (var pin = DataFileLease.OpenExisting(regular)) MustFail(() => { using var write = File.OpenWrite(regular); });
+        using (var pin = DataFileLease.OpenExisting(regular)) MustFail(() => { using var write = File.Open(regular, FileMode.Open, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete); });
         File.Move(regular, regular + ".moved"); File.Move(regular + ".moved", regular);
 
         var db = Path.Combine(root, "library.db"); var settings = Path.Combine(root, "settings.json");
@@ -42,8 +42,8 @@ internal static class MutableDataSecurityValidation
             {
                 if (count != 1) return;
                 MustFail(() => File.Delete(db)); MustFail(() => File.Move(db, db + ".moved"));
-                MustFail(() => { using var write = File.OpenWrite(db); });
-                MustFail(() => { using var write = File.OpenWrite(db + ".retained"); });
+                MustFail(() => { using var write = File.Open(db, FileMode.Open, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete); });
+                MustFail(() => { using var write = File.Open(db + ".retained", FileMode.Open, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete); });
                 throw new IOException("Owned interruption after first handle-based install.");
             });
         }
@@ -66,7 +66,7 @@ internal static class MutableDataSecurityValidation
             stream.WriteByte(42);
             var partial = Directory.GetFiles(root, "*.partial-*").Single();
             MustFail(() => File.Move(partial, partial + ".moved"));
-            MustFail(() => { using var writer = File.OpenWrite(partial); });
+            MustFail(() => { using var writer = File.Open(partial, FileMode.Open, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete); });
         });
         if (!File.ReadAllBytes(archive).SequenceEqual(new byte[] { 42 }) || Directory.GetFiles(root, "*.partial-*").Length != 0)
             throw new InvalidOperationException("Same-handle archive publication failed.");
