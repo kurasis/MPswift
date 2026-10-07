@@ -46,3 +46,8 @@ Tracked files contain no confirmed disposable temp/archive remnants. Fixture med
 | P3 | `src/Player.App/ViewModels/DiagnosticsViewModel.cs`, `Services/Audio/NativeDiagnostics.cs` | Public historical diagnostic types are not instantiated by the current composition root. | Absence of direct production references does not establish absence of external consumers; preserve the public interfaces requested by the owner. |
 
 Existing full Windows 11/physical Narrator/DPI, two-hour real-device output, listening/digital/full-profile and stable distribution acceptance remain open in the release documents. This audit does not claim to complete those gates.
+
+
+## Authorized completion follow-up
+
+The later specification-completion block resolves the paused DSP retention finding: smoothing now holds the exact previous filter state without referencing the previous processor's older smoothing chain. The public constructor and same mutable-filter behavior/20 ms output curve are retained. A 1000-edit weak-reference regression and an independent curve comparison pass. This supersedes the deferred DSP implementation note without rewriting historical audit evidence.

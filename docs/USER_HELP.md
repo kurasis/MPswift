@@ -30,7 +30,7 @@ A packaged `portable.marker` selects `Data/` beside the app; remove the marker b
 
 The database/settings backup action is separate from the disposable `Cache/Waveforms` directory. Never delete the database to clear cache. Corrupt/newer storage is preserved and rejected; choose a valid backup for recovery. Local diagnostic logs rotate at five 2 MiB files, with bounded buffering and personal path prefix redaction. Inspect the text before sharing; the app never uploads logs. A disk error remains visible even if logging itself cannot write.
 
-Package hashes are in SHA256SUMS.txt; `scripts/Verify-Candidate.ps1` in the source checkout audits the complete manifest. License metadata/notices are included under notices/, native/ and docs/. Their presence does not settle corresponding-source or commercial-use obligations. This candidate is unsigned; no public release was made. See RELEASE_ACCEPTANCE.md for the exact remaining acceptance list.
+Package hashes are in SHA256SUMS.txt; `scripts/Verify-Candidate.ps1` in the source checkout audits the complete manifest. License metadata/notices are included under notices/, native/ and docs/. Their presence does not settle corresponding-source or commercial-use obligations. This candidate is unsigned; development ZIP prereleases are available, while stable 1.0 acceptance remains open. See RELEASE_ACCEPTANCE.md for the exact remaining acceptance list.
 
 If settings are damaged or missing and a valid previous settings copy exists, startup offers explicit recovery. Choosing No exits without changing either copy. Recovery retains damaged settings under a separate `settings.json.preserved-*` name and restores the backup. Unsupported settings versions require a compatible application and are never silently downgraded. Database recovery remains a separate operation.
 
@@ -39,7 +39,7 @@ Use Backup in the action menu to save a complete local .zip containing playlists
 
 ## Settings and album headings
 
-Use the gear in the title bar to open Settings. Choose English or Russian (applies after restarting MPswift), show/hide album and folder headings, or choose close-to-tray behavior. Apply saves the choices; Cancel leaves them unchanged. The Sound section opens output device, EQ, ReplayGain and crossfade controls.
+Use the gear in the title bar to open Settings. Choose English or Russian (applies immediately after Apply), show/hide album and folder headings, or choose close-to-tray behavior. Apply saves the choices; Cancel leaves them unchanged. The Sound section opens output device, EQ, ReplayGain and crossfade controls.
 
 Dropping a folder onto the playlist tabs creates a playlist including its subfolders. Album headings use tags when present, otherwise folder names. Folder hints distinguish discs/subfolders, and counts reflect visible tracks. Search and reordering update headings without changing the playlist's playback order. The ellipsis menu groups playlist, selected-track, queue and file/backup actions.
 
@@ -58,3 +58,13 @@ The title bar and F1 help show the compiled version. Published builds use `0.2.<
 Right-click a playlist tab (or focus it and use Shift+F10) to rename, duplicate, delete, move, sort or export that playlist. Drag a tab before/after another tab; the amber marker shows where it will land. Hold near either edge to scroll overflowing tabs. Tab order is saved, and moving tabs keeps the playing source and queue. Dropping a music folder still creates a playlist.
 
 The waveform now shows measured average PCM energy as its solid envelope and quieter peak context. Short loud transients do not fill every column. Stereo channels are analyzed independently before combining energy; opposite-phase material stays visible. It follows source audio, independent of app volume/EQ. Old cached waveforms regenerate automatically; refresh remains available in the action menu.
+
+## Cache, startup and diagnostics
+
+Settings now include four accent colors, energy/peak waveform display, startup repeat/shuffle defaults and active-session/position restoration. Restored sessions keep their repeat/shuffle state; defaults apply to a new or disabled session restore. Playlists and ratings always remain saved; no startup option autoplays. File/folder dialogs remember their last local directories.
+
+Storage shows actual cache usage and a live 16–2048 MiB limit. Clear waveform cache removes only disposable peaks, including protection against earlier analysis refilling it. It preserves music, database, ratings and the waveform already on screen; another analysis regenerates peaks on demand. Local data/log locations are shown.
+
+Use Preview and copy diagnostics in Settings or the action menu. The report shows compiled/native/deployed-decoder, requested/actual output, DSP/gain/mute and logging details, with configured personal prefixes hidden. Inspect the preview before copying; nothing is sent automatically. Redaction is bounded and cannot recognize every personal string in an arbitrary exception.
+
+Remove duplicate entries is available from the playlist tab context menu and Playlist actions. The preview operates on the full playlist and keeps the first canonical-path/exact-CUE-bound occurrence; different songs within an album FLAC remain distinct. Cancel removes nothing. Confirmed removal affects playlist entries only, preserving source files/current playback/queued snapshots; a changed order requires a new preview. Power-state notifications pause/save the active session; playback resumes only after an explicit Play. Physical driver/sleep acceptance remains separate.

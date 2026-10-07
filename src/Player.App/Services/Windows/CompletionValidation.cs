@@ -22,7 +22,7 @@ internal static class CompletionValidation
         var source = model.SourcePlaylistId; var queue = model.Queue.Select(q => q.Id).ToArray();
         var data = ((App)Application.Current).DataDirectory;
         var database = Path.Combine(data, "library.db");
-        var beforeData = File.ReadAllBytes(database);
+        var beforeData = ReadSharedBytes(database);
         var preferences = new PreferencesWindow(window, model);
         preferences.Show(); await preferences.CacheRefreshCompletion.WaitAsync(TimeSpan.FromSeconds(15));
         try
@@ -32,7 +32,7 @@ internal static class CompletionValidation
             Check(preferences.IsVisible && model.WindowSettings.WaveformCacheMiB == settings.WaveformCacheMiB, "Invalid cache budget was silently clamped/applied.");
             preferences.ClearCacheButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); await preferences.CacheClearCompletion.WaitAsync(TimeSpan.FromSeconds(15));
             Check((await model.GetCacheUsageAsync()) is { Files: 0, Bytes: 0 }, "Cache clear left completed peak files.");
-            Check(File.ReadAllBytes(database).AsSpan().SequenceEqual(beforeData), "Cache clear changed the playlist database.");
+            Check(ReadSharedBytes(database).AsSpan().SequenceEqual(beforeData), "Cache clear changed the playlist database.");
             Check(model.Snapshot.EntryId == originalSnapshot.EntryId && model.Snapshot.State == originalSnapshot.State, "Cache management changed playback.");
         }
         finally { preferences.Close(); }
@@ -116,4 +116,12 @@ internal static class CompletionValidation
     }
     [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
     private static extern nint SendMessage(nint window, uint message, nint parameter, nint data);
+    private static byte[] ReadSharedBytes(string path)
+    {
+        // This compares an owned smoke database, not a backup of a live WAL database.
+        // SQLite keeps a read/write handle open, so our read must allow that existing owner.
+        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        if (stream.Length > 32 * 1024 * 1024) throw new InvalidDataException("Owned cache-check database is unexpectedly large.");
+        var bytes = new byte[checked((int)stream.Length)]; stream.ReadExactly(bytes); return bytes;
+    }
 }

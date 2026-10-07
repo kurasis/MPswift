@@ -31,7 +31,8 @@ internal static class LongFormatValidation
             {
                 Check(Bass.ChannelGetInfo(stream, out var info), "Long fixture format unavailable.");
                 var bytes = Bass.ChannelGetLength(stream); var duration = Bass.ChannelBytes2Seconds(stream, bytes);
-                Check(info.Frequency == fixture.GetProperty("sampleRate").GetInt32() && info.Channels == fixture.GetProperty("channels").GetInt32() && info.ChannelType.ToString() == fixture.GetProperty("codec").GetString(), "Long format facts differ.");
+                Check(info.Frequency == fixture.GetProperty("sampleRate").GetInt32() && info.Channels == fixture.GetProperty("channels").GetInt32() && info.ChannelType.ToString() == fixture.GetProperty("codec").GetString(),
+                    $"Long format facts differ: {name}; actual {info.Frequency} Hz/{info.Channels} channels/{info.ChannelType}; expected {fixture.GetProperty("sampleRate")}/{fixture.GetProperty("channels")}/{fixture.GetProperty("codec")}; duration {duration:R}.");
                 Check(Math.Abs(duration - fixture.GetProperty("durationSeconds").GetDouble()) < .1, "Long duration truncated or inflated.");
                 var ranges = new List<object>(); var buffer = new float[4096];
                 foreach (var position in new[] { .25, 3600.25, 7199.25 })
