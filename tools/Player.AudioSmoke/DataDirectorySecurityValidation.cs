@@ -45,8 +45,27 @@ internal static class DataDirectorySecurityValidation
         Directory.Delete(alias); Directory.Move(actual, actual + "-moved"); Directory.Move(actual + "-moved", actual);
         Directory.Move(parent, parent + "-moved"); Directory.Move(parent + "-moved", parent);
         if (new SettingsFile(Path.Combine(actual, "nested")).Load().Volume != 47) throw new InvalidOperationException("Settings lost after released-directory controls.");
+        var stage = Path.Combine(actual, "stage-clean");
+        var stageLease = DataDirectoryLease.Create(stage);
+        File.WriteAllText(Path.Combine(stage, "library.db"), "generated database");
+        File.WriteAllText(Path.Combine(stage, "library.db.owner.lock"), "generated ownership file");
+        MustFail(() => Directory.Move(stage, stage + "-moved"));
+        BackupStageCleanup.Clean(stage, stageLease);
+        if (Directory.Exists(stage)) throw new InvalidOperationException("Flat staging directory was not removed.");
+
+        var unexpected = Path.Combine(actual, "stage-unexpected");
+        var unexpectedLease = DataDirectoryLease.Create(unexpected);
+        File.WriteAllText(Path.Combine(unexpected, "library.db"), "generated database");
+        var nested = Directory.CreateDirectory(Path.Combine(unexpected, "unexpected-album"));
+        var sentinel = Path.Combine(nested.FullName, "keep.txt"); File.WriteAllText(sentinel, "owned sentinel");
+        MustFail(() => BackupStageCleanup.Clean(unexpected, unexpectedLease));
+        if (File.Exists(Path.Combine(unexpected, "library.db")) || File.ReadAllText(sentinel) != "owned sentinel")
+            throw new InvalidOperationException("Staging cleanup traversed unexpected data or missed generated metadata.");
+        Directory.Move(unexpected, unexpected + "-moved"); Directory.Move(unexpected + "-moved", unexpected);
+        Directory.Move(parent, parent + "-moved"); Directory.Move(parent + "-moved", parent);
         return new { RequestedLinkPinned = true, ReparseWriteOpenBlocked = true, PhysicalDirectoryPinned = true, AncestorPinned = true, LocalDirectoryLinksSupported = true,
-            SettingsAndCacheRoundTrip = true, ReplacementWorksAfterDispose = true, StoredDataPreserved = true };
+            SettingsAndCacheRoundTrip = true, ReplacementWorksAfterDispose = true, StoredDataPreserved = true,
+            StagingDirectoryPinned = true, FlatStageRemoved = true, UnexpectedStageDataRetained = true, FailedCleanupHandlesReleased = true };
     }
     private static SafeFileHandle OpenReparseForWrite(string path)
     {

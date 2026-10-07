@@ -1,5 +1,11 @@
 # Requirement and acceptance status
 
+## Backup staging follow-up (2026-10-07)
+
+Observed baseline `51e85d3213b2` / `0.2.76-dev.1`: [main run 37610865422](https://github.com/kurasis/MPswift/actions/runs/37610865422) passed all three jobs, 263 tests on each OS, all 216 bounded parser cases, restricted Windows cache/directory controls, EN/RU/extracted WPF and package verification. This supersedes older pending notes for that exact baseline. The downloaded ZIP, 577-file/13-native inventory and compiled versions were independently verified.
+
+Two owned-data regressions reproduced destructive cleanup of unexpected flat/nested staging contents. The correction deletes generated metadata under the retained directory pin, then requests only nonrecursive empty-root removal; unknown contents and original/cleanup failure causes are preserved. Archive hashing/copying retain the same source handles, and extraction computes SHA-256 while writing. The corrected locked build passes **270 tests**, zero failures/skips/warnings/errors. APIs, formats, source audio and pinned dependencies remain intact. Changed-source restricted Windows/native/WPF/extracted-package checks remain mandatory before publication. [Findings, evidence and narrow residual scope](BACKUP_STAGING_2026-10-07.md).
+
 ## File continuity follow-up (2026-10-07)
 
 Baseline `bb8ef75fa034`/`0.2.73-dev.1` main run 37605822384 passed 258 tests on each OS, all 216 parser cases, EN/RU/extracted WPF and package verification. This follow-up uses one validated handle for cache reads/LRU touches, rejects linked Windows cache entries, reserves new SQLite backup/recovery destinations atomically and gates temporary cleanup on successful creation. Baseline linked-cache regression failed; corrected locked Release checks pass **263 tests**, zero failures/skips/warnings/errors. Public APIs, formats, source audio and pinned dependencies remain intact. New restricted-token Windows link/timestamp controls and existing native/WPF/package checks await this source CI. [Finding, hardening distinction and residual boundaries](FILE_CONTINUITY_2026-10-07.md).

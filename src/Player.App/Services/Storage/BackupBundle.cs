@@ -13,7 +13,12 @@ public static class BackupBundle
     private const long MaximumDatabaseBytes = 2L * 1024 * 1024 * 1024;
     public sealed record Item(string Path, long Bytes, string Sha256);
     public sealed record Manifest(int SchemaVersion, Item[] Files);
-    private static string Hash(string path) { using var file = File.OpenRead(path); return Convert.ToHexString(SHA256.HashData(file)).ToLowerInvariant(); }
+    private static string Hash(Stream file)
+    {
+        var hash = Convert.ToHexString(SHA256.HashData(file)).ToLowerInvariant();
+        file.Position = 0;
+        return hash;
+    }
     public static async Task CreateAsync(IPlayerStore store, PlayerSettings settings, string destination)
     {
         destination = Path.GetFullPath(destination);
@@ -24,21 +29,29 @@ public static class BackupBundle
         var ownsTemporary = false;
         if (File.Exists(destination) || Directory.Exists(destination)) throw new IOException("Choose a new backup filename; existing files are never overwritten.");
         var stageLease = DataDirectoryLease.Create(stage);
+        Exception? failure = null;
         try
         {
             await store.BackupAsync(Path.Combine(stage, "library.db"));
             await Task.Run(() =>
             {
                 SettingsFile.Export(Path.Combine(stage, "settings.json"), settings);
-                var items = new[] { "library.db", "settings.json" }.Select(name => new Item(name, new FileInfo(Path.Combine(stage, name)).Length, Hash(Path.Combine(stage, name)))).ToArray();
-                if (items[0].Bytes > MaximumDatabaseBytes) throw new IOException("Backup database exceeds the 2 GiB archive limit; original data preserved.");
-                if (items[1].Bytes > 65536) throw new IOException("Backup settings exceed the 64 KiB limit; original data preserved.");
+                using var database = File.OpenRead(Path.Combine(stage, "library.db"));
+                using var settingsFile = File.OpenRead(Path.Combine(stage, "settings.json"));
+                if (database.Length > MaximumDatabaseBytes) throw new IOException("Backup database exceeds the 2 GiB archive limit; original data preserved.");
+                if (settingsFile.Length > 65536) throw new IOException("Backup settings exceed the 64 KiB limit; original data preserved.");
+                var files = new[] { database, settingsFile };
+                var items = new[] { "library.db", "settings.json" }.Select((name, index) => new Item(name, files[index].Length, Hash(files[index]))).ToArray();
                 using (var file = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
                 {
                     ownsTemporary = true;
                     using (var zip = new ZipArchive(file, ZipArchiveMode.Create, true))
                     {
-                        foreach (var item in items) zip.CreateEntryFromFile(Path.Combine(stage, item.Path), item.Path, CompressionLevel.Optimal);
+                        for (var index = 0; index < items.Length; index++)
+                        {
+                            using var entry = zip.CreateEntry(items[index].Path, CompressionLevel.Optimal).Open();
+                            files[index].CopyTo(entry); // Hash and archive use the same retained read handle.
+                        }
                         using var manifest = zip.CreateEntry("manifest.json").Open();
                         JsonSerializer.Serialize(manifest, new Manifest(1, items));
                     }
@@ -47,7 +60,8 @@ public static class BackupBundle
                 File.Move(temporary, destination);
             });
         }
-        finally { stageLease.Dispose(); if (ownsTemporary && File.Exists(temporary)) File.Delete(temporary); Directory.Delete(stage, true); }
+        catch (Exception error) { failure = error; throw; }
+        finally { FinishStage(stage, stageLease, failure, ownsTemporary ? temporary : null); }
     }
     public static async Task RestoreAsync(string directory, string archive)
     {
@@ -55,6 +69,7 @@ public static class BackupBundle
         directory = directoryLease.DirectoryPath;
         var stage = Path.Combine(directory, ".player-restore-" + Guid.NewGuid().ToString("N"));
         var stageLease = DataDirectoryLease.Create(stage);
+        Exception? failure = null;
         try
         {
             await Task.Run(() => ExtractValidated(archive, stage));
@@ -62,7 +77,21 @@ public static class BackupBundle
             await using (var validator = new SqlitePlayerStore(Path.Combine(stage, "library.db"))) await validator.LoadAsync();
             await Task.Run(() => Install(directory, stage));
         }
-        finally { stageLease.Dispose(); Directory.Delete(stage, true); }
+        catch (Exception error) { failure = error; throw; }
+        finally { FinishStage(stage, stageLease, failure); }
+    }
+    private static void FinishStage(string stage, DataDirectoryLease lease, Exception? failure, string? temporary = null)
+    {
+        var cleanupErrors = new List<Exception>();
+        try { if (temporary is not null && File.Exists(temporary)) File.Delete(temporary); }
+        catch (Exception cleanup) when (cleanup is IOException or UnauthorizedAccessException) { cleanupErrors.Add(cleanup); }
+        try { BackupStageCleanup.Clean(stage, lease); }
+        catch (Exception cleanup) when (cleanup is IOException or UnauthorizedAccessException) { cleanupErrors.Add(cleanup); }
+        if (cleanupErrors.Count != 0)
+        {
+            if (failure is not null) cleanupErrors.Insert(0, failure);
+            throw new AggregateException("Backup cleanup failed; retained staging data may require review.", cleanupErrors);
+        }
     }
     private static void ExtractValidated(string archive, string stage)
     {
@@ -93,12 +122,18 @@ public static class BackupBundle
             if (item.Bytes <= 0 || item.Bytes > maximum || entry.Length != item.Bytes || item.Sha256 is null || item.Sha256.Length != 64) throw new InvalidDataException("Backup file size/hash declaration invalid.");
             var path = Path.Combine(stage, item.Path);
             using (var input = entry.Open()) using (var output = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+            using (var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256))
             {
                 var buffer = new byte[65536]; long copied = 0; int read;
-                while ((read = input.Read(buffer)) != 0) { copied += read; if (copied > item.Bytes) throw new InvalidDataException("Backup expanded beyond its declared size."); output.Write(buffer, 0, read); }
+                while ((read = input.Read(buffer)) != 0)
+                {
+                    copied += read;
+                    if (copied > item.Bytes) throw new InvalidDataException("Backup expanded beyond its declared size.");
+                    output.Write(buffer, 0, read); hash.AppendData(buffer, 0, read);
+                }
                 if (copied != item.Bytes) throw new InvalidDataException("Backup file truncated."); output.Flush(true);
+                if (Convert.ToHexString(hash.GetHashAndReset()).ToLowerInvariant() != item.Sha256) throw new InvalidDataException("Backup checksum mismatch.");
             }
-            if (Hash(path) != item.Sha256) throw new InvalidDataException("Backup checksum mismatch.");
         }
         new SettingsFile(stage).Load();
         using var database = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = Path.Combine(stage, "library.db"), Mode = SqliteOpenMode.ReadOnly, Pooling = false }.ToString());

@@ -34,3 +34,8 @@ Still open: main database/settings mutable-file hardlinks and WAL companions, pr
 
 
 The owned Linux .NET 10.0.12 timestamp control also confirmed unchanged symbolic target metadata and changed shared hardlink metadata, with unchanged bytes. The official [pal_time.c](https://github.com/dotnet/runtime/blob/v10.0.12/src/native/libs/System.Native/pal_time.c) uses AT_SYMLINK_NOFOLLOW for path setters. The original regression only observed linked cache acceptance before failing its first assertion; no target timestamp change is inferred from that failure. [Exact owned control](evidence/file-time-control-linux.json). Windows hardlink/rejection/regeneration results still require the corrected source run.
+
+
+## Observed completion and subsequent staging work
+
+[Run 37610865422](https://github.com/kurasis/MPswift/actions/runs/37610865422) at `51e85d3213b210f2715ce148712f541aedef078f` passed all three jobs, 263 tests per OS, 216 parser cases, corrected Windows symbolic/hardlink controls, EN/RU/extracted WPF and package checks. The verified ZIP was `0.2.76-dev.1`, with 577 inventoried files and 13 native libraries. This observation supersedes this report's historical pre-CI pending statements. A [subsequent backup staging follow-up](BACKUP_STAGING_2026-10-07.md) removes recursive staging traversal and uses continuous hash/copy handles. Full handle-relative install/rollback and mutable-file identity protection remain open.

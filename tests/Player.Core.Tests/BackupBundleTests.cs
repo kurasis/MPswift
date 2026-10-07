@@ -54,6 +54,37 @@ public sealed class BackupBundleTests : IDisposable
         await using var store = new SqlitePlayerStore(Path.Combine(Source, "library.db")); await store.LoadAsync();
         await Assert.ThrowsAsync<IOException>(() => BackupBundle.CreateAsync(store, _settings, Archive)); Assert.Equal(before, File.ReadAllBytes(Archive));
     }
+    [Fact]
+    public async Task SchemaOneBundleMigratesAndCleansItsGeneratedSnapshot()
+    {
+        await CreateAsync();
+        var copy = Path.Combine(_directory, "legacy.db");
+        using (var zip = ZipFile.Open(Archive, ZipArchiveMode.Update))
+        {
+            using (var input = zip.GetEntry("library.db")!.Open()) using (var output = File.Create(copy)) input.CopyTo(output);
+            using (var database = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = copy, Pooling = false }.ToString()))
+            {
+                database.Open(); using var command = database.CreateCommand();
+                command.CommandText = "DROP TABLE MediaIndex; DROP TABLE LibraryRoots; DROP TABLE TrackStatistics; DROP TABLE ListeningHistory; ALTER TABLE PlaylistEntries DROP COLUMN AddedUtcTicks; PRAGMA user_version=1";
+                command.ExecuteNonQuery();
+            }
+            var bytes = File.ReadAllBytes(copy);
+            var manifest = JsonSerializer.Deserialize<BackupBundle.Manifest>(Read(zip.GetEntry("manifest.json")!))!;
+            manifest = manifest with { Files = manifest.Files.Select(item => item.Path == "library.db" ? item with
+                { Bytes = bytes.Length, Sha256 = Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant() } : item).ToArray() };
+            zip.GetEntry("library.db")!.Delete(); using (var entry = zip.CreateEntry("library.db").Open()) entry.Write(bytes);
+            Rewrite(zip, "manifest.json", JsonSerializer.Serialize(manifest));
+        }
+
+        await BackupBundle.RestoreAsync(Target, Archive);
+
+        Assert.Empty(Directory.GetDirectories(Target));
+        Assert.Equal(_settings.Language, new SettingsFile(Target).Load().Language);
+        await using var restored = new SqlitePlayerStore(Path.Combine(Target, "library.db"));
+        Assert.Equal(_state.Session, (await restored.LoadAsync()).Session);
+        using var check = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = Path.Combine(Target, "library.db"), Mode = SqliteOpenMode.ReadOnly, Pooling = false }.ToString());
+        check.Open(); using var version = check.CreateCommand(); version.CommandText = "PRAGMA user_version"; Assert.Equal(2L, version.ExecuteScalar());
+    }
     [Theory]
     [InlineData("checksum")]
     [InlineData("duplicate")]

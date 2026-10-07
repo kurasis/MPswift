@@ -1,0 +1,82 @@
+{
+  "baselineCommit": "51e85d3213b210f2715ce148712f541aedef078f",
+  "baselineWindowsRun": "https://github.com/kurasis/MPswift/actions/runs/37610865422",
+  "scope": "Owned-data managed tests on Linux; changed Windows controls require disposable source CI",
+  "baselineBuild": {
+    "file": "_a35019e5777b_2026-10-07_11_15_20_net10.0.trx",
+    "sha256": "7385817c41eca3af735e2fa81c6f03c6cab39179eaefed842b90503d0805d0b6",
+    "counters": {
+      "total": "263",
+      "executed": "263",
+      "passed": "263",
+      "failed": "0",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    }
+  },
+  "baselineRegression": {
+    "file": "backup-stage-baseline.trx",
+    "sha256": "fc27c2dd719e6448613c6eed4cdfca1fadf96ec477eea5c364cf2e1e2134dde9",
+    "counters": {
+      "total": "2",
+      "executed": "2",
+      "passed": "0",
+      "failed": "2",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    }
+  },
+  "correctedBuild": {
+    "file": "_a35019e5777b_2026-10-07_11_25_46_net10.0.trx",
+    "sha256": "8618e903825d8135b64baa3fede89fb058934ea2832b1df20bb0ff662d98575a",
+    "counters": {
+      "total": "270",
+      "executed": "270",
+      "passed": "270",
+      "failed": "0",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    }
+  },
+  "warnings": 0,
+  "errors": 0,
+  "baselineRegressionMeaning": "Unexpected flat and nested stage sentinels were deleted; no deterministic Windows name-race exploit is inferred",
+  "testedSources": {
+    "src/Player.App/Services/Storage/BackupBundle.cs": "bea78eb87c4817489829170f1361505a90c810e8122eb7749151a78974e3a6e2",
+    "src/Player.App/Services/Storage/BackupStageCleanup.cs": "b4eb9bf9f0251c2850f8c7033fea7aa6aab704f7ea6dbc8c4a29fa0b578daf06",
+    "tests/Player.Core.Tests/BackupStageCleanupTests.cs": "3482b66cf4d963c80a3e29fe578b921b65a2a4fe8486b033d35eda0ca35585fb",
+    "tests/Player.Core.Tests/BackupBundleTests.cs": "cf1ed128dfb48840cca8326b3b70adcc5f35249ef4c756e3e3dcc72ec3147c44",
+    "tools/Player.AudioSmoke/DataDirectorySecurityValidation.cs": "40f57658512b2baaf244bdcc4311a6f2242f5b0a84e6697f93c9bec7e143ee3b",
+    "tools/Player.AudioSmoke/Player.AudioSmoke.csproj": "a5e83c73c505dbcba1d709cfe10ad284d19437636420d7c6a671d136b9597142"
+  }
+}
