@@ -20,6 +20,10 @@ try {
     }
     [IO.File]::AppendAllText($help, 'owned-tamper-probe'); Require-Rejection 'changed file'; $checks += 'changed file'
     [IO.File]::WriteAllBytes($help, $original)
+    $license = Join-Path $app 'notices/TagLibSharp/2.3.0/COPYING'
+    $originalLicense = [IO.File]::ReadAllBytes($license)
+    [IO.File]::Delete($license); Require-Rejection 'missing LGPL license'; $checks += 'missing LGPL license'
+    [IO.File]::WriteAllBytes($license, $originalLicense)
     [IO.File]::Delete($help); Require-Rejection 'missing file'; $checks += 'missing file'
     [IO.File]::WriteAllBytes($help, $original)
     [IO.File]::WriteAllText((Join-Path $app 'private-user.db'), 'owned-extra-probe'); Require-Rejection 'extra file'; $checks += 'extra file'

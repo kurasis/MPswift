@@ -15,7 +15,10 @@
         "bass.txt"
       ],
       "license": "Proprietary; see upstream license text",
-      "distributionApproved": false
+      "distributionApproved": false,
+      "companionSha256": {
+        "bass.txt": "e2a6a97c41892f9df78c367e7901cbe2262843e80edd23882b721f50f7a9de4b"
+      }
     },
     {
       "name": "bassmix",
@@ -30,7 +33,10 @@
         "bassmix.txt"
       ],
       "license": "Proprietary; see upstream license text",
-      "distributionApproved": false
+      "distributionApproved": false,
+      "companionSha256": {
+        "bassmix.txt": "dd73aab53b8358ad941054617691fe53ce92939aebb6f1cc927de0344e9f6bd3"
+      }
     },
     {
       "name": "basswasapi",
@@ -45,7 +51,10 @@
         "basswasapi.txt"
       ],
       "license": "Proprietary; see upstream license text",
-      "distributionApproved": false
+      "distributionApproved": false,
+      "companionSha256": {
+        "basswasapi.txt": "711e15fbb19a0032278d9ff8fc510aaa7c17761e7314ef7b742599aac8e0f745"
+      }
     },
     {
       "name": "bassflac",
@@ -61,7 +70,10 @@
       ],
       "isDecoder": true,
       "license": "See upstream companion terms; distribution review pending",
-      "distributionApproved": false
+      "distributionApproved": false,
+      "companionSha256": {
+        "bassflac.txt": "228227cb203ccff945f18cf5e1240681103e4beaf26aa0e8fb0bef1932b81b49"
+      }
     },
     {
       "name": "bassopus",
@@ -77,7 +89,10 @@
       ],
       "isDecoder": true,
       "license": "See upstream companion terms; distribution review pending",
-      "distributionApproved": false
+      "distributionApproved": false,
+      "companionSha256": {
+        "bassopus.txt": "61f4bec13162e133c6d029eb3bc10075a412dab4ebb94d7c21bc5468fe9204ca"
+      }
     },
     {
       "name": "bassalac",
@@ -93,7 +108,10 @@
       ],
       "isDecoder": true,
       "license": "See upstream companion terms; distribution review pending",
-      "distributionApproved": false
+      "distributionApproved": false,
+      "companionSha256": {
+        "bassalac.txt": "57df6bfd0b31dd4f963aa4c2a71872e632f73741190d7387e8ddb6d60ea26660"
+      }
     },
     {
       "name": "bass_aac",
@@ -110,7 +128,11 @@
       ],
       "isDecoder": true,
       "license": "See upstream companion terms; distribution review pending",
-      "distributionApproved": false
+      "distributionApproved": false,
+      "companionSha256": {
+        "gpl.txt": "ddb9db7630752f8fdc6898f7c99a99eaeeac5213627ecb093df9c82f56175dc7",
+        "readme.txt": "c67d9db2494523873be5889f9dae7621651c0f287532a4869fb1993000c3850f"
+      }
     },
     {
       "name": "basswma",
@@ -127,7 +149,10 @@
       "license": "Proprietary; BASS upstream terms; development only",
       "distributionApproved": false,
       "systemDependency": "Windows Media Format modules; optional-component-free/Windows N support not established",
-      "isDecoder": true
+      "isDecoder": true,
+      "companionSha256": {
+        "basswma.txt": "a0bf8639d49da1410a29e67f637a00f1836e250ce15c28eadb762780110abb97"
+      }
     },
     {
       "name": "bassape",
@@ -143,7 +168,10 @@
       ],
       "license": "Proprietary; BASS upstream terms; development only",
       "distributionApproved": false,
-      "isDecoder": true
+      "isDecoder": true,
+      "companionSha256": {
+        "bassape.txt": "34fbf1952a5bab9748a44846635d555252e23f6e1cbabd39dc5b6107b2f9cd57"
+      }
     },
     {
       "name": "basswv",
@@ -159,7 +187,10 @@
       ],
       "license": "Proprietary; BASS upstream terms; development only",
       "distributionApproved": false,
-      "isDecoder": true
+      "isDecoder": true,
+      "companionSha256": {
+        "basswv.txt": "7ed46ed1f088ba834e150dafdf28ed9904aac1e0de5615152eddd163f6df8922"
+      }
     },
     {
       "name": "bassdsd",
@@ -175,7 +206,10 @@
       ],
       "license": "Proprietary; BASS upstream terms; development only",
       "distributionApproved": false,
-      "isDecoder": true
+      "isDecoder": true,
+      "companionSha256": {
+        "bassdsd.txt": "06ab33aaaca00b45b254ce44a5c0174685a2b092f559e8ffe8fb86982ce58da1"
+      }
     },
     {
       "name": "bass_mpc",
@@ -191,7 +225,10 @@
       ],
       "license": "See upstream accompanying license; development only, distribution review pending",
       "distributionApproved": false,
-      "isDecoder": true
+      "isDecoder": true,
+      "companionSha256": {
+        "bass_mpc/readme.txt": "aeec1a4b6e382f3788439955870a8d6a46e10c848e1d77c0d60b6ee2cadf2505"
+      }
     },
     {
       "name": "bass_tta",
@@ -208,7 +245,11 @@
       ],
       "license": "See upstream accompanying license; development only, distribution review pending",
       "distributionApproved": false,
-      "isDecoder": true
+      "isDecoder": true,
+      "companionSha256": {
+        "bass_tta/lgpl.txt": "5df07007198989c622f5d41de8d703e7bef3d0e79d62e24332ee739a452af62a",
+        "bass_tta/readme.txt": "7655a06083404bd3e3e564dbd889a4c5901c94aa410c6a9d4226d7605222162c"
+      }
     }
   ]
 }

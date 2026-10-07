@@ -36,7 +36,7 @@ SHA-256 of each official archive and x64 DLL is recorded in `native/manifest.jso
 
 **AAC gate:** the actual downloaded `readme.txt` states GPL distribution and identifies FAAD2/Nero commercial licensing. Merely loading this DLL dynamically is not distribution clearance. Before a release, select an owner-approved compatible source/license and corresponding-source path or replace this candidate with a licensed, verified bundled decoder. The owner now authorizes development ZIP publication; licensing purchases and full license acceptance remain separate.
 
-TagLibSharp's declared **LGPL-2.1-only** terms require a matching-source and replaceability/relinking/notice review for the actual distributed package. Final notices and corresponding-source provision are not prepared yet. Microsoft.Data.Sqlite includes SQLitePCLRaw/native SQLite dependencies: inventory those exact binaries and terms when packaging. Self-contained .NET/WPF runtime notices also belong in the actual release inventory.
+TagLibSharp's declared **LGPL-2.1-only** terms require a matching-source and replaceability/relinking/notice review for the actual distributed package. Pinned release COPYING/AUTHORS are now retained; complete corresponding-source and replacement/relinking acceptance remain open. Microsoft.Data.Sqlite includes SQLitePCLRaw/native SQLite dependencies: inventory those exact binaries and terms when packaging. Self-contained .NET/WPF runtime notices also belong in the actual release inventory.
 
 Development-only xUnit 2.9.3, runner 4.0.0 and Microsoft.NET.Test.Sdk 18.10.1 are pinned in the central package file and test lock. .NET SDK 10.0.401 and Linux PowerShell 7.6.6 are build tools, not app runtime dependencies. No third-party icon packs or downloaded fonts are used. Segoe UI is the existing Windows font.
 
@@ -56,3 +56,8 @@ The WPF target is `net10.0-windows10.0.19041.0`, with `WindowsSdkPackageVersion`
 ## Stage G candidate inventory
 
 Package-Candidate reads the app's restored project.assets.json and actual framework download dependencies, retaining **14** resolved managed/runtime/projection declarations plus available top-level LICENSE/NOTICE/COPYING texts. Native companions remain beside their pinned DLLs. The actual package inventory is dependency-inventory.json, file identities/sizes/SHA-256 are package-manifest.json and SHA256SUMS.txt, and the outer ZIP has a separate checksum. Files unavailable from a NuGet archive are not invented: expressions/license URLs remain declared metadata, with distributionReview pending. The Windows SDK targeting pack declares its SDK license URL; actual projection/WinRT redistribution obligations still require review. Existing corresponding-source/app-license/intended-use gates remain open. Successful main CI now publishes a separately tagged development ZIP with its inventory and checksums, as explicitly requested by the owner.
+
+
+## G13 notice preparation
+
+Missing Microsoft.Data.Sqlite/Core MIT and SQLitePCLRaw Apache LICENSE/NOTICE plus TagLibSharp LGPL COPYING/AUTHORS are now included from independently identified pinned upstream commits. Native companion texts receive original-archive SHA-256 checks. Actual inventory retains supplemental provenance, copyright, repository and license type. [Completed work, reproducible checks and unresolved rights/source decisions](DISTRIBUTION_REVIEW.md). This preparation does not close AC-035 or select the owner application license.

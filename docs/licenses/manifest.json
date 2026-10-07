@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "distributionApproved": false,
+  "files": [
+    {
+      "path": "dotnet-sqlite/LICENSE.txt",
+      "fileName": "LICENSE.txt",
+      "packages": [
+        "Microsoft.Data.Sqlite/10.0.12",
+        "Microsoft.Data.Sqlite.Core/10.0.12"
+      ],
+      "sourceUrl": "https://raw.githubusercontent.com/dotnet/dotnet/95017c711e6afc1085133d440e42b4bd78155701/src/efcore/LICENSE.txt",
+      "sourceCommit": "95017c711e6afc1085133d440e42b4bd78155701",
+      "sha256": "ae48df11a335dc1a615f4f938b69cba73bcf4485c4f97af49b38efb0f216353b",
+      "bytes": 1115
+    },
+    {
+      "path": "sqlitepclraw/LICENSE.TXT",
+      "fileName": "LICENSE.TXT",
+      "packages": [
+        "SQLitePCLRaw.bundle_e_sqlite3/2.1.12",
+        "SQLitePCLRaw.core/2.1.12",
+        "SQLitePCLRaw.lib.e_sqlite3/2.1.12",
+        "SQLitePCLRaw.provider.e_sqlite3/2.1.12"
+      ],
+      "sourceUrl": "https://raw.githubusercontent.com/ericsink/SQLitePCL.raw/ca835d21508bff43121c65081035840ac5006c4c/LICENSE.TXT",
+      "sourceCommit": "ca835d21508bff43121c65081035840ac5006c4c",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "bytes": 11358
+    },
+    {
+      "path": "sqlitepclraw/NOTICE.TXT",
+      "fileName": "NOTICE.TXT",
+      "packages": [
+        "SQLitePCLRaw.bundle_e_sqlite3/2.1.12",
+        "SQLitePCLRaw.core/2.1.12",
+        "SQLitePCLRaw.lib.e_sqlite3/2.1.12",
+        "SQLitePCLRaw.provider.e_sqlite3/2.1.12"
+      ],
+      "sourceUrl": "https://raw.githubusercontent.com/ericsink/SQLitePCL.raw/ca835d21508bff43121c65081035840ac5006c4c/NOTICE.TXT",
+      "sourceCommit": "ca835d21508bff43121c65081035840ac5006c4c",
+      "sha256": "485b276b3d2bfaa26df348e1e5c84df3648981e09b88531a6a53006f0705c24b",
+      "bytes": 9756
+    },
+    {
+      "path": "taglibsharp/COPYING",
+      "fileName": "COPYING",
+      "packages": [
+        "TagLibSharp/2.3.0"
+      ],
+      "sourceUrl": "https://raw.githubusercontent.com/mono/taglib-sharp/b5ae84f2e84087bf160bb0471420200dd2b5d809/COPYING",
+      "sourceCommit": "b5ae84f2e84087bf160bb0471420200dd2b5d809",
+      "sha256": "6095e9ffa777dd22839f7801aa845b31c9ed07f3d6bf8a26dc5d2dec8ccc0ef3",
+      "bytes": 26432
+    },
+    {
+      "path": "taglibsharp/AUTHORS",
+      "fileName": "AUTHORS",
+      "packages": [
+        "TagLibSharp/2.3.0"
+      ],
+      "sourceUrl": "https://raw.githubusercontent.com/mono/taglib-sharp/b5ae84f2e84087bf160bb0471420200dd2b5d809/AUTHORS",
+      "sourceCommit": "b5ae84f2e84087bf160bb0471420200dd2b5d809",
+      "sha256": "90da58ec1980154bd38d9991b314dc2db9a3e8526df77ccdf8b936871231db41",
+      "bytes": 717
+    }
+  ]
+}

@@ -42,7 +42,9 @@ jobs:
         run: ./scripts/Package-Candidate.ps1 -SkipBuild
       - name: Reject modified, missing and extra candidate files
         shell: pwsh
-        run: ./scripts/Test-CandidateIntegrity.ps1
+        run: |
+          ./scripts/Test-LicenseTexts.ps1
+          ./scripts/Test-CandidateIntegrity.ps1
       - name: Run extracted self-contained app from Unicode path
         if: runner.os == 'Windows'
         shell: pwsh

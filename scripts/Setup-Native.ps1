@@ -17,7 +17,9 @@ foreach ($library in $manifest.libraries) {
     $valid = (Test-Path $target) -and ((Get-FileHash $target -Algorithm SHA256).Hash -eq $library.sha256)
     foreach ($companion in $library.requiredCompanionFiles) {
         if ($companion -notin @("$($library.name).txt", 'gpl.txt', 'readme.txt', "$($library.name)/readme.txt", "$($library.name)/lgpl.txt")) { throw 'Unexpected companion name.' }
-        if (-not (Test-Path (Join-Path $destination $companion))) { $valid = $false }
+        $companionPath = Join-Path $destination $companion
+        if ($library.companionSha256.PSObject.Properties.Name -notcontains $companion) { throw 'Missing pinned native companion hash.' }
+        if (-not (Test-Path $companionPath) -or (Get-FileHash $companionPath -Algorithm SHA256).Hash.ToLowerInvariant() -ne $library.companionSha256.$companion) { $valid = $false }
     }
     if ($valid) { Write-Host "$($library.name): verified retained files"; continue }
     $archivePath = Join-Path $cache "$($library.name).zip"
@@ -45,6 +47,7 @@ foreach ($library in $manifest.libraries) {
             if ($null -eq $entry) { throw "Missing upstream license/documentation: $companion" }
             New-Item (Split-Path (Join-Path $destination $companion) -Parent) -ItemType Directory -Force | Out-Null
             [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, (Join-Path $destination $companion), $true)
+            if ((Get-FileHash (Join-Path $destination $companion) -Algorithm SHA256).Hash.ToLowerInvariant() -ne $library.companionSha256.$companion) { throw 'Native companion checksum mismatch.' }
         }
         Copy-Item $staging $target -Force
         Write-Host "$($library.name) $($library.version): archive, DLL SHA-256 and x64 architecture verified"

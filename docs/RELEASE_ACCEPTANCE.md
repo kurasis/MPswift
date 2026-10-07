@@ -31,3 +31,6 @@ Build uses locked restore. Package creation uses a fresh owned staging folder, a
 For each AC record: source commit; package SHA-256; exact OS build; standard-user status; CPU/RAM/storage; runtime/device/driver; dataset and source hashes; cold/warm state; start/end UTC; precise steps; measured values/capture paths; passed/failed/blocked/not-run; deviations and remaining issue. Never replace an unavailable workflow with a passed placeholder. Keep owner music and personal paths outside committed evidence.
 
 Run Verify-Candidate on a copied/extracted candidate. For a negative integrity check, change only an owned candidate copy and confirm verification fails, then re-extract. Do not alter source music. Back up owned test databases before crash/full-disk scenarios. File association setup and installer/signing remain separately requested work.
+
+
+G13 notice completeness/provenance preparation is implemented; [distribution review](DISTRIBUTION_REVIEW.md) separates the retained MIT/Apache/LGPL/native original texts from unresolved owner rights and complete corresponding-source/relinking/SDK evidence. AC-035 is not accepted by this change.

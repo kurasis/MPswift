@@ -27,6 +27,7 @@ try {
     Copy-Item docs/DESKTOP_ACCEPTANCE.md (Join-Path $app 'docs/DESKTOP_ACCEPTANCE.md')
     Copy-Item docs/AUDIO_ACCEPTANCE.md (Join-Path $app 'docs/AUDIO_ACCEPTANCE.md')
     Copy-Item docs/STRESS_ACCEPTANCE.md (Join-Path $app 'docs/STRESS_ACCEPTANCE.md')
+    Copy-Item docs/DISTRIBUTION_REVIEW.md (Join-Path $app 'docs/DISTRIBUTION_REVIEW.md')
     'Explicit portable data location; created only on first normal launch.' | Set-Content (Join-Path $app 'portable.marker') -Encoding utf8
     'DEVELOPMENT BUILD. FULL STAGE G ACCEPTANCE IS INCOMPLETE. See docs/RELEASE_ACCEPTANCE.md and docs/THIRD_PARTY_NOTICES.md.' | Set-Content (Join-Path $app 'DEVELOPMENT-ONLY.txt') -Encoding utf8
     $assets = Get-Content src/Player.App/obj/project.assets.json -Raw | ConvertFrom-Json -AsHashtable
@@ -44,6 +45,7 @@ try {
         }
     }
     $inventory = @()
+    $licenseTexts = @(& "$PSScriptRoot/Verify-LicenseTexts.ps1")
     foreach ($identity in ($packages.Keys | Sort-Object)) {
         $folder = $null
         foreach ($cache in $assets.packageFolders.Keys) {
@@ -57,12 +59,16 @@ try {
         $metadata = $xml.SelectSingleNode('/*[local-name()="package"]/*[local-name()="metadata"]')
         $license = $metadata.SelectSingleNode('*[local-name()="license"]')
         $url = $metadata.SelectSingleNode('*[local-name()="licenseUrl"]')
+        $copyright = $metadata.SelectSingleNode('*[local-name()="copyright"]')
+        $repository = $metadata.SelectSingleNode('*[local-name()="repository"]')
         $noticeFolder = Join-Path $app ('notices/' + $identity)
         New-Item $noticeFolder -ItemType Directory -Force | Out-Null
         Copy-Item $nuspec.FullName $noticeFolder
         $texts = @(Get-ChildItem $folder -File | Where-Object { $_.Name -match '(?i)license|notice|copying' })
         foreach ($text in $texts) { Copy-Item $text.FullName $noticeFolder }
-        $inventory += [ordered]@{ identity = $identity; declaration = ('notices/' + $identity + '/' + $nuspec.Name); license = $(if ($license) { $license.InnerText } else { $null }); licenseUrl = $(if ($url) { $url.InnerText } else { $null }); accompanyingTexts = @($texts | ForEach-Object { $_.Name }); distributionReview = 'pending; metadata is not legal clearance' }
+        $supplements = @($licenseTexts | Where-Object { $identity -cin $_.packages })
+        foreach ($text in $supplements) { Copy-Item (Join-Path $root ('docs/licenses/' + $text.path)) (Join-Path $noticeFolder $text.fileName) }
+        $inventory += [ordered]@{ identity = $identity; declaration = ('notices/' + $identity + '/' + $nuspec.Name); license = $(if ($license) { $license.InnerText } else { $null }); licenseType = $(if ($license) { $license.GetAttribute('type') } else { $null }); licenseUrl = $(if ($url) { $url.InnerText } else { $null }); copyright = $(if ($copyright) { $copyright.InnerText } else { $null }); repositoryUrl = $(if ($repository) { $repository.GetAttribute('url') } else { $null }); repositoryCommit = $(if ($repository) { $repository.GetAttribute('commit') } else { $null }); accompanyingTexts = @(@($texts | ForEach-Object { $_.Name }) + @($supplements | ForEach-Object { $_.fileName }) | Sort-Object -Unique); supplementalTextSources = @($supplements); distributionReview = 'pending; metadata is not legal clearance' }
     }
     $inventory | ConvertTo-Json -Depth 6 | Set-Content (Join-Path $app 'dependency-inventory.json') -Encoding utf8
     $native = Get-Content native/manifest.json -Raw | ConvertFrom-Json

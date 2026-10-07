@@ -39,7 +39,24 @@ foreach ($required in @('MPswift.exe','coreclr.dll','PresentationFramework.dll',
     if (-not $expected.ContainsKey($required)) { throw "Required candidate file absent: $required" }
 }
 $native = Get-Content (Join-Path $directory 'native/manifest.json') -Raw | ConvertFrom-Json
+$inventory = @(Get-Content (Join-Path $directory 'dependency-inventory.json') -Raw | ConvertFrom-Json)
+foreach ($dependency in $inventory) {
+    # Older candidates retain their original inventory; new supplemental records must match actual retained bytes.
+    if ($dependency.PSObject.Properties.Name -notcontains 'supplementalTextSources') { continue }
+    foreach ($text in $dependency.supplementalTextSources) {
+        if ($dependency.identity -cnotin $text.packages -or $text.fileName -notmatch '^[A-Za-z0-9._-]+$') { throw 'Invalid supplemental license-text identity.' }
+        $relative = 'notices/' + $dependency.identity + '/' + $text.fileName
+        if (-not $expected.ContainsKey($relative) -or (Get-FileHash (Join-Path $directory $relative) -Algorithm SHA256).Hash.ToLowerInvariant() -ne $text.sha256) { throw "Missing/modified supplemental license text: $relative" }
+    }
+}
 foreach ($library in $native.libraries) {
+    if ($library.PSObject.Properties.Name -contains 'companionSha256') {
+        foreach ($companion in $library.requiredCompanionFiles) {
+            if ($library.companionSha256.PSObject.Properties.Name -notcontains $companion) { throw 'Missing native companion pin.' }
+            $relative = 'native/win-x64/' + $companion
+            if (-not $expected.ContainsKey($relative) -or (Get-FileHash (Join-Path $directory $relative) -Algorithm SHA256).Hash.ToLowerInvariant() -ne $library.companionSha256.$companion) { throw "Native companion mismatch: $companion" }
+        }
+    }
     $path = Join-Path $directory "native/win-x64/$($library.fileName)"
     if ((Get-FileHash $path -Algorithm SHA256).Hash.ToLowerInvariant() -ne $library.sha256) { throw "Native manifest mismatch: $($library.name)" }
     $bytes = [IO.File]::ReadAllBytes($path); $offset = [BitConverter]::ToInt32($bytes, 0x3c)

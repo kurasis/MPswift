@@ -1,0 +1,2 @@
+# Preserve upstream notice bytes and whitespace exactly, including on Windows checkouts.
+docs/licenses/** -text -whitespace
