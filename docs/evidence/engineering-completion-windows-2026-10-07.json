@@ -1,0 +1,106 @@
+{
+  "observedDateUtc": "2026-10-07",
+  "sourceCommit": "e118f3e691b0df46b23b7513510e6843fedc60a3",
+  "runUrl": "https://github.com/kurasis/MPswift/actions/runs/37654713897",
+  "runAttempt": 1,
+  "jobs": [
+    {
+      "id": 112906770016,
+      "name": "Windows rebuilt TagLib replacement proof",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37654713897/job/112906770016",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 112906770228,
+      "name": "build (windows-2022)",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37654713897/job/112906770228",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 112906770360,
+      "name": "build (ubuntu-24.04)",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37654713897/job/112906770360",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 112909601856,
+      "name": "Publish separate Windows ZIP prerelease",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37654713897/job/112909601856",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "normalTests": {
+    "linux": 299,
+    "windows": 299,
+    "failed": 0,
+    "skipped": 0
+  },
+  "replacementReportSha256": "fed963373b4508b85a6a9c3e1f0808d2abf380432403b7d945a796e17e223413",
+  "replacement": {
+    "Status": "taglib-windows-replacement-passed",
+    "SourceCommit": "e118f3e691b0df46b23b7513510e6843fedc60a3",
+    "Windows": "Microsoft Windows NT 10.0.20348.0",
+    "Scope": "Owned build-output copies; real EN/RU WPF metadata/native workflow; no shipped dependency replacement",
+    "CoreTestsExerciseTagLib": false,
+    "SourceDistributionApproved": false,
+    "UpstreamCommit": "b5ae84f2e84087bf160bb0471420200dd2b5d809",
+    "SourceArchiveSha256": "ab6fab7e22c7423e428f591d7525a38ca283d217a49f9772eb9a29cd682c175d",
+    "SourceInventorySha256": "a34580b6959c4a61c030249821b0fc799c876ce669f73ead494365bad616a529",
+    "SourcePackagesLockSha256": "e8213dd837c889188707359c5845881bb8980bae988b3736177614e58aa52a41",
+    "Sdk": "10.0.401",
+    "AssemblyIdentity": "TagLibSharp, Version=2.3.0.0, Culture=neutral, PublicKeyToken=db62eba44689b5b0",
+    "OriginalDllSha256": "dad93b152d55cf6a58b2037bcf9dd34b45d87761fe5ed61a232b3d4641d2a5d3",
+    "RebuiltDllSha256": "0306938b180b1110075c7cf289d36867cf483329485caf52bd81f1f3cc278684",
+    "CoreTests": {
+      "Passed": 299,
+      "Skipped": 0,
+      "Failed": 0,
+      "Total": 299,
+      "TrxSha256": "deae92f6421f1bf5c9ebb30f2c3a868afde8170b073378f81fce7a7ecd47338d"
+    },
+    "Wpf": [
+      {
+        "ReportSha256": "ab70e49017874887ebf6a5b50bc5772dc119fe71ffd8daa387e2c0fbcf7024f3",
+        "BindingErrors": 0,
+        "Language": "en",
+        "Status": "ui-smoke-passed",
+        "LoadedTagLib": {
+          "Identity": "TagLibSharp, Version=2.3.0.0, Culture=neutral, PublicKeyToken=db62eba44689b5b0",
+          "RelativePath": "TagLibSharp.dll",
+          "Sha256": "0306938b180b1110075c7cf289d36867cf483329485caf52bd81f1f3cc278684"
+        }
+      },
+      {
+        "ReportSha256": "e792303c6cb5a5522fd8eeb76d7ecc9c9536eebcabbc1f460b65317b411a4691",
+        "BindingErrors": 0,
+        "Language": "ru",
+        "Status": "ui-smoke-passed",
+        "LoadedTagLib": {
+          "Identity": "TagLibSharp, Version=2.3.0.0, Culture=neutral, PublicKeyToken=db62eba44689b5b0",
+          "RelativePath": "TagLibSharp.dll",
+          "Sha256": "0306938b180b1110075c7cf289d36867cf483329485caf52bd81f1f3cc278684"
+        }
+      }
+    ],
+    "OriginalDllAndFixturesUnchanged": true
+  },
+  "resourceShutdown": "Normal EN/RU and extracted WPF pass real native/waveform/store/PNG post-release fault controls",
+  "boundedParserCases": 216,
+  "secretFamilies": 6,
+  "limits": "Real Windows EN/RU WPF loaded-library compatibility evidence; not bit-for-bit NuGet reproduction, source distribution approval, commercial grant, physical output or exhaustive safety.",
+  "publishedZip": {
+    "zipUrl": "https://github.com/kurasis/MPswift/releases/download/build-37654713897-attempt-1/MPswift-0.2.90-dev.1-e118f3e691b0-win-x64.zip",
+    "bytes": 85847449,
+    "sha256": "dc29c53afc3520f7d98201fea1b605a3b27d94ee9387e6965139ae0cb1b81922"
+  },
+  "independentCandidateInventory": {
+    "files": 578,
+    "nativeX64": 13,
+    "allHashesVerified": true,
+    "distributionApproved": false
+  }
+}

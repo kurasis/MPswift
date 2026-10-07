@@ -1,6 +1,6 @@
 # SQLite snapshot-copy investigation and proposed plan (2026-10-07)
 
-The owner approved a five-minute soft deadline. The [implementation and targeted controls](ENGINEERING_COMPLETION_2026-10-07.md) now cover backup, recovery and the additional pre-schema-migration copy through DatabaseSnapshotCopy. Copies use 128-page steps; unfinished native copies roll back. Existing immediate native contention errors remain. The planned UI cancellation/retry changes are not introduced.
+The owner approved a five-minute soft deadline. The [implementation and targeted controls](ENGINEERING_COMPLETION_2026-10-07.md) now cover backup, recovery and the additional pre-schema-migration copy through DatabaseSnapshotCopy. Copies use 128-page steps; unfinished native copies roll back. Source-specific Windows/native/package checks now pass in run 37654713897. Existing immediate native contention errors remain. The planned UI cancellation/retry changes are not introduced.
 
 ## Verified source behavior
 
