@@ -64,22 +64,37 @@ public sealed class MediaSessionService : IDisposable
     private async void UpdateArtwork()
     {
         var generation = ++_artGeneration;
+        InMemoryRandomAccessStream? next = null;
+        Exception? failure = null;
         try
         {
-            var next = new InMemoryRandomAccessStream();
+            next = new InMemoryRandomAccessStream();
             if (_model.CoverArt is BitmapSource image)
             {
-                var png = new PngBitmapEncoder(); png.Frames.Add(BitmapFrame.Create(image));
-                using var bytes = new System.IO.MemoryStream(); png.Save(bytes);
-                using var writer = new DataWriter(next.GetOutputStreamAt(0)); writer.WriteBytes(bytes.ToArray()); await writer.StoreAsync(); writer.DetachStream(); next.Seek(0);
-                if (_disposed || generation != _artGeneration) { next.Dispose(); return; }
+                await WriteArtworkAsync(next, image);
+                if (_disposed || generation != _artGeneration) { return; }
                 _controls.DisplayUpdater.Thumbnail = RandomAccessStreamReference.CreateFromStream(next);
             }
             else _controls.DisplayUpdater.Thumbnail = null;
-            if (_disposed || generation != _artGeneration) { next.Dispose(); return; }
-            _controls.DisplayUpdater.Update(); var old = _artwork; _artwork = next; old?.Dispose();
+            if (_disposed || generation != _artGeneration) { return; }
+            _controls.DisplayUpdater.Update(); var old = _artwork; _artwork = next; next = null; old?.Dispose();
         }
-        catch (Exception error) { if (!_disposed) _model.Details = error.Message; }
+        catch (Exception error) { failure = error; }
+        finally
+        {
+            try { next?.Dispose(); }
+            catch (Exception error) { failure = failure is null ? error : new AggregateException(failure, error); }
+            if (failure is not null && !_disposed) _model.Details = failure.Message;
+        }
+    }
+    internal static async Task WriteArtworkAsync(InMemoryRandomAccessStream destination, BitmapSource image)
+    {
+        var png = new PngBitmapEncoder(); png.Frames.Add(BitmapFrame.Create(image));
+        using var bytes = new System.IO.MemoryStream(); png.Save(bytes);
+        using (var output = destination.GetOutputStreamAt(0))
+        using (var writer = new DataWriter(output))
+        { writer.WriteBytes(bytes.ToArray()); await writer.StoreAsync(); writer.DetachStream(); }
+        destination.Seek(0);
     }
     public bool MetadataMatches(PlayerViewModel model) => _controls.DisplayUpdater.MusicProperties.Title == model.Title && _controls.DisplayUpdater.MusicProperties.Artist == model.Artist;
     public void Dispose()

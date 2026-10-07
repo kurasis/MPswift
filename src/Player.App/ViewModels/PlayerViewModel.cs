@@ -819,7 +819,16 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         try { if (save) await SaveNowAsync(); }
         catch { _closing = false; _player.SnapshotChanged += OnSnapshot; _coordinator.OrderChanged += OnOrderChanged; throw; }
         foreach (var row in _knownRows.Values) { row.EligibilityChanged -= RowChanged; row.RatingChanged -= RatingChanged; }
-        _watcher.Dispose(); await _waveforms.DisposeAsync(); await _coordinator.DisposeAsync(); await _store.DisposeAsync();
-        _waveCancellation?.Dispose(); _saveCancellation?.Dispose();
+        var failures = new List<Exception>();
+        void Release(IDisposable? resource)
+        { try { resource?.Dispose(); } catch (Exception error) { failures.Add(error); } }
+        async Task ReleaseAsync(IAsyncDisposable resource)
+        { try { await resource.DisposeAsync(); } catch (Exception error) { failures.Add(error); } }
+        Release(_watcher);
+        await ReleaseAsync(_waveforms); await ReleaseAsync(_coordinator); await ReleaseAsync(_store);
+        Release(_scanCancellation); Release(_artCancellation); Release(_importCancellation);
+        Release(_waveCancellation); Release(_saveCancellation);
+        if (failures.Count == 1) System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(failures[0]).Throw();
+        if (failures.Count > 1) throw new AggregateException("Player resource shutdown failed.", failures);
     }
 }

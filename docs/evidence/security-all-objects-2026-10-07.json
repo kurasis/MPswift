@@ -1,0 +1,22 @@
+{
+  "checkedUtc": "2026-10-07T16:32:07.568028+00:00",
+  "baselineCommit": "c216afe2ae7aa55fd276ed2aa5bf50a9a560fbff",
+  "scope": "All locally present Git blobs including unreachable/unpushed and binary bytes, plus current nonignored working files. Bounded reads overlap for cross-boundary matches; no matched values printed.",
+  "gitObjects": 2088,
+  "gitBlobs": 1137,
+  "gitBlobBytes": 53060380,
+  "workingFiles": 329,
+  "workingBytes": 41042079,
+  "families": [
+    "github-classic",
+    "github-fine-grained",
+    "aws-access-key-id",
+    "slack-token",
+    "google-api-key",
+    "private-key-pem"
+  ],
+  "positiveControlsPassed": 6,
+  "findings": [],
+  "skippedWorkingPaths": [],
+  "limitations": "Not remote-only/unavailable server objects, arbitrary/custom/obfuscated secrets, rotation or GitHub settings. A pattern match requires review; absence is not complete secrecy proof."
+}

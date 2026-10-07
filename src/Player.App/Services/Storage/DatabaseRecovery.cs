@@ -49,7 +49,7 @@ public static class DatabaseRecovery
                 ownsTemporary = true;
                 if (OperatingSystem.IsWindows()) identity = DataFileLease.Identify(reserved.SafeFileHandle);
                 using var target = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = temporary, Mode = SqliteOpenMode.ReadWrite, Pooling = false }.ToString());
-                target.Open(); source.BackupDatabase(target);
+                target.Open(); DatabaseSnapshotCopy.Copy(source, target);
                 copiedPin = DataFileLease.OpenExisting(temporary, writableSharing: true) ?? throw new FileNotFoundException("Owned recovery copy is unavailable.");
             }
             using var frozen = DataFileLease.OpenExisting(temporary) ?? throw new FileNotFoundException("Owned recovery copy is unavailable.");

@@ -27,6 +27,14 @@ jobs:
           global-json-file: global.json
           cache: true
           cache-dependency-path: '**/packages.lock.json'
+      - name: Read-only secret-pattern controls and current local Git scan
+        shell: pwsh
+        run: |
+          python ./scripts/Test-SecretAudit.py
+          if ($LASTEXITCODE -ne 0) { throw 'Secret-pattern negative/positive controls failed.' }
+          New-Item artifacts/smoke -ItemType Directory -Force | Out-Null
+          python ./scripts/Check-Secrets.py --output artifacts/smoke/secret-patterns.json
+          if ($LASTEXITCODE -ne 0) { throw 'Secret-pattern findings require review.' }
       - name: Provision pinned development native dependencies
         shell: pwsh
         run: ./scripts/Setup-Native.ps1

@@ -1,6 +1,6 @@
 # SQLite snapshot-copy investigation and proposed plan (2026-10-07)
 
-No production copy behavior or new refusal/time limit is introduced in this follow-up.
+The owner approved a five-minute soft deadline. The [implementation and targeted controls](ENGINEERING_COMPLETION_2026-10-07.md) now cover backup, recovery and the additional pre-schema-migration copy through DatabaseSnapshotCopy. Copies use 128-page steps; unfinished native copies roll back. Existing immediate native contention errors remain. The planned UI cancellation/retry changes are not introduced.
 
 ## Verified source behavior
 
@@ -15,4 +15,4 @@ The [official SQLite API](https://www.sqlite.org/c3ref/backup_finish.html) docum
 3. Preserve current successful valid backup/restore content, schema and public APIs. BUSY/LOCKED handling must have an explicit bounded retry policy; new cancellation/refusal UI must clearly expose the cause.
 4. Verify actual large owned databases, concurrent writers/held locks, cancellation between steps, native failure/finish rollback and post-failure reopening. Cover both backup and frozen restore snapshots, keeping current mutable-file/atomic-install controls.
 
-The page loop can improve responsiveness but does not establish a hard wall-clock guarantee. A hard deadline against stalled native I/O would require a separate process and a larger design. Before implementing maximum duration, retry/refusal or UI cancellation behavior, obtain the owner's agreement under the repository's functional-change rule. Exact policy/durations remain a decision; production code is unchanged pending it.
+The page loop can improve responsiveness but does not establish a hard wall-clock guarantee. A hard deadline against stalled native I/O would require a separate process and a larger design. Maximum duration was explicitly approved as five minutes and is implemented between steps. New retry or UI cancellation behavior would still require agreement. One stalled native call is outside a hard wall-clock guarantee.

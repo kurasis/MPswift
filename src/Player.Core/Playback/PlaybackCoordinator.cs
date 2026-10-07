@@ -202,8 +202,11 @@ public sealed class PlaybackCoordinator : IAsyncDisposable
         Task advance;
         lock (_gate) { _disposed = true; ++_intent; advance = _advance; }
         _player.SnapshotChanged -= OnSnapshot;
-        await _player.StopAsync().ConfigureAwait(false);
-        await advance.ConfigureAwait(false);
-        await _player.DisposeAsync().ConfigureAwait(false);
+        var failures = new List<Exception>();
+        try { await _player.StopAsync().ConfigureAwait(false); } catch (Exception error) { failures.Add(error); }
+        try { await advance.ConfigureAwait(false); } catch (Exception error) { failures.Add(error); }
+        try { await _player.DisposeAsync().ConfigureAwait(false); } catch (Exception error) { failures.Add(error); }
+        if (failures.Count == 1) System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(failures[0]).Throw();
+        if (failures.Count > 1) throw new AggregateException("Playback shutdown failed.", failures);
     }
 }

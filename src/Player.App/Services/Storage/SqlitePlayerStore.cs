@@ -116,7 +116,7 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
         // Reserve atomically, retaining the name while native SQLite opens/copies the same empty file.
         using var reserved = new FileStream(destination, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.ReadWrite);
         using var backup = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = destination, Mode = SqliteOpenMode.ReadWrite, Pooling = false }.ToString());
-        backup.Open(); connection.BackupDatabase(backup); return true;
+        backup.Open(); DatabaseSnapshotCopy.Copy(connection, backup); return true;
     });
     internal Task CheckpointAsync() => Queue(() =>
     {
