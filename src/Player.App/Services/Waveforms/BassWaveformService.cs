@@ -9,7 +9,7 @@ using Player.Core.Waveforms;
 
 namespace Player.App.Services.Waveforms;
 
-public sealed class BassWaveformService : IWaveformService
+public sealed class BassWaveformService : IWaveformService, IWaveformCacheControl
 {
     private readonly BlockingCollection<Job> _jobs = new(1);
     private readonly Dictionary<string, Job> _inflight = [];
@@ -23,6 +23,9 @@ public sealed class BassWaveformService : IWaveformService
         _cache = cache;
         new Thread(Run) { IsBackground = true, Priority = ThreadPriority.BelowNormal, Name = "Player waveform analysis" }.Start();
     }
+    public Task<WaveformCacheUsage> GetCacheUsageAsync() => Task.Run(_cache.GetUsage);
+    public Task SetCacheBudgetAsync(long bytes) => Task.Run(() => _cache.SetBudget(bytes));
+    public Task ClearCacheAsync() => Task.Run(_cache.Clear);
     public Task<WaveformData> AnalyzeAsync(string path, IProgress<double>? progress, CancellationToken cancellationToken, bool refresh = false)
     {
         // Validation/stat/cache work also stays off the dispatcher.
@@ -43,7 +46,7 @@ public sealed class BassWaveformService : IWaveformService
                     _active?.Cancellation.Cancel();
                     if (_jobs.TryTake(out var pending))
                     { pending.Cancellation.Cancel(); pending.Completion.TrySetCanceled(); _inflight.Remove(pending.Key); pending.Cancellation.Dispose(); }
-                    job = new Job(path, key, file.Length, file.LastWriteTimeUtc.Ticks, refresh);
+                    job = new Job(path, key, file.Length, file.LastWriteTimeUtc.Ticks, refresh, _cache.Epoch);
                     _inflight[key] = job;
                     if (!_jobs.TryAdd(job)) throw new IOException("Waveform worker queue is unavailable.");
                 }
@@ -72,7 +75,7 @@ public sealed class BassWaveformService : IWaveformService
                         var file = new FileInfo(job.Path);
                         if (file.Length != job.Size || file.LastWriteTimeUtc.Ticks != job.Modified) throw new IOException("Source changed during waveform analysis.");
                         // A cache write failure must not discard a valid in-memory waveform.
-                        try { _cache.Write(job.Key, data); } catch (Exception error) when (error is IOException or UnauthorizedAccessException) { }
+                        try { _cache.WriteIfCurrent(job.Key, data, job.CacheEpoch); } catch (Exception error) when (error is IOException or UnauthorizedAccessException) { }
                     }
                     job.Completion.TrySetResult(data);
                 }
@@ -130,13 +133,14 @@ public sealed class BassWaveformService : IWaveformService
         }
         return new(_exit.Task);
     }
-    private sealed class Job(string path, string key, long size, long modified, bool refresh)
+    private sealed class Job(string path, string key, long size, long modified, bool refresh, long cacheEpoch)
     {
         public string Path { get; } = path;
         public string Key { get; } = key;
         public long Size { get; } = size;
         public long Modified { get; } = modified;
         public bool Refresh { get; } = refresh;
+        public long CacheEpoch { get; } = cacheEpoch;
         public CancellationTokenSource Cancellation { get; } = new();
         public TaskCompletionSource<WaveformData> Completion { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         public List<IProgress<double>> Progress { get; } = [];

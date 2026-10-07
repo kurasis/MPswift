@@ -42,12 +42,26 @@ public sealed record PlayerSettings(int SchemaVersion = 1, double Volume = 50, b
     int WaveformCacheMiB = 512, double WindowWidth = 840, double WindowHeight = 860, AudioProcessingSettings? Processing = null, AudioOutputSettings? Output = null,
     string Language = "en", bool CloseToTray = false, double? WindowLeft = null, double? WindowTop = null, bool WindowMaximized = false, bool ShowAlbumSections = true, int CueCodePage = 1251)
 {
+    public string Accent { get; init; } = "amber";
+    public string WaveformStyle { get; init; } = "energy";
+    public RepeatMode DefaultRepeat { get; init; } = RepeatMode.Off;
+    public bool DefaultShuffle { get; init; }
+    public bool RestoreSession { get; init; } = true;
+    public bool RestorePosition { get; init; } = true;
+    public string? LastFileDirectory { get; init; }
+    public string? LastFolderDirectory { get; init; }
+
     public PlayerSettings Validate()
     {
         if (SchemaVersion != 1) throw new InvalidDataException("Unsupported settings schema. Original settings were preserved.");
         return this with
         {
             Language = Language is "en" or "ru" ? Language : "en",
+            Accent = Accent is "amber" or "blue" or "green" or "violet" ? Accent : "amber",
+            WaveformStyle = WaveformStyle is "energy" or "peaks" ? WaveformStyle : "energy",
+            DefaultRepeat = Enum.IsDefined(DefaultRepeat) ? DefaultRepeat : RepeatMode.Off,
+            LastFileDirectory = ValidateDirectory(LastFileDirectory),
+            LastFolderDirectory = ValidateDirectory(LastFolderDirectory),
             CueCodePage = CueCodePage is 0 or 1251 or 1252 or 866 ? CueCodePage : 1251,
             WindowLeft = WindowLeft is { } left && double.IsFinite(left) && Math.Abs(left) <= 32768 ? left : null,
             WindowTop = WindowTop is { } top && double.IsFinite(top) && Math.Abs(top) <= 32768 ? top : null,
@@ -58,5 +72,11 @@ public sealed record PlayerSettings(int SchemaVersion = 1, double Volume = 50, b
             WindowWidth = double.IsFinite(WindowWidth) ? Math.Clamp(WindowWidth, 640, 7680) : 840,
             WindowHeight = double.IsFinite(WindowHeight) ? Math.Clamp(WindowHeight, 520, 4320) : 860
         };
+    }
+    private static string? ValidateDirectory(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return null;
+        try { return Player.Core.Media.LocalMediaPath.Parse(value.TrimEnd('\\', '/') + "\\directory-validation").Value[..^"directory-validation".Length]; }
+        catch (ArgumentException) { return null; }
     }
 }

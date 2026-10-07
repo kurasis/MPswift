@@ -61,11 +61,22 @@ internal static class CustomizationValidation
             dialog.LanguageBox.SelectedIndex = language == "ru" ? 0 : 1;
             dialog.AlbumSectionsBox.IsChecked = !before.ShowAlbumSections;
             dialog.CloseToTrayBox.IsChecked = !before.CloseToTray;
+            dialog.AccentBox.SelectedIndex = before.Accent == "blue" ? 2 : 1;
+            dialog.CacheBudgetBox.Text = "64";
+            dialog.WaveformStyleBox.SelectedIndex = 1;
+            dialog.RepeatDefaultBox.SelectedValue = Player.Core.Playback.RepeatMode.One;
+            dialog.ShuffleDefaultBox.IsChecked = true;
+            dialog.RestoreSessionBox.IsChecked = !before.RestoreSession;
+            dialog.RestorePositionBox.IsChecked = !before.RestorePosition;
             dialog.ApplyButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             await dialog.ApplyCompletion.WaitAsync(TimeSpan.FromSeconds(15));
             var saved = new Storage.SettingsFile(((App)Application.Current).DataDirectory).Load();
             Check(saved.Language != before.Language && saved.ShowAlbumSections != before.ShowAlbumSections && saved.CloseToTray != before.CloseToTray,
                 "Settings Apply did not persist language/grouping/close behavior.");
+            Check(saved.Accent != before.Accent && saved.WaveformCacheMiB == 64 && saved.RestoreSession != before.RestoreSession && saved.RestorePosition != before.RestorePosition,
+                "Settings Apply lost accent, cache budget or restoration preferences.");
+            Check(saved.WaveformStyle == "peaks" && model.UsePeakWaveform && saved.DefaultRepeat == Player.Core.Playback.RepeatMode.One && saved.DefaultShuffle, "Waveform style or playback defaults were lost.");
+            Check((await model.GetCacheUsageAsync())?.BudgetBytes == 64L * 1024 * 1024, "Cache budget did not apply to the running service.");
             await Idle();
             Check(!dialog.IsVisible && model.Message == Strings.PreferencesSaved && Strings.Culture.TwoLetterISOLanguageName != language,
                 "Language did not change immediately after Apply.");
@@ -84,14 +95,14 @@ internal static class CustomizationValidation
         finally
         {
             if (dialog.IsVisible) dialog.Close();
-            model.WindowSettings = before; await model.SaveNowAsync();
+            await model.SavePreferencesAsync(before);
             Strings.SetLanguage(before.Language); model.RefreshLanguage(); await Idle();
         }
         var canceled = new PreferencesWindow(window, model);
         canceled.Show(); canceled.AlbumSectionsBox.IsChecked = !before.ShowAlbumSections; canceled.Close();
         Check(model.WindowSettings.ShowAlbumSections == before.ShowAlbumSections, "Cancel applied a draft preference.");
         return new { Status = "customization-passed", CompactMenu = true, KeyboardSubmenu = true, NestedAction = true,
-            LocalizedSettingsShortcut = true, SettingsPersisted = true, DraftCancel = true, PlaybackPreserved = true,
+            LocalizedSettingsShortcut = true, SettingsPersisted = true, AccentPersisted = true, RuntimeCacheBudget = true, RestorationPreferences = true, DraftCancel = true, PlaybackPreserved = true,
             LanguageChange = "immediate; persisted across restarts", UniformVectorIcons = true, VisibleBuildVersion = Player.Core.ProductInfo.Version };
     }
 

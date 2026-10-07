@@ -16,6 +16,8 @@ public sealed class WaveformControl : FrameworkElement
     public static readonly DependencyProperty PositionProperty = DependencyProperty.Register(nameof(Position), typeof(double), typeof(WaveformControl), new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsRender));
     public static readonly DependencyProperty DurationProperty = DependencyProperty.Register(nameof(Duration), typeof(double), typeof(WaveformControl), new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsRender));
     public static readonly DependencyProperty CanSeekProperty = DependencyProperty.Register(nameof(CanSeek), typeof(bool), typeof(WaveformControl), new PropertyMetadata(false));
+    public static readonly DependencyProperty UsePeaksProperty = DependencyProperty.Register(nameof(UsePeaks), typeof(bool), typeof(WaveformControl), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender, GeometryChanged));
+    public bool UsePeaks { get => (bool)GetValue(UsePeaksProperty); set => SetValue(UsePeaksProperty, value); }
     public WaveformData? Data { get => (WaveformData?)GetValue(DataProperty); set => SetValue(DataProperty, value); }
     public double Position { get => (double)GetValue(PositionProperty); set => SetValue(PositionProperty, value); }
     public double Duration { get => (double)GetValue(DurationProperty); set => SetValue(DurationProperty, value); }
@@ -66,7 +68,8 @@ public sealed class WaveformControl : FrameworkElement
                 var x = ActualWidth * column / columns.Length;
                 var width = Math.Max(0.5, ActualWidth / columns.Length - 1);
                 var amplitude = Math.Clamp(columns[column].Rms, 0, 1) * half;
-                if (amplitude > 0) Bar(context, x, width, center - amplitude, center + amplitude);
+                if (UsePeaks) Bar(context, x, width, center - Math.Clamp(columns[column].Maximum, 0, 1) * half, center - Math.Clamp(columns[column].Minimum, -1, 0) * half);
+                else if (amplitude > 0) Bar(context, x, width, center - amplitude, center + amplitude);
                 Bar(peakContext, x, width, center - Math.Clamp(columns[column].Maximum, 0, 1) * half,
                     center - Math.Clamp(columns[column].Minimum, -1, 0) * half);
             }

@@ -102,3 +102,11 @@ public interface IWaveformService : IAsyncDisposable
 {
     Task<WaveformData> AnalyzeAsync(string path, IProgress<double>? progress, CancellationToken cancellationToken, bool refresh = false);
 }
+
+public sealed record WaveformCacheUsage(long Bytes, int Files, long BudgetBytes);
+public interface IWaveformCacheControl
+{
+    Task<WaveformCacheUsage> GetCacheUsageAsync();
+    Task SetCacheBudgetAsync(long bytes);
+    Task ClearCacheAsync();
+}

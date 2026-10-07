@@ -20,6 +20,8 @@ public partial class App : Application
     static App() => System.Windows.Forms.Application.SetHighDpiMode(System.Windows.Forms.HighDpiMode.PerMonitorV2);
     private RotatingLog? _log;
     public string DataDirectory { get; private set; } = "";
+    public long DroppedLogRecords => _log?.Dropped ?? 0;
+    public string? LogError => _log?.LastError;
     public async Task FlushDiagnosticsAsync() { if (_log is not null) await _log.DisposeAsync(); }
     private void WatchDiagnostics(PlayerViewModel model) => model.PropertyChanged += (_, args) => { if (args.PropertyName == nameof(PlayerViewModel.Details) && model.Details.Length > 0) _log?.Record("operation", model.Details); };
     private SingleInstanceService? _instance;

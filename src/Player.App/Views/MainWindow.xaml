@@ -27,6 +27,7 @@
                 <MenuItem Header="{r:Loc SortPath}" Tag="Path" Click="OnTabSort" />
                 <MenuItem Header="{r:Loc SortAdded}" Tag="Date added" Click="OnTabSort" />
             </MenuItem>
+            <MenuItem Header="{r:Loc RemoveDuplicates}" Tag="Duplicates" Click="OnTabMenuAction" />
             <MenuItem Header="{r:Loc ExportPlaylist}" Tag="Export" Click="OnTabMenuAction" />
             <Separator />
             <MenuItem Header="{r:Loc DeletePlaylist}" Tag="Delete" Click="OnTabMenuAction" />
@@ -86,7 +87,7 @@
         <Grid Grid.Row="3" Margin="16,0,16,8">
             <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="44" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
             <TextBlock Text="{Binding WaveformStatus}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
-            <c:WaveformControl x:Name="WaveformView" Grid.Row="1" Focusable="True" AutomationProperties.Name="{r:Loc Seek}" Data="{Binding Waveform}" Position="{Binding SeekPosition}" Duration="{Binding DurationSeconds}" CanSeek="{Binding CanSeek}" />
+            <c:WaveformControl x:Name="WaveformView" Grid.Row="1" Focusable="True" AutomationProperties.Name="{r:Loc Seek}" Data="{Binding Waveform}" UsePeaks="{Binding UsePeakWaveform}" Position="{Binding SeekPosition}" Duration="{Binding DurationSeconds}" CanSeek="{Binding CanSeek}" />
             <Slider x:Name="SeekSlider" Grid.Row="2" Value="{Binding SeekPosition, Mode=TwoWay}" Maximum="{Binding DurationSeconds}" Minimum="0"
                     IsEnabled="{Binding CanSeek}" SmallChange="5" LargeChange="30" IsMoveToPointEnabled="True"
                     AutomationProperties.Name="{r:Loc Seek}" Margin="0,4" PreviewMouseLeftButtonDown="OnSeekStart"
@@ -101,6 +102,7 @@
                         <MenuItem Header="{r:Loc PlaylistMenu}">
                         <MenuItem Header="{r:Loc RenamePlaylist}" Click="OnRenamePlaylist" />
                         <MenuItem Header="{r:Loc DuplicatePlaylist}" Click="OnDuplicatePlaylist" />
+                        <MenuItem Header="{r:Loc RemoveDuplicates}" Click="OnRemoveDuplicates" />
                         <MenuItem Header="{r:Loc TabLeft}" Click="OnTabLeft" />
                         <MenuItem Header="{r:Loc TabRight}" Click="OnTabRight" />
                         <MenuItem Header="{r:Loc DeletePlaylist}" Click="OnDeletePlaylist" />
@@ -130,6 +132,7 @@
                         <MenuItem Header="{r:Loc Backup}" Click="OnBackup" />
                         <MenuItem Header="{r:Loc RestoreBackup}" Click="OnRestoreBackup" />
                         </MenuItem>
+                        <MenuItem Header="{r:Loc PreviewDiagnostics}" Click="OnDiagnostics" />
                         <MenuItem Header="{r:Loc RefreshWaveform}" Command="{Binding RefreshWaveformCommand}" />
                         <Separator />
                         <MenuItem Header="{r:Loc Settings}" Click="OnPreferences" />

@@ -128,3 +128,8 @@ The 128 MiB owned NTFS VHD exposed 133,099,520 filesystem bytes and was filled w
 An isolated actual tool copy without BASSWMA returned a typed Dependency error and reopened core WAV before/after the failure, with unchanged sources and released handles. This does not substitute for an actual Windows N installation. Power loss, clean Windows 11/offline/device/manual dialog/accessibility and licensing gates remain separate. Hosted warm performance remains a comparator: extracted query+UI p95 was 241.8951 ms, maximum 261.6244 ms; not every sample was within 250 ms and reference-hardware acceptance is not claimed.
 
 Initial failures were corrected without weakening assertions: PS stereo needed a non-cancelling owned signal; hosted WMA encoding needed supported concrete profiles; the migration seed needed the known native duration; metadata guard InvalidDataException needed an explicit fallback catch. Independent failed case reports remain in their CI artifacts. Final verification adds an explicit RF64 duration assertion and a nonzero uncorrected-hybrid PCM control, and fills the same owned VHD coarsely then by clusters to avoid excessive flushes. These final harness refinements require their own main CI build before publication.
+
+
+## Specification completion follow-up (2026-10-07)
+
+The concrete §11.1 duplicate-preview, §13.3/§19.1 live cache/settings, §15.5 restore/default/directory and §20.3 redacted diagnostic-preview gaps are now implemented. Existing AC evidence above is retained with its boundaries; whole requirements do not become passed from compilation. [Behavior and outstanding acceptance](SPEC_COMPLETION.md). Windows observation of the additional owned workflows awaits this source main CI.

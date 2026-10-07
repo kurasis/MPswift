@@ -40,7 +40,7 @@ public sealed class PcmProcessor
     private readonly double _preamp;
     private readonly bool _enabled;
     private readonly int _channels;
-    private PcmProcessor? _previous;
+    private FilterState? _previous;
     private int _smoothFrames;
     private readonly int _smoothTotal;
     public long ProtectedSamples { get; private set; }
@@ -48,7 +48,10 @@ public sealed class PcmProcessor
     {
         if (rate < 1000 || channels is < 1 or > 64) throw new ArgumentOutOfRangeException(nameof(rate));
         settings = settings.Validate(); _channels = channels; _enabled = settings.EqualizerEnabled;
-        _previous = previous; _smoothTotal = Math.Max(1, rate / 50); _smoothFrames = previous is null ? _smoothTotal : 0;
+        // Smoothing consumes only the previous filter state, not its older smoothing chain.
+        // Retain the same filters/coefficients without retaining every paused settings edit.
+        _previous = previous is null ? null : new(previous._filters, previous._preamp, previous._enabled);
+        _smoothTotal = Math.Max(1, rate / 50); _smoothFrames = previous is null ? _smoothTotal : 0;
         // Conservative EQ headroom; final saturation covers untagged overrange sources/overlap.
         var headroom = _enabled ? settings.Bands!.Where(b => b > 0).Sum() : 0;
         _preamp = _enabled ? Math.Pow(10, (settings.PreampDb - headroom) / 20) : 1;
@@ -64,7 +67,7 @@ public sealed class PcmProcessor
             {
                 var index = frame * _channels + c; double value = samples[index];
                 var input = value; value = FilterSample(value, c);
-                if (_previous is { } previous) value = previous.FilterSample(input, c) * (1 - (double)_smoothFrames / _smoothTotal) + value * _smoothFrames / _smoothTotal;
+                if (_previous is { } previous) value = previous.Apply(input, c) * (1 - (double)_smoothFrames / _smoothTotal) + value * _smoothFrames / _smoothTotal;
                 value *= gain;
                 if (!double.IsFinite(value)) { value = 0; ProtectedSamples++; }
                 else if (value is > 1 or < -1) { value = Math.Clamp(value, -1, 1); ProtectedSamples++; }
@@ -75,6 +78,11 @@ public sealed class PcmProcessor
     }
     private double FilterSample(double value, int channel)
     { if (!_enabled) return value; value *= _preamp; foreach (var filter in _filters) value = filter.Apply(value, channel); return value; }
+    private sealed record FilterState(Filter[] Filters, double Preamp, bool Enabled)
+    {
+        public double Apply(double value, int channel)
+        { if (!Enabled) return value; value *= Preamp; foreach (var filter in Filters) value = filter.Apply(value, channel); return value; }
+    }
     private sealed class Filter
     {
         private readonly double b0 = 1, b1, b2, a1, a2;

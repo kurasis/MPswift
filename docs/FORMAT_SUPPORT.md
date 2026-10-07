@@ -40,3 +40,8 @@ G4 native results are now observed in [run 37418131090](https://github.com/kuras
 
 
 G8 extends the observed matrix to 30 committed profiles plus independently codec-tagged owned WMA lossless/Pro and a real sparse RF64 >4 GiB. Exact rates/channels, PCM comparisons, attempted unavailable encoder inputs, source-preservation methods and Windows N boundary are retained in [G8/G9 reports](evidence/stage-g8-g9-windows.json). PCM24 192 kHz stereo and 96 kHz 6/8-channel files passed; this does not assert physical multichannel endpoint routing or every encoding/rate combination. Full profile/hardware/codec licensing acceptance remains in RELEASE_ACCEPTANCE.md.
+
+
+## Two-hour M4B/APE follow-up
+
+Two new owned fixtures and a bounded native/production seek/end/source-preservation runner cover AAC-LC M4B and normal APE at 7201 seconds; APE float offsets exceed Int32. Independent FFprobe duration/profile/rate/channel facts and file hashes are recorded before Windows execution. Main CI will retain `long-formats.json`; its result must be observed before these profiles are marked verified. These fixtures do not claim >4 GiB compressed APE, Windows N, physical output or lossy gapless.

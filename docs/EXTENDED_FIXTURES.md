@@ -37,3 +37,9 @@ against the quantized source, and performs bounded 64-bit reads/seeks in a real
 sparse NTFS RF64 larger than 4 GiB. Sparse file size is logical size, not a claim
 of allocating 4 GiB of physical data. Windows N and actual endpoint playback
 remain separate required environments.
+
+## Long-duration fixture follow-up
+
+`tests/fixtures/audio-long` contains two owned CC0 sources lasting **7201 seconds**: AAC-LC mono 48 kHz M4B and normal stereo 48 kHz APE. Generate a new directory with `Generate-LongFixtures.py --mac <pinned-built-mac>`. The manifest records source/file SHA-256, encoder revisions/arguments and independent FFprobe M4B facts. APE's source is a 1,382,592,044-byte sparse PCM16 WAV with three actual one-second owned tone markers; its float decode range is **2,765,184,000 bytes**, above Int32. APE is physically small because the intervals are silent; this does not prove an encoded APE file larger than 4 GiB. M4B repeats the owned left channel to avoid opposite-phase mono cancellation.
+
+`--long-formats` hashes unchanged sources, checks native duration/format and bounded samples at 0.25/3600.25/7199.25 seconds, exact tail/end/disposal, exclusive handle release and production backend prepare/seek/stop without starting output. The 16 KiB decode buffer never grows with duration. This is long-file decoding, **not** a two-hour device soak or long-file waveform measurement. Windows observation is pending main CI. No encoder/input PCM is shipped in the application ZIP.

@@ -55,11 +55,20 @@ public sealed class BassAudioBackend : IAudioBackend, IAdvancedAudioBackend
     private void StartOutput()
     {
         var request = _request ?? throw new AudioBackendException(AudioErrorCategory.Decoder, "No source is loaded.");
-        EnsureOutput();
-        if (_graph?.ActiveEntryId != request.EntryId) _graph!.Load(request, _position);
-        if (_prepared is not null) _graph!.PrepareNext(_prepared, _repeatOne);
-        _graph!.SetVolume(_volume, _muted, true);
-        Check(BassWasapi.Start(), "Start output"); _running = true;
+        try
+        {
+            EnsureOutput();
+            if (_graph?.ActiveEntryId != request.EntryId) _graph!.Load(request, _position);
+            if (_prepared is not null) _graph!.PrepareNext(_prepared, _repeatOne);
+            _graph!.SetVolume(_volume, _muted, true);
+            Check(BassWasapi.Start(), "Start output"); _running = true;
+        }
+        catch
+        {
+            // A failed/invalidated endpoint must be reopened on explicit retry,
+            // rather than repeatedly reusing an initialized but unusable driver context.
+            CloseOutput(); throw;
+        }
     }
     private int FindDevice()
     {

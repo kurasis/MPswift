@@ -27,6 +27,8 @@ public partial class MainWindow : Window
     private bool _shutdownComplete;
     private bool _shutdownStarted;
     private bool _exitRequested;
+    private System.Windows.Interop.HwndSource? _powerSource;
+    internal Task PowerPauseCompletion { get; private set; } = Task.CompletedTask;
     public Task RestoreCompletion { get; private set; } = Task.CompletedTask;
     private PlayerViewModel Model => (PlayerViewModel)DataContext;
     public MainWindow()
@@ -39,6 +41,11 @@ public partial class MainWindow : Window
         MinWidth = Math.Min(MinWidth, SystemParameters.WorkArea.Width);
         MinHeight = Math.Min(MinHeight, SystemParameters.WorkArea.Height);
         ApplyContrastTheme();
+        SourceInitialized += (_, _) =>
+        {
+            _powerSource = System.Windows.Interop.HwndSource.FromHwnd(new System.Windows.Interop.WindowInteropHelper(this).Handle);
+            _powerSource?.AddHook(OnPowerMessage);
+        };
         DataContextChanged += (_, args) =>
         {
             if (args.OldValue is PlayerViewModel previous) previous.PropertyChanged -= OnAccessibleStateChanged;
@@ -48,6 +55,7 @@ public partial class MainWindow : Window
         Closed += (_, _) =>
         {
             SystemParameters.StaticPropertyChanged -= OnSystemSettings;
+            _powerSource?.RemoveHook(OnPowerMessage); _powerSource = null;
             if (DataContext is PlayerViewModel current) current.PropertyChanged -= OnAccessibleStateChanged;
         };
     }
@@ -67,6 +75,23 @@ public partial class MainWindow : Window
     {
         if (e.OriginalSource is DependencyObject element && ItemsControl.ContainerFromElement(PlaylistList, element) is ListBoxItem { DataContext: PlaylistRowViewModel row }
             && !OwnsInput(element)) await Model.PlayEntryCommand.ExecuteAsync(row);
+    }
+    private nint OnPowerMessage(nint window, int message, nint parameter, nint data, ref bool handled)
+    {
+        if (message == 0x0218 && parameter is 4 or 7 or 18) // WM_POWERBROADCAST suspend/resume
+            PowerPauseCompletion = PauseAfterPowerChangeAsync();
+        return 0;
+    }
+    internal async Task PauseAfterPowerChangeAsync()
+    {
+        if (_shutdownStarted || DataContext is not PlayerViewModel model || !model.Initialized) return;
+        try
+        {
+            await model.HandleMediaAsync("Pause");
+            await model.SaveNowAsync();
+            model.Message = Strings.Get("SleepPaused");
+        }
+        catch (Exception error) { model.Message = Strings.Get("SaveFailed"); model.Details = error.Message; }
     }
     private void OnRemove(object sender, RoutedEventArgs e) => Model.RemoveEntriesCommand.Execute(PlaylistList.SelectedItems.Cast<PlaylistRowViewModel>().ToArray());
     private void OnHelp(object sender, RoutedEventArgs e) => new HelpWindow(this, ((App)Application.Current).DataDirectory).Show();
@@ -214,6 +239,7 @@ public partial class MainWindow : Window
             case "Left": OnTabLeft(sender, e); break;
             case "Right": OnTabRight(sender, e); break;
             case "Export": OnExportPlaylist(sender, e); break;
+            case "Duplicates": OnRemoveDuplicates(sender, e); break;
         }
     }
     private void OnTabSort(object sender, RoutedEventArgs e) { if (SelectTabMenuTarget(sender)) OnSort(sender, e); }
@@ -325,6 +351,8 @@ public partial class MainWindow : Window
         var dictionaries = Application.Current.Resources.MergedDictionaries;
         foreach (var dictionary in dictionaries.Where(d => d.Source?.OriginalString.EndsWith("HighContrast.xaml", StringComparison.Ordinal) == true).ToArray()) dictionaries.Remove(dictionary);
         if (SystemParameters.HighContrast) dictionaries.Add(new ResourceDictionary { Source = new Uri("/MPswift;component/Themes/HighContrast.xaml", UriKind.Relative) });
+        Services.Windows.AppearanceService.Apply((DataContext as PlayerViewModel)?.WindowSettings.Accent ?? "amber");
+        WaveformView.InvalidateVisual();
     }
     private void OnRowDragStart(object sender, MouseButtonEventArgs e)
     {
@@ -355,6 +383,22 @@ public partial class MainWindow : Window
     { PlaylistActions.ContextMenu.DataContext = Model; PlaylistActions.ContextMenu.PlacementTarget = PlaylistActions; PlaylistActions.ContextMenu.IsOpen = true; }
     private void OnLibrary(object sender, RoutedEventArgs e) => new LibraryWindow(this, Model).Show();
     private void OnSort(object sender, RoutedEventArgs e) { if (sender is MenuItem { Tag: string field }) Model.SortPlaylist(field); }
+    private void OnRemoveDuplicates(object sender, RoutedEventArgs e)
+    {
+        if (Model.IsImporting) return;
+        var tab = Model.SelectedPlaylist; var entries = tab.Entries.Select(row => row.Entry).ToArray();
+        var duplicates = Player.Core.Playback.PlaylistDuplicates.FindRemovable(entries); var ids = duplicates.ToHashSet();
+        if (duplicates.Count == 0) { Model.Message = Strings.Get("NoDuplicates"); return; }
+        if (new DuplicateEntriesWindow(this, entries.Where(entry => ids.Contains(entry.Id)).ToArray()).ShowDialog() != true) return;
+        if (Model.RemovePlaylistDuplicates(tab.Id, entries.Select(entry => entry.Id).ToArray(), duplicates))
+            Model.Message = string.Format(Strings.Culture, Strings.Get("DuplicatesRemoved"), duplicates.Count);
+        else Model.Message = Strings.Get("DuplicatePreviewStale");
+    }
+    private async void OnDiagnostics(object sender, RoutedEventArgs e)
+    {
+        try { var versions = await new Services.Audio.NativeDiagnostics().VerifyAsync(); new DiagnosticsWindow(this, Model.CreateDiagnosticReport(versions)).ShowDialog(); }
+        catch (Exception error) { Model.Message = Strings.Get("DiagnosticsFailed"); Model.Details = error.Message; }
+    }
     private async void OnExportPlaylist(object sender, RoutedEventArgs e)
     {
         var dialog = new Microsoft.Win32.SaveFileDialog { Filter = Strings.Get("PlaylistFilter"), FileName = "playlist.m3u8" }; if (dialog.ShowDialog(this) != true) return;

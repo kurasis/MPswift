@@ -8,6 +8,25 @@ namespace Player.App.Services.Storage;
 public sealed class WaveformCache(string directory, long budgetBytes = 512L * 1024 * 1024)
 {
     private const int HeaderBytes = 104;
+    private readonly object _gate = new();
+    private long _budgetBytes = budgetBytes;
+    private long _epoch;
+    public long Epoch => Interlocked.Read(ref _epoch);
+    public WaveformCacheUsage GetUsage()
+    {
+        lock (_gate)
+        {
+            long bytes = 0; var count = 0;
+            if (Directory.Exists(directory))
+                foreach (var file in new DirectoryInfo(directory).EnumerateFiles("*.peaks")) { bytes += file.Length; count++; }
+            return new(bytes, count, _budgetBytes);
+        }
+    }
+    public void SetBudget(long bytes)
+    {
+        if (bytes is < 16L * 1024 * 1024 or > 2048L * 1024 * 1024) throw new ArgumentOutOfRangeException(nameof(bytes));
+        lock (_gate) { _budgetBytes = bytes; if (Directory.Exists(directory)) Evict(); }
+    }
     public static string Fingerprint(string canonicalPath, long size, long modifiedTicks, string decoderVersion) =>
         Convert.ToHexStringLower(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes($"v2|all-channel-extrema-rms|{canonicalPath.ToUpperInvariant()}|{size}|{modifiedTicks}|{decoderVersion}")));
     private string PathFor(string key)
@@ -16,6 +35,8 @@ public sealed class WaveformCache(string directory, long budgetBytes = 512L * 10
         return Path.Combine(directory, key + ".peaks");
     }
     public WaveformData? Read(string key)
+    { lock (_gate) return ReadCore(key); }
+    private WaveformData? ReadCore(string key)
     {
         var path = PathFor(key);
         if (!File.Exists(path)) return null;
@@ -46,6 +67,10 @@ public sealed class WaveformCache(string directory, long budgetBytes = 512L * 10
         catch (Exception error) when (error is IOException or UnauthorizedAccessException or ArgumentException or InvalidDataException) { return null; }
     }
     public void Write(string key, WaveformData data)
+    { lock (_gate) WriteCore(key, data); }
+    public void WriteIfCurrent(string key, WaveformData data, long epoch)
+    { lock (_gate) { if (epoch == _epoch) WriteCore(key, data); } }
+    private void WriteCore(string key, WaveformData data)
     {
         data.Validate(); Directory.CreateDirectory(directory);
         var path = PathFor(key); var temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
@@ -74,6 +99,10 @@ public sealed class WaveformCache(string directory, long budgetBytes = 512L * 10
     }
     public void Clear()
     {
+        lock (_gate) { Interlocked.Increment(ref _epoch); ClearCore(); }
+    }
+    private void ClearCore()
+    {
         if (!Directory.Exists(directory)) return;
         foreach (var file in Directory.EnumerateFiles(directory, "*.peaks")) File.Delete(file);
     }
@@ -81,6 +110,6 @@ public sealed class WaveformCache(string directory, long budgetBytes = 512L * 10
     {
         var files = new DirectoryInfo(directory).EnumerateFiles("*.peaks").OrderBy(f => f.LastWriteTimeUtc).ToArray();
         var size = files.Sum(f => f.Length);
-        foreach (var file in files) { if (size <= budgetBytes) break; size -= file.Length; file.Delete(); }
+        foreach (var file in files) { if (size <= _budgetBytes) break; size -= file.Length; file.Delete(); }
     }
 }

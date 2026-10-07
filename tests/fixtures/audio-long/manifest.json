@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "sourceSha256": "265bfc54a7b0bfc2b75cf63c427873d00b516bbbb9dcaae17346de76cc4757fb",
+  "durationSeconds": 7201,
+  "fixtures": [
+    {
+      "path": "long-markers.ape",
+      "sha256": "60f77d4ffabf841c1cb9de6307bad69f698dbf237251ec080d7df7d1b6b6f0c4",
+      "codec": "APE",
+      "sampleRate": 48000,
+      "channels": 2,
+      "durationSeconds": 7201,
+      "signal": "markers",
+      "markerSeconds": [
+        0,
+        3600,
+        7199
+      ],
+      "expectedPeakMinimum": 0.04,
+      "expectedPeakMaximum": 0.2,
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "long-audiobook.m4b",
+      "sha256": "152660431789fcd80f24d4e47c0fe71264a86af3ceccec5114e271bc67c816aa",
+      "codec": "MP4",
+      "sampleRate": 48000,
+      "channels": 1,
+      "durationSeconds": 7201,
+      "signal": "continuous",
+      "markerSeconds": [],
+      "expectedPeakMinimum": 0.04,
+      "expectedPeakMaximum": 0.2,
+      "license": "CC0-1.0"
+    }
+  ],
+  "generator": "Generate-LongFixtures.py",
+  "apeEncoder": "Monkey's Audio 3.99.6 port at bac9b6bb4714a6de85a990a6916d1abc4c171271; assembly disabled; normal",
+  "apeDecodedFloatBytes": 2765184000,
+  "sparsePcmInputBytes": 1382592044,
+  "m4bEncoder": "ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers",
+  "m4bArguments": [
+    "-t",
+    "7201",
+    "-af",
+    "pan=mono|c0=c0",
+    "-c:a",
+    "aac",
+    "-b:a",
+    "16k",
+    "-ar",
+    "48000",
+    "-fflags",
+    "+bitexact",
+    "-flags:a",
+    "+bitexact",
+    "-metadata",
+    "title=Owned two-hour audiobook",
+    "-metadata",
+    "artist=MPswift tests",
+    "-f",
+    "ipod"
+  ],
+  "independentM4bProfile": "LC",
+  "independentM4bDuration": 7201.0,
+  "provenance": "Owned PCM only; APE sparse silent source with one-second markers; M4B repeated left channel avoids opposite-phase mono cancellation"
+}

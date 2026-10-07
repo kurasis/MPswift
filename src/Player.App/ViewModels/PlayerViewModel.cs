@@ -110,10 +110,12 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         {
             var refresh = _windowSettings.ShowAlbumSections != value.ShowAlbumSections;
             _windowSettings = value;
+            OnPropertyChanged(nameof(UsePeakWaveform));
             if (refresh && VisibleEntries is not null) UpdatePlaylistStatus();
         }
     }
     public bool Initialized => _initialized;
+    public bool UsePeakWaveform => WindowSettings.WaveformStyle == "peaks";
 
     [ObservableProperty] private PlaylistTabViewModel _selectedPlaylist = null!;
     [ObservableProperty] private PlaylistRowViewModel? _selectedEntry;
@@ -187,13 +189,15 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         SelectedPlaylist = Playlists.FirstOrDefault(p => p.Id == state.Session.SelectedPlaylistId) ?? Playlists[0];
         _sourcePlaylistId = state.Session.SourcePlaylistId;
         SyncSource();
-        if (state.Session.Order is { } order) _coordinator.RestoreOrder(order);
+        if (WindowSettings.RestoreSession && state.Session.Order is { } order) _coordinator.RestoreOrder(order);
+        else { _coordinator.Repeat = WindowSettings.DefaultRepeat; _coordinator.Shuffle = WindowSettings.DefaultShuffle; }
         Repeat = _coordinator.Repeat; Shuffle = _coordinator.Shuffle; RefreshQueue();
         if (_player is IAdvancedAudioPlayer advanced) { await advanced.SetProcessingAsync(WindowSettings.Processing ?? new()); await advanced.SetOutputAsync(WindowSettings.Output ?? new()); }
         await _coordinator.SetVolumeAsync(WindowSettings.Volume / 100, WindowSettings.Muted);
-        if (state.Session.ActiveEntry is { } active)
-            await _coordinator.RestoreAsync(active, TimeSpan.FromTicks(state.Session.PositionTicks));
+        if (WindowSettings.RestoreSession && state.Session.ActiveEntry is { } active)
+            await _coordinator.RestoreAsync(active, WindowSettings.RestorePosition ? TimeSpan.FromTicks(state.Session.PositionTicks) : TimeSpan.Zero);
         ApplySnapshot(_player.Snapshot);
+        AppearanceService.Apply(WindowSettings.Accent);
         _initialized = true;
         AddFilesCommand.NotifyCanExecuteChanged(); AddFolderCommand.NotifyCanExecuteChanged();
         SaveStatus = Strings.Get("Saved");
@@ -333,15 +337,66 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     { if (!_closing && !_dispatcher.HasShutdownStarted) _dispatcher.BeginInvoke(() => { RefreshQueue(); ScheduleSave(false); }, DispatcherPriority.Background); }
     private void RefreshQueue() { Queue.Clear(); foreach (var item in _coordinator.Queue) Queue.Add(item); }
     public Task<AudioDevice[]> GetDevicesAsync() => _player is IAdvancedAudioPlayer advanced ? advanced.GetDevicesAsync() : Task.FromResult(Array.Empty<AudioDevice>());
+    public Task<WaveformCacheUsage?> GetCacheUsageAsync() => GetCacheUsageCoreAsync();
+    private async Task<WaveformCacheUsage?> GetCacheUsageCoreAsync() => _waveforms is IWaveformCacheControl cache ? await cache.GetCacheUsageAsync() : null;
+    public Task ClearWaveformCacheAsync() => _waveforms is IWaveformCacheControl cache ? cache.ClearCacheAsync() : Task.CompletedTask;
+    public async Task SavePreferencesAsync(PlayerSettings settings)
+    {
+        var previous = WindowSettings;
+        settings = settings.Validate();
+        try
+        {
+            if (_waveforms is IWaveformCacheControl cache) await cache.SetCacheBudgetAsync(settings.WaveformCacheMiB * 1024L * 1024);
+            WindowSettings = settings;
+            await SaveNowAsync();
+        }
+        catch
+        {
+            WindowSettings = previous;
+            if (_waveforms is IWaveformCacheControl cache) await cache.SetCacheBudgetAsync(previous.WaveformCacheMiB * 1024L * 1024);
+            throw;
+        }
+        AppearanceService.Apply(settings.Accent);
+    }
+    public string CreateDiagnosticReport(IReadOnlyDictionary<string, string> nativeVersions)
+    {
+        var app = (App)System.Windows.Application.Current;
+        var snapshot = Snapshot;
+        var report = System.Text.Json.JsonSerializer.Serialize(new
+        {
+            App = ProductName, Version = ProductVersion, OS = System.Runtime.InteropServices.RuntimeInformation.OSDescription,
+            Architecture = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString(),
+            Native = nativeVersions, DeployedDecoders = Services.Audio.NativeLibraryBootstrap.DecoderPaths.Select(Path.GetFileName).ToArray(), DecoderErrors = Services.Audio.NativeLibraryBootstrap.DecoderValidationErrors,
+            SelectedOutput = WindowSettings.Output ?? new(), Source = snapshot.SourceFormat, ActualOutput = snapshot.OutputFormat,
+            Processing = WindowSettings.Processing ?? new(), snapshot.Volume, snapshot.Muted, snapshot.State, PositionSeconds = snapshot.Position.TotalSeconds,
+            Error = snapshot.Error, Details, Data = app.DataDirectory, Logs = Path.Combine(app.DataDirectory, "Logs"),
+            LogDropped = app.DroppedLogRecords, LogError = app.LogError, SourceFilesAreReadOnly = true, Network = "local-only",
+            Acceptance = "Development candidate; real-device and clean Windows 11 acceptance remain separate."
+        }, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+        // JSON escapes backslashes; redact the escaped prefixes as well as plain display text.
+        var prefixes = new[] { Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), app.DataDirectory, AppContext.BaseDirectory };
+        return Player.Core.Integration.DiagnosticReport.Redact(report, prefixes.Concat(prefixes.Select(p => System.Text.Json.JsonSerializer.Serialize(p)[1..^1])));
+    }
     public async Task ConfigureAudioAsync(AudioProcessingSettings processing, AudioOutputSettings output)
     {
         processing = processing.Validate();
         if (_player is IAdvancedAudioPlayer advanced) { await advanced.SetProcessingAsync(processing); await advanced.SetOutputAsync(output); }
         WindowSettings = WindowSettings with { Processing = processing, Output = output }; ScheduleSave(false);
     }
-    [RelayCommand(CanExecute = nameof(CanImport))] private Task AddFilesAsync() => AddPathsAsync(_dialogs.PickFiles());
+    [RelayCommand(CanExecute = nameof(CanImport))] private Task AddFilesAsync()
+    {
+        ConfigureDialogDirectories(); var files = _dialogs.PickFiles();
+        if (files.Length > 0) { WindowSettings = WindowSettings with { LastFileDirectory = Path.GetDirectoryName(files[0]) }; ScheduleSave(false); }
+        return AddPathsAsync(files);
+    }
     [RelayCommand(CanExecute = nameof(CanImport))] private Task AddFolderAsync()
-    { var folder = _dialogs.PickFolder(); return folder is null ? Task.CompletedTask : AddPathsAsync([folder]); }
+    {
+        ConfigureDialogDirectories(); var folder = _dialogs.PickFolder();
+        if (folder is null) return Task.CompletedTask;
+        WindowSettings = WindowSettings with { LastFolderDirectory = folder }; ScheduleSave(false); return AddPathsAsync([folder]);
+    }
+    private void ConfigureDialogDirectories()
+    { if (_dialogs is FileDialogService dialogs) { dialogs.LastFileDirectory = WindowSettings.LastFileDirectory; dialogs.LastFolderDirectory = WindowSettings.LastFolderDirectory; } }
     private bool CanImport() => !IsImporting && !_closing && _initialized;
     public bool CanAcceptFileDrop => CanImport();
     [RelayCommand] private void CancelImport() => _importCancellation?.Cancel();
@@ -447,6 +502,17 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         foreach (var row in rows?.ToArray() ?? [])
         { row.EligibilityChanged -= RowChanged; row.RatingChanged -= RatingChanged; Entries.Remove(row); _knownRows.Remove(row.Id); }
         UpdateEntries();
+    }
+    public bool RemovePlaylistDuplicates(Guid playlistId, IReadOnlyList<Guid> expectedOrder, IReadOnlyList<Guid> duplicateIds)
+    {
+        var tab = Playlists.FirstOrDefault(p => p.Id == playlistId);
+        if (tab is null || IsImporting || !tab.Entries.Select(r => r.Id).SequenceEqual(expectedOrder)) return false;
+        var current = PlaylistDuplicates.FindRemovable(tab.Entries.Select(r => r.Entry));
+        if (!current.SequenceEqual(duplicateIds)) return false;
+        var ids = duplicateIds.ToHashSet();
+        foreach (var row in tab.Entries.Where(r => ids.Contains(r.Id)).ToArray())
+        { row.EligibilityChanged -= RowChanged; row.RatingChanged -= RatingChanged; tab.Entries.Remove(row); _knownRows.Remove(row.Id); }
+        UpdateEntries(); return true;
     }
     public Task ExpandCueImagesAsync(IEnumerable<PlaylistRowViewModel> selected)
     {

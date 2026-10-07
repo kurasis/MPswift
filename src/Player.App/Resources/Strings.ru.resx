@@ -596,7 +596,9 @@ F1: локальная справка
 
 Исходные файлы не изменяются. Оценки, история, медиатека, очередь и настройки хранятся локально. Восстановление не включает звук. Принимаются только локальные доступные без сети файлы. Приложение не обращается к сети. Условия распространения BASS и декодеров ещё подлежат проверке; это сборка для разработки.
 
-Резервная копия сохраняет базу и настройки в один локальный ZIP. Восстановление проверяет архив, оставляет текущие файлы отдельно и не запускает музыку. Музыка, кэш и журналы исключены; прежние копии .db восстанавливают только базу. После смены языка из копии перезапустите приложение.</value>
+Резервная копия сохраняет базу и настройки в один локальный ZIP. Восстановление проверяет архив, оставляет текущие файлы отдельно и не запускает музыку. Музыка, кэш и журналы исключены; прежние копии .db восстанавливают только базу. После смены языка из копии перезапустите приложение.
+
+В настройках доступны акцент, вид дорожки, параметры запуска и сессии, размер и очистка локального кэша. Удаление повторов показывает предпросмотр совпадений файла и границ CUE, сохраняя первую запись. Диагностика показывается перед копированием; личные пути скрываются.</value>
     </data>
     <data xml:space="preserve" name="CopySuffix">
         <value> (копия)</value>
@@ -657,4 +659,45 @@ F1: локальная справка
     <data xml:space="preserve" name="CueImagesExpanded"><value>Развёрнуто FLAC-альбомов: {0}. Аудиофайлы не изменялись.</value></data>
     <data xml:space="preserve" name="CueEncoding"><value>Кодировка старых CUE / плейлистов</value></data>
     <data xml:space="preserve" name="CueEncodingHelp"><value>Сначала читается Unicode. Для старых документов применяется выбранная кодировка. Windows-1251 — стандартный вариант для кириллических альбомов.</value></data>
+    <data name="AccentColor" xml:space="preserve"><value>Цвет акцента</value></data>
+    <data name="Accent_amber" xml:space="preserve"><value>Янтарный</value></data>
+    <data name="Accent_blue" xml:space="preserve"><value>Голубой</value></data>
+    <data name="Accent_green" xml:space="preserve"><value>Зелёный</value></data>
+    <data name="Accent_violet" xml:space="preserve"><value>Фиолетовый</value></data>
+    <data name="AccentHelp" xml:space="preserve"><value>Применяется сразу после сохранения. Высокая контрастность Windows имеет приоритет.</value></data>
+    <data name="PlaybackPreferences" xml:space="preserve"><value>Воспроизведение и запуск</value></data>
+    <data name="RestoreSession" xml:space="preserve"><value>Восстанавливать текущий трек и очередь при запуске</value></data>
+    <data name="RestorePosition" xml:space="preserve"><value>Восстанавливать сохранённую позицию</value></data>
+    <data name="RestoreSessionHelp" xml:space="preserve"><value>Плейлисты и оценки сохраняются всегда. Звук при запуске не включается. Если восстановление сессии отключено, плеер открывается без текущего трека и очереди.</value></data>
+    <data name="StorageSection" xml:space="preserve"><value>Хранение и кэш</value></data>
+    <data name="CacheBudget" xml:space="preserve"><value>Лимит кэша звуковых дорожек (МиБ)</value></data>
+    <data name="CacheBudgetHelp" xml:space="preserve"><value>16–2048 МиБ. Новый лимит применяется после сохранения; сначала удаляются старые дорожки из кэша.</value></data>
+    <data name="CacheChecking" xml:space="preserve"><value>Проверка кэша…</value></data>
+    <data name="CacheUsage" xml:space="preserve"><value>Занято: {0:N2} МиБ · файлов: {1:N0}</value></data>
+    <data name="CacheUnavailable" xml:space="preserve"><value>Управление кэшем недоступно.</value></data>
+    <data name="CacheFailed" xml:space="preserve"><value>Не удалось открыть кэш. См. технические подробности.</value></data>
+    <data name="CacheCleared" xml:space="preserve"><value>Кэш звуковых дорожек очищен.</value></data>
+    <data name="ClearWaveformCache" xml:space="preserve"><value>Очистить кэш звуковых дорожек</value></data>
+    <data name="ClearCacheHelp" xml:space="preserve"><value>Удаляет только кэш дорожек. Музыка, плейлисты, оценки и отображаемая дорожка сохраняются. Старые задания анализа не заполнят очищенный кэш снова.</value></data>
+    <data name="CacheBudgetInvalid" xml:space="preserve"><value>Введите целое число от 16 до 2048.</value></data>
+    <data name="DiagnosticsTitle" xml:space="preserve"><value>Локальная диагностика</value></data>
+    <data name="PreviewDiagnostics" xml:space="preserve"><value>Просмотреть и скопировать диагностику…</value></data>
+    <data name="CopyDiagnostics" xml:space="preserve"><value>Скопировать отчёт</value></data>
+    <data name="DiagnosticsCopied" xml:space="preserve"><value>Скопировано</value></data>
+    <data name="DiagnosticsPreviewHelp" xml:space="preserve"><value>Личные пути и пути данных приложения скрыты. Просмотрите локальный отчёт перед копированием или отправкой. Автоматически ничего не отправляется.</value></data>
+    <data name="DiagnosticsFailed" xml:space="preserve"><value>Не удалось подготовить диагностику. См. технические подробности.</value></data>
+    <data name="ClipboardUnavailable" xml:space="preserve"><value>Буфер обмена занят. Попробуйте скопировать ещё раз.</value></data>
+    <data name="RemoveDuplicates" xml:space="preserve"><value>Удалить повторяющиеся записи…</value></data>
+    <data name="DuplicatesPreview" xml:space="preserve"><value>Записей к удалению: {0}. Сохраняется первая запись с тем же локальным путём и точными границами CUE. Разные песни CUE остаются. Удаляются только записи этого плейлиста; файлы музыки, очередь и текущее воспроизведение сохраняются.</value></data>
+    <data name="RemoveDuplicatesCount" xml:space="preserve"><value>Удалить записей: {0}</value></data>
+    <data name="DuplicatesRemoved" xml:space="preserve"><value>Удалено повторяющихся записей: {0}.</value></data>
+    <data name="NoDuplicates" xml:space="preserve"><value>В этом плейлисте нет повторяющихся записей.</value></data>
+    <data name="DuplicatePreviewStale" xml:space="preserve"><value>Плейлист изменился. Откройте предпросмотр повторов снова.</value></data>
+    <data name="SleepPaused" xml:space="preserve"><value>Воспроизведение приостановлено после смены состояния питания. Нажмите «Воспроизвести» для продолжения.</value></data>
+    <data name="WaveformStyle" xml:space="preserve"><value>Вид звуковой дорожки</value></data>
+    <data name="WaveformEnergy" xml:space="preserve"><value>Средняя энергия и контур пиков</value></data>
+    <data name="WaveformPeaks" xml:space="preserve"><value>Положительные и отрицательные пики</value></data>
+    <data name="DefaultRepeat" xml:space="preserve"><value>Режим повтора по умолчанию</value></data>
+    <data name="DefaultShuffle" xml:space="preserve"><value>Случайный порядок по умолчанию</value></data>
+    <data name="PlaybackDefaultsHelp" xml:space="preserve"><value>Используется, если нет сохранённой сессии или её восстановление отключено. При восстановлении сессии сохраняется её режим повтора и случайного порядка.</value></data>
 </root>
