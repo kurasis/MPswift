@@ -279,3 +279,12 @@ The clean baseline passes 196 managed tests with zero build warnings/errors. New
 Local completion checks pass **215 tests, 0 failed/skipped** with zero warnings/errors; SDK analyzers/style build passes. FFprobe independently reports AAC-LC mono 48 kHz M4B and stereo 48 kHz APE at exactly 7201 seconds. Native long-format and production WPF observations await main CI.
 
 Initial Windows completion runs 37575453800/37576035729 pass 215 managed tests but reject two new harness assumptions: live SQLite reads need compatible read/write sharing and queue notifications are dispatcher-delayed. They also expose pinned mono AAC/MP4 stereo decoding, now explicitly distinguished from encoded channels with a left/right identity assertion. No failing assertion is disabled and no failed ZIP is published.
+
+
+## Observed specification follow-up results
+
+[Main run 37576574867](https://github.com/kurasis/MPswift/actions/runs/37576574867) passed all three jobs at `9657f48ed5271a0bfbd73bd8d75013a9d15fa89c` (`0.2.64-dev.1`). Linux and Windows each passed **215/215 tests, zero failed/skipped**, with zero build warnings/errors. Real EN/RU and extracted-package WPF reports pass live settings, cache clear/regeneration/database preservation, duplicate cancel/stale/first-occurrence/current/queue handling, actual diagnostic clipboard and three saved-session policies. The software power workflow passes; physical sleep/output remains unrun.
+
+Both owned 7201-second profiles pass native range/EOF and production prepare/seek/stop checks with source hashes/handles preserved and bounded 16 KiB buffers. APE decoded float length is 2,765,184,000 bytes. Native AAC/MP4 outputs equal stereo channels for encoded mono; this distinction is retained in facts/UI. This does not establish two-hour playback or an encoded APE larger than 4 GiB.
+
+The published ZIP was independently downloaded from GitHub and matched API asset digests, ZIP sidecar and both package audits. Extracted inventory verification passes **559 files, 13 native x64 libraries, no extras**, with compiled version/provenance checks. [Exact job/artifact/report hashes, observations and download receipt](evidence/spec-completion-windows.json). Hosted real output enumeration again found zero enabled devices; clean Windows 11, hardware/manual/full two-hour acceptance and licensing remain open as enumerated in [SPEC_COMPLETION.md](SPEC_COMPLETION.md). This evidence records the tested source; the documentation follow-up receives its own CI/version/ZIP before handoff.

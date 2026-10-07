@@ -30,3 +30,12 @@ Two additional owned 7201-second M4B/APE fixtures add bounded real native durati
 P2 extensions (light theme, mini-player, spectrum, module/MIDI/AC3/DTS, chapter UI, installer/ASIO/native DSD) remain optional. This block does not silently introduce them or declare all P0/P1 accepted.
 
 The pinned native AAC/MP4 decoder reports stereo PCM for the owned mono M4B. The manifest distinguishes independently encoded mono from decoded stereo; validation requires equal left/right PCM rather than changing the original source facts. UI/diagnostics additionally show encoded metadata channel count when it differs from native decode channels. This is not bit-perfect mono decoding.
+
+
+## Observed specification follow-up results
+
+[Main run 37576574867](https://github.com/kurasis/MPswift/actions/runs/37576574867) passed all three jobs at `9657f48ed5271a0bfbd73bd8d75013a9d15fa89c` (`0.2.64-dev.1`). Linux and Windows each passed **215/215 tests, zero failed/skipped**, with zero build warnings/errors. Real EN/RU and extracted-package WPF reports pass live settings, cache clear/regeneration/database preservation, duplicate cancel/stale/first-occurrence/current/queue handling, actual diagnostic clipboard and three saved-session policies. The software power workflow passes; physical sleep/output remains unrun.
+
+Both owned 7201-second profiles pass native range/EOF and production prepare/seek/stop checks with source hashes/handles preserved and bounded 16 KiB buffers. APE decoded float length is 2,765,184,000 bytes. Native AAC/MP4 outputs equal stereo channels for encoded mono; this distinction is retained in facts/UI. This does not establish two-hour playback or an encoded APE larger than 4 GiB.
+
+The published ZIP was independently downloaded from GitHub and matched API asset digests, ZIP sidecar and both package audits. Extracted inventory verification passes **559 files, 13 native x64 libraries, no extras**, with compiled version/provenance checks. [Exact job/artifact/report hashes, observations and download receipt](evidence/spec-completion-windows.json). Hosted real output enumeration again found zero enabled devices; clean Windows 11, hardware/manual/full two-hour acceptance and licensing remain open as enumerated in the acceptance boundary above. This evidence records the tested source; the documentation follow-up receives its own CI/version/ZIP before handoff.

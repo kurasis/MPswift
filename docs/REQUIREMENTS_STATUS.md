@@ -133,3 +133,12 @@ Initial failures were corrected without weakening assertions: PS stereo needed a
 ## Specification completion follow-up (2026-10-07)
 
 The concrete §11.1 duplicate-preview, §13.3/§19.1 live cache/settings, §15.5 restore/default/directory and §20.3 redacted diagnostic-preview gaps are now implemented. Existing AC evidence above is retained with its boundaries; whole requirements do not become passed from compilation. [Behavior and outstanding acceptance](SPEC_COMPLETION.md). Windows observation of the additional owned workflows awaits this source main CI.
+
+
+## Observed specification follow-up results
+
+[Main run 37576574867](https://github.com/kurasis/MPswift/actions/runs/37576574867) passed all three jobs at `9657f48ed5271a0bfbd73bd8d75013a9d15fa89c` (`0.2.64-dev.1`). Linux and Windows each passed **215/215 tests, zero failed/skipped**, with zero build warnings/errors. Real EN/RU and extracted-package WPF reports pass live settings, cache clear/regeneration/database preservation, duplicate cancel/stale/first-occurrence/current/queue handling, actual diagnostic clipboard and three saved-session policies. The software power workflow passes; physical sleep/output remains unrun.
+
+Both owned 7201-second profiles pass native range/EOF and production prepare/seek/stop checks with source hashes/handles preserved and bounded 16 KiB buffers. APE decoded float length is 2,765,184,000 bytes. Native AAC/MP4 outputs equal stereo channels for encoded mono; this distinction is retained in facts/UI. This does not establish two-hour playback or an encoded APE larger than 4 GiB.
+
+The published ZIP was independently downloaded from GitHub and matched API asset digests, ZIP sidecar and both package audits. Extracted inventory verification passes **559 files, 13 native x64 libraries, no extras**, with compiled version/provenance checks. [Exact job/artifact/report hashes, observations and download receipt](evidence/spec-completion-windows.json). Hosted real output enumeration again found zero enabled devices; clean Windows 11, hardware/manual/full two-hour acceptance and licensing remain open as enumerated in [SPEC_COMPLETION.md](SPEC_COMPLETION.md). This evidence records the tested source; the documentation follow-up receives its own CI/version/ZIP before handoff.

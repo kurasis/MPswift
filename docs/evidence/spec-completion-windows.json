@@ -1,0 +1,351 @@
+{
+  "sourceCommit": "9657f48ed5271a0bfbd73bd8d75013a9d15fa89c",
+  "runUrl": "https://github.com/kurasis/MPswift/actions/runs/37576574867",
+  "runAttempt": 1,
+  "runStatus": "completed",
+  "runConclusion": "success",
+  "jobs": [
+    {
+      "id": 112646708221,
+      "name": "build (ubuntu-24.04)",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37576574867/job/112646708221",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 112646708413,
+      "name": "build (windows-2022)",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37576574867/job/112646708413",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 112649242849,
+      "name": "Publish separate Windows ZIP prerelease",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37576574867/job/112649242849",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "evidence-windows-2022",
+      "archiveSha256": "2bc9452e9e6fd6d9ca3ed73a9e2922239650b05a00df11aceeb47e340c9bd399",
+      "tests": [
+        {
+          "counters": {
+            "total": "215",
+            "executed": "215",
+            "passed": "215",
+            "failed": "0",
+            "error": "0",
+            "timeout": "0",
+            "aborted": "0",
+            "inconclusive": "0",
+            "passedButRunAborted": "0",
+            "notRunnable": "0",
+            "notExecuted": "0",
+            "disconnected": "0",
+            "warning": "0",
+            "completed": "0",
+            "inProgress": "0",
+            "pending": "0"
+          }
+        }
+      ],
+      "reports": {
+        "smoke/g11-device-probe.json": {
+          "fileSha256": "c3d5b6eb80453d746644225c53b95b3a5dd1c929d464ef26745a1e97fc4f2b3a",
+          "observed": {
+            "Status": "g11-device-probe-complete",
+            "Failure": null,
+            "Mode": "Probe",
+            "SourceCommit": "9657f48ed5271a0bfbd73bd8d75013a9d15fa89c",
+            "SourceTreeDirty": false,
+            "PackageManifestSha256": "9e5cfdda2353a3a0824db097aafbc372113aea7c3d441a3c471eb962490083ea",
+            "StartedUtc": "2026-10-07T05:38:03.8985449+00:00",
+            "EndedUtc": "2026-10-07T05:38:04.9225077+00:00",
+            "PowerShellVersion": "5.1.20348.5622",
+            "InvalidExternalDotnetRoots": true,
+            "ActualApphostProcessId": 1128,
+            "ActualNativeAudio": {
+              "Status": "g11-device-probe-complete",
+              "Mode": "probe",
+              "Versions": {
+                "bass": "2.4.18.3",
+                "bassmix": "2.4.13.0",
+                "basswasapi": "2.4.4.1"
+              },
+              "Devices": [],
+              "Selected": null,
+              "EnabledOutputs": 0,
+              "Output": "not-run",
+              "DigitalCapture": "not-run",
+              "Listening": "not-run",
+              "Windows": "Microsoft Windows 10.0.20348"
+            },
+            "InstalledMediaDrivers": [],
+            "ManualListening": "not-run",
+            "PhysicalHotplugSleep": "not-run",
+            "EvidenceBoundary": "Probe only enumerates actual native devices. Output modes require a real endpoint; Digital additionally requires matching stereo loopback and measured capture. Other codec boundaries and hardware/listening acceptance remain separate."
+          }
+        },
+        "smoke/long-formats.json": {
+          "fileSha256": "c2c600622d5afd6af138280f3cd00bd8f4f2dd54e48896b34c84125390f2d695",
+          "observed": {
+            "Status": "long-formats-passed",
+            "Results": [
+              {
+                "File": "long-markers.ape",
+                "DurationSeconds": 7201,
+                "DecodedFloatBytes": 2765184000,
+                "ExceedsInt32DecodedRange": true,
+                "Frequency": 48000,
+                "EncodedChannels": 2,
+                "DecodedChannels": 2,
+                "Ranges": [
+                  {
+                    "PositionSeconds": 0.25,
+                    "DecodedByteOffset": 96000,
+                    "Peak": 0.049987793,
+                    "Rms": 0.035366840395563065,
+                    "MonoUpmixMaximumDifference": 0,
+                    "SeekAndReadMilliseconds": 5.9404
+                  },
+                  {
+                    "PositionSeconds": 3600.25,
+                    "DecodedByteOffset": 1382496000,
+                    "Peak": 0.049987793,
+                    "Rms": 0.035366840395563065,
+                    "MonoUpmixMaximumDifference": 0,
+                    "SeekAndReadMilliseconds": 9.5284
+                  },
+                  {
+                    "PositionSeconds": 7199.25,
+                    "DecodedByteOffset": 2764512000,
+                    "Peak": 0.049987793,
+                    "Rms": 0.035366840395563065,
+                    "MonoUpmixMaximumDifference": 0,
+                    "SeekAndReadMilliseconds": 26.23
+                  }
+                ],
+                "NaturalEnd": true,
+                "BoundedBufferBytes": 16384,
+                "ElapsedMilliseconds": 45.681
+              },
+              {
+                "File": "long-audiobook.m4b",
+                "DurationSeconds": 7201.021333333333,
+                "DecodedFloatBytes": 2765192192,
+                "ExceedsInt32DecodedRange": true,
+                "Frequency": 48000,
+                "EncodedChannels": 1,
+                "DecodedChannels": 2,
+                "Ranges": [
+                  {
+                    "PositionSeconds": 0.25,
+                    "DecodedByteOffset": 96000,
+                    "Peak": 0.07469333,
+                    "Rms": 0.04074987286280735,
+                    "MonoUpmixMaximumDifference": 0,
+                    "SeekAndReadMilliseconds": 0.0705
+                  },
+                  {
+                    "PositionSeconds": 3600.25,
+                    "DecodedByteOffset": 1382496000,
+                    "Peak": 0.079942144,
+                    "Rms": 0.04104006415620194,
+                    "MonoUpmixMaximumDifference": 0,
+                    "SeekAndReadMilliseconds": 0.0442
+                  },
+                  {
+                    "PositionSeconds": 7199.25,
+                    "DecodedByteOffset": 2764512000,
+                    "Peak": 0.06601339,
+                    "Rms": 0.039017631455520695,
+                    "MonoUpmixMaximumDifference": 0,
+                    "SeekAndReadMilliseconds": 0.0429
+                  }
+                ],
+                "NaturalEnd": true,
+                "BoundedBufferBytes": 16384,
+                "ElapsedMilliseconds": 4.5806
+              }
+            ],
+            "ProductionPrepareSeekStop": true,
+            "SourcePreservation": true,
+            "Output": "not-run; bounded native decode is not two-hour device playback",
+            "HugeCompressedApe": "not-run; owned APE tests two-hour duration and >Int32 decoded range, not a compressed file over 4 GiB"
+          }
+        },
+        "smoke/package-smoke.json": {
+          "fileSha256": "2f4096fc59d4517e44a28d249c76b1c3ba7c011bf9bea59452734874c4d765bd",
+          "observed": {
+            "Status": "packaged-executable-smoke-passed",
+            "SourceCommit": "9657f48ed5271a0bfbd73bd8d75013a9d15fa89c",
+            "ZipSha256": "d8a762c011ec87e17478eb7dba768e43a8247e6b853494d228c969d30aa665f3",
+            "UnicodeExtractionPath": true,
+            "ArbitraryWorkingDirectory": true,
+            "InvalidExternalDotnetRoot": true,
+            "TamperRejected": true,
+            "Windows": "Microsoft Windows NT 10.0.20348.0",
+            "CleanWindows11WithoutSdk": "not-run",
+            "NetworkDisconnected": "not-run",
+            "DeviceOutput": "not-run",
+            "DistributionApproved": false
+          }
+        },
+        "smoke/packaged-ui.json": {
+          "fileSha256": "e27f9ec466c0fc5542a52e0ae48e5d1a861707c9bac2ff9ba25b3d3adcd642cd",
+          "observed": {
+            "Status": "ui-smoke-passed",
+            "Completion": {
+              "Status": "completion-passed",
+              "CacheClearPreservesDatabase": true,
+              "CacheRegeneration": true,
+              "InvalidBudgetRejected": true,
+              "DuplicatePreviewAndCancel": true,
+              "StalePreviewRefused": true,
+              "FirstOccurrenceRetained": true,
+              "QueueAndPlaybackPreserved": true,
+              "RedactedPreviewAndActualClipboard": true,
+              "RestoreOnWithoutPositionAndOff": true,
+              "RatingsPreserved": true,
+              "PowerPolicy": "owned paused-source software workflow passed; physical sleep/resume remains not-run"
+            },
+            "Customization": {
+              "Status": "customization-passed",
+              "CompactMenu": true,
+              "KeyboardSubmenu": true,
+              "NestedAction": true,
+              "LocalizedSettingsShortcut": true,
+              "SettingsPersisted": true,
+              "AccentPersisted": true,
+              "RuntimeCacheBudget": true,
+              "RestorationPreferences": true,
+              "DraftCancel": true,
+              "PlaybackPreserved": true,
+              "LanguageChange": "immediate; persisted across restarts",
+              "UniformVectorIcons": true,
+              "VisibleBuildVersion": "0.2.64-dev.1"
+            }
+          }
+        },
+        "smoke/ui-en.json": {
+          "fileSha256": "c13e6836366616dd7ac99f89fe81b197235cadd3d4f1413d3f53339725bf1ddc",
+          "observed": {
+            "Status": "ui-smoke-passed",
+            "Completion": {
+              "Status": "completion-passed",
+              "CacheClearPreservesDatabase": true,
+              "CacheRegeneration": true,
+              "InvalidBudgetRejected": true,
+              "DuplicatePreviewAndCancel": true,
+              "StalePreviewRefused": true,
+              "FirstOccurrenceRetained": true,
+              "QueueAndPlaybackPreserved": true,
+              "RedactedPreviewAndActualClipboard": true,
+              "RestoreOnWithoutPositionAndOff": true,
+              "RatingsPreserved": true,
+              "PowerPolicy": "owned paused-source software workflow passed; physical sleep/resume remains not-run"
+            },
+            "Customization": {
+              "Status": "customization-passed",
+              "CompactMenu": true,
+              "KeyboardSubmenu": true,
+              "NestedAction": true,
+              "LocalizedSettingsShortcut": true,
+              "SettingsPersisted": true,
+              "AccentPersisted": true,
+              "RuntimeCacheBudget": true,
+              "RestorationPreferences": true,
+              "DraftCancel": true,
+              "PlaybackPreserved": true,
+              "LanguageChange": "immediate; persisted across restarts",
+              "UniformVectorIcons": true,
+              "VisibleBuildVersion": "0.2.64-dev.1"
+            }
+          }
+        },
+        "smoke/ui-ru.json": {
+          "fileSha256": "12d446e884523b2c56e910681cb31e25353d22a726213609b7b0890b28b04602",
+          "observed": {
+            "Status": "ui-smoke-passed",
+            "Completion": {
+              "Status": "completion-passed",
+              "CacheClearPreservesDatabase": true,
+              "CacheRegeneration": true,
+              "InvalidBudgetRejected": true,
+              "DuplicatePreviewAndCancel": true,
+              "StalePreviewRefused": true,
+              "FirstOccurrenceRetained": true,
+              "QueueAndPlaybackPreserved": true,
+              "RedactedPreviewAndActualClipboard": true,
+              "RestoreOnWithoutPositionAndOff": true,
+              "RatingsPreserved": true,
+              "PowerPolicy": "owned paused-source software workflow passed; physical sleep/resume remains not-run"
+            },
+            "Customization": {
+              "Status": "customization-passed",
+              "CompactMenu": true,
+              "KeyboardSubmenu": true,
+              "NestedAction": true,
+              "LocalizedSettingsShortcut": true,
+              "SettingsPersisted": true,
+              "AccentPersisted": true,
+              "RuntimeCacheBudget": true,
+              "RestorationPreferences": true,
+              "DraftCancel": true,
+              "PlaybackPreserved": true,
+              "LanguageChange": "immediate; persisted across restarts",
+              "UniformVectorIcons": true,
+              "VisibleBuildVersion": "0.2.64-dev.1"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "evidence-ubuntu-24.04",
+      "archiveSha256": "9db130dfe67fd1c2097a5e798d3ff0d86b74642ae995e320846f3ffdd97fa2f0",
+      "tests": [
+        {
+          "counters": {
+            "total": "215",
+            "executed": "215",
+            "passed": "215",
+            "failed": "0",
+            "error": "0",
+            "timeout": "0",
+            "aborted": "0",
+            "inconclusive": "0",
+            "passedButRunAborted": "0",
+            "notRunnable": "0",
+            "notExecuted": "0",
+            "disconnected": "0",
+            "warning": "0",
+            "completed": "0",
+            "inProgress": "0",
+            "pending": "0"
+          }
+        }
+      ],
+      "reports": {}
+    }
+  ],
+  "download": {
+    "status": "published-download-verified",
+    "sourceCommit": "9657f48ed5271a0bfbd73bd8d75013a9d15fa89c",
+    "runUrl": "https://github.com/kurasis/MPswift/actions/runs/37576574867",
+    "releaseUrl": "https://github.com/kurasis/MPswift/releases/tag/build-37576574867-attempt-1",
+    "zipUrl": "https://github.com/kurasis/MPswift/releases/download/build-37576574867-attempt-1/MPswift-0.2.64-dev.1-9657f48ed527-win-x64.zip",
+    "bytes": 85732835,
+    "sha256": "d8a762c011ec87e17478eb7dba768e43a8247e6b853494d228c969d30aa665f3",
+    "verifiedInventory": {
+      "files": 559,
+      "nativeX64Libraries": 13,
+      "extraFiles": 0,
+      "method": "Downloaded published GitHub assets, matched GitHub SHA-256 digests and both audit documents, then ran scripts/Verify-Candidate.ps1 on extracted inventory."
+    }
+  }
+}
