@@ -20,7 +20,7 @@ The known AAC outputs do not establish gapless trim to the original presentation
 
 ## Additional production mixer regression
 
-The disposable native mixer check is expanded for these exact MP3 CBR/VBR and Opus fixtures: decode each independently to its verified 144,000-frame EOF; prepare two production sources with crossfade disabled; render blocks crossing the join; compare all 288,000 resulting frames with concatenated separately decoded PCM; require exact transition/EOF and released unchanged inputs. Maximum error must remain below 1e-6. The source implementation changes only test coverage. Cross-target compilation passes; actual source CI observations remain required.
+The disposable native mixer check is expanded for these exact MP3 CBR/VBR and Opus fixtures: decode each independently to its verified 144,000-frame EOF; prepare two production sources with crossfade disabled; render blocks crossing the join; compare all 288,000 resulting frames with concatenated separately decoded PCM; require exact transition/EOF and released unchanged inputs. Maximum error must remain below 1e-6. The source implementation changes only test coverage. [Successful source run 37632708722](https://github.com/kurasis/MPswift/actions/runs/37632708722) observes **zero** maximum error for each of the three profiles, exact transition/EOF and released unchanged inputs. [Actual report hashes and results](evidence/security-completion-windows-2026-10-07.json).
 
 This is not a general promise covering every encoder/tag/container, phase/trim equivalence with the original uncompressed source, listening or actual endpoint latency/capture. Physical output gapless acceptance remains open.
 

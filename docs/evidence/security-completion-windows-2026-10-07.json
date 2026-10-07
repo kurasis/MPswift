@@ -1,0 +1,617 @@
+{
+  "status": "observed-successful-source-and-verified-github-download",
+  "sourceCommit": "c91618e7c6b5174c30b3a683002c17ca3289ba96",
+  "runUrl": "https://github.com/kurasis/MPswift/actions/runs/37632708722",
+  "runAttempt": 1,
+  "jobs": [
+    {
+      "id": 112830837638,
+      "name": "build (ubuntu-24.04)",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37632708722/job/112830837638",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 112830837778,
+      "name": "build (windows-2022)",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37632708722/job/112830837778",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 112837117480,
+      "name": "Publish separate Windows ZIP prerelease",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37632708722/job/112837117480",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "evidence-windows-2022",
+      "archiveSha256": "81bb48a258f5e4ba12564a29c4e35a6f400a412e93a6ce7ece0dbe74406c05e7",
+      "testCounters": {
+        "total": "284",
+        "executed": "284",
+        "passed": "284",
+        "failed": "0",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      }
+    },
+    {
+      "name": "evidence-ubuntu-24.04",
+      "archiveSha256": "2197916688d67f7de564aaa9bf7ffacfe0c114705f05bd9b4ef6cf6d253a002c",
+      "testCounters": {
+        "total": "284",
+        "executed": "284",
+        "passed": "284",
+        "failed": "0",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      }
+    }
+  ],
+  "parser": {
+    "Status": "bounded-parser-security-passed",
+    "Seeds": 14,
+    "Cases": 216,
+    "MemoryLimitBytes": 536870912,
+    "UserCpuLimitSeconds": 8,
+    "WallLimitSeconds": 15,
+    "AssignedLimitsQueried": true,
+    "TimeoutControlKilledAndWaited": true,
+    "NativeFiles": {
+      "Status": "restricted-file-security-passed",
+      "AdministratorGroupDisabled": true,
+      "MaximumPrivilegesDisabled": true,
+      "Scope": "Synchronous filesystem/loader operations under an impersonated restricted token; not a process sandbox",
+      "Checks": {
+        "Status": "native-file-security-passed",
+        "DelayedDecoderPins": 10,
+        "DelayedDecoderWritesDenied": true,
+        "ApprovedModulePaths": true,
+        "SystemDependenciesFromSystem32": true,
+        "InertCwdAndNativeDirectoryShadowsIgnored": true,
+        "SourceWritesAndReplacementsDenied": true,
+        "DirectoryReplacementDenied": true,
+        "HardlinkAliasWritesDenied": true,
+        "NativeLinksRejected": true,
+        "LocalMediaLinksPreserved": true,
+        "RemoteLinkChainsRejectedByPathPolicy": true,
+        "ReadLeaseReleased": true
+      },
+      "DataDirectories": {
+        "RequestedLinkPinned": true,
+        "ReparseWriteOpenBlocked": true,
+        "PhysicalDirectoryPinned": true,
+        "AncestorPinned": true,
+        "LocalDirectoryLinksSupported": true,
+        "SettingsAndCacheRoundTrip": true,
+        "ReplacementWorksAfterDispose": true,
+        "StoredDataPreserved": true,
+        "StagingDirectoryPinned": true,
+        "FlatStageRemoved": true,
+        "UnexpectedStageDataRetained": true,
+        "FailedCleanupHandlesReleased": true
+      },
+      "CacheFiles": {
+        "SymbolicCacheLinkIgnored": true,
+        "HardlinkedCacheIgnored": true,
+        "OutsideBytesAndTimestampsPreserved": true,
+        "RegenerationReplacesEntryOnly": true,
+        "HandleBasedLruTouch": true,
+        "LegacySymbolicTouchUpdatesLinkOnly": true,
+        "LegacyHardlinkTouchChangesFileObject": true,
+        "ReleasedReadHandles": true,
+        "LinkedEntryClearPreservesTarget": true
+      },
+      "MutableData": {
+        "SymbolicDataRejected": true,
+        "HardlinkedDataRejected": true,
+        "OutsideBytesPreserved": true,
+        "WritableSqliteSharingRetained": true,
+        "MutableNameReplacementBlocked": true,
+        "FrozenSnapshotWritesDenied": true,
+        "HeldInstalledAndOriginalMutationsDenied": true,
+        "SameHandleRollbackPassed": true,
+        "SameHandleCommitPassed": true,
+        "HandlesReleased": true,
+        "ReplacementIdentityCleanupRefused": true,
+        "OwnedIdentityCleanupPassed": true,
+        "SameHandleUnicodePublicationPassed": true
+      },
+      "StreamLifetime": {
+        "Status": "production-stream-lifetime-passed",
+        "WavWritesAndReplacementDenied": true,
+        "WavPackMainAndCorrectionWritesDenied": true,
+        "CorrectionReplacementDenied": true,
+        "CallbacksSurviveCollection": true,
+        "MissingCorrectionSelectionFrozen": true,
+        "RenamedWavPackDetected": true,
+        "DirectPublicHandleReleasePreserved": true,
+        "LocalCorrectionLinksPreserved": true,
+        "CorrectedMaximumPcmError": 0,
+        "UncorrectedMaximumPcmError": 3.0517578e-05,
+        "SourceHandlesReleased": true
+      }
+    },
+    "OriginalSeedHashesUnchanged": true,
+    "Coverage": "Deterministic header/body/tail/size mutations, guarded TagLib reads, seek/reopen/EOF and WavPack correction controls; not coverage-guided native fuzzing or proof of memory safety"
+  },
+  "parserOutcomes": {
+    "decode/decoded": 57,
+    "metadata/metadata-parsed": 65,
+    "decode/rejected": 41,
+    "metadata/rejected": 35,
+    "lifecycle/lifecycle-passed": 14,
+    "correction/decoded": 1,
+    "correction/rejected": 3
+  },
+  "reports": {
+    "waveform.json": {
+      "sha256": "a76a891b9ebf6f63ef139ba7eb1e4d4b45a84a8c0b1f7c0ccd3f7a0ec34cceaf",
+      "observations": {
+        "Status": "waveform-passed",
+        "SourceUnchanged": true,
+        "IndependentDecoder": true,
+        "GainAndMuteIndependent": true,
+        "OppositePhasePeaksPreserved": true,
+        "CacheRoundTrip": true,
+        "CorruptCacheRegenerated": true,
+        "ShortBuckets": 300,
+        "LongDurationSeconds": 7200,
+        "LongBuckets": 300000,
+        "LongFramesPerBucket": 192,
+        "PeakPayloadBytes": 2400000,
+        "CancellationAndHandleRelease": true,
+        "CorrectionCache": {
+          "AppearanceInvalidates": true,
+          "ModificationInvalidates": true,
+          "RemovalRecoversAbsentEntry": true,
+          "ActualDecodedPeaksDiffer": true,
+          "MainSourceUnchanged": true,
+          "HandlesReleased": true
+        },
+        "DeviceOutput": "not-run",
+        "FixtureLicense": "CC0-1.0"
+      }
+    },
+    "mixer.json": {
+      "sha256": "7c6cc412febc2defe29e4894bd84dcd6acd617d6fe4996c5bec9ec142040d76d",
+      "observations": {
+        "Status": "mixer-passed",
+        "LosslessMaximumSampleError": 0,
+        "CueMaximumSampleError": 0,
+        "AddedOrDuplicatedFrames": 0,
+        "SourceUnchanged": true,
+        "LossyProfiles": {
+          "Status": "known-lossy-mixer-profiles-passed",
+          "Results": [
+            {
+              "File": "mp3-cbr.mp3",
+              "SourceFrames": 144000,
+              "CombinedFrames": 288000,
+              "MaximumMixerReferenceError": 0,
+              "TransitionAndExactEof": true,
+              "SourceUnchanged": true,
+              "SourceHandlesReleased": true
+            },
+            {
+              "File": "mp3-vbr.mp3",
+              "SourceFrames": 144000,
+              "CombinedFrames": 288000,
+              "MaximumMixerReferenceError": 0,
+              "TransitionAndExactEof": true,
+              "SourceUnchanged": true,
+              "SourceHandlesReleased": true
+            },
+            {
+              "File": "opus.opus",
+              "SourceFrames": 144000,
+              "CombinedFrames": 288000,
+              "MaximumMixerReferenceError": 0,
+              "TransitionAndExactEof": true,
+              "SourceUnchanged": true,
+              "SourceHandlesReleased": true
+            }
+          ],
+          "Scope": "These owned MP3 CBR/VBR and Opus profiles only; reference is actual separately decoded PCM with independently observed skip/padding frame counts",
+          "AacGapless": "not-claimed: observed AAC profiles include extra decoded frames",
+          "EndpointCapture": "not-run"
+        },
+        "LossyGapless": "not-claimed-universally",
+        "WasapiOutputCapture": "not-run",
+        "Listening": "not-run"
+      }
+    },
+    "ui-en.json": {
+      "sha256": "7e4a8721f759e6792409a4018931e36ce144fd6754eecf0e67a82a214da6e3a2",
+      "observations": {
+        "Status": "ui-smoke-passed",
+        "BindingErrors": 0,
+        "CompleteBackupRestore": {
+          "Status": "complete-backup-restore-passed",
+          "DatabaseSettingsAndSession": true,
+          "LibraryRatingsAndQueue": true,
+          "CurrentOriginalsRetained": true,
+          "NoAutoplay": true,
+          "NativeCuePositionRestored": true,
+          "RejectedArchiveReopensCurrentModel": true,
+          "MediaRebound": true
+        },
+        "StorageArtwork": {
+          "Status": "storage-artwork-passed",
+          "WindowsDirectoryWriteDeniedByAcl": true,
+          "LockedSettingsRejected": true,
+          "OriginalAndPreviousSettingsUnchangedOnFailure": true,
+          "WriterRecovered": true,
+          "InvalidCoverRejected": true,
+          "EncodedLimitBytes": 20971520,
+          "PartialBundleRestoreRolledBackOnLockedSettings": true,
+          "LiveDatabaseDirectoryPinned": true,
+          "BackupStagingAndDestinationPinned": true,
+          "OversizedTruncatedHeaderRejected": true,
+          "DeclaredPixelLimit": 40000000,
+          "PortraitThumbnailWidth": 3,
+          "PortraitThumbnailHeight": 192,
+          "BoundedCoverMutations": {
+            "Cases": 5,
+            "TruncatedPngRejected": true,
+            "OverflowDimensionsRejected": true,
+            "InvalidJpegRejected": true,
+            "ValidPngRecovered": true
+          },
+          "FrozenCacheHit": true,
+          "SameFactsSiblingIdentity": true,
+          "CancellationLeavesWorkerUsable": true,
+          "SourceHashUnchanged": true,
+          "ReaderHandlesReleased": true,
+          "DiskFull": "not-run",
+          "HugeTagProcessIsolation": "not-run"
+        },
+        "Completion": {
+          "Status": "completion-passed",
+          "CacheClearPreservesDatabase": true,
+          "CacheRegeneration": true,
+          "InvalidBudgetRejected": true,
+          "DuplicatePreviewAndCancel": true,
+          "StalePreviewRefused": true,
+          "FirstOccurrenceRetained": true,
+          "QueueAndPlaybackPreserved": true,
+          "RedactedPreviewAndActualClipboard": true,
+          "RestoreOnWithoutPositionAndOff": true,
+          "RatingsPreserved": true,
+          "PowerPolicy": "owned paused-source software workflow passed; physical sleep/resume remains not-run"
+        }
+      }
+    },
+    "ui-ru.json": {
+      "sha256": "f77db05fba8510b7e9fe4b0aa746f2108a78e2f7dd87a3e9f0811f617f382f73",
+      "observations": {
+        "Status": "ui-smoke-passed",
+        "BindingErrors": 0,
+        "CompleteBackupRestore": {
+          "Status": "complete-backup-restore-passed",
+          "DatabaseSettingsAndSession": true,
+          "LibraryRatingsAndQueue": true,
+          "CurrentOriginalsRetained": true,
+          "NoAutoplay": true,
+          "NativeCuePositionRestored": true,
+          "RejectedArchiveReopensCurrentModel": true,
+          "MediaRebound": true
+        },
+        "StorageArtwork": {
+          "Status": "storage-artwork-passed",
+          "WindowsDirectoryWriteDeniedByAcl": true,
+          "LockedSettingsRejected": true,
+          "OriginalAndPreviousSettingsUnchangedOnFailure": true,
+          "WriterRecovered": true,
+          "InvalidCoverRejected": true,
+          "EncodedLimitBytes": 20971520,
+          "PartialBundleRestoreRolledBackOnLockedSettings": true,
+          "LiveDatabaseDirectoryPinned": true,
+          "BackupStagingAndDestinationPinned": true,
+          "OversizedTruncatedHeaderRejected": true,
+          "DeclaredPixelLimit": 40000000,
+          "PortraitThumbnailWidth": 3,
+          "PortraitThumbnailHeight": 192,
+          "BoundedCoverMutations": {
+            "Cases": 5,
+            "TruncatedPngRejected": true,
+            "OverflowDimensionsRejected": true,
+            "InvalidJpegRejected": true,
+            "ValidPngRecovered": true
+          },
+          "FrozenCacheHit": true,
+          "SameFactsSiblingIdentity": true,
+          "CancellationLeavesWorkerUsable": true,
+          "SourceHashUnchanged": true,
+          "ReaderHandlesReleased": true,
+          "DiskFull": "not-run",
+          "HugeTagProcessIsolation": "not-run"
+        },
+        "Completion": {
+          "Status": "completion-passed",
+          "CacheClearPreservesDatabase": true,
+          "CacheRegeneration": true,
+          "InvalidBudgetRejected": true,
+          "DuplicatePreviewAndCancel": true,
+          "StalePreviewRefused": true,
+          "FirstOccurrenceRetained": true,
+          "QueueAndPlaybackPreserved": true,
+          "RedactedPreviewAndActualClipboard": true,
+          "RestoreOnWithoutPositionAndOff": true,
+          "RatingsPreserved": true,
+          "PowerPolicy": "owned paused-source software workflow passed; physical sleep/resume remains not-run"
+        }
+      }
+    },
+    "packaged-ui.json": {
+      "sha256": "240dcc68c8fb518811f95ea8365bf40a6b8e387bf5ae2a3297b50f50feafbc2c",
+      "observations": {
+        "Status": "ui-smoke-passed",
+        "BindingErrors": 0,
+        "CompleteBackupRestore": {
+          "Status": "complete-backup-restore-passed",
+          "DatabaseSettingsAndSession": true,
+          "LibraryRatingsAndQueue": true,
+          "CurrentOriginalsRetained": true,
+          "NoAutoplay": true,
+          "NativeCuePositionRestored": true,
+          "RejectedArchiveReopensCurrentModel": true,
+          "MediaRebound": true
+        },
+        "StorageArtwork": {
+          "Status": "storage-artwork-passed",
+          "WindowsDirectoryWriteDeniedByAcl": true,
+          "LockedSettingsRejected": true,
+          "OriginalAndPreviousSettingsUnchangedOnFailure": true,
+          "WriterRecovered": true,
+          "InvalidCoverRejected": true,
+          "EncodedLimitBytes": 20971520,
+          "PartialBundleRestoreRolledBackOnLockedSettings": true,
+          "LiveDatabaseDirectoryPinned": true,
+          "BackupStagingAndDestinationPinned": true,
+          "OversizedTruncatedHeaderRejected": true,
+          "DeclaredPixelLimit": 40000000,
+          "PortraitThumbnailWidth": 3,
+          "PortraitThumbnailHeight": 192,
+          "BoundedCoverMutations": {
+            "Cases": 5,
+            "TruncatedPngRejected": true,
+            "OverflowDimensionsRejected": true,
+            "InvalidJpegRejected": true,
+            "ValidPngRecovered": true
+          },
+          "FrozenCacheHit": true,
+          "SameFactsSiblingIdentity": true,
+          "CancellationLeavesWorkerUsable": true,
+          "SourceHashUnchanged": true,
+          "ReaderHandlesReleased": true,
+          "DiskFull": "not-run",
+          "HugeTagProcessIsolation": "not-run"
+        },
+        "Completion": {
+          "Status": "completion-passed",
+          "CacheClearPreservesDatabase": true,
+          "CacheRegeneration": true,
+          "InvalidBudgetRejected": true,
+          "DuplicatePreviewAndCancel": true,
+          "StalePreviewRefused": true,
+          "FirstOccurrenceRetained": true,
+          "QueueAndPlaybackPreserved": true,
+          "RedactedPreviewAndActualClipboard": true,
+          "RestoreOnWithoutPositionAndOff": true,
+          "RatingsPreserved": true,
+          "PowerPolicy": "owned paused-source software workflow passed; physical sleep/resume remains not-run"
+        }
+      }
+    },
+    "g9-resilience.json": {
+      "sha256": "8e37791ce1f655fae3f91d913998cbc5220f6b5044670e776eef456dee299ddc",
+      "observations": {
+        "Status": "g9-resilience-passed",
+        "ReadOnlyPortable": {
+          "ActualDeniedDirectoryAcl": true,
+          "ExplicitDeclinePreservedUserDirectory": true,
+          "ExplicitAcceptSavedPerUser": true,
+          "Choices": 2,
+          "PermissionRecovery": true,
+          "InteractiveMessageBox": "policy callback exercised; manual dialog interaction remains separate"
+        },
+        "Metadata": {
+          "ActualOversizedRiffTagBytes": 33554434,
+          "FallbackAndArtworkIsolation": true,
+          "NativeAudioDecodeUnaffected": true,
+          "TruncatedFlacRejected": true,
+          "UnsupportedCompressedFrameIsolated": true,
+          "ValidTitleInputCharacters": 100000,
+          "BoundedTitleCharacters": 4096,
+          "SubsequentValidMetadata": true,
+          "SourceUnchanged": true,
+          "SourceHandlesReleased": true,
+          "Decode": {
+            "SampleRate": 48000,
+            "Channels": 2,
+            "DurationSeconds": 3,
+            "DecodedBytes": 1152000,
+            "Peak": 0.049987793,
+            "Codec": "WavePCM",
+            "BitDepth": 16
+          }
+        },
+        "WatcherOverflow": {
+          "ActualInternalBufferOverflows": 1,
+          "BufferBytes": 4096,
+          "BurstCreateDeletePairs": 4000,
+          "NativeCallbackTemporarilyHeld": true,
+          "DebouncedRootHint": true,
+          "ProductionScannerReconciled": true,
+          "StableIdsAndRatingsAndPlaylist": true,
+          "MissingAndReappearing": true,
+          "CancellationAfterCommittedBatch": 64,
+          "NoFalseMissingFromPartialScan": true,
+          "ResumedFiles": 133
+        },
+        "FullDisk": {
+          "OwnedNtfsVhd": true,
+          "FileSystem": "NTFS",
+          "VolumeBytes": 133099520,
+          "FilledBytes": 118095872,
+          "ActualWindowsDiskFullCode": 112,
+          "ActualSqliteFullCode": 13,
+          "TransactionRollbackPreservedCommittedState": true,
+          "SettingsAndPreviousBytesPreserved": true,
+          "IncompleteBackupNotPublished": true,
+          "SaveAndBackupAfterSpaceFreed": true
+        },
+        "PowerLoss": "not-run",
+        "Windows": "Microsoft Windows NT 10.0.20348.0",
+        "SourceCommit": "c91618e7c6b5174c30b3a683002c17ca3289ba96"
+      }
+    },
+    "crash-restart.json": {
+      "sha256": "dd3832a2ffaf6f0cfdc48a5de11a80e781b49c6156ca977f3a989eff6cb2385f",
+      "observations": {
+        "Status": "crash-restart-model-passed",
+        "CommittedPlaylistIdentityOrderAndFlags": true,
+        "ActiveSourceAndPosition": true,
+        "QueueRepeatShuffle": true,
+        "Ratings": true,
+        "VolumeMute": true,
+        "NativePreparation": true,
+        "NoAutoplay": true,
+        "SqliteIntegrityAndReferences": true,
+        "UncommittedValidationTransactionRolledBack": true,
+        "SourceUnchanged": true,
+        "PositionToleranceSeconds": 0.05,
+        "DevicePlayback": "not-run",
+        "KillDuringMigrationOrPowerLoss": "not-run",
+        "Windows": "Microsoft Windows NT 10.0.20348.0",
+        "ForcedWpfTermination": true,
+        "KilledExitCode": -1,
+        "Method": "Actual apphost killed after a production checkpoint, while a diagnostic SQLite write transaction was open; actual WPF/native restart validates the last committed state.",
+        "SourceCommit": "c91618e7c6b5174c30b3a683002c17ca3289ba96"
+      }
+    },
+    "migration-restart.json": {
+      "sha256": "52f3f876e40ccacdf1aba5f9da468de185c599d884e699d833a3676ea59dd4dd",
+      "observations": {
+        "Status": "production-migration-kill-restart-passed",
+        "InterruptedActualProductionDdl": true,
+        "SchemaAndAlterRolledBackBeforeRestart": true,
+        "MigrationRetryCompleted": true,
+        "SchemaOneBackups": 2,
+        "IdentitiesOrderDuplicatesAndFlags": true,
+        "NativePreparation": true,
+        "NoAutoplay": true,
+        "PowerLoss": "not-run: forced process termination is not power loss",
+        "Windows": "Microsoft Windows NT 10.0.20348.0",
+        "ForcedWpfTermination": true,
+        "KilledExitCode": -1,
+        "Method": "Actual apphost killed inside production schema migration after DDL and before Commit; assert schema-one rollback before actual WPF/native restart retries migration.",
+        "SourceCommit": "c91618e7c6b5174c30b3a683002c17ca3289ba96"
+      }
+    },
+    "package-smoke.json": {
+      "sha256": "35e29fe23eb89d837eab1a56f03f9d949045f1246ac98e73a0d05707df14f404",
+      "observations": {
+        "Status": "packaged-executable-smoke-passed",
+        "SourceCommit": "c91618e7c6b5174c30b3a683002c17ca3289ba96",
+        "ZipSha256": "49eaed39b97a8b2ab8043d8dc03878f8158195e3eba4f9a51bc79a764570ac25",
+        "UnicodeExtractionPath": true,
+        "ArbitraryWorkingDirectory": true,
+        "InvalidExternalDotnetRoot": true,
+        "TamperRejected": true,
+        "Windows": "Microsoft Windows NT 10.0.20348.0",
+        "CleanWindows11WithoutSdk": "not-run",
+        "NetworkDisconnected": "not-run",
+        "DeviceOutput": "not-run",
+        "DistributionApproved": false
+      }
+    }
+  },
+  "download": {
+    "status": "published-download-verified",
+    "sourceCommit": "c91618e7c6b5174c30b3a683002c17ca3289ba96",
+    "runUrl": "https://github.com/kurasis/MPswift/actions/runs/37632708722",
+    "releaseUrl": "https://github.com/kurasis/MPswift/releases/tag/build-37632708722-attempt-1",
+    "zipUrl": "https://github.com/kurasis/MPswift/releases/download/build-37632708722-attempt-1/MPswift-0.2.85-dev.1-c91618e7c6b5-win-x64.zip",
+    "bytes": 85840594,
+    "sha256": "49eaed39b97a8b2ab8043d8dc03878f8158195e3eba4f9a51bc79a764570ac25"
+  },
+  "package": {
+    "Status": "local-candidate-packaged",
+    "ProductVersion": "0.2.85-dev.1",
+    "SourceCommit": "c91618e7c6b5174c30b3a683002c17ca3289ba96",
+    "SourceTreeDirty": false,
+    "Zip": "MPswift-0.2.85-dev.1-c91618e7c6b5-win-x64.zip",
+    "ZipSha256": "49eaed39b97a8b2ab8043d8dc03878f8158195e3eba4f9a51bc79a764570ac25",
+    "Bytes": 85840594,
+    "Files": 578,
+    "Dependencies": 14,
+    "NativeLibraries": 13,
+    "DistributionApproved": false
+  },
+  "csWinRtShippedLicenseSha256": "9906940f61b1f0b533fa7d99baf55178b2808fbe113ea51dfbfad8572ccd5f2b",
+  "changedSourceHashes": {
+    ".github/workflows/build.yml": "8bbe747a6c5d9d6b4d578df8b38216041121c59fa4a47d7ef309da7e90dba7dc",
+    "scripts/Prepare-TagLibSource.py": "8c5dc7c701796092914b3a2d3ce84c8499a01a558520e5d993bf312e4a3c8325",
+    "scripts/Test-LicenseTexts.ps1": "dd848a3f9035668c48ced8d0a30a8104639f8dac427e37ff7f8563aa8d2ff9f5",
+    "scripts/Verify-LicenseTexts.ps1": "cb8eda72282bc776a756661ea6c096abc52ab4bc780793d21e9818ef14a8af0c",
+    "src/Player.App/Services/Audio/BassAudioBackend.cs": "66899df4b1383839015a83de4fcef913b1066a40ebb72aa90c41ca40fbfdd1c5",
+    "src/Player.App/Services/Audio/BassMixerGraph.cs": "5ce86d4058914d0f02812e62c51a99685a705440b2fab341c63b12c755118d23",
+    "src/Player.App/Services/Audio/LocalFileAccess.cs": "2161440da1a9b2fd77a1b0b61fe2deb924ea8e00f00c8434b09fc291046e04d9",
+    "src/Player.App/Services/Audio/NativeDecodeContext.cs": "55ce9b3fc0bec97446e233a4b02e25390b706da056edf9dd7002674031120cb3",
+    "src/Player.App/Services/Audio/NativeLibraryBootstrap.cs": "0836b6e5736ebb7236a61d14309159448f19065cf51a2dba66d09a399b7bc4ff",
+    "src/Player.App/Services/Audio/NativeStreamPins.cs": "4305106a9772ed14d106b2638408fc4e5eca910a20a98053dca84cce2381040c",
+    "src/Player.App/Services/Audio/SourceReadPins.cs": "9c45e8bcac1790685d396a24421d94e3e82a5fe51764bbc98a55d0fe1fd881cb",
+    "src/Player.App/Services/Storage/BackupBundle.cs": "cce9a1020cf781b12d9dc499f918a78a3e1fa3b0da4db64e6779d030d02da2d3",
+    "src/Player.App/Services/Storage/DataFileLease.cs": "b29438da78a3f5779dbdd8de8c12cb83e73d41a3fd96483a7072b34f4860d00b",
+    "src/Player.App/Services/Storage/DatabaseRecovery.cs": "600668c7fc989d066b2f222e64231ce5a4445aae8c108d90974746ffbcc4e566",
+    "src/Player.App/Services/Storage/RestoreFileTransaction.cs": "7d137aa5ca0f55e0b90c99fe00a8a055f207d96e5df4f5c09f363d90ec217166",
+    "src/Player.App/Services/Storage/SettingsFile.cs": "60f669bd21e622cfd37a0e89dbe85da29fd3b89c94c92b9cfe6925f5d025dc3a",
+    "src/Player.App/Services/Storage/SqlitePlayerStore.cs": "5136921e1ced18994d04ab325818ff026cd58e31eec5b4c9063b5f5844ec07d3",
+    "src/Player.App/Services/Waveforms/BassWaveformService.cs": "3a37fa6a7f155e37f2e027ea0c29296af49eb4d2b493a1cc6a912bbd30a6df9f",
+    "tests/Player.Core.Tests/DataFilePolicyTests.cs": "2ff3de9ad7df1d889aa04e461af1f2405088b8ca44df27aa0811be6f570caf83",
+    "tests/Player.Core.Tests/RestoreTransactionTests.cs": "d84a69c6c2a7159b17d4575e6088311c9f70f4c7d3558e3d636b45b863a7fd5e",
+    "tests/Player.Core.Tests/StorageAndWaveformTests.cs": "fb755e2de662b05cc28f6ed606331901f080ab6604c068bfd4d29128b9a7b8bd",
+    "tools/Player.AudioSmoke/LossyMixerValidation.cs": "594bff89a04235874a04e39af97e9b65bfa9e0c01ee0e6a8cf1ff46d558c67eb",
+    "tools/Player.AudioSmoke/MixerValidation.cs": "b6b8def5b7acd7479f217aa1262b70fad3caff3d348cdf80fdf30387aecb1bbc",
+    "tools/Player.AudioSmoke/MutableDataSecurityValidation.cs": "b342fed41765a581c4e7f4fb134e4662fca063e7c5757caf950590cc83a82e1f",
+    "tools/Player.AudioSmoke/NativeFileSecurityValidation.cs": "a1c1dc09d904a5a12f4dd97f3b03fded47ed3595b7b872f4cbae37d4d082fa0c",
+    "tools/Player.AudioSmoke/ParserSecurityValidation.cs": "70a4594d2db28dfa627f81a07b8023ed4cfb6d72d5f53599247512eb1f404415",
+    "tools/Player.AudioSmoke/Player.AudioSmoke.csproj": "81a83018c7c41b898b105f5c717cf938b86527fc84a626dafe911a722280174e",
+    "tools/Player.AudioSmoke/RestrictedFileSecurityValidation.cs": "14df34644e8b77a6034abb070912ec367974275e84f017a67229ad465900b4c1",
+    "tools/Player.AudioSmoke/StreamLifetimeValidation.cs": "34853a257f902cbe79e8f0bb2706ce5d29ece1b207496d21cb605afbd50d1777",
+    "tools/Player.AudioSmoke/WaveformValidation.cs": "174f962b7b86e54822ee920660e9e888f4b9a70c2d76b7c18ed4deccbb44616e"
+  },
+  "limits": [
+    "Disposable Windows Server CI is not clean offline Windows 11 or physical endpoint acceptance",
+    "Job limits and local sharing controls are not a production parser process sandbox or a same-user malware boundary",
+    "Known-profile software mixer comparison is not universal lossy trim or endpoint capture",
+    "Normal configured build/analyzers pass; optional latest-all exploration previously reported 558 diagnostics",
+    "Owner licensing, publisher signing and source/redistribution obligations remain separate"
+  ]
+}

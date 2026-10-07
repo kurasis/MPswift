@@ -1,5 +1,9 @@
 # Test evidence — Stages A–G
 
+## Observed security completion (2026-10-07)
+
+Latest verified implementation: `c91618e7c6b5`, **0.2.85-dev.1**, [successful main run 37632708722](https://github.com/kurasis/MPswift/actions/runs/37632708722). Linux and Windows each pass 284 tests; all 216 bounded parser cases and restricted mutable-file/stream controls pass. EN/RU and extracted WPF have zero binding errors; actual rollback, ACL, disk-full, migration-kill, correction-cache and three exact lossy-profile joins pass. The GitHub ZIP, compiled/source versions and 578-file/13-native inventory were downloaded and independently verified. [Findings and exact observed evidence](SECURITY_COMPLETION_2026-10-07.md#observed-completion). This closes the pending checks below for that source; [remaining engineering/hardware/licensing gates](REMAINING_WORK.md) stay open. Documentation-only follow-up source still receives its own normal CI and versioned ZIP.
+
 ## Mutable-data and restore completion (2026-10-07)
 
 Observed baseline `f8716db56be1` / `0.2.77-dev.1`: [run 37614245760](https://github.com/kurasis/MPswift/actions/runs/37614245760) passed 270 tests per OS, 216 isolated cases, restricted Windows staging controls, EN/RU/extracted WPF and independently verified 577-file/13-native ZIP. This supersedes historical pending notes for that exact source.

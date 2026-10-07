@@ -1,5 +1,7 @@
 # Decoder input lifetime and WavPack correction continuity
 
+Current observation: [successful main run 37632708722](https://github.com/kurasis/MPswift/actions/runs/37632708722), source `c91618e7c6b5` / `0.2.85-dev.1`, closes the formerly pending observations below. Restricted actual production stream controls pass every required write/replacement, forced-GC, renamed-input, local-link and release assertion. Corrected reference PCM error is zero; the independent absent-correction control differs. Actual correction-cache appearance/modification/removal checks and EN/RU/extracted WPF pass. Both OSs pass 284 tests. [Exact report/source hashes and observations](evidence/security-completion-windows-2026-10-07.json); [current residual boundaries](REMAINING_WORK.md).
+
 ## Scope and finding
 
 P2, conditional local data-integrity/availability hardening: `BassMixerGraph.OpenSource` previously released its canonical `LocalReadLease` after decoder creation while the native decoder continued reading. `BassWaveformService.Decode` retained only the primary input; BASSWV could discover a correction sidecar by pathname, and the waveform cache fingerprint omitted that sidecar. A writer with access to the media directory could replace/change later inputs or produce a stale correction-dependent waveform. Deterministic exploitation of native decoder implementation races is not claimed; this is neither privilege escalation nor an OS boundary against same-user malware.
