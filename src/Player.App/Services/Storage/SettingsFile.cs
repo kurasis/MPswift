@@ -6,20 +6,29 @@ namespace Player.App.Services.Storage;
 
 public sealed class SettingsFile(string directory)
 {
+    private static readonly object IoGate = new();
     private readonly string _path = Path.Combine(directory, "settings.json");
     public PlayerSettings Load()
     {
-        if (!File.Exists(_path))
+        lock (IoGate)
         {
-            if (File.Exists(_path + ".bak")) throw new InvalidDataException("Settings are missing but a previous backup exists; choose recovery explicitly.");
+            if (!Directory.Exists(Path.GetDirectoryName(_path))) return new();
+            using var lease = DataDirectoryLease.Open(Path.GetDirectoryName(_path)!);
+            var path = Path.Combine(lease.DirectoryPath, "settings.json");
+            using var file = DataFileLease.OpenExisting(path);
+            if (file is not null) return Read(file.Stream);
+            using var backup = DataFileLease.OpenExisting(path + ".bak");
+            if (backup is not null) throw new InvalidDataException("Settings are missing but a previous backup exists; choose recovery explicitly.");
             return new();
         }
-        using var lease = DataDirectoryLease.Open(Path.GetDirectoryName(_path)!);
-        return Read(Path.Combine(lease.DirectoryPath, "settings.json"));
     }
     private static PlayerSettings Read(string path)
     {
-        using var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+        using var lease = DataFileLease.OpenExisting(path) ?? throw new FileNotFoundException("Settings file is unavailable.");
+        return Read(lease.Stream);
+    }
+    private static PlayerSettings Read(Stream file)
+    {
         var length = file.Length;
         if (length > 65536) throw new InvalidDataException("Settings file is too large; original preserved.");
         var bytes = new byte[checked((int)length)]; file.ReadExactly(bytes);
@@ -32,8 +41,11 @@ public sealed class SettingsFile(string directory)
     }
     public PlayerSettings LoadBackup()
     {
-        using var lease = DataDirectoryLease.Open(Path.GetDirectoryName(_path)!);
-        return Read(Path.Combine(lease.DirectoryPath, "settings.json.bak"));
+        lock (IoGate)
+        {
+            using var lease = DataDirectoryLease.Open(Path.GetDirectoryName(_path)!);
+            return Read(Path.Combine(lease.DirectoryPath, "settings.json.bak"));
+        }
     }
     /// <summary>No implicit fallback: only a valid supported backup and explicit user choice permit recovery.</summary>
     public PlayerSettings LoadWithRecovery(Func<Exception, bool> chooseRecovery)
@@ -51,45 +63,43 @@ public sealed class SettingsFile(string directory)
     }
     public string? RestoreBackup()
     {
-        using var lease = DataDirectoryLease.Open(Path.GetDirectoryName(_path)!);
-        var path = Path.Combine(lease.DirectoryPath, "settings.json");
-        var settings = Read(path + ".bak");
-        var temporary = path + ".restore-" + Guid.NewGuid().ToString("N");
-        var preserved = path + ".preserved-" + Guid.NewGuid().ToString("N");
-        var ownsTemporary = false;
-        try
+        lock (IoGate)
         {
-            using (var file = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
-            { ownsTemporary = true; JsonSerializer.Serialize(file, settings); file.Flush(true); }
-            if (File.Exists(path)) { File.Replace(temporary, path, preserved); return preserved; }
-            File.Move(temporary, path);
-            return null; // No original existed to preserve.
+            using var lease = DataDirectoryLease.Open(Path.GetDirectoryName(_path)!);
+            var path = Path.Combine(lease.DirectoryPath, "settings.json");
+            var settings = Read(path + ".bak");
+            var preserved = path + ".preserved-" + Guid.NewGuid().ToString("N");
+            var existed = File.Exists(path);
+            using var content = new MemoryStream(); JsonSerializer.Serialize(content, settings);
+            RestoreFileTransaction.Install([(path, content)], [(path, preserved, false)]);
+            return existed ? preserved : null;
         }
-        finally { if (ownsTemporary && File.Exists(temporary)) File.Delete(temporary); }
     }
     public static void Export(string path, PlayerSettings settings)
     {
-        settings = settings.Validate();
-        using var lease = DataDirectoryLease.Open(Path.GetDirectoryName(Path.GetFullPath(path))!);
-        path = Path.Combine(lease.DirectoryPath, Path.GetFileName(path));
-        using var file = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None);
-        JsonSerializer.Serialize(file, settings); file.Flush(true);
+        lock (IoGate)
+        {
+            settings = settings.Validate();
+            using var lease = DataDirectoryLease.Open(Path.GetDirectoryName(Path.GetFullPath(path))!);
+            path = Path.Combine(lease.DirectoryPath, Path.GetFileName(path));
+            using var file = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None);
+            JsonSerializer.Serialize(file, settings); file.Flush(true);
+        }
     }
     public void Save(PlayerSettings settings)
     {
-        settings = settings.Validate();
-        using var lease = DataDirectoryLease.Create(Path.GetDirectoryName(_path)!);
-        var path = Path.Combine(lease.DirectoryPath, "settings.json");
-        var temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
-        var ownsTemporary = false;
-        try
+        lock (IoGate)
         {
-            using (var file = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
-            { ownsTemporary = true; JsonSerializer.Serialize(file, settings); file.Flush(true); }
-            if (File.Exists(path)) File.Replace(temporary, path, path + ".bak");
-            else File.Move(temporary, path);
+            settings = settings.Validate();
+            using var lease = DataDirectoryLease.Create(Path.GetDirectoryName(_path)!);
+            var path = Path.Combine(lease.DirectoryPath, "settings.json");
+            bool existed;
+            using (var current = DataFileLease.OpenExisting(path)) existed = current is not null;
+            using var previous = existed ? null : DataFileLease.OpenExisting(path + ".bak");
+            using var content = new MemoryStream(); JsonSerializer.Serialize(content, settings);
+            RestoreFileTransaction.Install([(path, content)], existed ?
+                [(path + ".bak", path + ".bak.previous-" + Guid.NewGuid().ToString("N"), true), (path, path + ".bak", false)] : []);
         }
-        finally { if (ownsTemporary && File.Exists(temporary)) File.Delete(temporary); }
     }
 }
 

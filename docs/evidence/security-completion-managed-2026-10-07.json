@@ -1,0 +1,82 @@
+{
+  "baselineCommit": "f8716db56be15821563cb3eb03a2d4352fa60d23",
+  "approvedPolicy": "Reject symbolic/hardlinked mutable application files; preserve local directory/music link support",
+  "baseline": {
+    "file": "_a35019e5777b_2026-10-07_11_56_11_net10.0.trx",
+    "sha256": "68557a373a84c932c9cb8305b46ffb8d45a03d1340b6d195732f3a564d209196",
+    "counters": {
+      "total": "270",
+      "executed": "270",
+      "passed": "270",
+      "failed": "0",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    }
+  },
+  "firstExpandedRun": {
+    "file": "_a35019e5777b_2026-10-07_12_18_37_net10.0.trx",
+    "sha256": "a8b531d18216876cd5aee90dd3caf608b65ff7ad10321953e323eed1730d51d4",
+    "counters": {
+      "total": "280",
+      "executed": "280",
+      "passed": "277",
+      "failed": "3",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    }
+  },
+  "firstFailures": "Linux fallback closed descriptors before rename; ownership cleanup incorrectly treated a closed descriptor as already-deleted. Corrected path fallback ownership, without changing Windows handle cleanup.",
+  "corrected": {
+    "file": "_a35019e5777b_2026-10-07_12_35_45_net10.0.trx",
+    "sha256": "0058368f173367f9ca53e5b0d6e69ad09798761feab4ba6154324c9b7fd2f434",
+    "counters": {
+      "total": "283",
+      "executed": "283",
+      "passed": "283",
+      "failed": "0",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    }
+  },
+  "scope": "Owned Linux tests; Windows sharing, hardlinks, identity comparison and handle renames require source CI",
+  "warnings": 0,
+  "errors": 0,
+  "sourceHashes": {
+    "src/Player.App/Services/Storage/BackupBundle.cs": "cce9a1020cf781b12d9dc499f918a78a3e1fa3b0da4db64e6779d030d02da2d3",
+    "src/Player.App/Services/Storage/DatabaseRecovery.cs": "600668c7fc989d066b2f222e64231ce5a4445aae8c108d90974746ffbcc4e566",
+    "src/Player.App/Services/Storage/SettingsFile.cs": "60f669bd21e622cfd37a0e89dbe85da29fd3b89c94c92b9cfe6925f5d025dc3a",
+    "src/Player.App/Services/Storage/SqlitePlayerStore.cs": "5136921e1ced18994d04ab325818ff026cd58e31eec5b4c9063b5f5844ec07d3",
+    "src/Player.App/Services/Storage/DataFileLease.cs": "bd0963c641ac56f3bc74478d6f07ce100ae760a1614a16444adc23d2e2a75123",
+    "src/Player.App/Services/Storage/RestoreFileTransaction.cs": "22f09ce4e317744cea8088795f6d6eb8f84e4c1b63e6e2253e94fe6debe731bd"
+  }
+}

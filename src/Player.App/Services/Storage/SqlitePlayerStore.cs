@@ -19,7 +19,9 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
     private SqliteConnection? _connection;
     private FileStream? _ownership;
     private DataDirectoryLease? _directoryLease;
+    private List<DataFileLease>? _fileLeases;
     internal Action? MigrationBeforeCommit { get; init; }
+    internal bool ReadOnlyValidation { get; init; }
     public SqlitePlayerStore(string path, string defaultPlaylistName = "Default")
     {
         if (string.IsNullOrWhiteSpace(defaultPlaylistName) || defaultPlaylistName.Length > 200) throw new ArgumentException("Invalid default playlist name.");
@@ -116,6 +118,13 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
         using var backup = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = destination, Mode = SqliteOpenMode.ReadWrite, Pooling = false }.ToString());
         backup.Open(); connection.BackupDatabase(backup); return true;
     });
+    internal Task CheckpointAsync() => Queue(() =>
+    {
+        using var command = Command(Open(), null, "PRAGMA wal_checkpoint(TRUNCATE)");
+        using var reader = command.ExecuteReader();
+        if (!reader.Read() || reader.GetInt32(0) != 0) throw new IOException("Owned database checkpoint is busy; original data preserved.");
+        return true;
+    });
     private SqliteConnection Open()
     {
         if (_connection is not null) return _connection;
@@ -125,10 +134,28 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
         try { ownership = new FileStream(databasePath + ".owner.lock", FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None); }
         catch (IOException error) when ((error.HResult & 0xffff) is 32 or 33 || !OperatingSystem.IsWindows() && (error.HResult & 0xffff) == 11) { directoryLease.Dispose(); throw new PlayerStoreInUseException(error); }
         catch { directoryLease.Dispose(); throw; }
-        var existed = File.Exists(databasePath);
-        var connection = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = databasePath, Mode = existed ? SqliteOpenMode.ReadWrite : SqliteOpenMode.ReadWriteCreate, Pooling = false, DefaultTimeout = 3 }.ToString());
+        var files = new List<DataFileLease>();
+        var existed = false;
+        var connection = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = ReadOnlyValidation ? new Uri(databasePath).AbsoluteUri + "?immutable=1" : databasePath,
+            Mode = ReadOnlyValidation ? SqliteOpenMode.ReadOnly : SqliteOpenMode.ReadWrite, Pooling = false, DefaultTimeout = 3 }.ToString());
         try
         {
+            var paths = ReadOnlyValidation ? [databasePath] : new[] { databasePath, databasePath + "-wal", databasePath + "-shm" };
+            var pinned = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var path in paths)
+            {
+                var file = DataFileLease.OpenExisting(path, writableSharing: !ReadOnlyValidation);
+                if (file is not null) { files.Add(file); pinned.Add(path); }
+                if (path == databasePath) existed = file is not null;
+            }
+            if (ReadOnlyValidation && !existed) throw new FileNotFoundException("Owned validation database is missing.");
+            if (!ReadOnlyValidation)
+                foreach (var path in paths)
+                    if (!pinned.Contains(path))
+                    {
+                        var file = DataFileLease.OpenOrCreate(path); files.Add(file);
+                        if (path == databasePath) existed = !file.Created;
+                    }
             connection.Open();
             DatabaseRecovery.ConfigureReadLimits(connection);
             using var validationBudget = new DatabaseValidationBudget(connection);
@@ -136,6 +163,7 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
             using var version = connection.CreateCommand(); version.CommandText = "PRAGMA user_version";
             var schema = Convert.ToInt32(version.ExecuteScalar(), System.Globalization.CultureInfo.InvariantCulture);
             if (schema > 2) throw new NewerDatabaseSchemaException(schema);
+            if (ReadOnlyValidation && schema != 2) throw new InvalidDataException("Read-only validation requires the migrated schema.");
             if (existed && schema == 0) throw new InvalidDataException("Unrecognized database schema. Original database preserved.");
             using var check = connection.CreateCommand(); check.CommandText = "PRAGMA quick_check";
             if ((string?)check.ExecuteScalar() != "ok") throw new InvalidDataException("Database integrity check failed. Original database preserved.");
@@ -146,7 +174,8 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
                 using var reader = tables.ExecuteReader(); var names = new HashSet<string>(); while (reader.Read()) names.Add(reader.GetString(0));
                 if (required.Any(name => !names.Contains(name))) throw new InvalidDataException("Database schema tables are incomplete. Original database preserved.");
             }
-            Execute(connection, null, "PRAGMA foreign_keys=ON; PRAGMA busy_timeout=3000; PRAGMA journal_mode=WAL;");
+            Execute(connection, null, "PRAGMA foreign_keys=ON; PRAGMA busy_timeout=3000;");
+            if (!ReadOnlyValidation) Execute(connection, null, "PRAGMA journal_mode=WAL;");
             if (!existed)
             {
                 using var transaction = connection.BeginTransaction();
@@ -162,9 +191,9 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
                 transaction.Commit();
             }
             if (schema < 2) AddIndexSchema(connection, existed);
-            _connection = connection; _ownership = ownership; _directoryLease = directoryLease; return connection;
+            _connection = connection; _ownership = ownership; _directoryLease = directoryLease; _fileLeases = files; return connection;
         }
-        catch { connection.Dispose(); ownership.Dispose(); directoryLease.Dispose(); throw; }
+        catch { connection.Dispose(); foreach (var file in files) file.Dispose(); ownership.Dispose(); directoryLease.Dispose(); throw; }
     }
     private static SqliteCommand Command(SqliteConnection connection, SqliteTransaction? transaction, string sql)
     { var command = connection.CreateCommand(); command.Transaction = transaction; command.CommandText = sql; return command; }
@@ -195,6 +224,7 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
         finally
         {
             try { _connection?.Dispose(); } catch (Exception error) { failure = error; }
+            if (_fileLeases is not null) foreach (var file in _fileLeases) file.Dispose();
             try { _ownership?.Dispose(); } catch (Exception error) { failure = failure is null ? error : new AggregateException(failure, error); }
             try { _directoryLease?.Dispose(); } catch (Exception error) { failure = failure is null ? error : new AggregateException(failure, error); }
             _work.Dispose();

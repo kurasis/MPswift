@@ -22,6 +22,7 @@ internal static class RestrictedFileSecurityValidation
         NativeFileSecurityValidation.PrepareLinks(fixture);
         DataDirectorySecurityValidation.PrepareLinks();
         CacheFileSecurityValidation.PrepareLinks();
+        MutableDataSecurityValidation.PrepareLinks();
         if (!OpenProcessToken(GetCurrentProcess(), 2 | 8, out var original)) throw new Win32Exception(Marshal.GetLastPInvokeError());
         using (original)
         {
@@ -39,7 +40,7 @@ internal static class RestrictedFileSecurityValidation
                         using var identity = WindowsIdentity.GetCurrent();
                         if (new WindowsPrincipal(identity).IsInRole(WindowsBuiltInRole.Administrator)) throw new InvalidOperationException("File test still has an enabled Administrator group.");
                         return new { Status = "restricted-file-security-passed", AdministratorGroupDisabled = true, MaximumPrivilegesDisabled = true,
-                            Scope = "Synchronous filesystem/loader operations under an impersonated restricted token; not a process sandbox", Checks = NativeFileSecurityValidation.Run(fixture), DataDirectories = DataDirectorySecurityValidation.Run(), CacheFiles = CacheFileSecurityValidation.Run() };
+                            Scope = "Synchronous filesystem/loader operations under an impersonated restricted token; not a process sandbox", Checks = NativeFileSecurityValidation.Run(fixture), DataDirectories = DataDirectorySecurityValidation.Run(), CacheFiles = CacheFileSecurityValidation.Run(), MutableData = MutableDataSecurityValidation.Run() };
                     });
             }
             finally { Marshal.FreeHGlobal(memory); }

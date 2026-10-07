@@ -28,32 +28,47 @@ public static class DatabaseRecovery
         backup = Path.Combine(sourceLease.DirectoryPath, Path.GetFileName(backup));
         if (string.Equals(destination, backup, StringComparison.OrdinalIgnoreCase)) throw new IOException("Choose a separate backup file.");
         using var ownership = new FileStream(destination + ".owner.lock", FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+        // Selected backup bytes are read-only; existing local file-link inputs remain compatible.
+        using var sourcePin = new FileStream(backup, FileMode.Open, FileAccess.Read, FileShare.Read);
+        using var walPin = DataFileLease.OpenExisting(backup + "-wal", writableSharing: true);
+        using var shmPin = DataFileLease.OpenExisting(backup + "-shm", writableSharing: true);
         using var source = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = backup, Mode = SqliteOpenMode.ReadOnly, Pooling = false }.ToString());
         source.Open();
         ConfigureReadLimits(source);
         Validate(source);
         var temporary = destination + ".restore-" + Guid.NewGuid().ToString("N");
         var preserved = destination + ".preserved-" + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + "-" + Guid.NewGuid().ToString("N");
-        var moved = new List<(string Original, string Preserved)>();
         var ownsTemporary = false;
+        DataFileLease? copiedPin = null;
+        DataFileLease.FileIdentity? identity = null;
+        Exception? failure = null;
         try
         {
             using (var reserved = new FileStream(temporary, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.ReadWrite))
             {
                 ownsTemporary = true;
+                if (OperatingSystem.IsWindows()) identity = DataFileLease.Identify(reserved.SafeFileHandle);
                 using var target = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = temporary, Mode = SqliteOpenMode.ReadWrite, Pooling = false }.ToString());
                 target.Open(); source.BackupDatabase(target);
+                copiedPin = DataFileLease.OpenExisting(temporary, writableSharing: true) ?? throw new FileNotFoundException("Owned recovery copy is unavailable.");
             }
-            foreach (var suffix in new[] { "", "-wal", "-shm" })
-                if (File.Exists(destination + suffix)) { File.Move(destination + suffix, preserved + suffix); moved.Add((destination + suffix, preserved + suffix)); }
-            File.Move(temporary, destination);
+            using var frozen = DataFileLease.OpenExisting(temporary) ?? throw new FileNotFoundException("Owned recovery copy is unavailable.");
+            using (var validation = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = new Uri(temporary).AbsoluteUri + "?immutable=1", Mode = SqliteOpenMode.ReadOnly, Pooling = false }.ToString()))
+            { validation.Open(); ConfigureReadLimits(validation); Validate(validation); }
+            RestoreFileTransaction.Install([(destination, frozen.Stream)], new[] { "", "-wal", "-shm" }.Select(suffix => (destination + suffix, preserved + suffix, false)).ToArray());
         }
-        catch
+        catch (Exception error) { failure = error; throw; }
+        finally
         {
-            foreach (var (original, retained) in moved.AsEnumerable().Reverse()) if (!File.Exists(original)) File.Move(retained, original);
-            throw;
+            copiedPin?.Dispose();
+            try
+            {
+                if (ownsTemporary && (!OperatingSystem.IsWindows() || identity is not null) && !DataFileLease.DeleteIfSame(temporary, identity))
+                    throw new IOException("Recovery temporary name changed; unrelated data retained.");
+            }
+            catch (Exception cleanup) when (failure is not null && cleanup is IOException or UnauthorizedAccessException)
+            { throw new AggregateException("Database recovery and owned-copy cleanup failed.", failure, cleanup); }
         }
-        finally { if (ownsTemporary && File.Exists(temporary)) File.Delete(temporary); }
     }
     internal static void Validate(SqliteConnection source)
     {

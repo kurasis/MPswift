@@ -1,5 +1,11 @@
 # Implementation checkpoint
 
+## Mutable-data and restore completion (2026-10-07)
+
+Observed baseline `f8716db56be1` / `0.2.77-dev.1`: [run 37614245760](https://github.com/kurasis/MPswift/actions/runs/37614245760) passed 270 tests per OS, 216 isolated cases, restricted Windows staging controls, EN/RU/extracted WPF and independently verified 577-file/13-native ZIP. This supersedes historical pending notes for that exact source.
+
+The owner approved refusing symbolic/hardlinked mutable data files. The implementation pins/checks main DB/WAL/SHM and settings entries, validates frozen backup snapshots with the production loader, and publishes/installs/rolls back using held Windows objects. Existing APIs/schemas/dependencies and local music/directory-link support remain. Added tests and restricted-token controls require this source's Windows run before publication. [Findings, tradeoffs and evidence](SECURITY_COMPLETION_2026-10-07.md).
+
 ## Backup staging follow-up (2026-10-07)
 
 Observed baseline `51e85d3213b2` / `0.2.76-dev.1`: [main run 37610865422](https://github.com/kurasis/MPswift/actions/runs/37610865422) passed all three jobs, 263 tests on each OS, all 216 bounded parser cases, restricted Windows cache/directory controls, EN/RU/extracted WPF and package verification. This supersedes older pending notes for that exact baseline. The downloaded ZIP, 577-file/13-native inventory and compiled versions were independently verified.

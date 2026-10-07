@@ -25,8 +25,6 @@ public static class BackupBundle
         using var destinationLease = DataDirectoryLease.Open(Path.GetDirectoryName(destination)!);
         destination = Path.Combine(destinationLease.DirectoryPath, Path.GetFileName(destination));
         var stage = Path.Combine(Path.GetDirectoryName(destination)!, ".player-backup-" + Guid.NewGuid().ToString("N"));
-        var temporary = destination + ".partial-" + Guid.NewGuid().ToString("N");
-        var ownsTemporary = false;
         if (File.Exists(destination) || Directory.Exists(destination)) throw new IOException("Choose a new backup filename; existing files are never overwritten.");
         var stageLease = DataDirectoryLease.Create(stage);
         Exception? failure = null;
@@ -36,15 +34,15 @@ public static class BackupBundle
             await Task.Run(() =>
             {
                 SettingsFile.Export(Path.Combine(stage, "settings.json"), settings);
-                using var database = File.OpenRead(Path.Combine(stage, "library.db"));
-                using var settingsFile = File.OpenRead(Path.Combine(stage, "settings.json"));
+                using var databaseLease = DataFileLease.OpenExisting(Path.Combine(stage, "library.db")) ?? throw new FileNotFoundException("Owned backup database is missing.");
+                using var settingsLease = DataFileLease.OpenExisting(Path.Combine(stage, "settings.json")) ?? throw new FileNotFoundException("Owned backup settings are missing.");
+                var database = databaseLease.Stream; var settingsFile = settingsLease.Stream;
                 if (database.Length > MaximumDatabaseBytes) throw new IOException("Backup database exceeds the 2 GiB archive limit; original data preserved.");
                 if (settingsFile.Length > 65536) throw new IOException("Backup settings exceed the 64 KiB limit; original data preserved.");
                 var files = new[] { database, settingsFile };
                 var items = new[] { "library.db", "settings.json" }.Select((name, index) => new Item(name, files[index].Length, Hash(files[index]))).ToArray();
-                using (var file = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+                RestoreFileTransaction.PublishNew(destination, file =>
                 {
-                    ownsTemporary = true;
                     using (var zip = new ZipArchive(file, ZipArchiveMode.Create, true))
                     {
                         for (var index = 0; index < items.Length; index++)
@@ -55,13 +53,11 @@ public static class BackupBundle
                         using var manifest = zip.CreateEntry("manifest.json").Open();
                         JsonSerializer.Serialize(manifest, new Manifest(1, items));
                     }
-                    file.Flush(true);
-                }
-                File.Move(temporary, destination);
+                });
             });
         }
         catch (Exception error) { failure = error; throw; }
-        finally { FinishStage(stage, stageLease, failure, ownsTemporary ? temporary : null); }
+        finally { FinishStage(stage, stageLease, failure); }
     }
     public static async Task RestoreAsync(string directory, string archive)
     {
@@ -72,19 +68,25 @@ public static class BackupBundle
         Exception? failure = null;
         try
         {
-            await Task.Run(() => ExtractValidated(archive, stage));
+            using var extracted = await Task.Run(() => ExtractValidated(archive, stage));
             // Actual production loader validates dimensions, IDs, paths and session JSON; migrations affect only this owned copy.
-            await using (var validator = new SqlitePlayerStore(Path.Combine(stage, "library.db"))) await validator.LoadAsync();
-            await Task.Run(() => Install(directory, stage));
+            if (extracted.SchemaVersion == 1)
+            {
+                extracted.AllowMigration(Path.Combine(stage, "library.db"));
+                await using var validator = new SqlitePlayerStore(Path.Combine(stage, "library.db"));
+                await validator.LoadAsync(); await validator.CheckpointAsync();
+            }
+            using var frozen = DataFileLease.OpenExisting(Path.Combine(stage, "library.db")) ?? throw new FileNotFoundException("Owned restore database is missing.");
+            // Revalidate the final checkpointed bytes under the continuous name pin and a writer-denying read handle.
+            await using (var validator = new SqlitePlayerStore(Path.Combine(stage, "library.db")) { ReadOnlyValidation = true }) await validator.LoadAsync();
+            await Task.Run(() => Install(directory, frozen.Stream, extracted.Settings.Stream));
         }
         catch (Exception error) { failure = error; throw; }
         finally { FinishStage(stage, stageLease, failure); }
     }
-    private static void FinishStage(string stage, DataDirectoryLease lease, Exception? failure, string? temporary = null)
+    private static void FinishStage(string stage, DataDirectoryLease lease, Exception? failure)
     {
         var cleanupErrors = new List<Exception>();
-        try { if (temporary is not null && File.Exists(temporary)) File.Delete(temporary); }
-        catch (Exception cleanup) when (cleanup is IOException or UnauthorizedAccessException) { cleanupErrors.Add(cleanup); }
         try { BackupStageCleanup.Clean(stage, lease); }
         catch (Exception cleanup) when (cleanup is IOException or UnauthorizedAccessException) { cleanupErrors.Add(cleanup); }
         if (cleanupErrors.Count != 0)
@@ -93,7 +95,20 @@ public static class BackupBundle
             throw new AggregateException("Backup cleanup failed; retained staging data may require review.", cleanupErrors);
         }
     }
-    private static void ExtractValidated(string archive, string stage)
+    private sealed class ExtractedFiles : IDisposable
+    {
+        public DataFileLease Database { get; private set; }
+        public DataFileLease Settings { get; }
+        public int SchemaVersion { get; }
+        public ExtractedFiles(DataFileLease database, DataFileLease settings, int schemaVersion) { Database = database; Settings = settings; SchemaVersion = schemaVersion; }
+        public void AllowMigration(string path)
+        {
+            var writable = DataFileLease.OpenExisting(path, writableSharing: true) ?? throw new FileNotFoundException("Owned migration database is missing.");
+            Database.Dispose(); Database = writable;
+        }
+        public void Dispose() { Database.Dispose(); Settings.Dispose(); }
+    }
+    private static ExtractedFiles ExtractValidated(string archive, string stage)
     {
         using var archiveLease = DataDirectoryLease.Open(Path.GetDirectoryName(Path.GetFullPath(archive))!);
         archive = Path.Combine(archiveLease.DirectoryPath, Path.GetFileName(archive));
@@ -115,60 +130,49 @@ public static class BackupBundle
         Manifest manifest;
         manifest = JsonSerializer.Deserialize<Manifest>(manifestBytes, new JsonSerializerOptions { MaxDepth = 8 }) ?? throw new InvalidDataException("Backup manifest invalid.");
         if (manifest.SchemaVersion != 1 || manifest.Files is null || manifest.Files.Length != 2 || manifest.Files.Any(i => i is null) || names.Take(2).Any(name => manifest.Files.Count(i => i.Path == name) != 1)) throw new InvalidDataException("Backup manifest schema/files invalid.");
-        foreach (var item in manifest.Files)
+        var pinned = new Dictionary<string, DataFileLease>();
+        try
         {
-            var entry = zip.GetEntry(item.Path)!;
-            var maximum = item.Path == "settings.json" ? 65536 : MaximumDatabaseBytes;
-            if (item.Bytes <= 0 || item.Bytes > maximum || entry.Length != item.Bytes || item.Sha256 is null || item.Sha256.Length != 64) throw new InvalidDataException("Backup file size/hash declaration invalid.");
-            var path = Path.Combine(stage, item.Path);
-            using (var input = entry.Open()) using (var output = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None))
-            using (var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256))
+            foreach (var item in manifest.Files)
             {
-                var buffer = new byte[65536]; long copied = 0; int read;
-                while ((read = input.Read(buffer)) != 0)
+                var entry = zip.GetEntry(item.Path)!;
+                var maximum = item.Path == "settings.json" ? 65536 : MaximumDatabaseBytes;
+                if (item.Bytes <= 0 || item.Bytes > maximum || entry.Length != item.Bytes || item.Sha256 is null || item.Sha256.Length != 64) throw new InvalidDataException("Backup file size/hash declaration invalid.");
+                var path = Path.Combine(stage, item.Path);
+                using (var input = entry.Open()) using (var output = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.ReadWrite))
+                using (var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256))
                 {
-                    copied += read;
-                    if (copied > item.Bytes) throw new InvalidDataException("Backup expanded beyond its declared size.");
-                    output.Write(buffer, 0, read); hash.AppendData(buffer, 0, read);
+                    var buffer = new byte[65536]; long copied = 0; int read;
+                    while ((read = input.Read(buffer)) != 0)
+                    {
+                        copied += read;
+                        if (copied > item.Bytes) throw new InvalidDataException("Backup expanded beyond its declared size.");
+                        output.Write(buffer, 0, read); hash.AppendData(buffer, 0, read);
+                    }
+                    if (copied != item.Bytes) throw new InvalidDataException("Backup file truncated."); output.Flush(true);
+                    if (Convert.ToHexString(hash.GetHashAndReset()).ToLowerInvariant() != item.Sha256) throw new InvalidDataException("Backup checksum mismatch.");
+                    pinned.Add(item.Path, DataFileLease.OpenExisting(path, writableSharing: true) ?? throw new FileNotFoundException("Owned extracted file is missing."));
                 }
-                if (copied != item.Bytes) throw new InvalidDataException("Backup file truncated."); output.Flush(true);
-                if (Convert.ToHexString(hash.GetHashAndReset()).ToLowerInvariant() != item.Sha256) throw new InvalidDataException("Backup checksum mismatch.");
+                using var frozen = DataFileLease.OpenExisting(path) ?? throw new FileNotFoundException("Owned extracted file is missing.");
+                if (frozen.Stream.Length != item.Bytes || Hash(frozen.Stream) != item.Sha256) throw new InvalidDataException("Extracted backup changed before validation.");
+                var readPin = DataFileLease.OpenExisting(path) ?? throw new FileNotFoundException("Owned extracted file is missing.");
+                pinned[item.Path].Dispose(); pinned[item.Path] = readPin;
             }
+            new SettingsFile(stage).Load();
+            using var database = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = new Uri(Path.Combine(stage, "library.db")).AbsoluteUri + "?immutable=1", Mode = SqliteOpenMode.ReadOnly, Pooling = false }.ToString());
+            database.Open(); DatabaseRecovery.ConfigureReadLimits(database); DatabaseRecovery.Validate(database);
+            using var version = database.CreateCommand(); version.CommandText = "PRAGMA user_version";
+            return new(pinned["library.db"], pinned["settings.json"], Convert.ToInt32(version.ExecuteScalar(), System.Globalization.CultureInfo.InvariantCulture));
         }
-        new SettingsFile(stage).Load();
-        using var database = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = Path.Combine(stage, "library.db"), Mode = SqliteOpenMode.ReadOnly, Pooling = false }.ToString());
-        database.Open(); DatabaseRecovery.ConfigureReadLimits(database); DatabaseRecovery.Validate(database);
+        catch { foreach (var pin in pinned.Values) pin.Dispose(); throw; }
     }
-    private static void Install(string directory, string stage)
+    private static void Install(string directory, Stream databaseContents, Stream settingsContents)
     {
         var database = Path.Combine(directory, "library.db");
         using var ownership = new FileStream(database + ".owner.lock", FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
         var id = Guid.NewGuid().ToString("N");
-        var originals = new[] { "library.db", "library.db-wal", "library.db-shm", "settings.json", "settings.json.bak" };
-        foreach (var name in originals) if (Directory.Exists(Path.Combine(directory, name))) throw new IOException("A data filename is occupied by a directory; originals preserved.");
-        var moved = new List<(string Original, string Preserved)>(); var installed = new List<string>();
-        try
-        {
-            foreach (var name in originals)
-            {
-                var original = Path.Combine(directory, name);
-                if (!File.Exists(original)) continue;
-                var preserved = name.StartsWith("library.db", StringComparison.Ordinal) ? database + ".preserved-" + id + name["library.db".Length..] : Path.Combine(directory, name + ".preserved-" + id);
-                File.Move(original, preserved); moved.Add((original, preserved));
-            }
-            foreach (var name in new[] { "library.db", "settings.json" })
-            {
-                var target = Path.Combine(directory, name); File.Move(Path.Combine(stage, name), target); installed.Add(target);
-            }
-        }
-        catch (Exception failure)
-        {
-            var errors = new List<Exception> { failure };
-            foreach (var target in installed.AsEnumerable().Reverse()) try { File.Delete(target); } catch (Exception error) { errors.Add(error); }
-            foreach (var (original, preserved) in moved.AsEnumerable().Reverse())
-                try { File.Move(preserved, original); } catch (Exception error) { errors.Add(error); }
-            if (errors.Count > 1) throw new AggregateException("Restore interrupted; retained originals require recovery before reopening.", errors);
-            throw;
-        }
+        var originals = new[] { "library.db", "library.db-wal", "library.db-shm", "settings.json", "settings.json.bak" }.Select(name =>
+            (Path.Combine(directory, name), name.StartsWith("library.db", StringComparison.Ordinal) ? database + ".preserved-" + id + name["library.db".Length..] : Path.Combine(directory, name + ".preserved-" + id), false)).ToArray();
+        RestoreFileTransaction.Install([(database, databaseContents), (Path.Combine(directory, "settings.json"), settingsContents)], originals);
     }
 }
