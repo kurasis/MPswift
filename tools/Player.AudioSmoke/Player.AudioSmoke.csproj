@@ -11,6 +11,7 @@
     <PackageReference Include="TagLibSharp" />
     <PackageReference Include="ManagedBass.Mix" />
     <PackageReference Include="ManagedBass.Wasapi" />
+    <Compile Include="../../src/Player.App/Services/Library/MediaMetadataReader.cs" Link="Library/MediaMetadataReader.cs" />
     <Compile Include="../../src/Player.App/Services/Audio/NativeLibraryBootstrap.cs" Link="Audio/NativeLibraryBootstrap.cs" />
     <Compile Include="../../src/Player.App/Services/Audio/BassSmokeSession.cs" Link="Audio/BassSmokeSession.cs" />
     <Compile Include="../../src/Player.App/Services/Audio/BassMixerGraph.cs" Link="Audio/BassMixerGraph.cs" />

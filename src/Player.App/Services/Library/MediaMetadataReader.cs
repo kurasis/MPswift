@@ -29,7 +29,7 @@ public static class MediaMetadataReader
                     double.IsFinite(tag.ReplayGainTrackPeak) && tag.ReplayGainTrackPeak > 0 ? tag.ReplayGainTrackPeak : null, double.IsFinite(tag.ReplayGainAlbumPeak) && tag.ReplayGainAlbumPeak > 0 ? tag.ReplayGainAlbumPeak : null)
             };
         }
-        catch (Exception e) when (e is TagLib.CorruptFileException or TagLib.UnsupportedFormatException or IOException or InvalidDataException or UnauthorizedAccessException or ArgumentException or NotImplementedException)
+        catch (Exception e) when (e is TagLib.CorruptFileException or TagLib.UnsupportedFormatException or IOException or InvalidDataException or UnauthorizedAccessException or ArgumentException or NotImplementedException or KeyNotFoundException)
         { diagnostic("Metadata fallback: " + Path.GetFileName(path) + "; " + e.Message); return track; }
     }
     private static string? Bounded(string? text) => string.IsNullOrWhiteSpace(text) ? null : text[..Math.Min(text.Length, 4096)];

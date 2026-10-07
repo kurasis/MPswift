@@ -63,8 +63,10 @@ internal static class ParserSecurityValidation
             {
                 var source = File.ReadAllBytes(Path.Combine(fixtures, name));
                 if (source.Length is < 128 or > 4 * 1024 * 1024) throw new InvalidDataException("Security seeds must be small synthetic fixtures.");
-                foreach (var mutation in new[] { "control", "truncated", "header-bits", "declared-size", "body-bits", "body-truncated", "tail-bits", "lifecycle-control" })
-                foreach (var kind in mutation == "lifecycle-control" ? new[] { "lifecycle" } : new[] { "decode", "metadata" })
+                var mutations = new List<string> { "control", "truncated", "header-bits", "declared-size", "body-bits", "body-truncated", "tail-bits", "lifecycle-control" };
+                if (Path.GetExtension(name) is ".ogg" or ".opus") mutations.Add("late-stream");
+                foreach (var mutation in mutations)
+                foreach (var kind in mutation == "lifecycle-control" ? new[] { "lifecycle" } : mutation == "late-stream" ? new[] { "metadata" } : new[] { "decode", "metadata" })
                 {
                     var bytes = Mutate(source, Path.GetExtension(name), mutation);
                     var path = Path.Combine(root, "case-" + results.Count + Path.GetExtension(name)); File.WriteAllBytes(path, bytes);
@@ -81,6 +83,9 @@ internal static class ParserSecurityValidation
                             kind == "lifecycle" && outcome != "lifecycle-passed" ||
                             kind == "metadata" && mutation == "control" && name.EndsWith(".wav", StringComparison.Ordinal) && outcome != "metadata-parsed")
                             throw new InvalidDataException("Worker did not produce current valid control/rejection evidence.");
+                        if (mutation == "late-stream" && (outcome != "rejected" ||
+                            !evidence.GetProperty("GuardPreflightPassed").GetBoolean() || evidence.GetProperty("ErrorType").GetString() != "KeyNotFoundException" ||
+                            !evidence.GetProperty("ProductionMetadataFallback").GetBoolean())) throw new InvalidDataException("Late Ogg stream did not exercise actual library exception and production fallback.");
                         if (before != Hash(path)) throw new InvalidDataException("Decoder changed owned input bytes.");
                         using (File.Open(path, FileMode.Open, FileAccess.Read, FileShare.None)) { }
                         results.Add(new { Seed = name, Kind = kind, Mutation = mutation, Sha256 = before, Outcome = outcome, child.ExitCode, child.PeakCommittedBytes, child.WallMilliseconds, SourceUnchanged = true, Evidence = evidence.Clone() });
@@ -166,6 +171,21 @@ internal static class ParserSecurityValidation
         if (mutation == "body-truncated") return source[..(source.Length * 3 / 4)];
         if (mutation == "truncated") return source[..Math.Min(128, source.Length / 2)];
         var bytes = source.ToArray();
+        if (mutation == "late-stream")
+        {
+            var position = 0; var last = 0;
+            while (position < bytes.Length)
+            {
+                if (position > bytes.Length - 27 || !bytes.AsSpan(position, 4).SequenceEqual("OggS"u8)) throw new InvalidDataException("Owned late-stream seed is not Ogg.");
+                last = position; var count = bytes[position + 26];
+                if (position + 27 + count > bytes.Length) throw new InvalidDataException("Owned Ogg laces truncated.");
+                var body = 0; foreach (var lace in bytes.AsSpan(position + 27, count)) body += lace;
+                position = checked(position + 27 + count + body);
+                if (position > bytes.Length) throw new InvalidDataException("Owned Ogg body truncated.");
+            }
+            var serial = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(last + 14));
+            BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(last + 14), serial ^ 0x80000000u);
+        }
         if (mutation == "header-bits")
         { var random = new Random(0x4d5053); for (var i = 0; i < 16; i++) bytes[random.Next(Math.Min(96, bytes.Length))] ^= (byte)(1 << random.Next(8)); }
         if (mutation is "body-bits" or "tail-bits")
@@ -186,22 +206,26 @@ internal static class ParserSecurityValidation
     private static object MetadataWorker(string source)
     {
         using var lease = LocalReadLease.Open(source);
+        var guarded = false;
         try
         {
-            Player.Core.Media.MetadataReadGuard.Validate(lease.Path);
+            Player.Core.Media.MetadataReadGuard.Validate(lease.Path); guarded = true;
             using var file = TagLib.File.Create(lease.Path, TagLib.ReadStyle.Average);
             var title = file.Tag.Title; var pictures = file.Tag.Pictures;
             return new { Status = "bounded-parser-worker-completed", Outcome = "metadata-parsed", TitleCharacters = title?.Length ?? 0, Pictures = pictures.Length,
                 PictureBytes = pictures.Sum(p => (long)p.Data.Count), GuardedRead = true };
         }
-        catch (Exception error) when (error is TagLib.CorruptFileException or TagLib.UnsupportedFormatException or IOException or InvalidDataException or ArgumentException or NotImplementedException)
+        catch (Exception error) when (error is TagLib.CorruptFileException or TagLib.UnsupportedFormatException or IOException or InvalidDataException or ArgumentException or NotImplementedException or KeyNotFoundException)
         {
+            var diagnostics = new List<string>();
+            var fallback = Player.App.Services.Library.MediaMetadataReader.Read(source, Guid.NewGuid(), diagnostics.Add);
+            if (diagnostics.Count == 0 || fallback.Path != source || !fallback.Available) throw new InvalidDataException("Production metadata fallback was not preserved.");
             // Same process must still parse a valid source after this rejection.
             var control = Path.Combine(Environment.CurrentDirectory, "lease-control.wav");
             Player.Core.Media.MetadataReadGuard.Validate(control);
             using var file = TagLib.File.Create(control, TagLib.ReadStyle.Average);
             if (file.Properties.AudioSampleRate <= 0) throw new InvalidDataException("Metadata rejection damaged the valid control.");
-            return new { Status = "bounded-parser-worker-completed", Outcome = "rejected", Error = error.Message[..Math.Min(error.Message.Length, 1024)], ValidMetadataControlRecovered = true };
+            return new { Status = "bounded-parser-worker-completed", Outcome = "rejected", ErrorType = error.GetType().Name, GuardPreflightPassed = guarded, Error = error.Message[..Math.Min(error.Message.Length, 1024)], ValidMetadataControlRecovered = true, ProductionMetadataFallback = true };
         }
     }
     private static void CopyDirectory(string source, string destination)

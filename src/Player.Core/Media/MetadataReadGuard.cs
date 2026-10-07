@@ -80,9 +80,14 @@ public static class MetadataReadGuard
         if (header[..4].SequenceEqual("OggS"u8))
         {
             long position = start, total = 0; var packets = 0; Span<byte> laces = stackalloc byte[255];
+            var streams = new HashSet<uint>();
             for (var pages = 0; packets < 3 && pages < 65536; pages++)
             {
                 Read(file, position, header[..27]); Require(header[..4].SequenceEqual("OggS"u8), "Invalid Ogg page.");
+                Require(header[4] == 0 && (header[5] & ~7) == 0, "Invalid Ogg version/flags.");
+                var serial = BinaryPrimitives.ReadUInt32LittleEndian(header[14..18]);
+                if ((header[5] & 2) != 0) Require(streams.Add(serial), "Duplicate Ogg stream beginning.");
+                else Require(streams.Contains(serial), "Ogg page references a stream without a beginning.");
                 var count = header[26]; Read(file, position + 27, laces[..count]); var body = 0;
                 foreach (var lace in laces[..count]) { body += lace; if (lace < 255) packets++; }
                 total += 27 + count + body; Limit(total, file.Length); position += 27 + count + body;

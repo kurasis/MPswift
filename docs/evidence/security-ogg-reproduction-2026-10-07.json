@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-07",
+  "testedSourceCommit": "ec462e16ba988cbc9a8b37714cdb779b19679d91",
+  "runUrl": "https://github.com/kurasis/MPswift/actions/runs/37600106914",
+  "reportSha256": "a992f57c06792880f33189e79455e765b76b004f556acf3fcec6057e3662362a",
+  "cases": 214,
+  "failures": [
+    "audio/vorbis.ogg/metadata/declared-size: Worker exit 1: {\r\n  \"Status\": \"failed\",\r\n  \"ErrorType\": \"KeyNotFoundException\",\r\n  \"Message\": \"The given key \\u00271912369424\\u0027 was not present in the dictionary.\",\r\n  \"Environment\": \"Microsoft Windows 10.0.20348\"\r\n}\r\n ",
+    "audio/opus.opus/metadata/declared-size: Worker exit 1: {\r\n  \"Status\": \"failed\",\r\n  \"ErrorType\": \"KeyNotFoundException\",\r\n  \"Message\": \"The given key \\u00272116544013\\u0027 was not present in the dictionary.\",\r\n  \"Environment\": \"Microsoft Windows 10.0.20348\"\r\n}\r\n "
+  ],
+  "failedCases": [
+    {
+      "Seed": "audio/vorbis.ogg",
+      "Kind": "metadata",
+      "Mutation": "declared-size",
+      "Outcome": "worker-failed",
+      "Detail": "Worker exit 1: {\r\n  \"Status\": \"failed\",\r\n  \"ErrorType\": \"KeyNotFoundException\",\r\n  \"Message\": \"The given key \\u00271912369424\\u0027 was not present in the dictionary.\",\r\n  \"Environment\": \"Microsoft Windows 10.0.20348\"\r\n}\r\n ",
+      "WallMilliseconds": 132.8884
+    },
+    {
+      "Seed": "audio/opus.opus",
+      "Kind": "metadata",
+      "Mutation": "declared-size",
+      "Outcome": "worker-failed",
+      "Detail": "Worker exit 1: {\r\n  \"Status\": \"failed\",\r\n  \"ErrorType\": \"KeyNotFoundException\",\r\n  \"Message\": \"The given key \\u00272116544013\\u0027 was not present in the dictionary.\",\r\n  \"Environment\": \"Microsoft Windows 10.0.20348\"\r\n}\r\n ",
+      "WallMilliseconds": 130.4433
+    }
+  ],
+  "originalHashesUnchanged": true,
+  "directoryChecks": {
+    "RequestedLinkPinned": true,
+    "ReparseWriteOpenBlocked": true,
+    "PhysicalDirectoryPinned": true,
+    "AncestorPinned": true,
+    "LocalDirectoryLinksSupported": true,
+    "SettingsAndCacheRoundTrip": true,
+    "ReplacementWorksAfterDispose": true,
+    "StoredDataPreserved": true
+  },
+  "upstream": {
+    "package": "TagLibSharp",
+    "version": "2.3.0",
+    "tag": "TaglibSharp-2.3.0.0",
+    "commit": "b5ae84f2e84087bf160bb0471420200dd2b5d809",
+    "sourceUrl": "https://raw.githubusercontent.com/mono/taglib-sharp/b5ae84f2e84087bf160bb0471420200dd2b5d809/src/TaglibSharp/Ogg/File.cs",
+    "sourceSha256": "f075aea8dd3733b95089c643029667ca70658da82cc29a9327ec3f2e01bcb072",
+    "relevantLines": [
+      334,
+      376
+    ]
+  },
+  "classification": "Observed managed parsing/fallback availability bug; no native fault, data loss, assigned CVE or code execution established."
+}

@@ -34,7 +34,7 @@ public sealed class ArtworkService
                     var picture = file.Tag.Pictures.FirstOrDefault(p => p.Type == TagLib.PictureType.FrontCover) ?? file.Tag.Pictures.FirstOrDefault();
                     if (picture?.Data.Count is > 0 and <= MaximumBytes) encoded = picture.Data.Data;
                 }
-                catch (Exception e) when (e is TagLib.CorruptFileException or TagLib.UnsupportedFormatException or IOException or InvalidDataException or UnauthorizedAccessException or ArgumentException or NotImplementedException) { }
+                catch (Exception e) when (e is TagLib.CorruptFileException or TagLib.UnsupportedFormatException or IOException or InvalidDataException or UnauthorizedAccessException or ArgumentException or NotImplementedException or KeyNotFoundException) { }
                 if (encoded is null && sibling is not null)
                 {
                     using var lease = LocalReadLease.Open(sibling);

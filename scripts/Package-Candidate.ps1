@@ -23,6 +23,7 @@ try {
     }
     New-Item (Join-Path $app 'docs/evidence') -ItemType Directory -Force | Out-Null
     Copy-Item docs/evidence/security-dependencies-2026-10-07.json (Join-Path $app 'docs/evidence/security-dependencies-2026-10-07.json')
+    Copy-Item docs/evidence/security-ogg-reproduction-2026-10-07.json (Join-Path $app 'docs/evidence/security-ogg-reproduction-2026-10-07.json')
     Copy-Item README.md (Join-Path $app 'README.md')
     New-Item (Join-Path $app 'acceptance') -ItemType Directory -Force | Out-Null
     foreach ($script in @('Acceptance-Helpers.ps1','Desktop-Acceptance.ps1','Audio-Acceptance.ps1','Stress-Acceptance.ps1')) { Copy-Item (Join-Path $PSScriptRoot $script) (Join-Path $app "acceptance/$script") }
