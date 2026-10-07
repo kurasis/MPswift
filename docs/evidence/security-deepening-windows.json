@@ -1,0 +1,190 @@
+{
+  "sourceCommit": "f689fdc038c88e14c51bc22db980763426f40534",
+  "runUrl": "https://github.com/kurasis/MPswift/actions/runs/37601643993",
+  "runAttempt": 1,
+  "runStatus": "completed",
+  "runConclusion": "success",
+  "jobs": [
+    {
+      "id": 112727176261,
+      "name": "build (ubuntu-24.04)",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37601643993/job/112727176261",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 112727176499,
+      "name": "build (windows-2022)",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37601643993/job/112727176499",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 112730445105,
+      "name": "Publish separate Windows ZIP prerelease",
+      "html_url": "https://github.com/kurasis/MPswift/actions/runs/37601643993/job/112730445105",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "evidence-windows-2022",
+      "archiveSha256": "4213ae1fbeb521be9c0763a1f94fee7f50010ef3f8e29c38b95ca74d871dfe29",
+      "testCounters": [
+        {
+          "total": "249",
+          "executed": "249",
+          "passed": "249",
+          "failed": "0",
+          "error": "0",
+          "timeout": "0",
+          "aborted": "0",
+          "inconclusive": "0",
+          "passedButRunAborted": "0",
+          "notRunnable": "0",
+          "notExecuted": "0",
+          "disconnected": "0",
+          "warning": "0",
+          "completed": "0",
+          "inProgress": "0",
+          "pending": "0"
+        }
+      ]
+    },
+    {
+      "name": "evidence-ubuntu-24.04",
+      "archiveSha256": "0f61f52dd0af6aa4f7f787400c145cab96ad66fe59f11fb850a9cd7b66c005c0",
+      "testCounters": [
+        {
+          "total": "249",
+          "executed": "249",
+          "passed": "249",
+          "failed": "0",
+          "error": "0",
+          "timeout": "0",
+          "aborted": "0",
+          "inconclusive": "0",
+          "passedButRunAborted": "0",
+          "notRunnable": "0",
+          "notExecuted": "0",
+          "disconnected": "0",
+          "warning": "0",
+          "completed": "0",
+          "inProgress": "0",
+          "pending": "0"
+        }
+      ]
+    }
+  ],
+  "security": {
+    "sourceCommit": "f689fdc038c88e14c51bc22db980763426f40534",
+    "status": "bounded-parser-security-passed",
+    "cases": 216,
+    "outcomes": {
+      "decoded": 58,
+      "metadata-parsed": 65,
+      "rejected": 79,
+      "lifecycle-passed": 14
+    },
+    "peakCommittedMiB": 23.13671875,
+    "maximumWallMilliseconds": 324.6078,
+    "lateStreamLibraryAndProductionFallback": true,
+    "dataDirectoryChecks": {
+      "RequestedLinkPinned": true,
+      "ReparseWriteOpenBlocked": true,
+      "PhysicalDirectoryPinned": true,
+      "AncestorPinned": true,
+      "LocalDirectoryLinksSupported": true,
+      "SettingsAndCacheRoundTrip": true,
+      "ReplacementWorksAfterDispose": true,
+      "StoredDataPreserved": true
+    },
+    "parserReportSha256": "d38e3049633267cba42a2604d6ac6a624a5c5cca739d20a2bef6214496f31c29",
+    "download": {
+      "zipUrl": "https://github.com/kurasis/MPswift/releases/download/build-37601643993-attempt-1/MPswift-0.2.72-dev.1-f689fdc038c8-win-x64.zip",
+      "bytes": 85819531,
+      "sha256": "29d9aa18306edd4ca3516094350d6b01b5287e4f477d8535fdb2578de41a1148"
+    }
+  },
+  "publishedDownload": {
+    "status": "published-download-verified",
+    "sourceCommit": "f689fdc038c88e14c51bc22db980763426f40534",
+    "runUrl": "https://github.com/kurasis/MPswift/actions/runs/37601643993",
+    "releaseUrl": "https://github.com/kurasis/MPswift/releases/tag/build-37601643993-attempt-1",
+    "zipUrl": "https://github.com/kurasis/MPswift/releases/download/build-37601643993-attempt-1/MPswift-0.2.72-dev.1-f689fdc038c8-win-x64.zip",
+    "bytes": 85819531,
+    "sha256": "29d9aa18306edd4ca3516094350d6b01b5287e4f477d8535fdb2578de41a1148"
+  },
+  "reports": [
+    {
+      "path": "smoke/ui-en.json",
+      "sha256": "7c761b9f18310abab26f16a9dddcd1378994b98f86363a2bfe4c556d2fb58ce4",
+      "status": "ui-smoke-passed",
+      "sourceCommit": null,
+      "bindingErrors": 0
+    },
+    {
+      "path": "smoke/ui-ru.json",
+      "sha256": "fcd9409a075730a84ae98de2dea59e60208e4cd64dab5583e42a111a71543d39",
+      "status": "ui-smoke-passed",
+      "sourceCommit": null,
+      "bindingErrors": 0
+    },
+    {
+      "path": "smoke/packaged-ui.json",
+      "sha256": "8a663235fe76eee83b1e5c8d2cd12dd2172badcb5928df132a6dfe5b60a25503",
+      "status": "ui-smoke-passed",
+      "sourceCommit": null,
+      "bindingErrors": 0
+    },
+    {
+      "path": "smoke/g9-resilience.json",
+      "sha256": "9e22177ff5ee899c3c06df33c31df79ebfada7f856b29f7f17ceb84f74c86a43",
+      "status": "g9-resilience-passed",
+      "sourceCommit": "f689fdc038c88e14c51bc22db980763426f40534",
+      "bindingErrors": null
+    },
+    {
+      "path": "smoke/g8-formats.json",
+      "sha256": "0add66ee87389b965a4279ed61ca09bea7bc29185281166b56289ee48eeecc66",
+      "status": "extended-formats-passed",
+      "sourceCommit": null,
+      "bindingErrors": null
+    },
+    {
+      "path": "smoke/security-parsers.json",
+      "sha256": "d38e3049633267cba42a2604d6ac6a624a5c5cca739d20a2bef6214496f31c29",
+      "status": "bounded-parser-security-passed",
+      "sourceCommit": null,
+      "bindingErrors": null
+    },
+    {
+      "path": "smoke/package-smoke.json",
+      "sha256": "a5d658a8e1def29ff7b11e636e717a47336a0aadfd5089cd588081f6908e1125",
+      "status": "packaged-executable-smoke-passed",
+      "sourceCommit": "f689fdc038c88e14c51bc22db980763426f40534",
+      "bindingErrors": null
+    },
+    {
+      "path": "portable/package-audit.json",
+      "sha256": "06d5fef0085f89e591135b81c4f5c8ac48a2a05b4ca5a5ecf69705e743b163d3",
+      "status": "local-candidate-packaged",
+      "sourceCommit": "f689fdc038c88e14c51bc22db980763426f40534",
+      "bindingErrors": null
+    },
+    {
+      "path": "portable/integrity-audit.json",
+      "sha256": "21adbce8e3e3c13c5bd1751f0efa44c0e0509b31d0d3bc335ddd7331e11e2c23",
+      "status": "candidate-integrity-negative-checks-passed",
+      "sourceCommit": "f689fdc038c88e14c51bc22db980763426f40534",
+      "bindingErrors": null
+    }
+  ],
+  "limits": [
+    "Hosted Windows Server integration, not clean Windows 11 acceptance",
+    "No actual sound endpoint playback or listening",
+    "Deterministic bounded parser cases, not exhaustive fuzzing or a production parser sandbox",
+    "Distribution approval remains false; publisher signing is absent"
+  ]
+}

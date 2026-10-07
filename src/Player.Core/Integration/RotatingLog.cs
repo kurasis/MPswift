@@ -19,12 +19,16 @@ public sealed class RotatingLog : IAsyncDisposable
     {
         if (maximumBytes < 4096 || files is < 1 or > 10) throw new ArgumentOutOfRangeException(nameof(maximumBytes));
         _directory = directory; _maximumBytes = maximumBytes; _files = files;
-        _privatePrefixes = (privatePrefixes ?? []).Where(p => !string.IsNullOrWhiteSpace(p)).OrderByDescending(p => p.Length).ToArray();
+        _privatePrefixes = DiagnosticReport.PreparePrefixes(privatePrefixes ?? []);
         _worker = Task.Run(WriteAsync);
     }
     public bool Record(string operation, string detail)
     {
-        foreach (var prefix in _privatePrefixes) detail = detail.Replace(prefix, "<local>", StringComparison.OrdinalIgnoreCase);
+        foreach (var prefix in _privatePrefixes)
+        {
+            detail = detail.Replace(prefix, "<local>", StringComparison.OrdinalIgnoreCase);
+            operation = operation.Replace(prefix, "<local>", StringComparison.OrdinalIgnoreCase);
+        }
         static string Bound(string value, int limit)
         { var length = Math.Min(value.Length, limit); if (length < value.Length && length > 0 && char.IsHighSurrogate(value[length - 1])) length--; return value[..length]; }
         var record = JsonSerializer.SerializeToUtf8Bytes(new { Utc = DateTime.UtcNow, Operation = Bound(operation, 64), Detail = Bound(detail, 2048) });

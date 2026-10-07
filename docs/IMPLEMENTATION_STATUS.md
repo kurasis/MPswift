@@ -1,5 +1,13 @@
 # Implementation checkpoint
 
+## Current checkpoint (2026-10-07)
+
+Baseline `f689fdc038c8`, build `0.2.72-dev.1`: [main run 37601643993](https://github.com/kurasis/MPswift/actions/runs/37601643993) passed all three jobs, 249 tests on each OS, 216 bounded parser cases, EN/RU/extracted WPF and package checks. Independently downloaded ZIP digest and complete 577-file/13-native inventory were verified. [Source-specific evidence](evidence/security-deepening-windows.json). Older sections below are historical source checkpoints; their pre-CI pending notes are superseded by later observed results, not current blockers.
+
+Diagnostic privacy follow-up preserves APIs, persisted formats and field/file bounds while correcting configured-prefix slash/JSON/trailing-separator forms and log Operation. Baseline tests passed; four of six initial new cases failed before the correction. The corrected locked Release build passes **258 tests**, zero failures/skips/warnings/errors. [Finding and regression scope](DIAGNOSTIC_PRIVACY_2026-10-07.md). This changed source requires its own Windows/package CI before publication.
+
+[The consolidated remaining-work list](REMAINING_WORK.md) separates independent development from hardware/manual/license decisions and optional P2. Stable 1.0 acceptance remains open.
+
 ## Specification completion block (2026-10-07)
 
 Settings now expose accent, waveform energy/peak rendering, startup repeat/shuffle defaults, active-session/position restoration and a live 16–2048 MiB waveform-cache budget. Cache usage/clear operate off the dispatcher; clearing invalidates earlier job writes and preserves source audio/database/current display. Saved file/folder dialogs remember local directories. Existing settings remain compatible through additive defaults. Duplicate removal previews the full playlist, keeps the first case-insensitive canonical-path/exact-CUE-bound occurrence, refuses stale previews and retains current playback/queued snapshots. Local diagnostics preview a bounded redacted report before copying, with compiled/native/output/DSP/log information. Native power messages request a paused, saved session without autoplay. EQ smoothing retains only the immediately used filter state rather than a chain of prior processors, preserving its original 20 ms curve and public constructor.

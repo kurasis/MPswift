@@ -1,5 +1,13 @@
 # Test evidence — Stages A–G
 
+## Current checkpoint (2026-10-07)
+
+Baseline `f689fdc038c8`, build `0.2.72-dev.1`: [main run 37601643993](https://github.com/kurasis/MPswift/actions/runs/37601643993) passed all three jobs, 249 tests on each OS, 216 bounded parser cases, EN/RU/extracted WPF and package checks. Independently downloaded ZIP digest and complete 577-file/13-native inventory were verified. [Source-specific evidence](evidence/security-deepening-windows.json). Older sections below are historical source checkpoints; their pre-CI pending notes are superseded by later observed results, not current blockers.
+
+Diagnostic privacy follow-up preserves APIs, persisted formats and field/file bounds while correcting configured-prefix slash/JSON/trailing-separator forms and log Operation. Baseline tests passed; four of six initial new cases failed before the correction. The corrected locked Release build passes **258 tests**, zero failures/skips/warnings/errors. [Finding and regression scope](DIAGNOSTIC_PRIVACY_2026-10-07.md). This changed source requires its own Windows/package CI before publication.
+
+[The consolidated remaining-work list](REMAINING_WORK.md) separates independent development from hardware/manual/license decisions and optional P2. Stable 1.0 acceptance remains open.
+
 ## Conservative audit regression checks (2026-10-07)
 
 Before edits, locked Release compilation and 184 tests passed; SDK analyzer and targeted IDE0005/IDE0051 verification returned success. A new semantic-backup rejection regression failed on the original code (InvalidDataException escaped without the primary failure). After the fixes, locked compilation has zero warnings/errors and all 196 managed tests pass. Added cases preserve shuffle bag/occurrence order under eligibility/source/restore changes and 10k-entry updates, retain BOM encodings through backup/save, enforce the inclusive 64 KiB limit, and preserve both original settings files and recovery causes. Existing Windows smoke checks actual equal-facts sibling PNG pixels/cache identity in EN/RU and the extracted app. Hosted results remain source/run-specific; the main workflow requires their success before publishing. [Audit and remaining limits](CODE_AUDIT_2026-10-07.md), [raw managed timing/ownership and dependency snapshot](evidence/code-audit-managed-2026-10-07.json).

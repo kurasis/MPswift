@@ -373,9 +373,8 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
             LogDropped = app.DroppedLogRecords, LogError = app.LogError, SourceFilesAreReadOnly = true, Network = "local-only",
             Acceptance = "Development candidate; real-device and clean Windows 11 acceptance remain separate."
         }, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
-        // JSON escapes backslashes; redact the escaped prefixes as well as plain display text.
         var prefixes = new[] { Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), app.DataDirectory, AppContext.BaseDirectory };
-        return Player.Core.Integration.DiagnosticReport.Redact(report, prefixes.Concat(prefixes.Select(p => System.Text.Json.JsonSerializer.Serialize(p)[1..^1])));
+        return Player.Core.Integration.DiagnosticReport.Redact(report, prefixes);
     }
     public async Task ConfigureAudioAsync(AudioProcessingSettings processing, AudioOutputSettings output)
     {

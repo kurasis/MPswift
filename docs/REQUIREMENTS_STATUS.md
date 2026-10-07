@@ -1,5 +1,13 @@
 # Requirement and acceptance status
 
+## Current checkpoint (2026-10-07)
+
+Baseline `f689fdc038c8`, build `0.2.72-dev.1`: [main run 37601643993](https://github.com/kurasis/MPswift/actions/runs/37601643993) passed all three jobs, 249 tests on each OS, 216 bounded parser cases, EN/RU/extracted WPF and package checks. Independently downloaded ZIP digest and complete 577-file/13-native inventory were verified. [Source-specific evidence](evidence/security-deepening-windows.json). Older sections below are historical source checkpoints; their pre-CI pending notes are superseded by later observed results, not current blockers.
+
+Diagnostic privacy follow-up preserves APIs, persisted formats and field/file bounds while correcting configured-prefix slash/JSON/trailing-separator forms and log Operation. Baseline tests passed; four of six initial new cases failed before the correction. The corrected locked Release build passes **258 tests**, zero failures/skips/warnings/errors. [Finding and regression scope](DIAGNOSTIC_PRIVACY_2026-10-07.md). This changed source requires its own Windows/package CI before publication.
+
+[The consolidated remaining-work list](REMAINING_WORK.md) separates independent development from hardware/manual/license decisions and optional P2. Stable 1.0 acceptance remains open.
+
 Conservative audit follow-up (2026-10-07): optimize AC-007 shuffle/source/restore lookup costs without changing candidate identities/order; correct AC-023 sibling artwork identity; strengthen bounded settings/recovery reads without changing schemas or fallback policy. Local locked build and 196 managed tests pass; the unchanged Windows workflow includes actual equal-size/time sibling thumbnail validation before publication. [Prioritized findings, exact local evidence and intentionally deferred DSP/API work](CODE_AUDIT_2026-10-07.md).
 
 AC-007 follow-up: playlist-tab management is available on right click/keyboard context opening. Tabs can be dragged before/after another tab with insertion feedback and edge scrolling, while source/queue identities and SQLite order are preserved. Private owner-checked payloads distinguish tab movement from existing folder/track drops.
@@ -75,7 +83,7 @@ The full specification remains the target. Unit tests or cross-builds do not sat
 | AC-022 | P1 | Exclusive mode unavailable | D–G | Explicit exclusive request/check/error implemented; hardware unrun | No silent shared fallback; unavailable/busy endpoint acceptance pending |
 | AC-023 | P1 | Metadata/artwork failure | D–G | Read-only metadata/local bounded thumbnails/fallback implemented | G6 cover checks and G9 oversized/truncated/compressed tag isolation, bounded long title, native audio/source preservation passed; remaining full acceptance is separate |
 | AC-024 | P1 | Folder scan cancellation | D–G | Bounded cancellable incremental scanner implemented | 256 pending paths, one reader, 64-record writes; confirmed batches retained; Windows scan/reconcile workflow passed |
-| AC-025 | P1 | File changes/watcher overflow | D–G | Fingerprint generations/watcher hints/overflow reconciliation implemented | Actual SQLite missing/reappearance state tested; native watcher overflow pending |
+| AC-025 | P1 | File changes/watcher overflow | D–G | Fingerprint generations/watcher hints/overflow reconciliation implemented | Actual SQLite missing/reappearance state and G9 native watcher overflow/cancellation passed; physical Windows 11 acceptance separate |
 | AC-026 | P1 | Import/export | D–G | M3U8/PLS/legacy import and atomic M3U8 export implemented | Domain duplicate/order/local/recursive/encoding/CUE refusal tests pass; Windows scan/reconcile workflow passed |
 | AC-027 | P1 | Search does not alter playback order | D–G | Unicode filtering keeps persisted source; manual filtered reorder rejected | Core tests and prior real WPF search proof; expanded tab/reopen check passed |
 | AC-028 | P1 | Single instance | D–G | Real second-process concurrent forwarding/recovery passed | [Stage F Windows evidence](evidence/stage-f-windows-integration.json); bounded current-user pipe, no autoplay |
@@ -85,9 +93,9 @@ The full specification remains the target. Unit tests or cross-builds do not sat
 | AC-032 | P1 | Read-only portable location | D–G | Portable marker/fallback implemented; acceptance partial | G9 real denied portable-directory ACL, explicit decline/accept and permission recovery passed; actual manual dialog/Windows 11 remain separate |
 | AC-033 | P1 | Long playback/stress | D–G | G12 1000 native PCM transitions + 60-second soak passed; full output acceptance open | Existing preparation stress passed; actual native PCM + short soak and CPU/range/slope reports; two-hour device/full UI resources open |
 | AC-034 | P1 | Offline traffic audit | D–G | Controlled G10 ETW passed on hosted Windows; clean baseline open | Four observed root lifetimes with zero app events, positive controls and no lost events; Windows 11/disconnected acceptance open |
-| AC-035 | P1 | Package audit | D–G | Linux/Windows 550-file audit, negative integrity and Windows apphost smoke passed | Fresh candidate/14 dependency declarations/13 native x64; license approval false; [gates](RELEASE_ACCEPTANCE.md) |
+| AC-035 | P1 | Package audit | D–G | Latest verified 577-file audit, negative integrity and Windows apphost smoke passed | Fresh candidate/14 dependency declarations/13 native x64; license approval false; [gates](RELEASE_ACCEPTANCE.md) |
 | AC-036 | P1 | Reference visual review | D–G | Actual screenshot reviewed; original vector/chrome/compact dark hierarchy | EN/RU screenshots retained in CI; review found/fixed ambient-language drift; physical scale review open |
-| AC-037 | P1 | P1 format matrix | D–G | Six additional pinned P1 decoder paths implemented; coverage incomplete | 13 DLLs audited, WV/TTA/M4B fixtures added; native/profile/license release blockers remain |
+| AC-037 | P1 | P1 format matrix | D–G | Six additional pinned P1 decoder paths implemented; coverage incomplete | 30 committed profiles plus owned WMA lossless/Pro, >4 GiB RF64 and long M4B/APE checks passed; Windows N, encoded large APE/other variants and license gates remain |
 | AC-038 | P1 | Source preservation | D–G | Codec/independent/long-wave source hash and handle checks passed | Read-only file/hash/handle checks include independent and long-wave paths in Windows CI |
 | AC-039 | P1 | Crash/restart | D–G | Actual Windows WPF process termination/restart and rollback passed; full crash acceptance partial | G3 checkpoint and G9 actual production migration termination/retry passed, with native preparation/no-autoplay and retained identities/backups; actual power loss remains open |
 | AC-040 | P1 | Diagnostic honesty | D–G | Reporting implemented; full release evidence pending | [Test results](TEST_RESULTS.md) and [checkpoint](IMPLEMENTATION_STATUS.md) |

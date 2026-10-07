@@ -1,5 +1,17 @@
 # Known limitations
 
+Current baseline: `f689fdc038c8`, development build `0.2.72-dev.1`; 249 tests per OS, 216 bounded parser cases, EN/RU/extracted WPF and 577-file/13-native package verification passed. [Exact evidence](evidence/security-deepening-windows.json). Diagnostic privacy changes receive their own CI. This is not accepted stable version 1.0; [remaining work](REMAINING_WORK.md) and [release gates](RELEASE_ACCEPTANCE.md) define current blockers. Older source snapshots below are historical; the corrections in this paragraph supersede their pending notes:
+
+- G8 passed 30 committed profiles, WMA lossless/Pro and >4 GiB RF64; long M4B/APE checks also pass. HE-AAC/APE/MPC/WV hybrid are not blanket untested blockers. Actual Windows N, encoded >4 GiB APE and other uncovered representative combinations remain open.
+- G9 actual NTFS full-disk rollback, read-only portable fallback, production migration kill/retry, watcher overflow and cancellation passed. Actual power-loss/manual Windows 11 acceptance remains open.
+- Malformed tags/artwork and 216 deterministic bounded parser cases passed in disposable Windows workers. Production parser process isolation, exhaustive fuzzing and individual mutable-file/streaming/WVC races remain open. Test Job containment is not a production sandbox.
+- The paused EQ processor-retention issue is corrected without changing its 20 ms curve. Queue/session JSON is limited to 16 Mi UTF-16 units rather than a byte-size promise.
+- Latest directory leases protect storage/backup chains; same-user pre-start compromise, hardlinks/individual files/WAL and stage cleanup intervals remain investigation boundaries. Arbitrary closed-addon internal loads are not fully established.
+- Configured diagnostic paths now cover plain/default-JSON/slash representations and log Operation; arbitrary secrets/unconfigured paths can remain. The current prefix correction requires its own CI.
+- Publisher signing remains absent; hashes are integrity checks relative to trusted metadata. Licensing, actual clean Windows 11, devices/Narrator/physical DPI and two-hour real output remain release gates.
+
+## Historical checkpoints
+
 - Stage F Windows integration passed at `39a8a25`. Stage G4–G7 passes 115 tests on Linux/Windows, 21 native profiles, complete ZIP restore, storage/artwork and measured search/scroll plus extracted apphost checks at `a00ee6c`; full file audits and negative integrity checks pass. The final software-routed WPF dropdown-Escape regression also passed. This is not version 1.0.
 - Persistent mixer, scheduled boundaries and crossfade are implemented. Only the committed real-PCM Windows harness can establish the tested mixer combinations; endpoint capture, acoustic listening, output latency, hotplug/sleep/exclusive and lossy gapless are not claimed as verified.
 - EQ uses float biquads through the production render path, conservative positive-band headroom, 20 ms parameter blending and final saturation after app volume. It is not a bit-perfect mode. ReplayGain reads tags only; unknown/invalid tags do not trigger library loudness analysis.
