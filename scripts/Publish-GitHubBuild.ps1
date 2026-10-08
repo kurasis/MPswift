@@ -47,7 +47,7 @@ Linux/Windows build tests, Windows native/WPF smoke, candidate integrity checks,
 
 The owner authorized this versioned release. Clean Windows 11, physical device/two-hour output/manual acceptance and third-party distribution-rights review remain open; version numbering does not mark them passed. The EXE is unsigned: a publisher certificate is not configured. See the packaged release acceptance, 1.0 notes and distribution review before redistributing or using commercially.
 "@ | Set-Content $notes -Encoding utf8
-$flags = if ($version.IsRelease) { @('--latest=false') } else { @('--prerelease','--latest=false') }
+[string[]]$flags = if ($version.IsRelease) { @('--latest=false') } else { @('--prerelease','--latest=false') }
 & gh release create $tag --repo $env:GH_REPO --target $audit.SourceCommit --title "MPswift $($version.Version.Split('+')[0]) · Windows x64" --notes-file $notes --draft @flags
 if ($LASTEXITCODE -ne 0) { throw 'GitHub draft creation failed.' }
 $assets = @($zip, $checksum, $setup, ($setup + '.sha256'), (Join-Path $Directory 'package-audit.json'), (Join-Path $Directory 'integrity-audit.json'), (Join-Path $Directory 'installer-audit.json'), (Join-Path $Directory 'installer-smoke.json'))
