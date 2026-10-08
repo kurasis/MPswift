@@ -76,6 +76,20 @@ try {
             if (-not $process.WaitForExit(120000)) { $process.Kill(); throw 'Owned uninstaller timed out.' }
             if ($process.ExitCode -ne 0) { throw 'Standard-user uninstall failed.' }
         } finally { $process.Dispose() }
+        # The uninstaller's self-delete helper can outlive its launcher briefly.
+        # Wait for its log owner to finish before allowing profile/workspace cleanup.
+        $uninstallLog = Join-Path $PSScriptRoot 'uninstall.log'
+        $finish = [Diagnostics.Stopwatch]::StartNew()
+        while ($true) {
+            try {
+                $closedLog = [IO.File]::Open($uninstallLog, [IO.FileMode]::Open, [IO.FileAccess]::Read, [IO.FileShare]::None)
+                $closedLog.Dispose()
+                break
+            } catch [IO.IOException] {
+                if ($finish.Elapsed.TotalSeconds -ge 15) { throw 'Uninstaller log owner did not finish within 15 seconds.' }
+                Start-Sleep -Milliseconds 200
+            }
+        }
         if ((Test-Path (Join-Path $app 'MPswift.exe')) -or (Test-Path $registry) -or (Test-Path (Join-Path $shortcuts 'MPswift.lnk'))) { throw 'Uninstall retained application/registry/shortcut.' }
         if ((Get-Content (Join-Path $app 'keep-user-file.txt') -Raw).Trim() -ne 'Owned extra content') { throw 'Uninstall deleted unknown user content.' }
     }
