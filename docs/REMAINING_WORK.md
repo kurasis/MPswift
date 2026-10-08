@@ -46,7 +46,7 @@ Production parser process isolation is not implemented. Test Job resource limits
 
 ## Optional P2 and excluded scope
 
-Optional: light theme, mini-player, compact playlist rows, spectrum, M4B chapter UI, additional CUE/pregap exposure, module/MIDI/AC3/DTS support, bit-perfect mode, ASIO/native DSD/DoP, tag editing and an installer. These do not replace P0/P1 acceptance. Automatic updates, streaming/cloud/accounts/telemetry, DRM bypass, audio recording and ARM64/x86 release support are explicitly outside v1.0 scope.
+Optional: light theme, mini-player, compact playlist rows, spectrum, M4B chapter UI, additional CUE/pregap exposure, module/MIDI/AC3/DTS support, bit-perfect mode, ASIO/native DSD/DoP, and tag editing. The requested per-user installer is now implemented with mandatory isolated standard-user lifecycle and installed WPF checks. These do not replace P0/P1 acceptance. Automatic updates, streaming/cloud/accounts/telemetry, DRM bypass, audio recording and ARM64/x86 release support are explicitly outside v1.0 scope.
 
 Intentional current constraints are not unfinished features: ordinary M3U8 refuses lossy CUE-segment export; ReplayGain is tag-driven rather than library analysis; moving music roots requires explicit relink; waveform CUE clipping uses source-bucket resolution. Public historical diagnostic types are retained because no external-consumer absence is established. A large view model or repeated extension lists alone are not confirmed bugs.
 

@@ -9,10 +9,10 @@ try {
     $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
     $principal = [Security.Principal.WindowsPrincipal]::new($identity)
     if ($principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator) -or $identity.Name -notmatch '\\mpswiftqa[0-9a-f]{8}$') { throw 'Installer validation requires its disposable standard-user identity.' }
-    $profile = Get-ItemPropertyValue ("HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList\" + $identity.User.Value) ProfileImagePath
+    $userProfileImage = Get-ItemPropertyValue ("HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList\" + $identity.User.Value) ProfileImagePath
     # CreateProcessWithLogonW may inherit the caller's environment, even with a loaded profile.
     # Initialize only this disposable child's profile variables from its actual token/SID.
-    $env:USERPROFILE = [Environment]::ExpandEnvironmentVariables($profile)
+    $env:USERPROFILE = [Environment]::ExpandEnvironmentVariables($userProfileImage)
     $env:APPDATA = Join-Path $env:USERPROFILE 'AppData/Roaming'
     $env:LOCALAPPDATA = Join-Path $env:USERPROFILE 'AppData/Local'
     $audit = Get-Content (Join-Path $PSScriptRoot 'installer-audit.json') -Raw | ConvertFrom-Json
