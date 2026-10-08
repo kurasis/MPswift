@@ -27,13 +27,13 @@ try {
     if (-not $localData) { throw 'The isolated standard-user profile has no LocalAppData known folder.' }
     $app = Join-Path $localData 'Programs/MPswift'
     $data = Join-Path $localData 'MPswift/LocalAudioPlayer'
-    $group = 'MPswift QA ' + $identity.User.Value.Split('-')[-1]
+    $group = 'MPswift'
     $shortcuts = Join-Path ([Environment]::GetFolderPath('Programs', 'Create')) $group
     $registry = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\{EC91F463-A93D-4DBE-94B7-2199F2F64FA6}_is1'
     function Run-Setup([string]$Target, [string]$Language) {
         $log = Join-Path $PSScriptRoot ($Phase + '-' + $Language + '-' + [guid]::NewGuid().ToString('N') + '.log')
         $start = [Diagnostics.ProcessStartInfo]::new($setup); $start.UseShellExecute = $false
-        foreach ($argument in @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',"/DIR=$Target","/GROUP=$group",'/TASKS=',"/LANG=$Language",("/LOG=" + $log))) { $start.ArgumentList.Add($argument) }
+        foreach ($argument in @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',"/DIR=$Target",'/TASKS=',"/LANG=$Language",("/LOG=" + $log))) { $start.ArgumentList.Add($argument) }
         $process = [Diagnostics.Process]::Start($start)
         try {
             if (-not $process.WaitForExit(120000)) { $process.Kill(); throw 'Owned installer timed out.' }
