@@ -1,6 +1,6 @@
 # Stage G release acceptance
 
-This is an executable development candidate and a verification workflow, not approved version 1.0. No scope reduction is accepted. The owner now authorizes GitHub development prereleases with ZIP/checksum assets after successful main CI. Stable version 1.0 acceptance, licensing purchases, registry associations/default overrides and private audio distribution remain separate.
+On 2026-10-08 the owner explicitly requested version 1.0 and a Windows installer; [1.0 release notes](RELEASE_1_0.md) record this publication authorization and installer behavior. Ordinary main builds remain development prereleases. Version numbering does not mark the remaining acceptance checks or third-party rights below passed. Licensing purchases, registry associations/default overrides and private audio distribution remain separate.
 
 ## Automated reproducible commands
 
@@ -13,7 +13,7 @@ This is an executable development candidate and a verification workflow, not app
 
 Build uses locked restore. Package creation uses a fresh owned staging folder, audits all application/runtime/native files, retains dependency declarations/available upstream texts, writes a per-file SHA-256 manifest/checksum list and an outer ZIP checksum, and rejects data/log/cache/music/reference/debug inputs. Every candidate is explicitly marked DEVELOPMENT-ONLY, with distributionApproved=false. Package creation itself does not upload assets. Main CI publishes the Windows-built ZIP as a separate development prerelease after both matrix jobs and Windows package smoke pass. Remote asset digests are checked before the draft becomes visible. Verify-Candidate rejects missing/changed/extra files and checks native x64 PE/hash. Package smoke runs the extracted self-contained executable from a Unicode path and different working directory with invalid DOTNET_ROOT, using only owned fixtures. An installed SDK elsewhere on a hosted runner means this is not clean-machine proof.
 
-## Required evidence still preventing version 1.0
+## Required acceptance evidence still outstanding
 
 | Gate | Required recorded workflow | Current boundary |
 | --- | --- | --- |
@@ -30,7 +30,7 @@ Build uses locked restore. Package creation uses a fresh owned staging folder, a
 
 For each AC record: source commit; package SHA-256; exact OS build; standard-user status; CPU/RAM/storage; runtime/device/driver; dataset and source hashes; cold/warm state; start/end UTC; precise steps; measured values/capture paths; passed/failed/blocked/not-run; deviations and remaining issue. Never replace an unavailable workflow with a passed placeholder. Keep owner music and personal paths outside committed evidence.
 
-Run Verify-Candidate on a copied/extracted candidate. For a negative integrity check, change only an owned candidate copy and confirm verification fails, then re-extract. Do not alter source music. Back up owned test databases before crash/full-disk scenarios. File association setup and installer/signing remain separately requested work.
+Run Verify-Candidate on a copied/extracted candidate. For a negative integrity check, change only an owned candidate copy and confirm verification fails, then re-extract. Do not alter source music. Back up owned test databases before crash/full-disk scenarios. File associations and signing remain separate decisions. The requested per-user installer now has mandatory source-specific standard-user lifecycle and actual installed WPF CI gates.
 
 
 G13 notice completeness/provenance preparation is implemented; [distribution review](DISTRIBUTION_REVIEW.md) separates the retained MIT/Apache/LGPL/native original texts from unresolved owner rights and complete corresponding-source/relinking/SDK evidence. AC-035 is not accepted by this change.

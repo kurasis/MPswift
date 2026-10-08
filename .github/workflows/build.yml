@@ -5,6 +5,12 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Leave empty for a development build; 1.0.0 publishes the owner-authorized release'
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: read
@@ -16,10 +22,11 @@ jobs:
       matrix:
         os: [ubuntu-24.04, windows-2022]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 25
+    timeout-minutes: 40
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: '1'
       DOTNET_NOLOGO: '1'
+      MPSWIFT_RELEASE_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.release_version || '' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
@@ -38,6 +45,9 @@ jobs:
       - name: Provision pinned development native dependencies
         shell: pwsh
         run: ./scripts/Setup-Native.ps1
+      - name: Verify build and publication version agreement
+        shell: pwsh
+        run: ./scripts/Test-Versioning.ps1
       - name: Compile locked native security harness
         if: runner.os == 'Windows'
         shell: pwsh
@@ -69,6 +79,14 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: ./scripts/Package-Smoke.ps1
+      - name: Compile audited per-user Windows installer
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/Package-Installer.ps1
+      - name: Standard-user install, reinstall, uninstall and installed WPF
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/Installer-Smoke.ps1 -IsolatedRunner
       - name: Retain verified Windows ZIP for publication
         if: runner.os == 'Windows' && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -79,6 +97,10 @@ jobs:
             artifacts/portable/*.zip.sha256
             artifacts/portable/package-audit.json
             artifacts/portable/integrity-audit.json
+            artifacts/portable/*.exe
+            artifacts/portable/*.exe.sha256
+            artifacts/portable/installer-audit.json
+            artifacts/portable/installer-smoke.json
           if-no-files-found: error
           retention-days: 14
       - name: Retain test and native decode evidence
@@ -104,6 +126,7 @@ jobs:
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: '1'
       DOTNET_NOLOGO: '1'
+      MPSWIFT_RELEASE_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.release_version || '' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
@@ -136,7 +159,7 @@ jobs:
           retention-days: 14
 
   publish:
-    name: Publish separate Windows ZIP prerelease
+    name: Publish verified Windows ZIP and installer
     needs: [build, taglib-replacement]
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-24.04
@@ -155,4 +178,5 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
+          MPSWIFT_RELEASE_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.release_version || '' }}
         run: ./scripts/Publish-GitHubBuild.ps1 -RunId '${{ github.run_id }}' -Attempt '${{ github.run_attempt }}'

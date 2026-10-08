@@ -1,6 +1,6 @@
 # MPswift — local user help
 
-This is a development candidate for Windows x64. Windows 11 is the release target; clean Windows 11/offline/hardware acceptance is not yet complete. No internet service, account, .NET installation or SDK is required by the self-contained app. Extract the whole folder; do not move only the executable. Start `MPswift.exe`. See `DEVELOPMENT-ONLY.txt` and the dependency review before distributing a copy.
+MPswift is a Windows x64 audio player. Version 1.0 is available as a per-user setup EXE and portable ZIP. Windows 11 is the release target; clean Windows 11/offline/hardware acceptance is not yet complete. No internet service, account, .NET installation or SDK is required by the self-contained app. Extract the whole folder; do not move only the executable. Start `MPswift.exe`. Setup installs into `%LOCALAPPDATA%/Programs/MPswift` without requesting elevation, with a Start menu shortcut and optional desktop shortcut; uninstall preserves data. See the packaged release notes and dependency review before redistributing.
 
 ## Files and playlists
 
@@ -51,7 +51,7 @@ For an existing whole FLAC row, select it (multiple images are supported), then 
 
 ## Development build versions
 
-The title bar and F1 help show the compiled version. Published builds use `0.2.<workflow run number>-dev.<attempt>`; restarting a workflow increments its attempt. The ZIP, GitHub release, package manifest, app and core file metadata identify the same version. Local unnumbered builds use `0.2.0-dev.0`. Keep the existing Data folder when replacing a portable build.
+The title bar and F1 help show the compiled version. Development builds use `1.0.<workflow run number>-dev.<attempt>`; version 1.0 uses `1.0.0+build.<run number>.<attempt>` in package metadata and 1.0.0 in the title; restarting a workflow increments its attempt. The ZIP, GitHub release, package manifest and app/core metadata identify the same source/build; stable UI shows 1.0.0 while file metadata records each workflow build. Local unnumbered builds use `1.0.0-dev.0`. Keep the existing Data folder when replacing a portable build.
 
 ## Playlist tabs and waveform
 

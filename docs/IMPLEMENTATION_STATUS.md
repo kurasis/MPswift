@@ -1,5 +1,10 @@
 # Implementation checkpoint
 
+## Version 1.0 and per-user installer preparation (2026-10-08)
+
+The owner explicitly requests version 1.0 and an installer. [Release notes](RELEASE_1_0.md) describe current-user installation, separate retained data, manual portable migration, unsigned publisher status and unchanged open acceptance/rights gates. Locked baseline before edits passed 299 tests with zero build warnings/errors. CI adds genuine isolated standard-user install/reinstall/uninstall and real installed EN/RU WPF gates. Final source-specific CI/release evidence is required; this preparation alone is not an observed pass.
+
+
 ## Observed engineering completion (2026-10-07)
 
 Implementation `e118f3e691b0`, **0.2.90-dev.1**, [run 37654713897](https://github.com/kurasis/MPswift/actions/runs/37654713897): all four jobs pass. Linux/Windows/copied-Core each pass 299 tests; all 216 parser cases and secret-pattern controls pass. Normal EN/RU, rebuilt-TagLib EN/RU and extracted WPF pass; the new real native/waveform/store/WinRT post-release fault checks release files/directory pins and reopen committed data. The published ZIP was independently downloaded and verified (578 files, 13 native libraries, complete hashes). [Exact observed evidence](evidence/engineering-completion-windows-2026-10-07.json). This supersedes the pre-CI pending notes below for that implementation. Documentation-only successors still receive normal source-specific CI and their own versioned ZIP; physical/manual, signing/rights/source-distribution and hard native-I/O preemption remain open.

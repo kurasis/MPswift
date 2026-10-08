@@ -11,8 +11,10 @@
     <BuildSequence Condition="'$(BuildSequence)' == ''">0</BuildSequence>
     <BuildAttempt Condition="'$(BuildAttempt)' == '' and '$(GITHUB_RUN_ATTEMPT)' != ''">$(GITHUB_RUN_ATTEMPT)</BuildAttempt>
     <BuildAttempt Condition="'$(BuildAttempt)' == ''">0</BuildAttempt>
-    <Version>0.2.$(BuildSequence)-dev.$(BuildAttempt)</Version>
-    <AssemblyVersion>0.2.0.0</AssemblyVersion>
-    <FileVersion>0.2.$(BuildSequence).$(BuildAttempt)</FileVersion>
+    <ReleaseVersion Condition="'$(ReleaseVersion)' == ''">$(MPSWIFT_RELEASE_VERSION)</ReleaseVersion>
+    <Version Condition="'$(ReleaseVersion)' == ''">1.0.$(BuildSequence)-dev.$(BuildAttempt)</Version>
+    <Version Condition="'$(ReleaseVersion)' != ''">$(ReleaseVersion)+build.$(BuildSequence).$(BuildAttempt)</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.$(BuildSequence).$(BuildAttempt)</FileVersion>
   </PropertyGroup>
 </Project>

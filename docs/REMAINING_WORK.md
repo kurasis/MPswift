@@ -1,5 +1,10 @@
 # Remaining work and acceptance boundaries
 
+## Version 1.0 and per-user installer preparation (2026-10-08)
+
+The owner explicitly requests version 1.0 and an installer. [Release notes](RELEASE_1_0.md) describe current-user installation, separate retained data, manual portable migration, unsigned publisher status and unchanged open acceptance/rights gates. Locked baseline before edits passed 299 tests with zero build warnings/errors. CI adds genuine isolated standard-user install/reinstall/uninstall and real installed EN/RU WPF gates. Final source-specific CI/release evidence is required; this preparation alone is not an observed pass.
+
+
 Updated 2026-10-07. Latest observed implementation: `e118f3e691b0`, **0.2.90-dev.1**, [successful run 37654713897](https://github.com/kurasis/MPswift/actions/runs/37654713897). All four jobs pass: 299 tests per OS and copied Core, 216 bounded parser cases, secret controls, actual EN/RU/rebuilt-library/extracted WPF and independently downloaded 578-file/13-native ZIP. [Observed bounded snapshots/resource-shutdown completion](ENGINEERING_COMPLETION_2026-10-07.md#observed-completion) supersedes pre-CI pending notes for this implementation. Documentation-only successors still require their own normal CI and versioned ZIP.
 
 ## Work possible without owner hardware or commercial decisions

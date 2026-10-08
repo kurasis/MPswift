@@ -3,6 +3,7 @@
 param([switch]$SkipBuild)
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
+. "$PSScriptRoot/Version-Helpers.ps1"
 $root = Split-Path $PSScriptRoot -Parent
 Push-Location $root
 $staging = Join-Path $root ('artifacts/candidate-stage-' + [guid]::NewGuid().ToString('N'))
@@ -18,13 +19,16 @@ try {
         if (-not (Test-Path (Join-Path $app $required))) { throw "Missing packaged runtime/application file: $required" }
     }
     New-Item (Join-Path $app 'docs') -ItemType Directory -Force | Out-Null
-    foreach ($document in @('DESIGN','ARCHITECTURE','FORMAT_SUPPORT','TEST_RESULTS','REQUIREMENTS_STATUS','KNOWN_LIMITATIONS','THIRD_PARTY_NOTICES','RELEASE_ACCEPTANCE','SPEC_COMPLETION','SECURITY_AUDIT_2026-10-07','SECURITY_FOLLOWUP_2026-10-07','SECURITY_DEEPENING_2026-10-07','USER_HELP','USER_HELP.ru')) {
+    foreach ($document in @('DESIGN','ARCHITECTURE','FORMAT_SUPPORT','TEST_RESULTS','REQUIREMENTS_STATUS','KNOWN_LIMITATIONS','THIRD_PARTY_NOTICES','RELEASE_ACCEPTANCE','RELEASE_1_0','SPEC_COMPLETION','SECURITY_AUDIT_2026-10-07','SECURITY_FOLLOWUP_2026-10-07','SECURITY_DEEPENING_2026-10-07','USER_HELP','USER_HELP.ru')) {
         Copy-Item "docs/$document.md" (Join-Path $app "docs/$document.md")
     }
     New-Item (Join-Path $app 'docs/evidence') -ItemType Directory -Force | Out-Null
     Copy-Item docs/evidence/security-dependencies-2026-10-07.json (Join-Path $app 'docs/evidence/security-dependencies-2026-10-07.json')
     Copy-Item docs/evidence/security-ogg-reproduction-2026-10-07.json (Join-Path $app 'docs/evidence/security-ogg-reproduction-2026-10-07.json')
     Copy-Item README.md (Join-Path $app 'README.md')
+    $installerPin = Get-Content installer/toolchain.json -Raw | ConvertFrom-Json
+    if ((Get-Item installer/LICENSE.txt).Length -ne $installerPin.licenseBytes -or (Get-FileHash installer/LICENSE.txt -Algorithm SHA256).Hash.ToLowerInvariant() -ne $installerPin.licenseSha256) { throw 'Pinned Inno Setup license text changed.' }
+    Copy-Item installer/LICENSE.txt (Join-Path $app 'docs/INNO_SETUP_LICENSE.txt')
     New-Item (Join-Path $app 'acceptance') -ItemType Directory -Force | Out-Null
     foreach ($script in @('Acceptance-Helpers.ps1','Desktop-Acceptance.ps1','Audio-Acceptance.ps1','Stress-Acceptance.ps1')) { Copy-Item (Join-Path $PSScriptRoot $script) (Join-Path $app "acceptance/$script") }
     Copy-Item docs/DESKTOP_ACCEPTANCE.md (Join-Path $app 'docs/DESKTOP_ACCEPTANCE.md')
@@ -32,7 +36,6 @@ try {
     Copy-Item docs/STRESS_ACCEPTANCE.md (Join-Path $app 'docs/STRESS_ACCEPTANCE.md')
     Copy-Item docs/DISTRIBUTION_REVIEW.md (Join-Path $app 'docs/DISTRIBUTION_REVIEW.md')
     'Explicit portable data location; created only on first normal launch.' | Set-Content (Join-Path $app 'portable.marker') -Encoding utf8
-    'DEVELOPMENT BUILD. FULL STAGE G ACCEPTANCE IS INCOMPLETE. See docs/RELEASE_ACCEPTANCE.md and docs/THIRD_PARTY_NOTICES.md.' | Set-Content (Join-Path $app 'DEVELOPMENT-ONLY.txt') -Encoding utf8
     $assets = Get-Content src/Player.App/obj/project.assets.json -Raw | ConvertFrom-Json -AsHashtable
     $packages = @{}
     foreach ($identity in $assets.libraries.Keys) {
@@ -84,13 +87,19 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Source commit unavailable.' }
     $dirty = @(& git status --porcelain).Count -ne 0
     $version = (& dotnet msbuild src/Player.App/Player.App.csproj -getProperty:Version).Trim()
-    if ($LASTEXITCODE -ne 0 -or $version -notmatch '^0\.2\.[0-9]+-dev\.[0-9]+$') { throw 'Build version unavailable or invalid.' }
+    if ($LASTEXITCODE -ne 0) { throw 'Build version unavailable.' }
+    $versionInfo = Get-PlayerVersionInfo $version
+    if ($versionInfo.IsRelease) {
+        'MPswift 1.0. Owner-authorized versioned release. Hardware/manual acceptance and third-party rights review remain open; see docs/RELEASE_1_0.md and docs/DISTRIBUTION_REVIEW.md.' | Set-Content (Join-Path $app 'RELEASE-NOTES.txt') -Encoding utf8
+    } else {
+        'DEVELOPMENT BUILD. FULL STAGE G ACCEPTANCE IS INCOMPLETE. See docs/RELEASE_ACCEPTANCE.md and docs/THIRD_PARTY_NOTICES.md.' | Set-Content (Join-Path $app 'DEVELOPMENT-ONLY.txt') -Encoding utf8
+    }
     $files = @(Get-ChildItem $app -Recurse -File | Sort-Object FullName | ForEach-Object {
         $relative = [IO.Path]::GetRelativePath($app, $_.FullName).Replace('\','/')
         if ($relative -match '(^|/)(Data|Cache|Logs|reference|test-results|\.git)(/|$)|\.(db(-wal|-shm)?|peaks|jsonl|wav|flac|mp3|pdb)$') { throw "Private/development input found in candidate: $relative" }
         [ordered]@{ path = $relative; bytes = $_.Length; sha256 = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() }
     })
-    $manifest = [ordered]@{ schemaVersion = 1; product = 'MPswift'; productVersion = $version; platform = 'win-x64'; sourceCommit = $source; sourceTreeDirty = $dirty; sdk = (& dotnet --version).Trim(); distributionApproved = $false; evidenceLevel = 'local development candidate; Windows 11 clean/offline/hardware/license gates remain'; files = $files }
+    $manifest = [ordered]@{ schemaVersion = 1; product = 'MPswift'; productVersion = $version; packageKind = 'portable'; platform = 'win-x64'; sourceCommit = $source; sourceTreeDirty = $dirty; sdk = (& dotnet --version).Trim(); distributionApproved = $false; evidenceLevel = 'automated integration; Windows 11 clean/offline/hardware/license gates remain'; files = $files }
     $manifest | ConvertTo-Json -Depth 6 | Set-Content (Join-Path $app 'package-manifest.json') -Encoding utf8
     $sums = @($files | ForEach-Object { $_.sha256 + '  ' + $_.path })
     $sums += (Get-FileHash (Join-Path $app 'package-manifest.json') -Algorithm SHA256).Hash.ToLowerInvariant() + '  package-manifest.json'
