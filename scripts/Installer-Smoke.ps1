@@ -7,7 +7,7 @@ if (-not $IsWindows -or -not $IsolatedRunner -or $env:CI -ne 'true') { throw 'In
 $root = Split-Path $PSScriptRoot -Parent
 $output = Join-Path $root 'artifacts/portable'
 $audit = Get-Content (Join-Path $output 'installer-audit.json') -Raw | ConvertFrom-Json
-$owned = Join-Path $env:TEMP ('mpswift-installer-' + [guid]::NewGuid().ToString('N'))
+$owned = Join-Path $root ('artifacts/installer-check-' + [guid]::NewGuid().ToString('N'))
 $userName = 'mpswiftqa' + [guid]::NewGuid().ToString('N').Substring(0,8)
 $password = ConvertTo-SecureString ([guid]::NewGuid().ToString('N') + 'aA1!') -AsPlainText -Force
 $account = $null

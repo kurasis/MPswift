@@ -15,6 +15,9 @@ try {
     $env:USERPROFILE = [Environment]::ExpandEnvironmentVariables($userProfileImage)
     $env:APPDATA = Join-Path $env:USERPROFILE 'AppData/Roaming'
     $env:LOCALAPPDATA = Join-Path $env:USERPROFILE 'AppData/Local'
+    $env:TEMP = Join-Path $env:LOCALAPPDATA 'Temp'
+    $env:TMP = $env:TEMP
+    New-Item $env:TEMP -ItemType Directory -Force | Out-Null
     $audit = Get-Content (Join-Path $PSScriptRoot 'installer-audit.json') -Raw | ConvertFrom-Json
     $setup = Join-Path $PSScriptRoot $audit.Installer
     if ((Get-FileHash $setup -Algorithm SHA256).Hash.ToLowerInvariant() -ne $audit.InstallerSha256) { throw 'Installer changed before standard-user execution.' }
@@ -28,12 +31,13 @@ try {
     $shortcuts = Join-Path ([Environment]::GetFolderPath('Programs', 'Create')) $group
     $registry = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\{EC91F463-A93D-4DBE-94B7-2199F2F64FA6}_is1'
     function Run-Setup([string]$Target, [string]$Language) {
+        $log = Join-Path $PSScriptRoot ($Phase + '-' + $Language + '-' + [guid]::NewGuid().ToString('N') + '.log')
         $start = [Diagnostics.ProcessStartInfo]::new($setup); $start.UseShellExecute = $false
-        foreach ($argument in @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',"/DIR=$Target","/GROUP=$group",'/TASKS=',"/LANG=$Language",("/LOG=" + (Join-Path $PSScriptRoot "$Phase-$Language.log")))) { $start.ArgumentList.Add($argument) }
+        foreach ($argument in @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',"/DIR=$Target","/GROUP=$group",'/TASKS=',"/LANG=$Language",("/LOG=" + $log))) { $start.ArgumentList.Add($argument) }
         $process = [Diagnostics.Process]::Start($start)
         try {
             if (-not $process.WaitForExit(120000)) { $process.Kill(); throw 'Owned installer timed out.' }
-            return $process.ExitCode
+            return [pscustomobject]@{ ExitCode = $process.ExitCode; Log = $(if (Test-Path $log) { Get-Content $log -Raw } else { 'Installer did not create a log.' }) }
         } finally { $process.Dispose() }
     }
     if ($Phase -eq 'Install') {
@@ -47,16 +51,20 @@ try {
         New-Item $foreign -ItemType Directory | Out-Null
         $sentinel = Join-Path $foreign 'keep.txt'; 'Owned unrelated content' | Set-Content $sentinel
         $before = (Get-FileHash $sentinel).Hash
-        if ((Run-Setup $foreign 'english') -eq 0 -or (Get-FileHash $sentinel).Hash -ne $before -or (Test-Path (Join-Path $foreign 'MPswift.exe'))) { throw 'Installer accepted/changed an unrelated nonempty directory.' }
+        $result = Run-Setup $foreign 'english'
+        if ($result.ExitCode -ne 7 -or -not $result.Log.Contains('Choose an empty folder') -or (Get-FileHash $sentinel).Hash -ne $before -or (Test-Path (Join-Path $foreign 'MPswift.exe'))) { throw "Unrelated-folder protection did not reject at PrepareToInstall: $($result | ConvertTo-Json -Compress)" }
         $portable = Join-Path $localData 'portable validation folder'
         New-Item (Join-Path $portable 'Data') -ItemType Directory -Force | Out-Null
         'owned portable marker' | Set-Content (Join-Path $portable 'portable.marker')
-        if ((Run-Setup $portable 'english') -eq 0 -or -not (Test-Path (Join-Path $portable 'portable.marker'))) { throw 'Installer accepted/changed a portable data directory.' }
-        if ((Run-Setup $app 'english') -ne 0) { throw 'Fresh standard-user install failed.' }
+        $result = Run-Setup $portable 'english'
+        if ($result.ExitCode -ne 7 -or -not $result.Log.Contains('Choose a separate installation folder') -or -not (Test-Path (Join-Path $portable 'portable.marker'))) { throw "Portable-folder protection did not reject at PrepareToInstall: $($result | ConvertTo-Json -Compress)" }
+        $result = Run-Setup $app 'english'
+        if ($result.ExitCode -ne 0) { throw "Fresh standard-user install failed: $($result | ConvertTo-Json -Compress)" }
     } elseif ($Phase -eq 'Upgrade') {
         # Unknown user content in a recognized installation must survive reinstallation and uninstall.
         'Owned extra content' | Set-Content (Join-Path $app 'keep-user-file.txt')
-        if ((Run-Setup $app 'russian') -ne 0) { throw 'Standard-user reinstall failed.' }
+        $result = Run-Setup $app 'russian'
+        if ($result.ExitCode -ne 0) { throw "Standard-user reinstall failed: $($result | ConvertTo-Json -Compress)" }
         if ((Get-Content (Join-Path $app 'keep-user-file.txt') -Raw).Trim() -ne 'Owned extra content') { throw 'Reinstall modified unknown user content.' }
         Remove-Item (Join-Path $app 'keep-user-file.txt')
     } else {

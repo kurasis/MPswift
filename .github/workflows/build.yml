@@ -56,17 +56,9 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Locked security-tool restore failed.' }
           dotnet build tools/Player.AudioSmoke/Player.AudioSmoke.csproj -c Release --no-restore
           if ($LASTEXITCODE -ne 0) { throw 'Security-tool build failed.' }
-      - name: Isolated bounded decoder mutation and file/DLL security checks
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: ./scripts/Security-Smoke.ps1
       - name: Locked restore, build and core tests
         shell: pwsh
         run: ./scripts/Build.ps1
-      - name: Windows native load and decode proof (no sound device required)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: ./scripts/Smoke.ps1 -SkipBuild
       - name: Audit local portable development candidate
         shell: pwsh
         run: ./scripts/Package-Candidate.ps1 -SkipBuild
@@ -75,10 +67,6 @@ jobs:
         run: |
           ./scripts/Test-LicenseTexts.ps1
           ./scripts/Test-CandidateIntegrity.ps1
-      - name: Run extracted self-contained app from Unicode path
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: ./scripts/Package-Smoke.ps1
       - name: Compile audited per-user Windows installer
         if: runner.os == 'Windows'
         shell: pwsh
@@ -87,6 +75,18 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: ./scripts/Installer-Smoke.ps1 -IsolatedRunner
+      - name: Isolated bounded decoder mutation and file/DLL security checks
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/Security-Smoke.ps1
+      - name: Windows native load and decode proof (no sound device required)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/Smoke.ps1 -SkipBuild
+      - name: Run extracted self-contained app from Unicode path
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/Package-Smoke.ps1
       - name: Retain verified Windows ZIP for publication
         if: runner.os == 'Windows' && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -114,6 +114,7 @@ jobs:
             artifacts/test-results/*.trx
             artifacts/smoke/*.json
             artifacts/smoke/g12-*-progress.jsonl
+            artifacts/smoke/installer-*.log
             artifacts/smoke/*.png
             artifacts/smoke/stage-d-mixer/*.f32
           if-no-files-found: warn
