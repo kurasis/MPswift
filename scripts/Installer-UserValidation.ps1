@@ -12,8 +12,12 @@ try {
     $audit = Get-Content (Join-Path $PSScriptRoot 'installer-audit.json') -Raw | ConvertFrom-Json
     $setup = Join-Path $PSScriptRoot $audit.Installer
     if ((Get-FileHash $setup -Algorithm SHA256).Hash.ToLowerInvariant() -ne $audit.InstallerSha256) { throw 'Installer changed before standard-user execution.' }
-    $app = Join-Path $env:LOCALAPPDATA 'Programs/MPswift'
-    $data = Join-Path $env:LOCALAPPDATA 'MPswift/LocalAudioPlayer'
+    # Credential-launched processes can inherit the caller's environment block.
+    # Resolve known folders for this token/profile, as the installer and player do.
+    $localData = [Environment]::GetFolderPath('LocalApplicationData')
+    if (-not $localData) { throw 'The isolated standard-user profile has no LocalAppData known folder.' }
+    $app = Join-Path $localData 'Programs/MPswift'
+    $data = Join-Path $localData 'MPswift/LocalAudioPlayer'
     $group = 'MPswift QA ' + $identity.User.Value.Split('-')[-1]
     $shortcuts = Join-Path ([Environment]::GetFolderPath('Programs')) $group
     $registry = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\{EC91F463-A93D-4DBE-94B7-2199F2F64FA6}_is1'
@@ -33,12 +37,12 @@ try {
         Copy-Item (Join-Path $PSScriptRoot 'pcm16.wav') (Join-Path $data 'owned-music.wav')
         $hashes = @(Get-ChildItem $data -File | ForEach-Object { @{ Name = $_.Name; Sha256 = (Get-FileHash $_.FullName -Algorithm SHA256).Hash } })
         $hashes | ConvertTo-Json | Set-Content (Join-Path $PSScriptRoot 'data-hashes.json') -Encoding utf8
-        $foreign = Join-Path $env:LOCALAPPDATA 'foreign validation folder'
+        $foreign = Join-Path $localData 'foreign validation folder'
         New-Item $foreign -ItemType Directory | Out-Null
         $sentinel = Join-Path $foreign 'keep.txt'; 'Owned unrelated content' | Set-Content $sentinel
         $before = (Get-FileHash $sentinel).Hash
         if ((Run-Setup $foreign 'english') -eq 0 -or (Get-FileHash $sentinel).Hash -ne $before -or (Test-Path (Join-Path $foreign 'MPswift.exe'))) { throw 'Installer accepted/changed an unrelated nonempty directory.' }
-        $portable = Join-Path $env:LOCALAPPDATA 'portable validation folder'
+        $portable = Join-Path $localData 'portable validation folder'
         New-Item (Join-Path $portable 'Data') -ItemType Directory -Force | Out-Null
         'owned portable marker' | Set-Content (Join-Path $portable 'portable.marker')
         if ((Run-Setup $portable 'english') -eq 0 -or -not (Test-Path (Join-Path $portable 'portable.marker'))) { throw 'Installer accepted/changed a portable data directory.' }
