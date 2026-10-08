@@ -32,6 +32,8 @@ try {
     foreach ($phase in @('Install','Upgrade','Uninstall')) {
         $process = Start-Process -FilePath (Join-Path $PSHOME 'pwsh.exe') -Credential $credential -LoadUserProfile -ArgumentList @('-NoProfile','-NonInteractive','-File',('"' + (Join-Path $owned 'Installer-UserValidation.ps1') + '"'),'-Phase',$phase) -PassThru
         try {
+            # Keep a handle before exit so credential-launched Process objects retain their exit code.
+            $null = $process.Handle
             if (-not $process.WaitForExit(360000)) { $process.Kill(); throw 'Standard-user phase timed out.' }
             $phaseReport = Get-Content (Join-Path $owned ($phase.ToLowerInvariant() + '.json')) -Raw | ConvertFrom-Json
             if ($process.ExitCode -ne 0 -or $phaseReport.Status -ne 'standard-user-installer-phase-passed') { throw "Standard-user $phase failed: $($phaseReport | ConvertTo-Json -Compress)" }

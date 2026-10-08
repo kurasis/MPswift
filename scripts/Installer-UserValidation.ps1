@@ -9,17 +9,23 @@ try {
     $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
     $principal = [Security.Principal.WindowsPrincipal]::new($identity)
     if ($principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator) -or $identity.Name -notmatch '\\mpswiftqa[0-9a-f]{8}$') { throw 'Installer validation requires its disposable standard-user identity.' }
+    $profile = Get-ItemPropertyValue ("HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList\" + $identity.User.Value) ProfileImagePath
+    # CreateProcessWithLogonW may inherit the caller's environment, even with a loaded profile.
+    # Initialize only this disposable child's profile variables from its actual token/SID.
+    $env:USERPROFILE = [Environment]::ExpandEnvironmentVariables($profile)
+    $env:APPDATA = Join-Path $env:USERPROFILE 'AppData/Roaming'
+    $env:LOCALAPPDATA = Join-Path $env:USERPROFILE 'AppData/Local'
     $audit = Get-Content (Join-Path $PSScriptRoot 'installer-audit.json') -Raw | ConvertFrom-Json
     $setup = Join-Path $PSScriptRoot $audit.Installer
     if ((Get-FileHash $setup -Algorithm SHA256).Hash.ToLowerInvariant() -ne $audit.InstallerSha256) { throw 'Installer changed before standard-user execution.' }
     # Credential-launched processes can inherit the caller's environment block.
     # Resolve known folders for this token/profile, as the installer and player do.
-    $localData = [Environment]::GetFolderPath('LocalApplicationData')
+    $localData = [Environment]::GetFolderPath('LocalApplicationData', 'Create')
     if (-not $localData) { throw 'The isolated standard-user profile has no LocalAppData known folder.' }
     $app = Join-Path $localData 'Programs/MPswift'
     $data = Join-Path $localData 'MPswift/LocalAudioPlayer'
     $group = 'MPswift QA ' + $identity.User.Value.Split('-')[-1]
-    $shortcuts = Join-Path ([Environment]::GetFolderPath('Programs')) $group
+    $shortcuts = Join-Path ([Environment]::GetFolderPath('Programs', 'Create')) $group
     $registry = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\{EC91F463-A93D-4DBE-94B7-2199F2F64FA6}_is1'
     function Run-Setup([string]$Target, [string]$Language) {
         $start = [Diagnostics.ProcessStartInfo]::new($setup); $start.UseShellExecute = $false
@@ -75,6 +81,6 @@ try {
     }
     [ordered]@{ Status = 'standard-user-installer-phase-passed'; Phase = $Phase; Administrator = $false; AppDirectory = $app; DataPreserved = $true; PerUserRegistration = $true; UnknownFilesPreserved = $true; SourceCommit = $audit.SourceCommit; ProductVersion = $audit.ProductVersion } | ConvertTo-Json | Set-Content $report -Encoding utf8
 } catch {
-    [ordered]@{ Status = 'standard-user-installer-phase-failed'; Phase = $Phase; Message = $_.Exception.Message; Details = $_.ToString() } | ConvertTo-Json | Set-Content $report -Encoding utf8
+    [ordered]@{ Status = 'standard-user-installer-phase-failed'; Phase = $Phase; Message = $_.Exception.Message; Details = $_.ToString(); ScriptStackTrace = $_.ScriptStackTrace } | ConvertTo-Json | Set-Content $report -Encoding utf8
     exit 1
 }
