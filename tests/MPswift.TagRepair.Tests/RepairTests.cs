@@ -109,6 +109,34 @@ public sealed class RepairTests
         Assert.Equal(2, Program.Run(["missing", "--cue-codepage", "9999"], output, errors)); Assert.Empty(output.ToString());
     }
 
+    [Fact] public async Task FreshCliProcessDecodesCueBeforeAnyAudioTagsInitializeCodePages()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "cli-cue-first-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            var path = Path.Combine(root, "Беларускае.cue");
+            var original = Encoding.GetEncoding(1251).GetBytes("TITLE \"Людзі\"\nFILE \"owned.flac\" WAVE\nTRACK 01 AUDIO\nINDEX 01 00:00:00\n");
+            File.WriteAllBytes(path, original);
+            var start = new System.Diagnostics.ProcessStartInfo(Environment.GetEnvironmentVariable("DOTNET_HOST_PATH") ?? "dotnet")
+            { UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true };
+            start.ArgumentList.Add(Path.Combine(AppContext.BaseDirectory, "MPswift.TagRepair.dll"));
+            start.ArgumentList.Add(root);
+            using var child = System.Diagnostics.Process.Start(start)!;
+            try
+            {
+                var output = child.StandardOutput.ReadToEndAsync(); var errors = child.StandardError.ReadToEndAsync();
+                using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+                await child.WaitForExitAsync(timeout.Token);
+                Assert.Equal(0, child.ExitCode); Assert.Empty(await errors);
+                Assert.Contains("planned=1; unchanged=0; errors=0", await output);
+                Assert.Equal(original, File.ReadAllBytes(path)); Assert.Single(Directory.GetFiles(root));
+            }
+            finally { if (!child.HasExited) { child.Kill(true); child.WaitForExit(5000); } }
+        }
+        finally { Directory.Delete(root, true); }
+    }
+
     [Fact] public void AudioOrCodecHeaderMutationIsDetected()
     {
         var bytes = File.ReadAllBytes(Fixture("flac16.flac")); using var stream = new MemoryStream(bytes);

@@ -55,6 +55,8 @@ internal static class TextRepair
 
     internal static byte[] Cue(byte[] bytes, string context, int fallbackCodePage)
     {
+        // CUE can be the first inspected file, before Recover initializes legacy encodings.
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         if (bytes.Length > 4 * 1024 * 1024) throw new InvalidDataException("CUE exceeds 4 MiB.");
         string text;
         if (bytes.AsSpan().StartsWith(new byte[] { 0xff, 0xfe, 0, 0 })) text = new UTF32Encoding(false, true, true).GetString(bytes, 4, bytes.Length - 4);
