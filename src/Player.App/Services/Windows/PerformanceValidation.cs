@@ -45,11 +45,13 @@ public static class PerformanceValidation
         var track = (System.Windows.Controls.Primitives.Track)scrollbar.Template.FindName("PART_Track", scrollbar);
         if (track.Thumb.ActualHeight < 36 || track.Thumb.ActualHeight > track.ActualHeight || track.Thumb.ActualWidth < 8)
             throw new InvalidOperationException("Large-playlist thumb has invalid minimum bounds.");
-        var before = scrollbar.Value;
-        scrollbar.Value = scrollbar.Maximum; list.UpdateLayout();
+        var viewer = CustomizationValidation.Descendants(list).OfType<ScrollViewer>().First();
+        var before = viewer.VerticalOffset;
+        viewer.ScrollToBottom(); list.UpdateLayout();
         await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ContextIdle);
-        if (Math.Abs(track.Value - scrollbar.Maximum) > .01) throw new InvalidOperationException("Minimum thumb changed scroll range.");
-        scrollbar.Value = before;
+        if (Math.Abs(track.Value - scrollbar.Maximum) > .01 || Math.Abs(viewer.VerticalOffset - viewer.ScrollableHeight) > .01)
+            throw new InvalidOperationException("Minimum thumb changed scroll range.");
+        viewer.ScrollToVerticalOffset(before); list.UpdateLayout();
         return new { ActualPlaylistRows = list.Items.Count, GlobalCapacity = 10000, Method = "ScrollIntoView + UpdateLayout + Dispatcher ContextIdle; software-driven WPF", MaximumRealizedContainers = maximumContainers,
             MinimumThumbHeight = track.Thumb.ActualHeight, MinimumThumbBoundsAndFullRange = true, Timings = Timings(samples, 100) };
     }
