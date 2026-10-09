@@ -37,8 +37,8 @@ $cliSmoke = Get-Content (Join-Path $Directory 'tagrepair-smoke.json') -Raw | Con
 if ($cli.Status -ne 'tagrepair-packaged' -or $cli.SourceTreeDirty -or $cli.SourceCommit -ne $audit.SourceCommit -or $cli.ProductVersion -ne $audit.ProductVersion -or
     $cli.Zip -ne "MPswift.TagRepair-$($audit.ProductVersion)-$($audit.SourceCommit.Substring(0,12))-win-x64.zip" -or -not $cli.RuntimeIncluded -or -not $cli.SourceAudioNotIncluded -or
     $cliSmoke.Status -ne 'tagrepair-packaged-cli-passed' -or $cliSmoke.SourceCommit -ne $audit.SourceCommit -or $cliSmoke.ProductVersion -ne $audit.ProductVersion -or $cliSmoke.ZipSha256 -ne $cli.ZipSha256 -or
-    [int]$cliSmoke.WindowsTests -lt 92 -or $cliSmoke.WindowsTestsFailed -ne 0 -or $cliSmoke.WindowsTestsSkipped -ne 0) { throw 'CLI source/version/runtime/Windows evidence mismatch.' }
-foreach ($gate in @('RealExe','RuntimeIncluded','PreviewNoWrites','PhysicalMp3FlacCue','ExactOriginalBackups','IndependentAudioHashes','SourceFixturesUnchanged','PrivateFilesUnchanged','Idempotent','PaddedMp3PrefixAndAudio','InvalidFileContinuation','FilenameConfirmedAsciiI','ContextualCollectionCases','FlatBackupDirectory','BackupSourceMappings')) {
+    [int]$cliSmoke.WindowsTests -lt 93 -or $cliSmoke.WindowsTestsFailed -ne 0 -or $cliSmoke.WindowsTestsSkipped -ne 0) { throw 'CLI source/version/runtime/Windows evidence mismatch.' }
+foreach ($gate in @('RealExe','RuntimeIncluded','PreviewNoWrites','PhysicalMp3FlacCue','ExactOriginalBackups','IndependentAudioHashes','SourceFixturesUnchanged','PrivateFilesUnchanged','Idempotent','PaddedMp3PrefixAndAudio','InvalidFileContinuation','FilenameConfirmedAsciiI','ContextualCollectionCases','MirroredBackupDirectory','BackupSourceMappings')) {
     if ($cliSmoke.$gate -ne $true) { throw "CLI verification gate failed: $gate" }
 }
 $cliZip = Join-Path $Directory $cli.Zip
@@ -55,7 +55,7 @@ Run the setup EXE for a per-user installation without administrator rights. Engl
 
 Alternatively, extract the portable ZIP and launch ``MPswift/MPswift.exe``. The .NET desktop runtime is included in both packages. There is no automatic updater, startup registration or file-association override.
 
-The separate **MPswift.TagRepair** ZIP is an offline Windows x64 console utility with its runtime included. Run ``MPswift.TagRepair.exe "C:\Music"`` for recursive preview, then add ``--apply`` to physically repair MP3/FLAC tags and CUE text. Verified original ``.bak`` copies are retained beside changed files; encoded audio is checked before writing. Read the utility README before applying, especially mixed-language/ambiguous tags and old ID3 device compatibility. CLI ZIP SHA-256: ``$cliHash``. Actual extracted EXE preview/apply/idempotence, exact backups and independent audio-range hashes passed on owned test copies in the Windows runner.
+The separate **MPswift.TagRepair** ZIP is an offline Windows x64 console utility with its runtime included. Run ``MPswift.TagRepair.exe "C:\Music"`` for recursive preview, then add ``--apply`` to physically repair MP3/FLAC tags and CUE text. Verified originals are retained under ``MPswift.TagRepair.Backups`` in the selected root, preserving original subfolders; encoded audio is checked before writing. Read the utility README before applying, especially mixed-language/ambiguous tags and old ID3 device compatibility. CLI ZIP SHA-256: ``$cliHash``. Actual extracted EXE preview/apply/idempotence, exact backups and independent audio-range hashes passed on owned test copies in the Windows runner.
 
 Linux/Windows build tests, Windows native/WPF smoke, candidate integrity checks, extracted executable smoke, genuine standard-user installer lifecycle and actual installed EN/RU WPF passed in [this workflow]($runUrl). ZIP SHA-256: ``$actual``. Installer SHA-256: ``$setupHash``. Audit and lifecycle reports are attached.
 

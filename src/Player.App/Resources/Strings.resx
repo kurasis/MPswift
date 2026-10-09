@@ -701,4 +701,60 @@ Settings include accent, waveform style, startup/session options and local cache
     <data name="DefaultShuffle" xml:space="preserve"><value>Shuffle by default</value></data>
     <data name="PlaybackDefaultsHelp" xml:space="preserve"><value>Used when there is no saved session or session restoration is disabled. A restored session retains its own repeat/shuffle state.</value></data>
     <data name="EncodedChannelCount" xml:space="preserve"><value>encoded channels: {0}</value></data>
+    <data xml:space="preserve" name="AddMenu"><value>Add</value></data>
+    <data xml:space="preserve" name="AddToFavorites"><value>Add to Favorites</value></data>
+    <data xml:space="preserve" name="FavoritesPlaylist"><value>Favorites</value></data>
+    <data xml:space="preserve" name="PlayPreviousPlaylist"><value>Play previous playlist</value></data>
+    <data xml:space="preserve" name="CopySelectedFiles"><value>Copy selected files to clipboard</value></data>
+    <data xml:space="preserve" name="PlaceAfterPlaying"><value>Place after the playing track</value></data>
+    <data xml:space="preserve" name="SendToMenu"><value>Send to</value></data>
+    <data xml:space="preserve" name="SendToPlaylist"><value>Send to another playlist</value></data>
+    <data xml:space="preserve" name="CopyToFolder"><value>Copy to folder…</value></data>
+    <data xml:space="preserve" name="ExportSelectedPlaylist"><value>Export selected tracks as M3U8…</value></data>
+    <data xml:space="preserve" name="DeletionMenu"><value>Removal</value></data>
+    <data xml:space="preserve" name="ClearPlaylist"><value>Clear playlist…</value></data>
+    <data xml:space="preserve" name="ClearPlaylistConfirm"><value>Remove all entries from this playlist? Music files will remain on disk.</value></data>
+    <data xml:space="preserve" name="RecycleFiles"><value>Delete selected files…</value></data>
+    <data xml:space="preserve" name="RecycleFilesConfirm"><value>Send these {0} physical files to the Windows Recycle Bin? All playlist entries using them will become unavailable. Windows will show its own confirmation, including any additional prompt if recycling is unavailable.</value></data>
+    <data xml:space="preserve" name="RecycleCueWarning"><value>A selected CUE song is part of a shared audio file. Deleting that file affects every song in the album image, not only the selected segment.</value></data>
+    <data xml:space="preserve" name="SelectedFiles"><value>Selected files</value></data>
+    <data xml:space="preserve" name="DisableSelected"><value>Disable</value></data>
+    <data xml:space="preserve" name="EnableSelected"><value>Enable</value></data>
+    <data xml:space="preserve" name="Unrated"><value>No rating</value></data>
+    <data xml:space="preserve" name="FilesCopied"><value>Copied files: {0}; errors: {1}. Existing files were preserved.</value></data>
+    <data xml:space="preserve" name="FilesRecycled"><value>Deleted files: {0}; errors: {1}.</value></data>
+    <data xml:space="preserve" name="FileOperationInProgress"><value>Wait for the current file operation to finish.</value></data>
+    <data xml:space="preserve" name="TrackSelectionChanged"><value>The playlist or selected tracks changed. Open the menu again.</value></data>
+    <data xml:space="preserve" name="OperationCanceled"><value>Operation cancelled. Completed copies were retained.</value></data>
+    <data xml:space="preserve" name="NewPlaylistName"><value>New playlist</value></data>
+    <data xml:space="preserve" name="FileInformation"><value>File information</value></data>
+    <data xml:space="preserve" name="FileInformationUnavailable"><value>Could not read file information.</value></data>
+    <data xml:space="preserve" name="LoadingFileInformation"><value>Reading file information…</value></data>
+    <data xml:space="preserve" name="ReadOnlyInformation"><value>Read-only information. Source tags and audio are preserved.</value></data>
+    <data xml:space="preserve" name="PreviousFile"><value>Previous file</value></data>
+    <data xml:space="preserve" name="NextFile"><value>Next file</value></data>
+    <data xml:space="preserve" name="FilePathLabel"><value>File path</value></data>
+    <data xml:space="preserve" name="GeneralTab"><value>General</value></data>
+    <data xml:space="preserve" name="LyricsTab"><value>Lyrics</value></data>
+    <data xml:space="preserve" name="NoLyrics"><value>No embedded lyrics.</value></data>
+    <data xml:space="preserve" name="NoTagBlock"><value>This tag block is not present in the file.</value></data>
+    <data xml:space="preserve" name="FileTitleLabel"><value>Title</value></data>
+    <data xml:space="preserve" name="FileArtistLabel"><value>Artist</value></data>
+    <data xml:space="preserve" name="FileAlbumLabel"><value>Album</value></data>
+    <data xml:space="preserve" name="FileAlbumArtistLabel"><value>Album artist</value></data>
+    <data xml:space="preserve" name="FileGenreLabel"><value>Genre</value></data>
+    <data xml:space="preserve" name="FileYearLabel"><value>Year</value></data>
+    <data xml:space="preserve" name="FileCommentLabel"><value>Comment</value></data>
+    <data xml:space="preserve" name="FormatLabel"><value>Format</value></data>
+    <data xml:space="preserve" name="DurationLabel"><value>Duration</value></data>
+    <data xml:space="preserve" name="QualityLabel"><value>Quality</value></data>
+    <data xml:space="preserve" name="FileSizeLabel"><value>Size</value></data>
+    <data xml:space="preserve" name="ModifiedLabel"><value>Modified</value></data>
+    <data xml:space="preserve" name="TagTypesLabel"><value>Tag blocks</value></data>
+    <data xml:space="preserve" name="TagVersionLabel"><value>Tag version</value></data>
+    <data xml:space="preserve" name="TrackGainLabel"><value>ReplayGain (track)</value></data>
+    <data xml:space="preserve" name="AlbumGainLabel"><value>ReplayGain (album)</value></data>
+    <data xml:space="preserve" name="CueTrackLabel"><value>Selected CUE song</value></data>
+    <data xml:space="preserve" name="CueRangeLabel"><value>CUE segment</value></data>
+    <data xml:space="preserve" name="BitUnit"><value>bit</value></data>
 </root>

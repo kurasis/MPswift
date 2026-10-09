@@ -285,7 +285,11 @@ public partial class MainWindow : Window
         { Model.MoveEntries(PlaylistList.SelectedItems.Cast<PlaylistRowViewModel>(), e.Key == Key.Up ? -1 : 1); e.Handled = true; return; }
         if (Keyboard.Modifiers == ModifierKeys.None && e.Key == Key.Space) { await Model.PlayPauseCommand.ExecuteAsync(null); e.Handled = true; }
         else if (PlaylistList.IsKeyboardFocusWithin && e.Key == Key.Enter) { await Model.PlayEntryCommand.ExecuteAsync(Model.SelectedEntry); e.Handled = true; }
-        else if (PlaylistList.IsKeyboardFocusWithin && e.Key == Key.Delete) { OnRemove(sender, e); e.Handled = true; }
+        else if (PlaylistList.IsKeyboardFocusWithin && e.Key == Key.F4 && Keyboard.Modifiers == ModifierKeys.None) { OnProperties(sender, e); e.Handled = true; }
+        else if (PlaylistList.IsKeyboardFocusWithin && (e.Key == Key.System ? e.SystemKey : e.Key) == Key.O && Keyboard.Modifiers == ModifierKeys.Alt) { OnShowFile(sender, e); e.Handled = true; }
+        else if (PlaylistList.IsKeyboardFocusWithin && e.Key == Key.Delete && Keyboard.Modifiers == ModifierKeys.Control)
+        { BeginTrackAction(() => RecycleSelectedAsync(PlaylistList.SelectedItems.Cast<PlaylistRowViewModel>().ToArray())); e.Handled = true; }
+        else if (PlaylistList.IsKeyboardFocusWithin && e.Key == Key.Delete && Keyboard.Modifiers == ModifierKeys.None) { OnRemove(sender, e); e.Handled = true; }
         else if (PlaylistList.IsKeyboardFocusWithin && e.Key == Key.A && Keyboard.Modifiers == ModifierKeys.Control) { PlaylistList.SelectAll(); e.Handled = true; }
         else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key is Key.Left or Key.Right) { await Model.CommitSeekAsync(Model.SeekPosition + (e.Key == Key.Right ? 5 : -5)); e.Handled = true; }
         else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key is Key.Up or Key.Down) { Model.Volume = Math.Clamp(Model.Volume + (e.Key == Key.Up ? 5 : -5), 0, 100); e.Handled = true; }
@@ -326,7 +330,7 @@ public partial class MainWindow : Window
         IsEnabled = false;
         Model.WindowSettings = Model.WindowSettings with { WindowWidth = RestoreBounds.Width, WindowHeight = RestoreBounds.Height,
             WindowLeft = RestoreBounds.Left, WindowTop = RestoreBounds.Top, WindowMaximized = WindowState == WindowState.Maximized };
-        try { await Model.DisposeAsync(); await ((App)Application.Current).FlushDiagnosticsAsync(); _shutdownComplete = true; Close(); }
+        try { _trackActionsCancellation.Cancel(); await TrackActionCompletion; await Model.DisposeAsync(); await ((App)Application.Current).FlushDiagnosticsAsync(); _shutdownComplete = true; Close(); }
         catch (Exception error)
         {
             Model.Message = Strings.Get("ErrorUnexpected"); Model.Details = error.Message;
@@ -433,14 +437,8 @@ public partial class MainWindow : Window
         start.ArgumentList.Add("/select,"); start.ArgumentList.Add(path);
         return start;
     }
-    private async void OnProperties(object sender, RoutedEventArgs e)
-    {
-        if (Model.SelectedEntry is not { } row) return; var track = row.Entry.Track;
-        Player.Core.Library.TrackStatistics? statistics = null;
-        try { if (Model.LibraryIndex is { } index) statistics = (await index.GetStatisticsAsync([track.Id])).FirstOrDefault(); } catch (Exception error) { Model.Details = error.Message; }
-        var played = statistics?.LastPlayedUtcTicks is { } last ? new DateTime(last, DateTimeKind.Utc).ToLocalTime().ToString("g", Strings.Culture) : "—";
-        MessageBox.Show(this, $"{track.Title}\n{track.Artist}\n{track.Album}\n{track.Path}\n\n{Strings.Get("MetadataHints")}:\n{track.SampleRateHint} {Strings.Get("HzUnit")} · {track.ChannelsHint} {Strings.Get("ChannelsUnit")} · {track.BitrateHint} {Strings.Get("KbpsUnit")}\n{Strings.Get("DiscLabel")} {track.DiscNumber}, {Strings.Get("TrackLabel")} {track.TrackNumber}, {track.Year}\n{track.Genre}\nCUE: {track.CueDocument ?? "—"}\n{Strings.Rating}: {row.Rating}\n{Strings.Get("CountedPlays")}: {statistics?.PlayCount ?? 0}\n{Strings.Get("LastPlayed")}: {played}", Strings.Get("TrackProperties"));
-    }
+    private void OnProperties(object sender, RoutedEventArgs e)
+    { if (Model.SelectedEntry is { } row) OpenFileInformation(row); }
     private async void OnLegacyImport(object sender, RoutedEventArgs e)
     {
         var dialog = new Microsoft.Win32.OpenFileDialog { Filter = Strings.Get("DocumentFilter") };

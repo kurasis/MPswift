@@ -156,8 +156,10 @@ try {
     $collectionApply = @(& $exe $collection --apply); $collectionApply | Add-Content $log -Encoding utf8
     if ($LASTEXITCODE -ne 0 -or -not ($collectionApply -match 'repaired=44; unchanged=0; errors=0')) { throw 'Collection apply did not repair every case.' }
     foreach ($path in $collectionOriginals.Keys) {
-        $backup = @(Get-ChildItem (Join-Path $collection 'MPswift.TagRepair.Backups') -Filter '*.bak' -File | Where-Object { (Get-Content ($_.FullName + '.json') -Raw | ConvertFrom-Json).SourceRelativePath -ceq [IO.Path]::GetRelativePath($collection, $path) })
+        $backup = @(Get-ChildItem (Join-Path $collection 'MPswift.TagRepair.Backups') -Filter '*.bak' -File -Recurse | Where-Object { (Get-Content ($_.FullName + '.json') -Raw | ConvertFrom-Json).SourceRelativePath -ceq [IO.Path]::GetRelativePath($collection, $path) })
         if ($backup.Count -ne 1 -or (Get-FileHash $backup[0].FullName -Algorithm SHA256).Hash -ne $collectionOriginals[$path] -or (Get-Content ($backup[0].FullName + '.json') -Raw | ConvertFrom-Json).OriginalSha256 -ne $collectionOriginals[$path]) { throw 'Collection backup differs from its exact original.' }
+        $expectedParent = Join-Path (Join-Path $collection 'MPswift.TagRepair.Backups') ([IO.Path]::GetDirectoryName([IO.Path]::GetRelativePath($collection, $path)))
+        if ($backup[0].DirectoryName -cne $expectedParent) { throw 'Original backup subfolders were not preserved.' }
         if ((AudioHash $path) -ne $collectionAudio[$path]) { throw 'Collection repair changed encoded audio.' }
         $case = $collectionTags[$path]; $file = [TagLib.File]::Create($path)
         try {
@@ -165,7 +167,7 @@ try {
             if ($saved -cne $case.Expected) { throw 'Collection tag still contains mojibake or changed Latin artist/spelling.' }
         } finally { $file.Dispose() }
     }
-    if (@(Get-ChildItem (Join-Path $collection 'MPswift.TagRepair.Backups') -Directory).Count -ne 0 -or @(Get-ChildItem (Join-Path $collection 'MPswift.TagRepair.Backups') -Filter '*.bak').Count -ne 44) { throw 'Backups must share one flat directory.' }
+    if (@(Get-ChildItem (Join-Path $collection 'MPswift.TagRepair.Backups') -Filter '*.bak' -Recurse).Count -ne 44) { throw 'Mirrored backups are incomplete.' }
     $collectionAgain = @(& $exe $collection --apply); $collectionAgain | Add-Content $log -Encoding utf8
     if ($LASTEXITCODE -ne 0 -or -not ($collectionAgain -match 'repaired=0; unchanged=44; errors=0') -or
         @(Get-ChildItem $collection -Filter '*.bak' -Recurse).Count -ne 44 -or @(Get-ChildItem $collection -Filter '*.tmp' -Recurse).Count -ne 0) { throw 'Collection physical repairs are not idempotent or left staging files.' }
@@ -190,10 +192,10 @@ try {
     $trx = Get-ChildItem (Join-Path $root 'artifacts/tagrepair-test-results') -Filter '*.trx' | Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
     [xml]$tests = Get-Content $trx.FullName -Raw
     $counters = $tests.SelectSingleNode("//*[local-name()='Counters']")
-    if ([int]$counters.total -lt 92 -or $counters.passed -ne $counters.total -or [int]$counters.failed -ne 0 -or [int]$counters.notExecuted -ne 0) { throw 'CLI Windows tests must all execute and pass.' }
+    if ([int]$counters.total -lt 93 -or $counters.passed -ne $counters.total -or [int]$counters.failed -ne 0 -or [int]$counters.notExecuted -ne 0) { throw 'CLI Windows tests must all execute and pass.' }
     [ordered]@{ Status = 'tagrepair-packaged-cli-passed'; SourceCommit = $audit.SourceCommit; ProductVersion = $audit.ProductVersion; ZipSha256 = $audit.ZipSha256;
         RealExe = $true; RuntimeIncluded = $true; PreviewNoWrites = $true; PhysicalMp3FlacCue = $true; ExactOriginalBackups = $true; IndependentAudioHashes = $true;
-        SourceFixturesUnchanged = $true; PrivateFilesUnchanged = $true; Idempotent = $true; PaddedMp3PrefixAndAudio = $true; InvalidFileContinuation = $true; FilenameConfirmedAsciiI = $true; ContextualCollectionCases = $true; FlatBackupDirectory = $true; BackupSourceMappings = $true;
+        SourceFixturesUnchanged = $true; PrivateFilesUnchanged = $true; Idempotent = $true; PaddedMp3PrefixAndAudio = $true; InvalidFileContinuation = $true; FilenameConfirmedAsciiI = $true; ContextualCollectionCases = $true; MirroredBackupDirectory = $true; BackupSourceMappings = $true;
         WindowsTests = [int]$counters.total; WindowsTestsFailed = 0; WindowsTestsSkipped = 0 } |
         ConvertTo-Json | Set-Content (Join-Path $output 'tagrepair-smoke.json') -Encoding utf8
 } finally { $env:DOTNET_ROOT = $previousRuntime }

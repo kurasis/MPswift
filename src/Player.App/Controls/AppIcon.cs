@@ -5,7 +5,7 @@ using System.Windows.Media;
 namespace Player.App.Controls;
 
 public enum AppIconKind { Settings, Minimize, Maximize, Close, Previous, Stop, Play, Pause, Next, Add, More, Delete, Help, Search,
-    FileAdd, FolderAdd, Folder, Shuffle, Volume, Muted, RepeatOff, RepeatAll, RepeatOne, Up, Down, Refresh, Copy, Edit, Export, Backup, Restore, Queue }
+    FileAdd, FolderAdd, Folder, Shuffle, Volume, Muted, RepeatOff, RepeatAll, RepeatOne, Up, Down, Refresh, Copy, Edit, Export, Backup, Restore, Queue, Favorite }
 
 /// <summary>One 18-DIP vector canvas for action icons, independent of font glyph metrics.</summary>
 public sealed class AppIcon : Control
@@ -15,6 +15,7 @@ public sealed class AppIcon : Control
     public AppIconKind Kind { get => (AppIconKind)GetValue(KindProperty); set => SetValue(KindProperty, value); }
     private static readonly IReadOnlyDictionary<AppIconKind, Geometry> Shapes = new Dictionary<AppIconKind, string>
     {
+        [AppIconKind.Favorite] = "M9,1 L11.4,6.2 17,6.9 12.9,10.8 14,16.5 9,13.7 4,16.5 5.1,10.8 1,6.9 6.6,6.2 Z",
         [AppIconKind.FileAdd] = "M3,1 L10,1 14,5 14,9 M10,1 L10,5 14,5 M3,1 L3,17 9,17 M13,10 L13,17 M9.5,13.5 L16.5,13.5",
         [AppIconKind.FolderAdd] = "M1,4 L1,15 9,15 M1,4 L7,4 9,6 17,6 17,10 M13,10 L13,17 M9.5,13.5 L16.5,13.5",
         [AppIconKind.Folder] = "M1,4 L7,4 9,6 17,6 17,15 1,15 Z",

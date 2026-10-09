@@ -1,5 +1,11 @@
 # Requirement and acceptance status
 
+## Owner follow-up: track actions and folder-preserving backups (2026-10-09)
+
+View-only information and an Избранное/Favorites playlist are explicitly selected by the owner. The new track context menu implements the requested action groups except Find-in-library, retaining localization, multi-selection and persistent integer ratings. File information shows actual tags/lyrics/technical details/cover with four read-only tabs and navigation. No tag editing or Save action is introduced. Previous playback playlist records actual source switches, rather than merely viewed tabs. File clipboard and folder/playlist sending are explicit local actions. Del retains non-destructive entry removal; Ctrl+Del requests physical recycling through a cancel-default preview and Windows prompts, with special shared-CUE warning and loaded-source protection.
+
+The latest backup instruction supersedes the prior flat arrangement: MPswift.TagRepair.Backups preserves original subfolders and exact originals/sidecars, with nested link refusal before descendant creation. Existing CLI options and dependencies remain. Actual owned Windows WPF/SQLite/copy and CLI tests are added to required CI; interactive recycle dialog acceptance and existing hardware/signing/licensing gates remain distinct from automated passes.
+
 ## Owner follow-up: encoding utility and icon ratings (2026-10-09)
 
 Player metadata behavior remains because the owner confirmed normal display after re-adding files and closed that complaint. Latest CLI log recovery covers all 60 observed residual fields through reversible, scoped context checks; ASCII spelling remains. Owner-requested backups share one flat folder under the selected root with private source-path/hash sidecars and verified exact originals. The old backup-location behavior is intentionally replaced by the owner's explicit request. Public CLI options, player metadata interfaces and pinned dependencies remain.

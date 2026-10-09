@@ -164,7 +164,8 @@
             <ListBox x:Name="PlaylistList" ItemsSource="{Binding VisibleEntries}" SelectedItem="{Binding SelectedEntry}" SelectionMode="Extended"
                      Background="{DynamicResource BackgroundBrush}" Foreground="{DynamicResource TextPrimaryBrush}" BorderThickness="0"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
-                     MouseDoubleClick="OnTrackDoubleClick" PreviewMouseLeftButtonDown="OnRowDragStart" PreviewMouseMove="OnRowDragMove" HorizontalContentAlignment="Stretch" AutomationProperties.Name="{Binding SelectedPlaylist.Name}">
+                     MouseDoubleClick="OnTrackDoubleClick" PreviewMouseRightButtonDown="OnTrackRightButtonDown" ContextMenuOpening="OnTrackContextMenuOpening" PreviewMouseLeftButtonDown="OnRowDragStart" PreviewMouseMove="OnRowDragMove" HorizontalContentAlignment="Stretch" AutomationProperties.Name="{Binding SelectedPlaylist.Name}">
+                <ListBox.ContextMenu><ContextMenu /></ListBox.ContextMenu>
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" /><Setter Property="Padding" Value="8,4" />

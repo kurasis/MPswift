@@ -701,4 +701,60 @@ F1: локальная справка
     <data name="DefaultShuffle" xml:space="preserve"><value>Случайный порядок по умолчанию</value></data>
     <data name="PlaybackDefaultsHelp" xml:space="preserve"><value>Используется, если нет сохранённой сессии или её восстановление отключено. При восстановлении сессии сохраняется её режим повтора и случайного порядка.</value></data>
     <data name="EncodedChannelCount" xml:space="preserve"><value>каналов в файле: {0}</value></data>
+    <data xml:space="preserve" name="AddMenu"><value>Добавить</value></data>
+    <data xml:space="preserve" name="AddToFavorites"><value>Добавить в Избранное</value></data>
+    <data xml:space="preserve" name="FavoritesPlaylist"><value>Избранное</value></data>
+    <data xml:space="preserve" name="PlayPreviousPlaylist"><value>Проиграть прошлый плейлист</value></data>
+    <data xml:space="preserve" name="CopySelectedFiles"><value>Копировать выбранные файлы в буфер обмена</value></data>
+    <data xml:space="preserve" name="PlaceAfterPlaying"><value>Поставить после проигрываемого</value></data>
+    <data xml:space="preserve" name="SendToMenu"><value>Отправить в</value></data>
+    <data xml:space="preserve" name="SendToPlaylist"><value>Отправить в другой плейлист</value></data>
+    <data xml:space="preserve" name="CopyToFolder"><value>Скопировать в папку…</value></data>
+    <data xml:space="preserve" name="ExportSelectedPlaylist"><value>Экспортировать выбранные треки в M3U8…</value></data>
+    <data xml:space="preserve" name="DeletionMenu"><value>Удаление</value></data>
+    <data xml:space="preserve" name="ClearPlaylist"><value>Очистить плейлист…</value></data>
+    <data xml:space="preserve" name="ClearPlaylistConfirm"><value>Убрать все записи из этого плейлиста? Музыкальные файлы останутся на диске.</value></data>
+    <data xml:space="preserve" name="RecycleFiles"><value>Удалить выбранные файлы…</value></data>
+    <data xml:space="preserve" name="RecycleFilesConfirm"><value>Отправить эти физические файлы ({0}) в корзину Windows? Все записи плейлистов, использующие их, станут недоступны. Windows покажет подтверждение, в том числе дополнительный запрос, если корзина недоступна.</value></data>
+    <data xml:space="preserve" name="RecycleCueWarning"><value>Выбранная песня CUE — часть общего аудиофайла. Удаление файла затронет все песни образа альбома, а не только выбранный отрезок.</value></data>
+    <data xml:space="preserve" name="SelectedFiles"><value>Выбранные файлы</value></data>
+    <data xml:space="preserve" name="DisableSelected"><value>Выключить</value></data>
+    <data xml:space="preserve" name="EnableSelected"><value>Включить</value></data>
+    <data xml:space="preserve" name="Unrated"><value>Без оценки</value></data>
+    <data xml:space="preserve" name="FilesCopied"><value>Скопировано файлов: {0}; ошибок: {1}. Существующие файлы сохранены.</value></data>
+    <data xml:space="preserve" name="FilesRecycled"><value>Удалено файлов: {0}; ошибок: {1}.</value></data>
+    <data xml:space="preserve" name="FileOperationInProgress"><value>Дождитесь завершения текущей операции с файлами.</value></data>
+    <data xml:space="preserve" name="TrackSelectionChanged"><value>Плейлист или выбранные треки изменились. Откройте меню заново.</value></data>
+    <data xml:space="preserve" name="OperationCanceled"><value>Операция отменена. Завершённые копии сохранены.</value></data>
+    <data xml:space="preserve" name="NewPlaylistName"><value>Новый плейлист</value></data>
+    <data xml:space="preserve" name="FileInformation"><value>Информация о файле</value></data>
+    <data xml:space="preserve" name="FileInformationUnavailable"><value>Не удалось прочитать информацию о файле.</value></data>
+    <data xml:space="preserve" name="LoadingFileInformation"><value>Чтение информации о файле…</value></data>
+    <data xml:space="preserve" name="ReadOnlyInformation"><value>Просмотр информации. Исходные теги и аудио сохраняются.</value></data>
+    <data xml:space="preserve" name="PreviousFile"><value>Предыдущий файл</value></data>
+    <data xml:space="preserve" name="NextFile"><value>Следующий файл</value></data>
+    <data xml:space="preserve" name="FilePathLabel"><value>Путь к файлу</value></data>
+    <data xml:space="preserve" name="GeneralTab"><value>Общее</value></data>
+    <data xml:space="preserve" name="LyricsTab"><value>Текст песни</value></data>
+    <data xml:space="preserve" name="NoLyrics"><value>Встроенного текста песни нет.</value></data>
+    <data xml:space="preserve" name="NoTagBlock"><value>Такого блока тегов в файле нет.</value></data>
+    <data xml:space="preserve" name="FileTitleLabel"><value>Заголовок</value></data>
+    <data xml:space="preserve" name="FileArtistLabel"><value>Исполнитель</value></data>
+    <data xml:space="preserve" name="FileAlbumLabel"><value>Альбом</value></data>
+    <data xml:space="preserve" name="FileAlbumArtistLabel"><value>Исполнитель альбома</value></data>
+    <data xml:space="preserve" name="FileGenreLabel"><value>Жанр</value></data>
+    <data xml:space="preserve" name="FileYearLabel"><value>Год</value></data>
+    <data xml:space="preserve" name="FileCommentLabel"><value>Комментарий</value></data>
+    <data xml:space="preserve" name="FormatLabel"><value>Формат</value></data>
+    <data xml:space="preserve" name="DurationLabel"><value>Длительность</value></data>
+    <data xml:space="preserve" name="QualityLabel"><value>Качество</value></data>
+    <data xml:space="preserve" name="FileSizeLabel"><value>Размер</value></data>
+    <data xml:space="preserve" name="ModifiedLabel"><value>Изменён</value></data>
+    <data xml:space="preserve" name="TagTypesLabel"><value>Блоки тегов</value></data>
+    <data xml:space="preserve" name="TagVersionLabel"><value>Версия тегов</value></data>
+    <data xml:space="preserve" name="TrackGainLabel"><value>ReplayGain (трек)</value></data>
+    <data xml:space="preserve" name="AlbumGainLabel"><value>ReplayGain (альбом)</value></data>
+    <data xml:space="preserve" name="CueTrackLabel"><value>Выбранная песня CUE</value></data>
+    <data xml:space="preserve" name="CueRangeLabel"><value>Отрезок CUE</value></data>
+    <data xml:space="preserve" name="BitUnit"><value>бит</value></data>
 </root>

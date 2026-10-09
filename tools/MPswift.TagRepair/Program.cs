@@ -27,6 +27,7 @@ internal static class Program
             output.WriteLine("Usage: MPswift.TagRepair.exe \"C:\\Music\" [--apply] [--top-only] [--cue-codepage 1251|1252|866]");
             output.WriteLine("Default: recursive PREVIEW only. Supported files: MP3, FLAC, CUE.");
             output.WriteLine("--apply: Windows-only writes; verified originals retained together in MPswift.TagRepair.Backups under the selected folder.");
+            output.WriteLine("Original subfolders are mirrored under that backup folder; no per-file folders are created.");
             output.WriteLine("Each .bak has a private .json sidecar recording its original relative path and SHA256; retain both for restoration.");
             output.WriteLine("MP3: ID3v2.4/UTF-8 without ID3v1. FLAC: UTF-8 tags. CUE: UTF-8 without BOM; file references/timings retained.");
             output.WriteLine("No audio transcoding, file renaming, shell commands, network access or administrator requirement.");

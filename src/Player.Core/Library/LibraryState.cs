@@ -50,6 +50,8 @@ public sealed record PlayerSettings(int SchemaVersion = 1, double Volume = 50, b
     public bool RestorePosition { get; init; } = true;
     public string? LastFileDirectory { get; init; }
     public string? LastFolderDirectory { get; init; }
+    public Guid? FavoritesPlaylistId { get; init; }
+    public Guid? PreviousPlaylistId { get; init; }
 
     public PlayerSettings Validate()
     {
@@ -60,6 +62,8 @@ public sealed record PlayerSettings(int SchemaVersion = 1, double Volume = 50, b
             Accent = Accent is "amber" or "blue" or "green" or "violet" ? Accent : "amber",
             WaveformStyle = WaveformStyle is "energy" or "peaks" ? WaveformStyle : "energy",
             DefaultRepeat = Enum.IsDefined(DefaultRepeat) ? DefaultRepeat : RepeatMode.Off,
+            FavoritesPlaylistId = FavoritesPlaylistId == Guid.Empty ? null : FavoritesPlaylistId,
+            PreviousPlaylistId = PreviousPlaylistId == Guid.Empty ? null : PreviousPlaylistId,
             LastFileDirectory = ValidateDirectory(LastFileDirectory),
             LastFolderDirectory = ValidateDirectory(LastFolderDirectory),
             CueCodePage = CueCodePage is 0 or 1251 or 1252 or 866 ? CueCodePage : 1251,

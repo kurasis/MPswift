@@ -41,15 +41,11 @@ internal static class FileRepair
         if (changes.Length == 0) return new(path, "unchanged", []);
         if (!apply) return new(path, "preview", changes, AudioSha256: audio?.Sha256);
         cancellation.ThrowIfCancellationRequested();
-        // Pin the selected root and the one flat backup directory through commit.
-        // Open follows links for other storage users; reject them explicitly here.
+        // Pin each mirrored directory before creating its next child. Existing
+        // links must never redirect backup creation outside the selected root.
         using var rootDirectory = DataDirectoryLease.Open(root);
         var backupFolder = System.IO.Path.Combine(rootDirectory.DirectoryPath, BackupDirectoryName);
-        Directory.CreateDirectory(backupFolder);
-        using var backups = DataDirectoryLease.Open(backupFolder);
-        if ((File.GetAttributes(backupFolder) & FileAttributes.ReparsePoint) != 0 ||
-            !backups.DirectoryPath.Equals(backupFolder, StringComparison.OrdinalIgnoreCase))
-            throw new IOException("The backup folder must not be a directory link; original retained.");
+        using var backups = CreateBackupDirectory(backupFolder, System.IO.Path.GetDirectoryName(relative));
         var nonce = Guid.NewGuid().ToString("N"); var temporary = physical + ".mpswift-" + nonce + ".tmp";
         var name = System.IO.Path.GetFileName(physical);
         if (name.Length > 120) name = name[..120];
@@ -73,7 +69,7 @@ internal static class FileRepair
             if (OperatingSystem.IsWindows()) CopyAccess(physical, backup);
             source.Position = 0; source.CopyTo(retained); retained.Flush(true); retained.Position = 0;
             if (!SHA256.HashData(retained).AsSpan().SequenceEqual(originalHash)) throw new IOException("Backup verification failed; original retained.");
-            // A private flat sidecar maps duplicate basenames to their source;
+            // A private sidecar records the source path and original checksum;
             // retain it with the exact backup even if a later write rolls back.
             using (var mapping = new FileStream(backup + ".json", FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None))
             {
@@ -110,6 +106,27 @@ internal static class FileRepair
             var identity = DataFileLease.Identify(prepared.SafeFileHandle); prepared.Dispose();
             if (!DataFileLease.DeleteIfSame(temporary, identity)) throw new IOException("Temporary object changed; unknown replacement retained.");
         }
+    }
+
+    private static DataDirectoryLease CreateBackupDirectory(string root, string? relativeDirectory)
+    {
+        var path = root; DataDirectoryLease? current = null;
+        try
+        {
+            var parts = new[] { "" }.Concat((relativeDirectory ?? "").Split(System.IO.Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries));
+            foreach (var part in parts)
+            {
+                if (part is "." or "..") throw new IOException("Invalid backup directory component.");
+                path = System.IO.Path.Combine(path, part);
+                Directory.CreateDirectory(path);
+                var next = DataDirectoryLease.Open(path);
+                if ((File.GetAttributes(path) & FileAttributes.ReparsePoint) != 0 || !next.DirectoryPath.Equals(path, StringComparison.OrdinalIgnoreCase))
+                { next.Dispose(); throw new IOException("Backup directories must not be links; original retained."); }
+                current?.Dispose(); current = next;
+            }
+            var result = current!; current = null; return result;
+        }
+        finally { current?.Dispose(); }
     }
 
     private static FileStream OpenSource(string path, bool writable)

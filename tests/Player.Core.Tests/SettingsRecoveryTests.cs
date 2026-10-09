@@ -10,6 +10,20 @@ public sealed class SettingsRecoveryTests : IDisposable
     private readonly string _directory = Path.Combine(Path.GetTempPath(), "settings-recovery-" + Guid.NewGuid().ToString("N"));
     private string Main => Path.Combine(_directory, "settings.json");
     private string Backup => Main + ".bak";
+    [Fact] public void FavoritesAndPreviousPlaylistIdentifiersRoundTripWithoutChangingSchema()
+    {
+        var file = Seed(); var favorites = Guid.NewGuid(); var previous = Guid.NewGuid();
+        file.Save(new PlayerSettings { FavoritesPlaylistId = favorites, PreviousPlaylistId = previous });
+        var loaded = file.Load();
+        Assert.Equal(favorites, loaded.FavoritesPlaylistId); Assert.Equal(previous, loaded.PreviousPlaylistId); Assert.Equal(1, loaded.SchemaVersion);
+    }
+    [Fact] public void LegacySettingsAndEmptyPlaylistIdentifiersRetainCompatibleDefaults()
+    {
+        var file = Seed(); File.WriteAllText(Main, "{\"SchemaVersion\":1,\"Volume\":23}");
+        var loaded = file.Load(); Assert.Null(loaded.FavoritesPlaylistId); Assert.Null(loaded.PreviousPlaylistId); Assert.Equal(23, loaded.Volume);
+        var normalized = new PlayerSettings { FavoritesPlaylistId = Guid.Empty, PreviousPlaylistId = Guid.Empty }.Validate();
+        Assert.Null(normalized.FavoritesPlaylistId); Assert.Null(normalized.PreviousPlaylistId);
+    }
     private SettingsFile Seed()
     {
         var file = new SettingsFile(_directory);

@@ -111,7 +111,12 @@ internal static class MetadataControlsValidation
                 catch (ArgumentOutOfRangeException) { }
             }
             var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap((int)stars.ActualWidth, (int)stars.ActualHeight, 96, 96, PixelFormats.Pbgra32);
-            bitmap.Render(stars); var png = new System.Windows.Media.Imaging.PngBitmapEncoder(); png.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bitmap));
+            var drawing = new DrawingVisual();
+            using (var context = drawing.RenderOpen()) context.DrawRectangle(new VisualBrush(stars), null, new Rect(0, 0, stars.ActualWidth, stars.ActualHeight));
+            bitmap.Render(drawing);
+            var pixels = new byte[bitmap.PixelWidth * bitmap.PixelHeight * 4]; bitmap.CopyPixels(pixels, bitmap.PixelWidth * 4, 0);
+            Check(pixels.Where((_, index) => index % 4 == 3).Any(alpha => alpha > 0), "Rating evidence rendered an empty image.");
+            var png = new System.Windows.Media.Imaging.PngBitmapEncoder(); png.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bitmap));
             using var image = File.Create(Path.Combine(output, "rating-stars-" + model.WindowSettings.Language + ".png")); png.Save(image);
         }
         finally { row.Rating = originalRating; }
@@ -125,6 +130,6 @@ internal static class MetadataControlsValidation
         return new { Status = "metadata-controls-passed", BelarusianTagLibRecovery = true, OwnedSourceUnchanged = true,
             VolumeClickBothDirections = true, VolumeBinding = true, VolumeRestored = model.Volume == original,
             RatingMouseAndClear = true, RatingKeyboardIsolation = true, RatingAccessibleRange = true,
-            RatingDuplicateBinding = true, RatingRestored = row.Rating == originalRating, LocalizedImportIcons = true, ConsistentActionIconCanvas = true };
+            RatingDuplicateBinding = true, RatingVisibleVectorRendering = true, RatingRestored = row.Rating == originalRating, LocalizedImportIcons = true, ConsistentActionIconCanvas = true };
     }
 }

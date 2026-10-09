@@ -221,14 +221,19 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         var row = new PlaylistRowViewModel(entry); row.EligibilityChanged += RowChanged;
         row.RatingChanged += RatingChanged; tab.Entries.Add(row); _knownRows.Add(row.Id, row);
     }
-    private void RowChanged() => UpdateEntries();
+    private bool _batchRowChanges;
+    private void RowChanged() { if (!_batchRowChanges) UpdateEntries(); }
     private void SyncSource()
     {
         var source = Playlists.FirstOrDefault(p => p.Id == _sourcePlaylistId);
         _coordinator.SetEntries(source?.Entries.Select(e => e.Entry) ?? []);
     }
     private void ChooseSource()
-    { _sourcePlaylistId = SelectedPlaylist.Id; SyncSource(); }
+    {
+        if (_sourcePlaylistId is { } previous && previous != SelectedPlaylist.Id && Playlists.Any(tab => tab.Id == previous))
+            WindowSettings = WindowSettings with { PreviousPlaylistId = previous };
+        _sourcePlaylistId = SelectedPlaylist.Id; SyncSource();
+    }
 
     public async Task AddLibraryRootAsync(string path)
     {

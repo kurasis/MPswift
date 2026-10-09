@@ -82,6 +82,13 @@
         <Setter Property="Background" Value="{DynamicResource AccentBrush}" /><Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" /><Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" /><Setter Property="FontWeight" Value="SemiBold" />
     </Style>
     <Style x:Key="IconButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}"><Setter Property="Width" Value="34" /><Setter Property="Height" Value="34" /><Setter Property="Padding" Value="0" /></Style>
+    <Style TargetType="TabControl"><Setter Property="Background" Value="{DynamicResource SurfaceBrush}" /><Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" /><Setter Property="Template"><Setter.Value><ControlTemplate TargetType="TabControl">
+        <DockPanel><ItemsPresenter DockPanel.Dock="Top" Margin="0,0,0,8" /><Border Background="{TemplateBinding Background}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="12"><ContentPresenter ContentSource="SelectedContent" /></Border></DockPanel>
+    </ControlTemplate></Setter.Value></Setter><Setter Property="ItemsPanel"><Setter.Value><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></Setter.Value></Setter></Style>
+    <Style TargetType="TabItem" BasedOn="{StaticResource {x:Type Control}}"><Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" /><Setter Property="Padding" Value="16,8" /><Setter Property="Template"><Setter.Value><ControlTemplate TargetType="TabItem">
+        <Border x:Name="Tab" Margin="0,0,6,0" CornerRadius="6" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Padding="{TemplateBinding Padding}"><ContentPresenter ContentSource="Header" RecognizesAccessKey="True" /></Border>
+        <ControlTemplate.Triggers><Trigger Property="IsSelected" Value="True"><Setter TargetName="Tab" Property="Background" Value="{DynamicResource SelectedRowBrush}" /><Setter TargetName="Tab" Property="BorderBrush" Value="{DynamicResource AccentBrush}" /></Trigger><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Tab" Property="BorderBrush" Value="{DynamicResource AccentBrush}" /></Trigger><Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.4" /></Trigger></ControlTemplate.Triggers>
+    </ControlTemplate></Setter.Value></Setter></Style>
     <Style TargetType="ToolTip"><Setter Property="Background" Value="{DynamicResource SurfaceBrush}" /><Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" /><Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" /><Setter Property="Padding" Value="10,6" /></Style>
     <Style TargetType="ContextMenu">
         <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
@@ -89,8 +96,8 @@
         <Setter Property="HasDropShadow" Value="False" /><Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ContextMenu">
             <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="9" Padding="5">
-                <ScrollViewer MaxHeight="420" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" CanContentScroll="False"><ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle" /></ScrollViewer>
-            </Border>
+                <ScrollViewer x:Name="MenuScroll" MaxHeight="420" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" CanContentScroll="False"><ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle" /></ScrollViewer>
+            </Border><ControlTemplate.Triggers><Trigger Property="Tag" Value="TrackMenu"><Setter TargetName="MenuScroll" Property="MaxHeight" Value="640" /></Trigger></ControlTemplate.Triggers>
         </ControlTemplate></Setter.Value></Setter>
     </Style>
     <Style TargetType="MenuItem">
@@ -99,10 +106,10 @@
         <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="MenuItem">
             <Grid>
                 <Border x:Name="MenuSurface" Background="{TemplateBinding Background}" CornerRadius="5" BorderThickness="1" BorderBrush="Transparent" Padding="{TemplateBinding Padding}">
-                    <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="26" /><ColumnDefinition Width="*" /><ColumnDefinition Width="20" /></Grid.ColumnDefinitions>
-                        <ContentPresenter ContentSource="Icon" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                    <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="26" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="20" /></Grid.ColumnDefinitions>
+                        <ContentPresenter ContentSource="Icon" VerticalAlignment="Center" HorizontalAlignment="Left" /><Path x:Name="MenuCheck" Data="M3,9 L7,13 15,5" Width="18" Height="18" Stroke="{DynamicResource AccentBrush}" StrokeThickness="1.5" HorizontalAlignment="Left" Visibility="Collapsed" />
                         <ContentPresenter Grid.Column="1" ContentSource="Header" VerticalAlignment="Center" RecognizesAccessKey="True" />
-                        <Path x:Name="SubmenuArrow" Grid.Column="2" Data="M0,0 L4,4 0,8" Stroke="{TemplateBinding Foreground}" StrokeThickness="1.4" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="Collapsed" />
+                        <TextBlock Grid.Column="2" Text="{TemplateBinding InputGestureText}" Margin="12,0,4,0" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" /><Path x:Name="SubmenuArrow" Grid.Column="3" Data="M0,0 L4,4 0,8" Stroke="{TemplateBinding Foreground}" StrokeThickness="1.4" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="Collapsed" />
                     </Grid>
                 </Border>
                 <Popup x:Name="PART_Popup" Placement="Right" HorizontalOffset="2" IsOpen="{TemplateBinding IsSubmenuOpen}" Focusable="False" AllowsTransparency="True">
@@ -112,7 +119,7 @@
                 </Popup>
             </Grid>
             <ControlTemplate.Triggers>
-                <Trigger Property="HasItems" Value="True"><Setter TargetName="SubmenuArrow" Property="Visibility" Value="Visible" /></Trigger>
+                <Trigger Property="IsChecked" Value="True"><Setter TargetName="MenuCheck" Property="Visibility" Value="Visible" /></Trigger><Trigger Property="HasItems" Value="True"><Setter TargetName="SubmenuArrow" Property="Visibility" Value="Visible" /></Trigger>
                 <Trigger Property="IsHighlighted" Value="True"><Setter TargetName="MenuSurface" Property="Background" Value="{DynamicResource HoverBrush}" /><Setter TargetName="MenuSurface" Property="BorderBrush" Value="{DynamicResource AccentBrush}" /></Trigger>
                 <Trigger Property="IsSubmenuOpen" Value="True"><Setter TargetName="MenuSurface" Property="Background" Value="{DynamicResource HoverBrush}" /></Trigger>
                 <Trigger Property="IsEnabled" Value="False"><Setter TargetName="MenuSurface" Property="Opacity" Value="0.45" /></Trigger>

@@ -18,7 +18,7 @@ public sealed class WindowsFileTests : IDisposable
     private string Cue()
     { var path = Path.Combine(root, "Беларускае.cue"); File.WriteAllBytes(path, Encoding.GetEncoding(1251).GetBytes("TITLE \"Людзі\"\r\nFILE \"owned.flac\" WAVE\r\nTRACK 01 AUDIO\r\nINDEX 01 02:40:03\r\n")); return path; }
 
-    [WindowsFact] public void FlatBackupsKeepDuplicateNamesAndSourceMappingsWithoutOverwrites()
+    [WindowsFact] public void MirroredBackupsKeepDuplicateNamesAndSourceMappingsWithoutOverwrites()
     {
         var original = File.ReadAllBytes(Cue());
         foreach (var album in new[] { "first", "second" })
@@ -28,17 +28,35 @@ public sealed class WindowsFileTests : IDisposable
             Assert.Equal("preview", FileRepair.Process(root, path, false, 1251).Status);
             if (album == "first") Assert.False(Directory.Exists(Path.Combine(root, FileRepair.BackupDirectoryName)));
             var result = FileRepair.Process(root, path, true, 1251);
-            Assert.Equal(Path.Combine(root, FileRepair.BackupDirectoryName), Path.GetDirectoryName(result.Backup));
+            Assert.Equal(Path.Combine(root, FileRepair.BackupDirectoryName, album), Path.GetDirectoryName(result.Backup));
             Assert.Equal(original, File.ReadAllBytes(result.Backup!));
             using var mapping = System.Text.Json.JsonDocument.Parse(File.ReadAllText(result.Backup! + ".json"));
             Assert.Equal(Path.GetRelativePath(root, path), mapping.RootElement.GetProperty("SourceRelativePath").GetString());
             Assert.Equal(Convert.ToHexStringLower(SHA256.HashData(original)), mapping.RootElement.GetProperty("OriginalSha256").GetString());
         }
         var folder = Path.Combine(root, FileRepair.BackupDirectoryName);
-        Assert.Equal(2, Directory.GetFiles(folder, "*.bak").Length); Assert.Empty(Directory.GetDirectories(folder));
+        Assert.Equal(2, Directory.GetFiles(folder, "*.bak", SearchOption.AllDirectories).Length);
+        Assert.Equal(new[] { "first", "second" }, Directory.GetDirectories(folder).Select(Path.GetFileName).Order().ToArray());
         File.WriteAllBytes(Path.Combine(folder, "must-not-process.cue"), original);
         using var output = new StringWriter(); using var errors = new StringWriter();
         Assert.Equal(0, Program.Run([root], output, errors)); Assert.Contains("planned=1; unchanged=2; errors=0", output.ToString());
+    }
+
+    [WindowsFact] public void LinkedNestedBackupFolderCannotCreateChildrenOutsideBackups()
+    {
+        var original = File.ReadAllBytes(Cue());
+        var directory = Directory.CreateDirectory(Path.Combine(root, "artist", "album")).FullName;
+        var path = Path.Combine(directory, "same.cue"); File.WriteAllBytes(path, original);
+        var outside = Directory.CreateDirectory(Path.Combine(root, "unrelated")).FullName;
+        var backupRoot = Directory.CreateDirectory(Path.Combine(root, FileRepair.BackupDirectoryName)).FullName;
+        var link = Path.Combine(backupRoot, "artist"); Directory.CreateSymbolicLink(link, outside);
+        try
+        {
+            Assert.Throws<IOException>(() => FileRepair.Process(root, path, true, 1251));
+            Assert.Equal(original, File.ReadAllBytes(path)); Assert.Empty(Directory.GetFileSystemEntries(outside));
+            Assert.Empty(Directory.GetFiles(root, "*.tmp", SearchOption.AllDirectories));
+        }
+        finally { Directory.Delete(link); }
     }
 
     [WindowsFact] public void LinkedBackupFolderIsRejectedBeforeSourceWrites()

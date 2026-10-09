@@ -1,5 +1,11 @@
 # Test evidence — Stages A–G
 
+## Track actions and mirrored backup verification (2026-10-09)
+
+Locked baseline: zero build warnings/errors, Core 321 passed; CLI 78 passed and 14 Windows-only skipped (92 total). Revised locked Release build compiles the real WPF app on Linux without warnings/errors; Core 323 passed and CLI 78 passed/15 Windows-only skipped (93 total). Two Core tests cover legacy settings defaults and Favorites/previous-playlist GUID round trips without a schema bump. Genuine Windows/WPF, nested backup-link refusal and packaged CLI/installer results require the committed-source workflow. Native Windows recycle confirmation dialogs remain manual-not-run: smoke only verifies loaded-source refusal and cancellation of the app preview without deleting fixture files.
+
+Actual WPF controls are mandatory in ordinary EN/RU, rebuilt TagLib EN/RU, extracted and installed workflows. They invoke production menu callbacks on real owned MP3/FLAC, SQLite and file-copy operations, verify unchanged audio hashes/playback and restore test tabs/settings/order/queue. File-information evidence reads actual ID3v1/v2, lyrics and FLAC properties; star screenshot evidence rejects transparent-only output. CLI packaged apply checks 44 writes and exact originals in mirrored album folders; publication requires MirroredBackupDirectory and all 93 Windows CLI tests.
+
 ## Latest tag log, flat backups and rating controls (2026-10-09)
 
 Baseline locked build: zero warnings/errors, Core 321 passed, CLI 70 passed/12 Windows-only skipped (82 total). Revised locked build: zero warnings/errors, Core 321 passed, CLI 78 passed/14 Windows-only skipped (92 total). Full read-only replay of the owner's 4673 original/proposed text values repairs 60 outstanding fields (`Mамка`, `ЗаеBest`, `Язычнiк я...`), preserves all other proposed values and passes repeated recovery. Four new real-MP3/FLAC theory cases cover original/partial states; four negative controls preserve unsupported evidence. Windows tests add flat duplicate-name backup mappings and linked-backup-folder refusal. No private music is available or modified in this environment.

@@ -10,6 +10,14 @@ The library window manages explicitly chosen local roots, cancellable scans and 
 
 M3U8 export preserves ordinary local paths, order and duplicates. PLS/M3U8/CUE imports are bounded and do not recursively import documents. Use the explicit legacy-encoding dialog for non-Unicode documents. CUE logical segments cannot be faithfully exported as ordinary M3U8; that export is refused. Relink independently validates the replacement and preserves stable IDs; it does not move or rewrite music.
 
+## Track context menu and file information
+
+Right-click a selected track to retain the multi-selection, or an unselected track to target it alone. The menu includes playback, add, Favorites, queue, file information/location, previous playback playlist, file clipboard, star rating, place after the current track, send/copy, entry removal and enable/disable. Favorites (Избранное in Russian) is a saved playlist; adding the same logical song again does not duplicate it. Sending tracks to another playlist creates new entries and keeps the originals. Place-after-current requires the active playback playlist and an unfiltered view. Previous playlist returns to the last playlist used as a playback source, not the last tab viewed.
+
+F4 opens read-only information: General, Lyrics, ID3v1 and ID3v2 tabs, technical properties, ReplayGain, local cover and history. The path toolbar copies the path, opens Explorer (Alt+O) and navigates files. No tags are edited. Copy files to clipboard supplies actual file references for Explorer paste. Copy to folder creates new files only; existing filenames are retained and reported as errors. Selected M3U8 export similarly requires a new filename and refuses CUE segments.
+
+Del removes playlist entries without touching audio. Ctrl+Del opens a physical-file list with Cancel selected by default, followed by Windows recycle confirmations. Deleting a CUE source affects all songs sharing that file. The loaded source must be changed before recycling; linked recycle paths are refused. Windows may additionally ask about permanent deletion when recycling is unavailable: inspect that system prompt before proceeding. Unavailable entries stay visible until you remove or relink them.
+
 ## Playback and sound
 
 Space plays/pauses outside text/checkbox/slider controls. Alt+Left/Right selects Previous/Next. Ctrl+Left/Right seeks five seconds outside text controls; a focused waveform also accepts unmodified arrows/Home/End. Ctrl+Up/Down changes app gain by five percentage points. The seek slider and waveform expose a keyboard/Automation range. App mute/gain never changes Windows system volume or stored waveform.
