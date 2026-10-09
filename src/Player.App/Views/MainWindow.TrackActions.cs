@@ -68,7 +68,7 @@ public partial class MainWindow
         queue.Items.Add(Item("PlayNext", "PlayNext", () => Done(() => Model.Enqueue(rows, true)), AppIconKind.Next));
         queue.Items.Add(Item("AddQueue", "AddQueue", () => Done(() => Model.Enqueue(rows, false)), AppIconKind.Queue));
         queue.Items.Add(Item("QueueRemove", "RemoveQueue", () => Done(() =>
-        { var ids = rows.Select(row => row.Id).ToHashSet(); foreach (var item in Model.Queue.Where(item => ids.Contains(item.Entry.Id)).ToArray()) Model.RemoveQueued(item.Id); }), AppIconKind.Close));
+        { var ids = rows.Select(row => row.Id).ToHashSet(); foreach (var item in Model.Queue.Where(item => ids.Contains(item.OriginEntryId ?? item.Entry.Id)).ToArray()) Model.RemoveQueued(item.Id); }), AppIconKind.Close));
         queue.Items.Add(Item("ShowQueue", "ShowQueue", () => Done(() => OnQueue(this, new RoutedEventArgs())), AppIconKind.Queue));
         queue.Items.Add(Item("ClearQueue", "ClearQueue", () => Done(() => Model.ClearQueueCommand.Execute(null)), AppIconKind.Delete)); Add(queue);
         Separator();
