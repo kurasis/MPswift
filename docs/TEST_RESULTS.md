@@ -8,6 +8,8 @@ Actual WPF controls are mandatory in ordinary EN/RU, rebuilt TagLib EN/RU, extra
 
 Initial source run [37934664154](https://github.com/kurasis/MPswift/actions/runs/37934664154) passed Core 323 on both operating systems, all 93 Windows CLI tests and actual packaged CLI writes/backups/audio hashes. Installed WPF stopped because its owned fixture folder only contained WAV/FLAC; the new ID3 information check also needs the existing CC0 MP3 fixture. Installer smoke now copies that fixture alongside them. No failed build is published; corrected-source Windows/WPF evidence is required.
 
+Its rebuilt-TagLib WPF check also exposed an incorrectly routed synthetic right-click: button-specific preview events are direct and do not tunnel from a row to its list. The check now raises the general Mouse.PreviewMouseDown tunnel, allowing WPF to promote the right-button event on the production list handler, as with native input. The selection assertion remains required; it is not bypassed.
+
 ## Latest tag log, flat backups and rating controls (2026-10-09)
 
 Baseline locked build: zero warnings/errors, Core 321 passed, CLI 70 passed/12 Windows-only skipped (82 total). Revised locked build: zero warnings/errors, Core 321 passed, CLI 78 passed/14 Windows-only skipped (92 total). Full read-only replay of the owner's 4673 original/proposed text values repairs 60 outstanding fields (`Mамка`, `ЗаеBest`, `Язычнiк я...`), preserves all other proposed values and passes repeated recovery. Four new real-MP3/FLAC theory cases cover original/partial states; four negative controls preserve unsupported evidence. Windows tests add flat duplicate-name backup mappings and linked-backup-folder refusal. No private music is available or modified in this environment.

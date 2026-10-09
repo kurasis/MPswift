@@ -49,11 +49,13 @@ internal static class TrackActionsValidation
             await model.AddPathsAsync([flac, mp3, flac]); await Idle();
             var rows = model.Entries.ToArray(); list.SelectedItems.Clear(); list.SelectedItems.Add(rows[0]); list.SelectedItems.Add(rows[1]);
             var unselected = (ListBoxItem)list.ItemContainerGenerator.ContainerFromItem(rows[2]);
-            unselected.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Right) { RoutedEvent = UIElement.PreviewMouseRightButtonDownEvent });
+            // Button-specific preview events are direct. Route the general tunnel
+            // so WPF promotes it on the list, as it does for actual mouse input.
+            unselected.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Right) { RoutedEvent = Mouse.PreviewMouseDownEvent });
             Check(list.SelectedItems.Count == 1 && list.SelectedItems.Contains(rows[2]), "Right-click did not select its new target.");
             list.SelectedItems.Clear(); list.SelectedItems.Add(rows[0]); list.SelectedItems.Add(rows[1]);
             var container = (ListBoxItem)list.ItemContainerGenerator.ContainerFromItem(rows[1]);
-            container.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Right) { RoutedEvent = UIElement.PreviewMouseRightButtonDownEvent });
+            container.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Right) { RoutedEvent = Mouse.PreviewMouseDownEvent });
             Check(list.SelectedItems.Count == 2, "Right-click lost an existing multi-selection.");
             var opening = (ContextMenuEventArgs)Activator.CreateInstance(typeof(ContextMenuEventArgs), BindingFlags.Instance | BindingFlags.NonPublic,
                 null, [container, true, -1d, -1d], null)!;
