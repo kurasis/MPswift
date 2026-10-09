@@ -1,5 +1,11 @@
 # Requirement and acceptance status
 
+## Owner follow-up: encoding utility and icon ratings (2026-10-09)
+
+Player metadata behavior remains because the owner confirmed normal display after re-adding files and closed that complaint. Latest CLI log recovery covers all 60 observed residual fields through reversible, scoped context checks; ASCII spelling remains. Owner-requested backups share one flat folder under the selected root with private source-path/hash sidecars and verified exact originals. The old backup-location behavior is intentionally replaced by the owner's explicit request. Public CLI options, player metadata interfaces and pinned dependencies remain.
+
+Numeric playlist ratings are replaced visually by five vector stars; persisted 0–5 values and logical-track synchronization remain. Mouse, keyboard, screen-reader range access and localized labels are supported. Obvious main/library/queue/diagnostics actions use 18-DIP icons; menu/settings/confirmation wording remains when an icon alone cannot identify the action. Targeted local tests pass; real Windows WPF/filesystem, packaging and installer evidence are required before release completion.
+
 ## Owner collection preview follow-up (2026-10-09)
 
 Implemented remaining six legacy-word variants in 16 fields/15 files using strictly reversible contextual recovery. Short i/I words, album-folder evidence and filename-confirmed prepositions alongside Latin artists are covered, including previous partial writes and albums stored in general collection folders. All 304 changed metadata values in the submitted log pass replay/idempotence; unseen tags and source audio cannot be classified from that preview. Existing CLI arguments, identifiers, Core/player behavior and dependency pins remain; original backup and encoded-audio verification gates are retained. Twelve ambiguity controls and unchanged CUE references/timings pass locally. Normal source-specific Windows build, all 82 CLI tests and extracted-EXE 28-case write/backup/audio/idempotence proof are mandatory before the new ZIP. Inherently ambiguous and irreversible metadata remain outside automatic recovery.

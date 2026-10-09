@@ -8,6 +8,10 @@ public sealed class CollectionRepairTests
 {
     public static TheoryData<string, string, string, string> OwnerExamples => new()
     {
+        { "Title", "Mамка не попалит", "Màìêà не попалит", "Albums/Collection/13. Mамка не попалит.mp3" },
+        { "Album", "ЗаеBest (Переиздание)", "ÇàåBest (Переиздание)", "Albums/2008 - ЗаеBest (Переиздание)/01 Ничего.mp3" },
+        { "Album", "Язычнiк я...", "Язычнiк ÿ...", "Albums/1997 - Язычнік я (перавыд. 2004)/04. Язычнiк я.mp3" },
+        { "Title", "Язычнiк я...", "Язычнiк ÿ...", "Albums/Collection/04. Язычнiк я.mp3" },
         { "Title", "Выпрауляла мацi сына", "Выпрауляла ìàöi сына", "Albums/Запаветы/02.mp3" },
         { "Album", "Пашпарт грамадзянiна N.R.M.", "Пашпарт ãðàìàäçÿíiíà N.R.M.", "Albums/PASSPART грамадзянiна N.R.M/25.mp3" },
         { "Album", "Дзецi леса", "Äçåöi леса", "Albums/Дзецi леса/01-Шлях.mp3" },
@@ -19,6 +23,10 @@ public sealed class CollectionRepairTests
 
     [Theory]
     [InlineData("ìàöi", "Albums/Запаветы/02.mp3", false)]
+    [InlineData("Màìêà не попалит", "Albums/Collection/other.mp3", false)]
+    [InlineData("ÇàåBest (Переиздание)", "Albums/Collection/01.mp3", true)]
+    [InlineData("Сонца ÿ...", "Albums/я/other.mp3", false)]
+    [InlineData("ÿ...", "Albums/Collection/я.mp3", false)]
     [InlineData("Вецеры ìàöi", "Albums/Запаветы/02.mp3", false)]
     [InlineData("Вецеры вецеры ìàöi", "Albums/Запаветы/02.mp3", false)]
     [InlineData("Вецеры сонца éèi", "Albums/Запаветы/02.mp3", false)]

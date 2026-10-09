@@ -294,7 +294,7 @@ public partial class MainWindow : Window
     {
         while (element is not null)
         {
-            if (element is TextBoxBase or PasswordBox or ButtonBase or Slider or ComboBox or MenuItem) return true;
+            if (element is TextBoxBase or PasswordBox or ButtonBase or Slider or Player.App.Controls.RatingStars or ComboBox or MenuItem) return true;
             element = element is System.Windows.Media.Visual or System.Windows.Media.Media3D.Visual3D
                 ? System.Windows.Media.VisualTreeHelper.GetParent(element)
                 : (element as FrameworkContentElement)?.Parent ?? LogicalTreeHelper.GetParent(element);
@@ -305,7 +305,7 @@ public partial class MainWindow : Window
     {
         while (element is not null)
         {
-            if (element is TextBoxBase or PasswordBox or ComboBox or MenuItem or Slider) return true;
+            if (element is TextBoxBase or PasswordBox or ComboBox or MenuItem or Slider or Player.App.Controls.RatingStars) return true;
             // Buttons/checkboxes own Space and Enter, but do not consume playlist Ctrl+A,
             // reorder, seek or volume shortcuts just because a row checkbox has focus.
             if (element is ButtonBase && modifiers == ModifierKeys.None && key is Key.Space or Key.Enter) return true;

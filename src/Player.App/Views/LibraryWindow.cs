@@ -1,3 +1,4 @@
+using Player.App.Controls;
 using Player.App.Resources;
 using System.Collections.ObjectModel;
 using System.Windows;
@@ -25,16 +26,16 @@ public sealed class LibraryWindow : Window
         Owner = owner; _model = model; LocalizedStrings.Bind(this, TitleProperty, "LibraryTitle"); Width = 780; Height = 580;
         var panel = new DockPanel { Margin = new Thickness(12) }; Content = panel;
         var controls = new WrapPanel(); DockPanel.SetDock(controls, Dock.Top); panel.Children.Add(controls);
-        void Button(string key, RoutedEventHandler action) { var b = new Button { Margin = new Thickness(3) }; LocalizedStrings.Bind(b, ContentControl.ContentProperty, key); b.Click += action; controls.Children.Add(b); }
-        Button("AddRoot", async (_, _) => { var d = new Microsoft.Win32.OpenFolderDialog(); if (d.ShowDialog(this) == true) { try { await model.AddLibraryRootAsync(d.FolderName); } catch (Exception e) { MessageBox.Show(this, Strings.ErrorUnexpected + "\n\n" + e.Message, Strings.Get("LibraryTitle")); } } });
-        Button("RefreshRoots", (_, _) => model.ScanRoots()); Button("CancelScan", (_, _) => model.CancelScan());
-        Button("AddSelected", (_, _) => model.AddLibraryTracks(_list!.SelectedItems.Cast<IndexedFile>().Select(f => f.Track)));
-        Button("PreviousPage", async (_, _) => { _offset = Math.Max(0, _offset - 100); await SearchAsync(); }); Button("NextPage", async (_, _) => { _offset += 100; await SearchAsync(); });
+        void Button(string key, AppIconKind icon, RoutedEventHandler action) { var b = IconActionButton.Create(key, icon); b.Click += action; controls.Children.Add(b); }
+        Button("AddRoot", AppIconKind.FolderAdd, async (_, _) => { var d = new Microsoft.Win32.OpenFolderDialog(); if (d.ShowDialog(this) == true) { try { await model.AddLibraryRootAsync(d.FolderName); } catch (Exception e) { MessageBox.Show(this, Strings.ErrorUnexpected + "\n\n" + e.Message, Strings.Get("LibraryTitle")); } } });
+        Button("RefreshRoots", AppIconKind.Refresh, (_, _) => model.ScanRoots()); Button("CancelScan", AppIconKind.Stop, (_, _) => model.CancelScan());
+        Button("AddSelected", AppIconKind.Add, (_, _) => model.AddLibraryTracks(_list!.SelectedItems.Cast<IndexedFile>().Select(f => f.Track)));
+        Button("PreviousPage", AppIconKind.Previous, async (_, _) => { _offset = Math.Max(0, _offset - 100); await SearchAsync(); }); Button("NextPage", AppIconKind.Next, async (_, _) => { _offset += 100; await SearchAsync(); });
         _search = new TextBox { Margin = new Thickness(0, 8, 0, 8), MaxLength = 4096 }; LocalizedStrings.Bind(_search, ToolTipProperty, "LibrarySearch"); DockPanel.SetDock(_search, Dock.Top); panel.Children.Add(_search);
         _search.TextChanged += async (_, _) => { _searchDelay?.Cancel(); _searchDelay?.Dispose(); _searchDelay = new(); var token = _searchDelay.Token; try { await Task.Delay(200, token); _offset = 0; await SearchAsync(); } catch (OperationCanceledException) { } };
         _status = new TextBlock { TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 6, 0, 6) }; DockPanel.SetDock(_status, Dock.Bottom); panel.Children.Add(_status);
         var roots = new ComboBox { ItemsSource = model.LibraryRoots, DisplayMemberPath = "Path", Margin = new Thickness(0, 0, 0, 8) }; DockPanel.SetDock(roots, Dock.Top); panel.Children.Add(roots);
-        Button("DisableRoot", async (_, _) => { if (roots.SelectedItem is LibraryRoot root) await model.DisableLibraryRootAsync(root); });
+        Button("DisableRoot", AppIconKind.Delete, async (_, _) => { if (roots.SelectedItem is LibraryRoot root) await model.DisableLibraryRootAsync(root); });
         _list = new ListBox { ItemsSource = _files, DisplayMemberPath = "Track.Title", SelectionMode = SelectionMode.Extended }; panel.Children.Add(_list);
         VirtualizingPanel.SetIsVirtualizing(_list, true); VirtualizingPanel.SetVirtualizationMode(_list, VirtualizationMode.Recycling);
         ScrollViewer.SetCanContentScroll(_list, true);

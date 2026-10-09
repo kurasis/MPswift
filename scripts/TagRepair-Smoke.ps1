@@ -97,12 +97,12 @@ try {
     $preview | Set-Content $log -Encoding utf8
     if ($LASTEXITCODE -ne 0 -or -not ($preview -match 'planned=3;')) { throw 'Actual CLI recursive preview did not inspect all three owned files.' }
     foreach ($path in $originals.Keys) { if ((Get-FileHash $path -Algorithm SHA256).Hash -ne $originals[$path]) { throw 'CLI preview changed original bytes.' } }
-    if (@(Get-ChildItem $album -Filter '*.bak').Count -ne 0) { throw 'Preview created backups.' }
+    if (@(Get-ChildItem $album -Filter '*.bak' -Recurse).Count -ne 0) { throw 'Preview created backups.' }
     $applied = @(& $exe $album --apply)
     $applied | Add-Content $log -Encoding utf8
     if ($LASTEXITCODE -ne 0 -or -not ($applied -match 'repaired=3;')) { throw 'Actual CLI did not apply all three owned repairs.' }
     foreach ($path in $originals.Keys) {
-        $backup = @(Get-ChildItem $album -File | Where-Object { $_.Name.StartsWith([IO.Path]::GetFileName($path) + '.mpswift-', [StringComparison]::Ordinal) -and $_.Extension -eq '.bak' })
+        $backup = @(Get-ChildItem (Join-Path $album 'MPswift.TagRepair.Backups') -File | Where-Object { $_.Name.StartsWith([IO.Path]::GetFileName($path) + '.mpswift-', [StringComparison]::Ordinal) -and $_.Extension -eq '.bak' })
         if ($backup.Count -ne 1 -or (Get-FileHash $backup[0].FullName -Algorithm SHA256).Hash -ne $originals[$path]) { throw 'CLI retained backup differs from its exact original.' }
         if ($audioHashes.ContainsKey($path)) {
             if ((AudioHash $path) -ne $audioHashes[$path]) { throw 'Independent MPEG/FLAC audio-range hash changed.' }
@@ -115,9 +115,13 @@ try {
     $again = @(& $exe $album --apply)
     $again | Add-Content $log -Encoding utf8
     if ($LASTEXITCODE -ne 0 -or -not ($again -match 'repaired=0; unchanged=3;')) { throw 'Physical repairs are not idempotent.' }
-    if (@(Get-ChildItem $album -Filter '*.bak').Count -ne 3 -or @(Get-ChildItem $album -Filter '*.tmp').Count -ne 0 -or [IO.File]::ReadAllText($private) -ne 'unknown data retained') { throw 'Unexpected backups/temp files or private-file modification.' }
+    if (@(Get-ChildItem $album -Filter '*.bak' -Recurse).Count -ne 3 -or @(Get-ChildItem $album -Filter '*.tmp').Count -ne 0 -or [IO.File]::ReadAllText($private) -ne 'unknown data retained') { throw 'Unexpected backups/temp files or private-file modification.' }
     $collection = Join-Path $workspace 'Owned collection follow-up'; New-Item $collection -ItemType Directory | Out-Null
     $cases = @(
+        @{ Field = 'Title'; Expected = 'Язычнiк я...'; Partial = 'Язычнiк ÿ...'; Relative = 'Albums/Collection/04. Язычнiк я.mp3' },
+        @{ Field = 'Title'; Expected = 'Mамка не попалит'; Partial = 'Màìêà не попалит'; Relative = 'Albums/Collection/13. Mамка не попалит.mp3' },
+        @{ Field = 'Album'; Expected = 'ЗаеBest (Переиздание)'; Partial = 'ÇàåBest (Переиздание)'; Relative = 'Albums/2008 - ЗаеBest (Переиздание)/01 Ничего.mp3' },
+        @{ Field = 'Album'; Expected = 'Язычнiк я...'; Partial = 'Язычнiк ÿ...'; Relative = 'Albums/1997 - Язычнік я (перавыд. 2004)/04. Язычнiк я.mp3' },
         @{ Field = 'Title'; Expected = 'Выпрауляла мацi сына'; Partial = 'Выпрауляла ìàöi сына'; Relative = 'Albums/Запаветы/02.mp3' },
         @{ Field = 'Album'; Expected = 'Пашпарт грамадзянiна N.R.M.'; Partial = 'Пашпарт ãðàìàäçÿíiíà N.R.M.'; Relative = 'Albums/PASSPART грамадзянiна N.R.M/25.mp3' },
         @{ Field = 'Album'; Expected = 'Дзецi леса'; Partial = 'Äçåöi леса'; Relative = 'Albums/Дзецi леса/01-Шлях.mp3' },
@@ -146,14 +150,14 @@ try {
         }
     }
     $collectionPreview = @(& $exe $collection); $collectionPreview | Add-Content $log -Encoding utf8
-    if ($LASTEXITCODE -ne 0 -or -not ($collectionPreview -match 'planned=28; unchanged=0; errors=0')) { throw 'Collection preview did not cover every original/partial MP3/FLAC case.' }
+    if ($LASTEXITCODE -ne 0 -or -not ($collectionPreview -match 'planned=44; unchanged=0; errors=0')) { throw 'Collection preview did not cover every original/partial MP3/FLAC case.' }
     foreach ($path in $collectionOriginals.Keys) { if ((Get-FileHash $path -Algorithm SHA256).Hash -ne $collectionOriginals[$path]) { throw 'Collection preview changed source bytes.' } }
     if (@(Get-ChildItem $collection -Filter '*.bak' -Recurse).Count -ne 0) { throw 'Collection preview created backups.' }
     $collectionApply = @(& $exe $collection --apply); $collectionApply | Add-Content $log -Encoding utf8
-    if ($LASTEXITCODE -ne 0 -or -not ($collectionApply -match 'repaired=28; unchanged=0; errors=0')) { throw 'Collection apply did not repair every case.' }
+    if ($LASTEXITCODE -ne 0 -or -not ($collectionApply -match 'repaired=44; unchanged=0; errors=0')) { throw 'Collection apply did not repair every case.' }
     foreach ($path in $collectionOriginals.Keys) {
-        $backup = @(Get-ChildItem (Split-Path $path -Parent) -File | Where-Object { $_.Name.StartsWith([IO.Path]::GetFileName($path) + '.mpswift-', [StringComparison]::Ordinal) -and $_.Extension -eq '.bak' })
-        if ($backup.Count -ne 1 -or (Get-FileHash $backup[0].FullName -Algorithm SHA256).Hash -ne $collectionOriginals[$path]) { throw 'Collection backup differs from its exact original.' }
+        $backup = @(Get-ChildItem (Join-Path $collection 'MPswift.TagRepair.Backups') -Filter '*.bak' -File | Where-Object { (Get-Content ($_.FullName + '.json') -Raw | ConvertFrom-Json).SourceRelativePath -ceq [IO.Path]::GetRelativePath($collection, $path) })
+        if ($backup.Count -ne 1 -or (Get-FileHash $backup[0].FullName -Algorithm SHA256).Hash -ne $collectionOriginals[$path] -or (Get-Content ($backup[0].FullName + '.json') -Raw | ConvertFrom-Json).OriginalSha256 -ne $collectionOriginals[$path]) { throw 'Collection backup differs from its exact original.' }
         if ((AudioHash $path) -ne $collectionAudio[$path]) { throw 'Collection repair changed encoded audio.' }
         $case = $collectionTags[$path]; $file = [TagLib.File]::Create($path)
         try {
@@ -161,9 +165,10 @@ try {
             if ($saved -cne $case.Expected) { throw 'Collection tag still contains mojibake or changed Latin artist/spelling.' }
         } finally { $file.Dispose() }
     }
+    if (@(Get-ChildItem (Join-Path $collection 'MPswift.TagRepair.Backups') -Directory).Count -ne 0 -or @(Get-ChildItem (Join-Path $collection 'MPswift.TagRepair.Backups') -Filter '*.bak').Count -ne 44) { throw 'Backups must share one flat directory.' }
     $collectionAgain = @(& $exe $collection --apply); $collectionAgain | Add-Content $log -Encoding utf8
-    if ($LASTEXITCODE -ne 0 -or -not ($collectionAgain -match 'repaired=0; unchanged=28; errors=0') -or
-        @(Get-ChildItem $collection -Filter '*.bak' -Recurse).Count -ne 28 -or @(Get-ChildItem $collection -Filter '*.tmp' -Recurse).Count -ne 0) { throw 'Collection physical repairs are not idempotent or left staging files.' }
+    if ($LASTEXITCODE -ne 0 -or -not ($collectionAgain -match 'repaired=0; unchanged=44; errors=0') -or
+        @(Get-ChildItem $collection -Filter '*.bak' -Recurse).Count -ne 44 -or @(Get-ChildItem $collection -Filter '*.tmp' -Recurse).Count -ne 0) { throw 'Collection physical repairs are not idempotent or left staging files.' }
     $invalidAlbum = Join-Path $workspace 'Owned unsupported before next album'; New-Item $invalidAlbum -ItemType Directory | Out-Null
     $bad = Join-Path $invalidAlbum 'Unsupported prefix.mp3'; Copy-Item (Join-Path $root 'tests/fixtures/audio/mp3-cbr.mp3') $bad
     $file = [TagLib.File]::Create($bad)
@@ -185,10 +190,10 @@ try {
     $trx = Get-ChildItem (Join-Path $root 'artifacts/tagrepair-test-results') -Filter '*.trx' | Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
     [xml]$tests = Get-Content $trx.FullName -Raw
     $counters = $tests.SelectSingleNode("//*[local-name()='Counters']")
-    if ([int]$counters.total -lt 82 -or $counters.passed -ne $counters.total -or [int]$counters.failed -ne 0 -or [int]$counters.notExecuted -ne 0) { throw 'CLI Windows tests must all execute and pass.' }
+    if ([int]$counters.total -lt 92 -or $counters.passed -ne $counters.total -or [int]$counters.failed -ne 0 -or [int]$counters.notExecuted -ne 0) { throw 'CLI Windows tests must all execute and pass.' }
     [ordered]@{ Status = 'tagrepair-packaged-cli-passed'; SourceCommit = $audit.SourceCommit; ProductVersion = $audit.ProductVersion; ZipSha256 = $audit.ZipSha256;
         RealExe = $true; RuntimeIncluded = $true; PreviewNoWrites = $true; PhysicalMp3FlacCue = $true; ExactOriginalBackups = $true; IndependentAudioHashes = $true;
-        SourceFixturesUnchanged = $true; PrivateFilesUnchanged = $true; Idempotent = $true; PaddedMp3PrefixAndAudio = $true; InvalidFileContinuation = $true; FilenameConfirmedAsciiI = $true; ContextualCollectionCases = $true;
+        SourceFixturesUnchanged = $true; PrivateFilesUnchanged = $true; Idempotent = $true; PaddedMp3PrefixAndAudio = $true; InvalidFileContinuation = $true; FilenameConfirmedAsciiI = $true; ContextualCollectionCases = $true; FlatBackupDirectory = $true; BackupSourceMappings = $true;
         WindowsTests = [int]$counters.total; WindowsTestsFailed = 0; WindowsTestsSkipped = 0 } |
         ConvertTo-Json | Set-Content (Join-Path $output 'tagrepair-smoke.json') -Encoding utf8
 } finally { $env:DOTNET_ROOT = $previousRuntime }

@@ -26,7 +26,8 @@ internal static class Program
             output.WriteLine("MPswift Tag Repair " + Player.Core.ProductInfo.Version);
             output.WriteLine("Usage: MPswift.TagRepair.exe \"C:\\Music\" [--apply] [--top-only] [--cue-codepage 1251|1252|866]");
             output.WriteLine("Default: recursive PREVIEW only. Supported files: MP3, FLAC, CUE.");
-            output.WriteLine("--apply: Windows-only writes; verified originals retained beside each changed file as .mpswift-<id>.bak.");
+            output.WriteLine("--apply: Windows-only writes; verified originals retained together in MPswift.TagRepair.Backups under the selected folder.");
+            output.WriteLine("Each .bak has a private .json sidecar recording its original relative path and SHA256; retain both for restoration.");
             output.WriteLine("MP3: ID3v2.4/UTF-8 without ID3v1. FLAC: UTF-8 tags. CUE: UTF-8 without BOM; file references/timings retained.");
             output.WriteLine("No audio transcoding, file renaming, shell commands, network access or administrator requirement.");
             output.WriteLine("Exit codes: 0 success; 1 per-file errors; 2 invalid arguments/folder; 3 unsupported write platform; 130 cancelled.");
@@ -91,6 +92,7 @@ internal static class Program
                 if ((attributes & FileAttributes.ReparsePoint) != 0) { output.WriteLine("SKIP LINK " + Quote(entry)); continue; }
                 if ((attributes & FileAttributes.Directory) != 0)
                 {
+                    if (Path.GetFileName(entry).Equals(FileRepair.BackupDirectoryName, StringComparison.OrdinalIgnoreCase)) continue;
                     if (recursive) { if (directory.Depth >= 64) throw new IOException("Folder exceeds the 64-level depth limit."); pending.Push((entry, directory.Depth + 1)); }
                 }
                 else if (Path.GetExtension(entry).ToLowerInvariant() is ".mp3" or ".flac" or ".cue") yield return entry;

@@ -18,6 +18,44 @@ public sealed class WindowsFileTests : IDisposable
     private string Cue()
     { var path = Path.Combine(root, "Беларускае.cue"); File.WriteAllBytes(path, Encoding.GetEncoding(1251).GetBytes("TITLE \"Людзі\"\r\nFILE \"owned.flac\" WAVE\r\nTRACK 01 AUDIO\r\nINDEX 01 02:40:03\r\n")); return path; }
 
+    [WindowsFact] public void FlatBackupsKeepDuplicateNamesAndSourceMappingsWithoutOverwrites()
+    {
+        var original = File.ReadAllBytes(Cue());
+        foreach (var album in new[] { "first", "second" })
+        {
+            var directory = Directory.CreateDirectory(Path.Combine(root, album)).FullName;
+            var path = Path.Combine(directory, "same.cue"); File.WriteAllBytes(path, original);
+            Assert.Equal("preview", FileRepair.Process(root, path, false, 1251).Status);
+            if (album == "first") Assert.False(Directory.Exists(Path.Combine(root, FileRepair.BackupDirectoryName)));
+            var result = FileRepair.Process(root, path, true, 1251);
+            Assert.Equal(Path.Combine(root, FileRepair.BackupDirectoryName), Path.GetDirectoryName(result.Backup));
+            Assert.Equal(original, File.ReadAllBytes(result.Backup!));
+            using var mapping = System.Text.Json.JsonDocument.Parse(File.ReadAllText(result.Backup! + ".json"));
+            Assert.Equal(Path.GetRelativePath(root, path), mapping.RootElement.GetProperty("SourceRelativePath").GetString());
+            Assert.Equal(Convert.ToHexStringLower(SHA256.HashData(original)), mapping.RootElement.GetProperty("OriginalSha256").GetString());
+        }
+        var folder = Path.Combine(root, FileRepair.BackupDirectoryName);
+        Assert.Equal(2, Directory.GetFiles(folder, "*.bak").Length); Assert.Empty(Directory.GetDirectories(folder));
+        File.WriteAllBytes(Path.Combine(folder, "must-not-process.cue"), original);
+        using var output = new StringWriter(); using var errors = new StringWriter();
+        Assert.Equal(0, Program.Run([root], output, errors)); Assert.Contains("planned=1; unchanged=2; errors=0", output.ToString());
+    }
+
+    [WindowsFact] public void LinkedBackupFolderIsRejectedBeforeSourceWrites()
+    {
+        var path = Cue(); var original = File.ReadAllBytes(path);
+        var target = Directory.CreateDirectory(Path.Combine(root, "unrelated")).FullName;
+        var link = Path.Combine(root, FileRepair.BackupDirectoryName);
+        Directory.CreateSymbolicLink(link, target);
+        try
+        {
+            Assert.Throws<IOException>(() => FileRepair.Process(root, path, true, 1251));
+            Assert.Equal(original, File.ReadAllBytes(path)); Assert.Empty(Directory.GetFiles(target));
+            Assert.Empty(Directory.GetFiles(root, "*.tmp"));
+        }
+        finally { Directory.Delete(link); }
+    }
+
     [WindowsFact] public void CueApplyCreatesExactBackupAndIsIdempotent()
     {
         var path = Cue(); var original = File.ReadAllBytes(path);
@@ -25,7 +63,7 @@ public sealed class WindowsFileTests : IDisposable
         Assert.Equal("repaired", result.Status); Assert.Equal(original, File.ReadAllBytes(result.Backup!));
         Assert.Contains("Людзі", new UTF8Encoding(false, true).GetString(File.ReadAllBytes(path)));
         Assert.Equal("unchanged", FileRepair.Process(root, path, true, 1251).Status);
-        Assert.Single(Directory.GetFiles(root, "*.bak")); Assert.Empty(Directory.GetFiles(root, "*.tmp"));
+        Assert.Single(Directory.GetFiles(root, "*.bak", SearchOption.AllDirectories)); Assert.Empty(Directory.GetFiles(root, "*.tmp"));
     }
 
     [WindowsFact] public void Mp3ApplyRepairsTagsAndPreservesActualEncodedAudio()
@@ -57,7 +95,7 @@ public sealed class WindowsFileTests : IDisposable
                 using (var file = TagLib.File.Create(path)) Assert.Equal(title, file.Tag.Title);
                 Assert.Equal("unchanged", FileRepair.Process(root, path, true, 1251).Status);
             }
-        Assert.Equal(6, Directory.GetFiles(root, "*.bak").Length); Assert.Empty(Directory.GetFiles(root, "*.tmp"));
+        Assert.Equal(6, Directory.GetFiles(root, "*.bak", SearchOption.AllDirectories).Length); Assert.Empty(Directory.GetFiles(root, "*.tmp"));
     }
 
     [WindowsFact] public void CollectionExamplesPhysicallyApplyWithExactBackupsAndIdempotence()
@@ -94,7 +132,7 @@ public sealed class WindowsFileTests : IDisposable
         var error = Assert.Throws<IOException>(() => FileRepair.Process(root, path, true, 1251, commit: (_, target) =>
         { target.Write("partial bad bytes"u8); throw new IOException("Injected mid-write failure."); }));
         Assert.Contains("original restored", error.Message); Assert.Equal(original, File.ReadAllBytes(path));
-        Assert.Equal(original, File.ReadAllBytes(Assert.Single(Directory.GetFiles(root, "*.bak")))); Assert.Empty(Directory.GetFiles(root, "*.tmp"));
+        Assert.Equal(original, File.ReadAllBytes(Assert.Single(Directory.GetFiles(root, "*.bak", SearchOption.AllDirectories)))); Assert.Empty(Directory.GetFiles(root, "*.tmp"));
     }
 
     [WindowsFact] public void BusySourceIsRejectedBeforeWritesOrBackups()
@@ -102,7 +140,7 @@ public sealed class WindowsFileTests : IDisposable
         var path = Cue(); var original = File.ReadAllBytes(path);
         using var locked = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
         Assert.Throws<IOException>(() => FileRepair.Process(root, path, true, 1251));
-        Assert.Equal(original, File.ReadAllBytes(path)); Assert.Empty(Directory.GetFiles(root, "*.bak")); Assert.Empty(Directory.GetFiles(root, "*.tmp"));
+        Assert.Equal(original, File.ReadAllBytes(path)); Assert.Empty(Directory.GetFiles(root, "*.bak", SearchOption.AllDirectories)); Assert.Empty(Directory.GetFiles(root, "*.tmp"));
     }
 
     [WindowsFact] public void HardlinkIsRejectedAndOtherNameRemainsUnchanged()
@@ -110,7 +148,7 @@ public sealed class WindowsFileTests : IDisposable
         var path = Cue(); var original = File.ReadAllBytes(path); var linked = Path.Combine(root, "alias.cue");
         Assert.True(CreateHardLink(linked, path, 0));
         Assert.Throws<IOException>(() => FileRepair.Process(root, linked, true, 1251));
-        Assert.Equal(original, File.ReadAllBytes(path)); Assert.Empty(Directory.GetFiles(root, "*.bak"));
+        Assert.Equal(original, File.ReadAllBytes(path)); Assert.Empty(Directory.GetFiles(root, "*.bak", SearchOption.AllDirectories));
     }
 
     [WindowsFact] public void ResolvedOutsideDirectoryCannotBeProcessed()
@@ -123,7 +161,7 @@ public sealed class WindowsFileTests : IDisposable
     {
         var path = Cue(); var original = File.ReadAllBytes(path);
         Assert.Throws<OperationCanceledException>(() => FileRepair.Process(root, path, true, 1251, new CancellationToken(true)));
-        Assert.Equal(original, File.ReadAllBytes(path)); Assert.Empty(Directory.GetFiles(root, "*.bak"));
+        Assert.Equal(original, File.ReadAllBytes(path)); Assert.Empty(Directory.GetFiles(root, "*.bak", SearchOption.AllDirectories));
     }
 
     [WindowsFact] public void RealCliRecursiveApplyRetainsUnrelatedFilesAndSiblingDirectories()
@@ -131,7 +169,7 @@ public sealed class WindowsFileTests : IDisposable
         var cue = Cue(); var original = File.ReadAllBytes(cue); File.WriteAllText(Path.Combine(root, "private.txt"), "untouched");
         using var output = new StringWriter(); using var errors = new StringWriter();
         Assert.Equal(0, Program.Run([root, "--apply"], output, errors)); Assert.Contains("repaired=1", output.ToString()); Assert.Empty(errors.ToString());
-        Assert.Equal("untouched", File.ReadAllText(Path.Combine(root, "private.txt"))); Assert.Equal(original, File.ReadAllBytes(Assert.Single(Directory.GetFiles(root, "*.bak"))));
+        Assert.Equal("untouched", File.ReadAllText(Path.Combine(root, "private.txt"))); Assert.Equal(original, File.ReadAllBytes(Assert.Single(Directory.GetFiles(root, "*.bak", SearchOption.AllDirectories))));
     }
 
     [WindowsFact] public void PaddedCbrAndVbrMp3ApplyPreservesPrefixAndAudioWithExactBackups()
@@ -156,7 +194,7 @@ public sealed class WindowsFileTests : IDisposable
             using (var file = TagLib.File.Create(path)) Assert.Equal("Людзі і сонца", file.Tag.Title);
             Assert.Equal("unchanged", FileRepair.Process(root, path, true, 1251).Status);
         }
-        Assert.Equal(2, Directory.GetFiles(root, "*.bak").Length); Assert.Empty(Directory.GetFiles(root, "*.tmp"));
+        Assert.Equal(2, Directory.GetFiles(root, "*.bak", SearchOption.AllDirectories).Length); Assert.Empty(Directory.GetFiles(root, "*.tmp"));
     }
 
     [WindowsFact] public void ApplyRejectsInvalidDocumentAndContinuesWithoutChangingIt()

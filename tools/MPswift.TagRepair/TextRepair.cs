@@ -70,14 +70,16 @@ internal static class TextRepair
             // Combine distinct longer Cyrillic field and scoped path words. This
             // also supports Unicode tags previously repaired only partly.
             var confirmed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            bool LongerEvidence(string word) => word.Count(IsCyrillic) >= 4 &&
+                (!word.Any(c => char.IsLetter(c) && !IsCyrillic(c)) ||
+                 contextWords.Contains(word) && !word.Any(c => char.IsLetter(c) && !IsCyrillic(c) && c is not 'i' and not 'I'));
             foreach (var word in contextWords)
-                if (word.Count(IsCyrillic) >= 4 && !word.Any(c => char.IsLetter(c) && !IsCyrillic(c))) confirmed.Add(word);
+                if (LongerEvidence(word)) confirmed.Add(word);
             foreach (Match match in Regex.Matches(original, words, options))
             {
                 var word = match.Value;
                 var candidate = word.Any(IsCyrillic) ? word : DecodeLegacyWord(word, encoding);
-                if (candidate is not null && candidate.Count(IsCyrillic) >= 4 &&
-                    !candidate.Any(c => char.IsLetter(c) && !IsCyrillic(c))) confirmed.Add(candidate);
+                if (candidate is not null && LongerEvidence(candidate)) confirmed.Add(candidate);
             }
             text = Regex.Replace(text, words, match =>
             {
@@ -87,12 +89,16 @@ internal static class TextRepair
                 if (candidate is null) return word;
                 var cyrillic = candidate.Count(IsCyrillic);
                 var exactWord = contextWords.Contains(candidate);
+                // Preserve ASCII fragments (M, Best, i) exactly. Admit a mixed
+                // word only when the filename or immediate album folder agrees.
+                if (exactWord && cyrillic >= 2 && word.Any(char.IsAsciiLetter) &&
+                    !candidate.Any(c => char.IsLetter(c) && !IsCyrillic(c) && !char.IsAsciiLetter(c))) return candidate;
                 if (word.Any(c => c is 'i' or 'I') && cyrillic >= 2 &&
                     !candidate.Any(c => char.IsLetter(c) && !IsCyrillic(c) && c is not 'i' and not 'I') &&
                     (exactWord || cyrillic >= 3 && confirmed.Count >= 2)) return candidate;
                 // Recover one-letter prepositions beside a Latin artist only with
                 // both filename evidence and a corroborating Cyrillic field word.
-                if (confirmed.Count > 0 && exactWord && candidate is "з" or "ў" or "і" or "у") return candidate;
+                if (confirmed.Count > 0 && exactWord && candidate is "з" or "ў" or "і" or "у" or "я") return candidate;
                 return word;
             }, options);
         }

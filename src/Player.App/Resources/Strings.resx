@@ -355,7 +355,7 @@ Settings include accent, waveform style, startup/session options and local cache
         <value>Rating</value>
     </data>
     <data xml:space="preserve" name="RatingHelp">
-        <value>Rating (0 = unrated)</value>
+        <value>Click a star to rate; click it again to clear. Arrow keys change rating; Home/Delete clears it.</value>
     </data>
     <data xml:space="preserve" name="Exported">
         <value>Playlist exported; source audio was unchanged.</value>

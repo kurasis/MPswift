@@ -6,6 +6,7 @@
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         xmlns:s="clr-namespace:System.Windows.Automation;assembly=PresentationCore"
         xmlns:c="clr-namespace:Player.App.Controls"
+        xmlns:p="clr-namespace:Player.Core.Playback;assembly=Player.Core"
         Style="{StaticResource {x:Type Window}}"
         WindowStyle="None" Title="{Binding ProductName}" Width="920" Height="820" MinWidth="640" MinHeight="520"
         AllowDrop="True" Drop="OnDrop" DragOver="OnDragOver" PreviewKeyDown="OnKeyDown" Closing="OnClosing">
@@ -13,12 +14,12 @@
     <Window.Resources>
         <r:EnumLabelConverter x:Key="EnumLabel" />
         <ContextMenu x:Key="PlaylistTabMenu">
-            <MenuItem Header="{r:Loc RenamePlaylist}" Tag="Rename" Click="OnTabMenuAction" />
-            <MenuItem Header="{r:Loc DuplicatePlaylist}" Tag="Duplicate" Click="OnTabMenuAction" />
+            <MenuItem Header="{r:Loc RenamePlaylist}" Tag="Rename" Click="OnTabMenuAction" ><MenuItem.Icon><c:AppIcon Kind="Edit" /></MenuItem.Icon></MenuItem>
+            <MenuItem Header="{r:Loc DuplicatePlaylist}" Tag="Duplicate" Click="OnTabMenuAction" ><MenuItem.Icon><c:AppIcon Kind="Copy" /></MenuItem.Icon></MenuItem>
             <Separator />
-            <MenuItem Header="{r:Loc TabLeft}" Tag="Left" Click="OnTabMenuAction" />
-            <MenuItem Header="{r:Loc TabRight}" Tag="Right" Click="OnTabMenuAction" />
-            <MenuItem Header="{r:Loc SortPlaylist}">
+            <MenuItem Header="{r:Loc TabLeft}" Tag="Left" Click="OnTabMenuAction" ><MenuItem.Icon><c:AppIcon Kind="Previous" /></MenuItem.Icon></MenuItem>
+            <MenuItem Header="{r:Loc TabRight}" Tag="Right" Click="OnTabMenuAction" ><MenuItem.Icon><c:AppIcon Kind="Next" /></MenuItem.Icon></MenuItem>
+            <MenuItem Header="{r:Loc SortPlaylist}"><MenuItem.Icon><c:AppIcon Kind="Down" /></MenuItem.Icon>
                 <MenuItem Header="{r:Loc SortTitle}" Tag="Title" Click="OnTabSort" />
                 <MenuItem Header="{r:Loc SortArtist}" Tag="Artist" Click="OnTabSort" />
                 <MenuItem Header="{r:Loc SortAlbum}" Tag="Album" Click="OnTabSort" />
@@ -27,10 +28,10 @@
                 <MenuItem Header="{r:Loc SortPath}" Tag="Path" Click="OnTabSort" />
                 <MenuItem Header="{r:Loc SortAdded}" Tag="Date added" Click="OnTabSort" />
             </MenuItem>
-            <MenuItem Header="{r:Loc RemoveDuplicates}" Tag="Duplicates" Click="OnTabMenuAction" />
-            <MenuItem Header="{r:Loc ExportPlaylist}" Tag="Export" Click="OnTabMenuAction" />
+            <MenuItem Header="{r:Loc RemoveDuplicates}" Tag="Duplicates" Click="OnTabMenuAction" ><MenuItem.Icon><c:AppIcon Kind="Delete" /></MenuItem.Icon></MenuItem>
+            <MenuItem Header="{r:Loc ExportPlaylist}" Tag="Export" Click="OnTabMenuAction" ><MenuItem.Icon><c:AppIcon Kind="Export" /></MenuItem.Icon></MenuItem>
             <Separator />
-            <MenuItem Header="{r:Loc DeletePlaylist}" Tag="Delete" Click="OnTabMenuAction" />
+            <MenuItem Header="{r:Loc DeletePlaylist}" Tag="Delete" Click="OnTabMenuAction" ><MenuItem.Icon><c:AppIcon Kind="Delete" /></MenuItem.Icon></MenuItem>
         </ContextMenu>
     </Window.Resources>
     <Window.InputBindings>
@@ -71,12 +72,19 @@
                 <TextBlock x:Name="PlaybackStateText" AutomationProperties.LiveSetting="Polite" Text="{Binding State}" HorizontalAlignment="Right" Foreground="{DynamicResource AccentBrush}" />
                 <TextBlock Text="{r:Loc Volume}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Margin="0,8,0,0" />
                 <Slider x:Name="VolumeSlider" Value="{Binding Volume, Mode=TwoWay}" Minimum="0" Maximum="100" TickFrequency="5" SmallChange="5" IsMoveToPointEnabled="True" AutomationProperties.Name="{r:Loc Volume}" />
-                <CheckBox x:Name="MuteBox" Content="{r:Loc Mute}" IsChecked="{Binding Muted}" />
+                <CheckBox x:Name="MuteBox" IsChecked="{Binding Muted}" ToolTip="{r:Loc Mute}" AutomationProperties.Name="{r:Loc Mute}"><c:AppIcon><c:AppIcon.Style><Style TargetType="c:AppIcon"><Setter Property="Kind" Value="Volume" /><Style.Triggers><DataTrigger Binding="{Binding Muted}" Value="True"><Setter Property="Kind" Value="Muted" /></DataTrigger></Style.Triggers></Style></c:AppIcon.Style></c:AppIcon></CheckBox>
             </StackPanel>
         </Grid></Border>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,6" IsEnabled="{Binding CanTransport}">
-            <CheckBox Content="{r:Loc Shuffle}" IsChecked="{Binding Shuffle}" VerticalAlignment="Center" Margin="6" />
-            <ComboBox x:Name="RepeatBox" ItemsSource="{Binding RepeatModes}" SelectedItem="{Binding Repeat}" Width="82" VerticalAlignment="Center" ToolTip="{r:Loc Repeat}" AutomationProperties.Name="{r:Loc Repeat}" Margin="4"><ComboBox.ItemTemplate><DataTemplate><TextBlock><TextBlock.Text><MultiBinding Converter="{StaticResource EnumLabel}"><Binding /><Binding Path="Culture" Source="{x:Static r:LocalizedStrings.Instance}" /></MultiBinding></TextBlock.Text></TextBlock></DataTemplate></ComboBox.ItemTemplate></ComboBox>
+            <CheckBox IsChecked="{Binding Shuffle}" VerticalAlignment="Center" Margin="6" ToolTip="{r:Loc Shuffle}" AutomationProperties.Name="{r:Loc Shuffle}"><c:AppIcon Kind="Shuffle" /></CheckBox>
+            <ComboBox x:Name="RepeatBox" ItemsSource="{Binding RepeatModes}" SelectedItem="{Binding Repeat}" Width="52" VerticalAlignment="Center" AutomationProperties.Name="{r:Loc Repeat}" Margin="4">
+                <ComboBox.ToolTip><MultiBinding Converter="{StaticResource EnumLabel}"><Binding Path="Repeat" /><Binding Path="Culture" Source="{x:Static r:LocalizedStrings.Instance}" /></MultiBinding></ComboBox.ToolTip>
+                <ComboBox.ItemTemplate><DataTemplate><c:AppIcon>
+                    <c:AppIcon.ToolTip><MultiBinding Converter="{StaticResource EnumLabel}"><Binding /><Binding Path="Culture" Source="{x:Static r:LocalizedStrings.Instance}" /></MultiBinding></c:AppIcon.ToolTip>
+                    <c:AppIcon.Style><Style TargetType="c:AppIcon"><Setter Property="Kind" Value="RepeatOff" /><Style.Triggers><DataTrigger Binding="{Binding}" Value="{x:Static p:RepeatMode.All}"><Setter Property="Kind" Value="RepeatAll" /></DataTrigger><DataTrigger Binding="{Binding}" Value="{x:Static p:RepeatMode.One}"><Setter Property="Kind" Value="RepeatOne" /></DataTrigger></Style.Triggers></Style></c:AppIcon.Style>
+                </c:AppIcon></DataTemplate></ComboBox.ItemTemplate>
+                <ComboBox.ItemContainerStyle><Style TargetType="ComboBoxItem" BasedOn="{StaticResource {x:Type ComboBoxItem}}"><Setter Property="AutomationProperties.Name"><Setter.Value><MultiBinding Converter="{StaticResource EnumLabel}"><Binding /><Binding Path="Culture" Source="{x:Static r:LocalizedStrings.Instance}" /></MultiBinding></Setter.Value></Setter></Style></ComboBox.ItemContainerStyle>
+            </ComboBox>
             <Button Command="{Binding PreviousCommand}" Margin="4" Style="{StaticResource IconButton}" ToolTip="{r:Loc Previous}" AutomationProperties.Name="{r:Loc Previous}"><c:AppIcon Kind="Previous" /></Button>
             <Button Command="{Binding StopCommand}" Margin="4" Style="{StaticResource IconButton}" ToolTip="{r:Loc Stop}" AutomationProperties.Name="{r:Loc Stop}"><c:AppIcon Kind="Stop" /></Button>
             <Button x:Name="PlayPauseButton" Style="{StaticResource AccentButton}" Command="{Binding PlayPauseCommand}" Margin="8,0" Width="48" Height="42" Padding="0" ToolTip="{Binding PlayPauseLabel}" AutomationProperties.Name="{Binding PlayPauseLabel}">
@@ -99,43 +107,43 @@
                 <Button  Click="OnCreatePlaylist" ToolTip="{r:Loc NewPlaylist}" AutomationProperties.Name="{r:Loc NewPlaylist}" Margin="2" Style="{StaticResource IconButton}"><c:AppIcon Kind="Add" /></Button>
                 <Button x:Name="PlaylistActions"  Click="OnPlaylistActions" ToolTip="{r:Loc PlaylistActions}" AutomationProperties.Name="{r:Loc PlaylistActions}" Margin="2" Style="{StaticResource IconButton}"><c:AppIcon Kind="More" />
                     <Button.ContextMenu><ContextMenu>
-                        <MenuItem Header="{r:Loc PlaylistMenu}">
-                        <MenuItem Header="{r:Loc RenamePlaylist}" Click="OnRenamePlaylist" />
-                        <MenuItem Header="{r:Loc DuplicatePlaylist}" Click="OnDuplicatePlaylist" />
-                        <MenuItem Header="{r:Loc RemoveDuplicates}" Click="OnRemoveDuplicates" />
-                        <MenuItem Header="{r:Loc TabLeft}" Click="OnTabLeft" />
-                        <MenuItem Header="{r:Loc TabRight}" Click="OnTabRight" />
-                        <MenuItem Header="{r:Loc DeletePlaylist}" Click="OnDeletePlaylist" />
+                        <MenuItem Header="{r:Loc PlaylistMenu}"><MenuItem.Icon><c:AppIcon Kind="Queue" /></MenuItem.Icon>
+                        <MenuItem Header="{r:Loc RenamePlaylist}" Click="OnRenamePlaylist" ><MenuItem.Icon><c:AppIcon Kind="Edit" /></MenuItem.Icon></MenuItem>
+                        <MenuItem Header="{r:Loc DuplicatePlaylist}" Click="OnDuplicatePlaylist" ><MenuItem.Icon><c:AppIcon Kind="Copy" /></MenuItem.Icon></MenuItem>
+                        <MenuItem Header="{r:Loc RemoveDuplicates}" Click="OnRemoveDuplicates" ><MenuItem.Icon><c:AppIcon Kind="Delete" /></MenuItem.Icon></MenuItem>
+                        <MenuItem Header="{r:Loc TabLeft}" Click="OnTabLeft" ><MenuItem.Icon><c:AppIcon Kind="Previous" /></MenuItem.Icon></MenuItem>
+                        <MenuItem Header="{r:Loc TabRight}" Click="OnTabRight" ><MenuItem.Icon><c:AppIcon Kind="Next" /></MenuItem.Icon></MenuItem>
+                        <MenuItem Header="{r:Loc DeletePlaylist}" Click="OnDeletePlaylist" ><MenuItem.Icon><c:AppIcon Kind="Delete" /></MenuItem.Icon></MenuItem>
                         </MenuItem>
-                        <MenuItem Header="{r:Loc SortPlaylist}"><MenuItem Header="{r:Loc SortTitle}" Tag="Title" Click="OnSort" /><MenuItem Header="{r:Loc SortArtist}" Tag="Artist" Click="OnSort" /><MenuItem Header="{r:Loc SortAlbum}" Tag="Album" Click="OnSort" /><MenuItem Header="{r:Loc SortTrack}" Tag="Track" Click="OnSort" /><MenuItem Header="{r:Loc SortDuration}" Tag="Duration" Click="OnSort" /><MenuItem Header="{r:Loc SortPath}" Tag="Path" Click="OnSort" /><MenuItem Header="{r:Loc SortAdded}" Tag="Date added" Click="OnSort" /></MenuItem>
-                        <MenuItem Header="{r:Loc SelectedTracksMenu}">
+                        <MenuItem Header="{r:Loc SortPlaylist}"><MenuItem.Icon><c:AppIcon Kind="Down" /></MenuItem.Icon><MenuItem Header="{r:Loc SortTitle}" Tag="Title" Click="OnSort" /><MenuItem Header="{r:Loc SortArtist}" Tag="Artist" Click="OnSort" /><MenuItem Header="{r:Loc SortAlbum}" Tag="Album" Click="OnSort" /><MenuItem Header="{r:Loc SortTrack}" Tag="Track" Click="OnSort" /><MenuItem Header="{r:Loc SortDuration}" Tag="Duration" Click="OnSort" /><MenuItem Header="{r:Loc SortPath}" Tag="Path" Click="OnSort" /><MenuItem Header="{r:Loc SortAdded}" Tag="Date added" Click="OnSort" /></MenuItem>
+                        <MenuItem Header="{r:Loc SelectedTracksMenu}"><MenuItem.Icon><c:AppIcon Kind="Play" /></MenuItem.Icon>
                         <MenuItem Header="{r:Loc ExpandCueImage}" Click="OnExpandCueImage" />
-                        <MenuItem Header="{r:Loc PlayNext}" Click="OnPlayNext" />
-                        <MenuItem Header="{r:Loc AddQueue}" Click="OnAddQueue" />
-                        <MenuItem Header="{r:Loc MoveUp}" Click="OnMoveUp" />
-                        <MenuItem Header="{r:Loc MoveDown}" Click="OnMoveDown" />
+                        <MenuItem Header="{r:Loc PlayNext}" Click="OnPlayNext" ><MenuItem.Icon><c:AppIcon Kind="Next" /></MenuItem.Icon></MenuItem>
+                        <MenuItem Header="{r:Loc AddQueue}" Click="OnAddQueue" ><MenuItem.Icon><c:AppIcon Kind="Queue" /></MenuItem.Icon></MenuItem>
+                        <MenuItem Header="{r:Loc MoveUp}" Click="OnMoveUp" ><MenuItem.Icon><c:AppIcon Kind="Up" /></MenuItem.Icon></MenuItem>
+                        <MenuItem Header="{r:Loc MoveDown}" Click="OnMoveDown" ><MenuItem.Icon><c:AppIcon Kind="Down" /></MenuItem.Icon></MenuItem>
                         <Separator />
-                        <MenuItem Header="{r:Loc CopyPath}" Click="OnCopyPath" />
-                        <MenuItem Header="{r:Loc ShowFile}" Click="OnShowFile" />
-                        <MenuItem Header="{r:Loc Properties}" Click="OnProperties" />
+                        <MenuItem Header="{r:Loc CopyPath}" Click="OnCopyPath" ><MenuItem.Icon><c:AppIcon Kind="Copy" /></MenuItem.Icon></MenuItem>
+                        <MenuItem Header="{r:Loc ShowFile}" Click="OnShowFile" ><MenuItem.Icon><c:AppIcon Kind="Folder" /></MenuItem.Icon></MenuItem>
+                        <MenuItem Header="{r:Loc Properties}" Click="OnProperties" ><MenuItem.Icon><c:AppIcon Kind="Help" /></MenuItem.Icon></MenuItem>
                         <MenuItem Header="{r:Loc Relink}" Click="OnRelink" />
                         </MenuItem>
-                        <MenuItem Header="{r:Loc QueueMenu}">
-                            <MenuItem Header="{r:Loc ShowQueue}" Click="OnQueue" />
-                            <MenuItem Header="{r:Loc ClearHistory}" Command="{Binding ClearHistoryCommand}" />
+                        <MenuItem Header="{r:Loc QueueMenu}"><MenuItem.Icon><c:AppIcon Kind="Queue" /></MenuItem.Icon>
+                            <MenuItem Header="{r:Loc ShowQueue}" Click="OnQueue" ><MenuItem.Icon><c:AppIcon Kind="Queue" /></MenuItem.Icon></MenuItem>
+                            <MenuItem Header="{r:Loc ClearHistory}" Command="{Binding ClearHistoryCommand}" ><MenuItem.Icon><c:AppIcon Kind="Delete" /></MenuItem.Icon></MenuItem>
                         </MenuItem>
                         <Separator />
-                        <MenuItem Header="{r:Loc Library}" Click="OnLibrary" />
-                        <MenuItem Header="{r:Loc FilesMenu}">
-                        <MenuItem Header="{r:Loc ExportPlaylist}" Click="OnExportPlaylist" />
+                        <MenuItem Header="{r:Loc Library}" Click="OnLibrary" ><MenuItem.Icon><c:AppIcon Kind="Folder" /></MenuItem.Icon></MenuItem>
+                        <MenuItem Header="{r:Loc FilesMenu}"><MenuItem.Icon><c:AppIcon Kind="Folder" /></MenuItem.Icon>
+                        <MenuItem Header="{r:Loc ExportPlaylist}" Click="OnExportPlaylist" ><MenuItem.Icon><c:AppIcon Kind="Export" /></MenuItem.Icon></MenuItem>
                         <MenuItem Header="{r:Loc LegacyImport}" Click="OnLegacyImport" />
-                        <MenuItem Header="{r:Loc Backup}" Click="OnBackup" />
-                        <MenuItem Header="{r:Loc RestoreBackup}" Click="OnRestoreBackup" />
+                        <MenuItem Header="{r:Loc Backup}" Click="OnBackup" ><MenuItem.Icon><c:AppIcon Kind="Backup" /></MenuItem.Icon></MenuItem>
+                        <MenuItem Header="{r:Loc RestoreBackup}" Click="OnRestoreBackup" ><MenuItem.Icon><c:AppIcon Kind="Restore" /></MenuItem.Icon></MenuItem>
                         </MenuItem>
-                        <MenuItem Header="{r:Loc PreviewDiagnostics}" Click="OnDiagnostics" />
-                        <MenuItem Header="{r:Loc RefreshWaveform}" Command="{Binding RefreshWaveformCommand}" />
+                        <MenuItem Header="{r:Loc PreviewDiagnostics}" Click="OnDiagnostics" ><MenuItem.Icon><c:AppIcon Kind="Help" /></MenuItem.Icon></MenuItem>
+                        <MenuItem Header="{r:Loc RefreshWaveform}" Command="{Binding RefreshWaveformCommand}" ><MenuItem.Icon><c:AppIcon Kind="Refresh" /></MenuItem.Icon></MenuItem>
                         <Separator />
-                        <MenuItem Header="{r:Loc Settings}" Click="OnPreferences" />
+                        <MenuItem Header="{r:Loc Settings}" Click="OnPreferences" ><MenuItem.Icon><c:AppIcon Kind="Settings" /></MenuItem.Icon></MenuItem>
                     </ContextMenu></Button.ContextMenu>
                 </Button>
             </StackPanel>
@@ -176,7 +184,7 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:PlaylistRowViewModel}">
                         <Grid>
-                            <Grid.ColumnDefinitions><ColumnDefinition Width="28" /><ColumnDefinition Width="*" /><ColumnDefinition Width="66" /><ColumnDefinition Width="64" /></Grid.ColumnDefinitions>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="28" /><ColumnDefinition Width="*" /><ColumnDefinition Width="116" /><ColumnDefinition Width="64" /></Grid.ColumnDefinitions>
                             <CheckBox IsChecked="{Binding Enabled}" VerticalAlignment="Center" AutomationProperties.Name="{r:Loc Enabled}" ToolTip="{r:Loc Enabled}" />
                             <StackPanel Grid.Column="1" Margin="0,0,8,0">
                                 <DockPanel>
@@ -187,7 +195,7 @@
                                 </DockPanel>
                                 <TextBlock Text="{Binding Metadata}" Margin="0,4,0,0" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
                             </StackPanel>
-                            <ComboBox Grid.Column="2" ItemsSource="{x:Static vm:PlaylistRowViewModel.RatingOptions}" SelectedItem="{Binding Rating, Mode=TwoWay}" VerticalAlignment="Center" ToolTip="{r:Loc RatingHelp}" AutomationProperties.Name="{r:Loc Rating}" />
+                            <c:RatingStars Grid.Column="2" Rating="{Binding Rating, Mode=TwoWay}" VerticalAlignment="Center" ToolTip="{r:Loc RatingHelp}" AutomationProperties.Name="{r:Loc Rating}" AutomationProperties.HelpText="{r:Loc RatingHelp}" />
                             <StackPanel Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" TextElement.Foreground="{DynamicResource TextSecondaryBrush}" TextElement.FontSize="12"><TextBlock Text="{Binding Duration}" /><TextBlock Text="{Binding Availability}" FontSize="10" Foreground="{DynamicResource ErrorBrush}" /></StackPanel>
                         </Grid>
                     </DataTemplate>
@@ -199,7 +207,7 @@
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                 <StackPanel.Style><Style TargetType="StackPanel"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><MultiDataTrigger><MultiDataTrigger.Conditions><Condition Binding="{Binding HasEntries}" Value="True" /><Condition Binding="{Binding HasVisibleEntries}" Value="False" /></MultiDataTrigger.Conditions><Setter Property="Visibility" Value="Visible" /></MultiDataTrigger></Style.Triggers></Style></StackPanel.Style>
                 <TextBlock Text="{r:Loc EmptySearch}" TextWrapping="Wrap" Margin="8" />
-                <Button Content="{r:Loc ClearSearch}" Command="{Binding ClearSearchCommand}" HorizontalAlignment="Center" />
+                <Button Style="{StaticResource IconButton}" ToolTip="{r:Loc ClearSearch}" AutomationProperties.Name="{r:Loc ClearSearch}" Command="{Binding ClearSearchCommand}" HorizontalAlignment="Center"><c:AppIcon Kind="Close" /></Button>
             </StackPanel>
         </Grid>
         <StackPanel Grid.Row="6" Margin="16,4">
@@ -213,8 +221,8 @@
         </StackPanel>
         <DockPanel Grid.Row="7" Background="{DynamicResource BackgroundBrush}" LastChildFill="True" Margin="8,4,8,8">
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="4">
-                <Button Content="{r:Loc AddFiles}" Padding="8,6" Command="{Binding AddFilesCommand}" Margin="2" />
-                <Button Content="{r:Loc AddFolder}" Command="{Binding AddFolderCommand}" Padding="8,6" Margin="2" />
+                <Button x:Name="AddFilesButton" Style="{StaticResource IconButton}" ToolTip="{r:Loc AddFiles}" AutomationProperties.Name="{r:Loc AddFiles}" Command="{Binding AddFilesCommand}" Margin="2"><c:AppIcon Kind="FileAdd" /></Button>
+                <Button x:Name="AddFolderButton" Style="{StaticResource IconButton}" ToolTip="{r:Loc AddFolder}" AutomationProperties.Name="{r:Loc AddFolder}" Command="{Binding AddFolderCommand}" Margin="2"><c:AppIcon Kind="FolderAdd" /></Button>
                 <Button  Style="{StaticResource IconButton}" ToolTip="{r:Loc Remove}" AutomationProperties.Name="{r:Loc Remove}" Click="OnRemove" Margin="2" ><c:AppIcon Kind="Delete" /></Button>
                 <Button  Style="{StaticResource IconButton}" ToolTip="{r:Loc Help}" AutomationProperties.Name="{r:Loc Help}" Click="OnHelp" Margin="2" ><c:AppIcon Kind="Help" /></Button>
             </StackPanel>

@@ -11,6 +11,7 @@ internal sealed record FileResult(string Path, string Status, string[] Changes, 
 
 internal static class FileRepair
 {
+    internal const string BackupDirectoryName = "MPswift.TagRepair.Backups";
     internal static FileResult Process(string root, string path, bool apply, int cueCodePage, CancellationToken cancellation = default,
         Action<Stream, Stream>? commit = null)
     {
@@ -40,8 +41,19 @@ internal static class FileRepair
         if (changes.Length == 0) return new(path, "unchanged", []);
         if (!apply) return new(path, "preview", changes, AudioSha256: audio?.Sha256);
         cancellation.ThrowIfCancellationRequested();
+        // Pin the selected root and the one flat backup directory through commit.
+        // Open follows links for other storage users; reject them explicitly here.
+        using var rootDirectory = DataDirectoryLease.Open(root);
+        var backupFolder = System.IO.Path.Combine(rootDirectory.DirectoryPath, BackupDirectoryName);
+        Directory.CreateDirectory(backupFolder);
+        using var backups = DataDirectoryLease.Open(backupFolder);
+        if ((File.GetAttributes(backupFolder) & FileAttributes.ReparsePoint) != 0 ||
+            !backups.DirectoryPath.Equals(backupFolder, StringComparison.OrdinalIgnoreCase))
+            throw new IOException("The backup folder must not be a directory link; original retained.");
         var nonce = Guid.NewGuid().ToString("N"); var temporary = physical + ".mpswift-" + nonce + ".tmp";
-        var backup = physical + ".mpswift-" + nonce + ".bak";
+        var name = System.IO.Path.GetFileName(physical);
+        if (name.Length > 120) name = name[..120];
+        var backup = System.IO.Path.Combine(backups.DirectoryPath, name + ".mpswift-" + nonce + ".bak");
         using var prepared = new FileStream(temporary, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
         try
         {
@@ -61,6 +73,15 @@ internal static class FileRepair
             if (OperatingSystem.IsWindows()) CopyAccess(physical, backup);
             source.Position = 0; source.CopyTo(retained); retained.Flush(true); retained.Position = 0;
             if (!SHA256.HashData(retained).AsSpan().SequenceEqual(originalHash)) throw new IOException("Backup verification failed; original retained.");
+            // A private flat sidecar maps duplicate basenames to their source;
+            // retain it with the exact backup even if a later write rolls back.
+            using (var mapping = new FileStream(backup + ".json", FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None))
+            {
+                DataFileLease.Check(mapping.SafeFileHandle);
+                if (OperatingSystem.IsWindows()) PrivateAccess(backup + ".json");
+                System.Text.Json.JsonSerializer.Serialize(mapping, new { SourceRelativePath = relative, OriginalSha256 = Convert.ToHexStringLower(originalHash) });
+                mapping.Flush(true);
+            }
             cancellation.ThrowIfCancellationRequested(); DataFileLease.Check(source.SafeFileHandle);
             try
             {

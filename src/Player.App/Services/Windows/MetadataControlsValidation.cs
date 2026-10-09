@@ -6,6 +6,11 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Threading;
+using System.Windows.Automation.Peers;
+using System.Windows.Automation.Provider;
+using System.Windows.Media;
+using Player.App.Controls;
+using Player.App.Resources;
 using Player.App.Services.Library;
 using Player.App.ViewModels;
 using Player.App.Views;
@@ -59,7 +64,67 @@ internal static class MetadataControlsValidation
             }
         }
         finally { model.Volume = original; }
+
+        static IEnumerable<T> Descendants<T>(DependencyObject parent) where T : DependencyObject
+        {
+            for (var i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T match) yield return match;
+                foreach (var nested in Descendants<T>(child)) yield return nested;
+            }
+        }
+        var list = (ListBox)window.FindName("PlaylistList");
+        var row = model.Entries[0]; var originalRating = row.Rating;
+        list.ScrollIntoView(row); window.UpdateLayout();
+        var container = (ListBoxItem)list.ItemContainerGenerator.ContainerFromItem(row);
+        var stars = Descendants<RatingStars>(container).Single();
+        var count = model.Entries.Count; var playing = model.IsPlaying;
+        try
+        {
+            row.Rating = 0;
+            foreach (var expected in new[] { 4, 0 })
+            {
+                var point = stars.PointToScreen(new Point(3 * 22 + 11, stars.ActualHeight / 2));
+                Check(SetCursorPos((int)Math.Round(point.X), (int)Math.Round(point.Y)), "Rating cursor positioning failed.");
+                await Task.Delay(100); await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ContextIdle);
+                stars.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left) { RoutedEvent = UIElement.MouseLeftButtonDownEvent });
+                await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ContextIdle);
+                Check(stars.Rating == expected && row.Rating == expected, "Rating click/clear did not update the real row binding.");
+                Check(model.Entries.Where(item => item.Entry.Track.Id == row.Entry.Track.Id).All(item => item.Rating == expected), "Star rating did not synchronize duplicate tracks.");
+            }
+            var input = PresentationSource.FromVisual(window)!;
+            foreach (var (key, expected) in new[] { (Key.Right, 1), (Key.End, 5), (Key.Left, 4), (Key.Delete, 0), (Key.Space, 1), (Key.Home, 0) })
+            {
+                var preview = new KeyEventArgs(Keyboard.PrimaryDevice, input, 0, key) { RoutedEvent = Keyboard.PreviewKeyDownEvent };
+                stars.RaiseEvent(preview); Check(!preview.Handled, "Window consumed rating keyboard input.");
+                stars.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, input, 0, key) { RoutedEvent = Keyboard.KeyDownEvent });
+                Check(row.Rating == expected && model.Entries.Count == count && model.IsPlaying == playing, "Rating keyboard input changed playback/removed a row or failed its binding.");
+            }
+            var peer = UIElementAutomationPeer.CreatePeerForElement(stars)!;
+            var range = (IRangeValueProvider)peer.GetPattern(PatternInterface.RangeValue);
+            Check(peer.GetName() == Strings.Rating && range.Minimum == 0 && range.Maximum == 5 && !range.IsReadOnly, "Stars lack a localized editable automation range.");
+            range.SetValue(3); Check(stars.Rating == 3 && row.Rating == 3, "Automation star value broke the binding.");
+            foreach (var value in new[] { -1d, 6d, .5, double.NaN })
+            {
+                try { range.SetValue(value); throw new InvalidOperationException("Invalid automation rating accepted."); }
+                catch (ArgumentOutOfRangeException) { }
+            }
+            var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap((int)stars.ActualWidth, (int)stars.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+            bitmap.Render(stars); var png = new System.Windows.Media.Imaging.PngBitmapEncoder(); png.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bitmap));
+            using var image = File.Create(Path.Combine(output, "rating-stars-" + model.WindowSettings.Language + ".png")); png.Save(image);
+        }
+        finally { row.Rating = originalRating; }
+        foreach (var (name, key, kind) in new[] { ("AddFilesButton", "AddFiles", AppIconKind.FileAdd), ("AddFolderButton", "AddFolder", AppIconKind.FolderAdd) })
+        {
+            var button = (Button)window.FindName(name);
+            Check(button.Content is AppIcon icon && icon.Kind == kind && button.Command is not null && button.ToolTip is not null &&
+                UIElementAutomationPeer.CreatePeerForElement(button)!.GetName() == Strings.Get(key), "Import icon action lost its command or localized label.");
+        }
+        Check(Descendants<AppIcon>(window).All(icon => icon.Width == 18 && icon.Height == 18), "Action icons do not share the 18-DIP canvas.");
         return new { Status = "metadata-controls-passed", BelarusianTagLibRecovery = true, OwnedSourceUnchanged = true,
-            VolumeClickBothDirections = true, VolumeBinding = true, VolumeRestored = model.Volume == original };
+            VolumeClickBothDirections = true, VolumeBinding = true, VolumeRestored = model.Volume == original,
+            RatingMouseAndClear = true, RatingKeyboardIsolation = true, RatingAccessibleRange = true,
+            RatingDuplicateBinding = true, RatingRestored = row.Rating == originalRating, LocalizedImportIcons = true, ConsistentActionIconCanvas = true };
     }
 }

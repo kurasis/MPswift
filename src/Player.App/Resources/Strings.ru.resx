@@ -330,7 +330,7 @@
         <value>Оценка</value>
     </data>
     <data xml:space="preserve" name="RatingHelp">
-        <value>Оценка (0 = без оценки)</value>
+        <value>Нажмите звезду для оценки, повторно — чтобы снять. Стрелки меняют оценку; Home/Delete снимает её.</value>
     </data>
     <data xml:space="preserve" name="Exported">
         <value>Плейлист экспортирован; исходные аудиофайлы не изменены.</value>

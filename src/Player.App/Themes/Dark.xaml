@@ -99,9 +99,10 @@
         <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="MenuItem">
             <Grid>
                 <Border x:Name="MenuSurface" Background="{TemplateBinding Background}" CornerRadius="5" BorderThickness="1" BorderBrush="Transparent" Padding="{TemplateBinding Padding}">
-                    <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="20" /></Grid.ColumnDefinitions>
-                        <ContentPresenter ContentSource="Header" VerticalAlignment="Center" RecognizesAccessKey="True" />
-                        <Path x:Name="SubmenuArrow" Grid.Column="1" Data="M0,0 L4,4 0,8" Stroke="{TemplateBinding Foreground}" StrokeThickness="1.4" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="Collapsed" />
+                    <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="26" /><ColumnDefinition Width="*" /><ColumnDefinition Width="20" /></Grid.ColumnDefinitions>
+                        <ContentPresenter ContentSource="Icon" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                        <ContentPresenter Grid.Column="1" ContentSource="Header" VerticalAlignment="Center" RecognizesAccessKey="True" />
+                        <Path x:Name="SubmenuArrow" Grid.Column="2" Data="M0,0 L4,4 0,8" Stroke="{TemplateBinding Foreground}" StrokeThickness="1.4" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="Collapsed" />
                     </Grid>
                 </Border>
                 <Popup x:Name="PART_Popup" Placement="Right" HorizontalOffset="2" IsOpen="{TemplateBinding IsSubmenuOpen}" Focusable="False" AllowsTransparency="True">
