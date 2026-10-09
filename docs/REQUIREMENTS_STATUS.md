@@ -1,5 +1,9 @@
 # Requirement and acceptance status
 
+## Owner collection preview follow-up (2026-10-09)
+
+Implemented remaining six legacy-word variants in 16 fields/15 files using strictly reversible contextual recovery. Short i/I words, album-folder evidence and filename-confirmed prepositions alongside Latin artists are covered, including previous partial writes and albums stored in general collection folders. All 304 changed metadata values in the submitted log pass replay/idempotence; unseen tags and source audio cannot be classified from that preview. Existing CLI arguments, identifiers, Core/player behavior and dependency pins remain; original backup and encoded-audio verification gates are retained. Twelve ambiguity controls and unchanged CUE references/timings pass locally. Normal source-specific Windows build, all 82 CLI tests and extracted-EXE 28-case write/backup/audio/idempotence proof are mandatory before the new ZIP. Inherently ambiguous and irreversible metadata remain outside automatic recovery.
+
 ## Owner-provided preview and mixed i titles (2026-10-09)
 
 The 1.0.113-dev.1 owner log confirms the previous batch crash is gone: 17 proposed repairs, zero errors, no apply. Implemented narrow physical-tag recovery for the remaining three mixed ASCII-i title examples, corroborated by the existing filename and strictly reversible bytes; literal i/I and filenames remain unchanged. No public CLI flags, normal player behavior or dependency versions change. Local Release/Core/CLI checks pass; genuine Windows writes, audio/backup checks and packaged EXE gate are mandatory before a new source-specific ZIP. Ambiguous words without basename evidence and irreversibly lost bytes remain outside automatic recovery.

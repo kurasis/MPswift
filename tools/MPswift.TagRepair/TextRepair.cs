@@ -14,7 +14,7 @@ internal static class TextRepair
         return new[] { 28591, 1252, 1251 }.Select(code => Encoding.GetEncoding(code, EncoderFallback.ExceptionFallback, DecoderFallback.ExceptionFallback)).ToArray();
     }
 
-    internal static string? Recover(string? value, string context)
+    internal static string? Recover(string? value, string context, bool album = false)
     {
         if (string.IsNullOrEmpty(value)) return value;
         var current = value;
@@ -50,36 +50,66 @@ internal static class TextRepair
                     if (encoding.GetString(Legacy[2].GetBytes(candidate)) == current) return candidate;
                 }
                 catch (ArgumentException) { }
-        return RecoverFilenameConfirmedAsciiI(recovered, context);
+        return RecoverContextualLegacyWords(current, recovered, context, album);
     }
 
-    private static string RecoverFilenameConfirmedAsciiI(string text, string context)
+    private static string RecoverContextualLegacyWords(string original, string text, string context, bool album)
     {
-        // Legacy Belarusian titles sometimes use ASCII i. Require an exact intact
-        // filename word as evidence, rather than guessing mixed-language spelling.
-        const string words = @"[\p{L}\p{N}]+";
+        // Keep filename and album-folder evidence scoped to the relevant tag.
         const RegexOptions options = RegexOptions.CultureInvariant | RegexOptions.NonBacktracking;
-        var filenameWords = Regex.Matches(Path.GetFileNameWithoutExtension(context.Replace('\\', '/')), words, options)
+        // Normalize separators for lexical evidence only; never use this to open a file.
+        var path = Regex.Replace(context, @"[\\/]+", "/", options);
+        var evidence = Path.GetFileNameWithoutExtension(path);
+        if (album) evidence += " " + Path.GetFileName(Path.GetDirectoryName(path));
+        var contextWords = Regex.Matches(evidence, @"[\p{L}\p{N}]+", options)
             .Select(match => match.Value).ToHashSet(StringComparer.OrdinalIgnoreCase);
         // Windows-1251 Ч becomes the non-letter multiplication sign in Latin-1.
-        return Regex.Replace(text, @"(?:[^\x00-\x7F]|[A-Za-z0-9])+", match =>
+        const string words = @"(?:[^\x00-\x7F]|[A-Za-z0-9])+";
+        foreach (var encoding in Legacy.Take(2))
         {
-            var word = match.Value;
-            if (word.Any(IsCyrillic) || !word.Any(c => c is 'i' or 'I')) return word;
-            foreach (var encoding in Legacy.Take(2))
-                try
-                {
-                    var bytes = encoding.GetBytes(word);
-                    var candidate = Legacy[2].GetString(bytes);
-                    if (candidate.Count(IsCyrillic) < 4 ||
-                        candidate.Any(c => char.IsLetter(c) && !IsCyrillic(c) && c is not 'i' and not 'I') ||
-                        candidate.Any(char.IsControl) || !filenameWords.Contains(candidate) ||
-                        encoding.GetString(bytes) != word || !Legacy[2].GetBytes(candidate).AsSpan().SequenceEqual(bytes)) continue;
-                    return candidate;
-                }
-                catch (ArgumentException) { }
-            return word;
-        }, options);
+            // Combine distinct longer Cyrillic field and scoped path words. This
+            // also supports Unicode tags previously repaired only partly.
+            var confirmed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var word in contextWords)
+                if (word.Count(IsCyrillic) >= 4 && !word.Any(c => char.IsLetter(c) && !IsCyrillic(c))) confirmed.Add(word);
+            foreach (Match match in Regex.Matches(original, words, options))
+            {
+                var word = match.Value;
+                var candidate = word.Any(IsCyrillic) ? word : DecodeLegacyWord(word, encoding);
+                if (candidate is not null && candidate.Count(IsCyrillic) >= 4 &&
+                    !candidate.Any(c => char.IsLetter(c) && !IsCyrillic(c))) confirmed.Add(candidate);
+            }
+            text = Regex.Replace(text, words, match =>
+            {
+                var word = match.Value;
+                if (word.Any(IsCyrillic)) return word;
+                var candidate = DecodeLegacyWord(word, encoding);
+                if (candidate is null) return word;
+                var cyrillic = candidate.Count(IsCyrillic);
+                var exactWord = contextWords.Contains(candidate);
+                if (word.Any(c => c is 'i' or 'I') && cyrillic >= 2 &&
+                    !candidate.Any(c => char.IsLetter(c) && !IsCyrillic(c) && c is not 'i' and not 'I') &&
+                    (exactWord || cyrillic >= 3 && confirmed.Count >= 2)) return candidate;
+                // Recover one-letter prepositions beside a Latin artist only with
+                // both filename evidence and a corroborating Cyrillic field word.
+                if (confirmed.Count > 0 && exactWord && candidate is "з" or "ў" or "і" or "у") return candidate;
+                return word;
+            }, options);
+        }
+        return text;
+    }
+
+    private static string? DecodeLegacyWord(string word, Encoding encoding)
+    {
+        try
+        {
+            var bytes = encoding.GetBytes(word);
+            var candidate = Legacy[2].GetString(bytes);
+            if (!candidate.Any(char.IsControl) && encoding.GetString(bytes) == word &&
+                Legacy[2].GetBytes(candidate).AsSpan().SequenceEqual(bytes)) return candidate;
+        }
+        catch (ArgumentException) { }
+        return null;
     }
 
     internal static byte[] Cue(byte[] bytes, string context, int fallbackCodePage)

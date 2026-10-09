@@ -100,8 +100,8 @@ internal static class TagEditor
     private static Dictionary<string, string> Recovered(TagLib.Tag tag, string context) => Fields.ToDictionary(field => field.Name, field =>
         JsonSerializer.Serialize(Value(field, tag) switch
         {
-            string text => (object?)TextRepair.Recover(text, context),
-            string[] texts => texts.Select(text => TextRepair.Recover(text, context)).ToArray(),
+            string text => (object?)TextRepair.Recover(text, context, field.Name is "Album" or "AlbumSort"),
+            string[] texts => texts.Select(text => TextRepair.Recover(text, context, field.Name is "Album" or "AlbumSort")).ToArray(),
             _ => null
         }, JsonOptions));
 

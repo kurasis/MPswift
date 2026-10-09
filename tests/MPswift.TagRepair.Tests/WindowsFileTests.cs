@@ -60,6 +60,34 @@ public sealed class WindowsFileTests : IDisposable
         Assert.Equal(6, Directory.GetFiles(root, "*.bak").Length); Assert.Empty(Directory.GetFiles(root, "*.tmp"));
     }
 
+    [WindowsFact] public void CollectionExamplesPhysicallyApplyWithExactBackupsAndIdempotence()
+    {
+        foreach (var data in CollectionRepairTests.OwnerExamples)
+            foreach (var fixture in new[] { "mp3-cbr.mp3", "flac16.flac" })
+                foreach (var partial in new[] { false, true })
+                {
+                    var field = (string)data[0]; var expected = (string)data[1]; var relative = (string)data[3];
+                    var extension = Path.GetExtension(fixture);
+                    var path = Path.Combine(root, partial ? "partial" : "original", Path.ChangeExtension(relative, extension));
+                    Directory.CreateDirectory(Path.GetDirectoryName(path)!); File.Copy(RepairTests.Fixture(fixture), path);
+                    using (var file = TagLib.File.Create(path))
+                    {
+                        var broken = partial ? (string)data[2] : Encoding.Latin1.GetString(Encoding.GetEncoding(1251).GetBytes(expected));
+                        if (field == "Album") file.Tag.Album = broken; else file.Tag.Title = broken;
+                        file.Save();
+                    }
+                    var original = File.ReadAllBytes(path); AudioFingerprint fingerprint;
+                    using (var source = File.OpenRead(path)) fingerprint = AudioFingerprint.Read(source, extension);
+                    var result = FileRepair.Process(root, path, true, 1251);
+                    Assert.Equal("repaired", result.Status); Assert.Equal(original, File.ReadAllBytes(result.Backup!));
+                    using (var source = File.OpenRead(path)) Assert.Equal(fingerprint, AudioFingerprint.Read(source, extension));
+                    using (var file = TagLib.File.Create(path)) Assert.Equal(expected, field == "Album" ? file.Tag.Album : file.Tag.Title);
+                    Assert.Equal("unchanged", FileRepair.Process(root, path, true, 1251).Status);
+                }
+        Assert.Equal(28, Directory.GetFiles(root, "*.bak", SearchOption.AllDirectories).Length);
+        Assert.Empty(Directory.GetFiles(root, "*.tmp", SearchOption.AllDirectories));
+    }
+
     [WindowsFact] public void PartialCommitFailureRestoresOriginalAndKeepsVerifiedBackup()
     {
         var path = Cue(); var original = File.ReadAllBytes(path);
