@@ -37,8 +37,8 @@ $cliSmoke = Get-Content (Join-Path $Directory 'tagrepair-smoke.json') -Raw | Con
 if ($cli.Status -ne 'tagrepair-packaged' -or $cli.SourceTreeDirty -or $cli.SourceCommit -ne $audit.SourceCommit -or $cli.ProductVersion -ne $audit.ProductVersion -or
     $cli.Zip -ne "MPswift.TagRepair-$($audit.ProductVersion)-$($audit.SourceCommit.Substring(0,12))-win-x64.zip" -or -not $cli.RuntimeIncluded -or -not $cli.SourceAudioNotIncluded -or
     $cliSmoke.Status -ne 'tagrepair-packaged-cli-passed' -or $cliSmoke.SourceCommit -ne $audit.SourceCommit -or $cliSmoke.ProductVersion -ne $audit.ProductVersion -or $cliSmoke.ZipSha256 -ne $cli.ZipSha256 -or
-    [int]$cliSmoke.WindowsTests -lt 50 -or $cliSmoke.WindowsTestsFailed -ne 0 -or $cliSmoke.WindowsTestsSkipped -ne 0) { throw 'CLI source/version/runtime/Windows evidence mismatch.' }
-foreach ($gate in @('RealExe','RuntimeIncluded','PreviewNoWrites','PhysicalMp3FlacCue','ExactOriginalBackups','IndependentAudioHashes','SourceFixturesUnchanged','PrivateFilesUnchanged','Idempotent','PaddedMp3PrefixAndAudio','InvalidFileContinuation')) {
+    [int]$cliSmoke.WindowsTests -lt 60 -or $cliSmoke.WindowsTestsFailed -ne 0 -or $cliSmoke.WindowsTestsSkipped -ne 0) { throw 'CLI source/version/runtime/Windows evidence mismatch.' }
+foreach ($gate in @('RealExe','RuntimeIncluded','PreviewNoWrites','PhysicalMp3FlacCue','ExactOriginalBackups','IndependentAudioHashes','SourceFixturesUnchanged','PrivateFilesUnchanged','Idempotent','PaddedMp3PrefixAndAudio','InvalidFileContinuation','FilenameConfirmedAsciiI')) {
     if ($cliSmoke.$gate -ne $true) { throw "CLI verification gate failed: $gate" }
 }
 $cliZip = Join-Path $Directory $cli.Zip

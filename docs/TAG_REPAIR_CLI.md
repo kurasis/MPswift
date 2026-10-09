@@ -24,6 +24,8 @@ The selected folder is scanned recursively. Add `--top-only` to inspect only tha
 
 Recovery supports losslessly reversible Windows-1251 interpreted as Latin-1/Windows-1252 and common UTF-8 mojibake, including UTF-8 interpreted as Windows-1251. Longer recovered words confirm short Belarusian prepositions. Ordinary Latin names, intact Unicode and opaque identifiers are preserved. No heuristic can identify every ambiguous word or reconstruct bytes already replaced by `?`/U+FFFD; review the preview on mixed-language albums. Malformed/replacement-containing CUEs and oversized metadata are refused. Custom opaque/binary tag data is not interpreted as text.
 
+For legacy words containing ASCII `i`/`I`, recovery requires at least four Cyrillic letters, no other Latin letters and an exact matching intact word in that file's basename (case insensitive). Directory names alone do not authorize this recovery. The ASCII letter remains unchanged: encoding repair does not rewrite spelling or replace `i` with Belarusian `і`. Ambiguous words without filename evidence remain for manual review.
+
 ## Original files and audio
 
 For every changed file, the original is retained beside it as `filename.mpswift-<unique-id>.bak`. Each backup is flushed and its complete SHA-256 verified before the original is written. Temporary copies are accessible only to the current user; backups receive a protected copy of the original Windows access rules before source bytes are copied. Encrypted sources are not modified. Keep backups until you have checked the result in your preferred player; to restore, close players/editors and copy the corresponding `.bak` over its original filename.

@@ -78,17 +78,18 @@ try {
         [IO.File]::WriteAllBytes($path, $padded)
     }
     $originals = @{}; $audioHashes = @{}; $fixtureHashes = @{}
+    $titles = @{ mp3 = 'Чарнобыльскi фон'; flac = 'Гомельскi вальс' }
     foreach ($format in @('mp3','flac')) {
         $fixture = Join-Path $root "tests/fixtures/audio/$(if ($format -eq 'mp3') { 'mp3-cbr.mp3' } else { 'flac16.flac' })"
         $fixtureHashes[$fixture] = (Get-FileHash $fixture -Algorithm SHA256).Hash
-        $path = Join-Path $album "Owned Беларускае.$format"; Copy-Item $fixture $path
+        $path = Join-Path $album "$($titles[$format]).$format"; Copy-Item $fixture $path
         $file = [TagLib.File]::Create($path)
-        try { $file.Tag.Title = [Text.Encoding]::Latin1.GetString($encoding.GetBytes('Людзі і сонца')); $file.Tag.Performers = @([Text.Encoding]::Latin1.GetString($encoding.GetBytes('Індыга'))); $file.Save() } finally { $file.Dispose() }
+        try { $file.Tag.Title = [Text.Encoding]::Latin1.GetString($encoding.GetBytes($titles[$format])); $file.Tag.Performers = @([Text.Encoding]::Latin1.GetString($encoding.GetBytes('Індыга'))); $file.Save() } finally { $file.Dispose() }
         if ($format -eq 'mp3') { AddOwnedMpegPrefix $path 257 }
         $originals[$path] = (Get-FileHash $path -Algorithm SHA256).Hash; $audioHashes[$path] = AudioHash $path
     }
     $cue = Join-Path $album 'Owned.cue'
-    [IO.File]::WriteAllBytes($cue, $encoding.GetBytes("TITLE `"Людзі`"`r`nFILE `"Owned Беларускае.flac`" WAVE`r`nTRACK 01 AUDIO`r`nINDEX 01 00:00:00`r`n"))
+    [IO.File]::WriteAllBytes($cue, $encoding.GetBytes("TITLE `"Людзі`"`r`nFILE `"Гомельскi вальс.flac`" WAVE`r`nTRACK 01 AUDIO`r`nINDEX 01 00:00:00`r`n"))
     $originals[$cue] = (Get-FileHash $cue -Algorithm SHA256).Hash
     $private = Join-Path $album 'private.txt'; [IO.File]::WriteAllText($private, 'unknown data retained')
     $log = Join-Path $root 'artifacts/smoke/tagrepair-cli.log'
@@ -106,11 +107,11 @@ try {
         if ($audioHashes.ContainsKey($path)) {
             if ((AudioHash $path) -ne $audioHashes[$path]) { throw 'Independent MPEG/FLAC audio-range hash changed.' }
             $file = [TagLib.File]::Create($path)
-            try { if ($file.Tag.Title -ne 'Людзі і сонца' -or ($file.Tag.Performers -join ',') -ne 'Індыга') { throw 'Physical saved tags are still garbled.' } } finally { $file.Dispose() }
+            try { if ($file.Tag.Title -ne $titles[[IO.Path]::GetExtension($path).TrimStart('.')] -or ($file.Tag.Performers -join ',') -ne 'Індыга') { throw 'Physical saved tags are still garbled.' } } finally { $file.Dispose() }
         }
     }
     $text = [Text.UTF8Encoding]::new($false,$true).GetString([IO.File]::ReadAllBytes($cue))
-    if (-not $text.Contains('TITLE "Людзі"') -or -not $text.Contains('FILE "Owned Беларускае.flac" WAVE') -or -not $text.Contains('INDEX 01 00:00:00')) { throw 'Physical CUE UTF-8 or references/timings failed.' }
+    if (-not $text.Contains('TITLE "Людзі"') -or -not $text.Contains('FILE "Гомельскi вальс.flac" WAVE') -or -not $text.Contains('INDEX 01 00:00:00')) { throw 'Physical CUE UTF-8 or references/timings failed.' }
     $again = @(& $exe $album --apply)
     $again | Add-Content $log -Encoding utf8
     if ($LASTEXITCODE -ne 0 -or -not ($again -match 'repaired=0; unchanged=3;')) { throw 'Physical repairs are not idempotent.' }
@@ -136,10 +137,10 @@ try {
     $trx = Get-ChildItem (Join-Path $root 'artifacts/tagrepair-test-results') -Filter '*.trx' | Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
     [xml]$tests = Get-Content $trx.FullName -Raw
     $counters = $tests.SelectSingleNode("//*[local-name()='Counters']")
-    if ([int]$counters.total -lt 50 -or $counters.passed -ne $counters.total -or [int]$counters.failed -ne 0 -or [int]$counters.notExecuted -ne 0) { throw 'CLI Windows tests must all execute and pass.' }
+    if ([int]$counters.total -lt 60 -or $counters.passed -ne $counters.total -or [int]$counters.failed -ne 0 -or [int]$counters.notExecuted -ne 0) { throw 'CLI Windows tests must all execute and pass.' }
     [ordered]@{ Status = 'tagrepair-packaged-cli-passed'; SourceCommit = $audit.SourceCommit; ProductVersion = $audit.ProductVersion; ZipSha256 = $audit.ZipSha256;
         RealExe = $true; RuntimeIncluded = $true; PreviewNoWrites = $true; PhysicalMp3FlacCue = $true; ExactOriginalBackups = $true; IndependentAudioHashes = $true;
-        SourceFixturesUnchanged = $true; PrivateFilesUnchanged = $true; Idempotent = $true; PaddedMp3PrefixAndAudio = $true; InvalidFileContinuation = $true;
+        SourceFixturesUnchanged = $true; PrivateFilesUnchanged = $true; Idempotent = $true; PaddedMp3PrefixAndAudio = $true; InvalidFileContinuation = $true; FilenameConfirmedAsciiI = $true;
         WindowsTests = [int]$counters.total; WindowsTestsFailed = 0; WindowsTestsSkipped = 0 } |
         ConvertTo-Json | Set-Content (Join-Path $output 'tagrepair-smoke.json') -Encoding utf8
 } finally { $env:DOTNET_ROOT = $previousRuntime }

@@ -35,6 +35,51 @@ public sealed class RepairTests
     { Assert.Equal(text, TextRepair.Recover(Broken(text, from, to), @"C:\Беларускае\album.mp3")); }
 
     [Theory]
+    [InlineData("×àðíîáûëüñêi ôîí", "Чарнобыльскi фон")]
+    [InlineData("Ãîìåëüñêi âàëüñ", "Гомельскi вальс")]
+    [InlineData("×àðíîáûëüñêi øëÿõ", "Чарнобыльскi шлях")]
+    public void RepairsOwnerTitlesWithFilenameConfirmedAsciiI(string broken, string expected)
+    {
+        var context = @"C:\Беларускае\" + expected + ".mp3";
+        Assert.Equal(expected, TextRepair.Recover(broken, context));
+        Assert.Equal(expected, TextRepair.Recover(expected, context));
+    }
+
+    [Theory]
+    [InlineData("×àðíîáûëüñêi", @"C:\Чарнобыльскi\album.mp3")]
+    [InlineData("×àðíîáûëüñêi", @"C:\Беларускае\іншы.mp3")]
+    [InlineData("Björki", @"C:\Беларускае\Björki.mp3")]
+    [InlineData("Caféi", @"C:\Беларускае\Caféi.mp3")]
+    [InlineData("Чарнобыльскi фон", @"C:\Беларускае\Чарнобыльскi фон.mp3")]
+    public void PreservesAmbiguousOrIntactWordsWithAsciiI(string text, string context)
+    { Assert.Equal(text, TextRepair.Recover(text, context)); }
+
+    [Fact] public void OwnerTitleRewritePreservesRealMp3AndFlacAudio()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "cli-owner-titles-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(root);
+        try
+        {
+            foreach (var title in new[] { "Чарнобыльскi фон", "Гомельскi вальс", "Чарнобыльскi шлях" })
+                foreach (var fixture in new[] { "mp3-cbr.mp3", "flac16.flac" })
+                {
+                    var extension = Path.GetExtension(fixture); var path = Path.Combine(root, title + extension);
+                    File.Copy(Fixture(fixture), path);
+                    using (var file = TagLib.File.Create(path)) { file.Tag.Title = Broken(title); file.Save(); }
+                    var original = File.ReadAllBytes(path);
+                    using var stream = new MemoryStream(); stream.Write(original);
+                    var fingerprint = AudioFingerprint.Read(stream, extension); var edit = TagEditor.Read(stream, path);
+                    Assert.Equal(title, System.Text.Json.JsonSerializer.Deserialize<string>(edit.After["Title"]));
+                    TagEditor.Rewrite(stream, path, edit);
+                    Assert.Equal(fingerprint, AudioFingerprint.Read(stream, extension));
+                    var saved = TagEditor.Read(stream, path);
+                    Assert.Equal(title, System.Text.Json.JsonSerializer.Deserialize<string>(saved.Before["Title"]));
+                    Assert.Empty(saved.Changes); Assert.Equal(original, File.ReadAllBytes(path));
+                }
+        }
+        finally { Directory.Delete(root, true); }
+    }
+
+    [Theory]
     [InlineData("Людзі / Цэпэліны / 🎵")]
     [InlineData("Björk / Café / München / Straße / Déjà vu")]
     [InlineData("À bientôt / www / :B:N:")]

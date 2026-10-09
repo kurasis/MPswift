@@ -50,7 +50,36 @@ internal static class TextRepair
                     if (encoding.GetString(Legacy[2].GetBytes(candidate)) == current) return candidate;
                 }
                 catch (ArgumentException) { }
-        return recovered;
+        return RecoverFilenameConfirmedAsciiI(recovered, context);
+    }
+
+    private static string RecoverFilenameConfirmedAsciiI(string text, string context)
+    {
+        // Legacy Belarusian titles sometimes use ASCII i. Require an exact intact
+        // filename word as evidence, rather than guessing mixed-language spelling.
+        const string words = @"[\p{L}\p{N}]+";
+        const RegexOptions options = RegexOptions.CultureInvariant | RegexOptions.NonBacktracking;
+        var filenameWords = Regex.Matches(Path.GetFileNameWithoutExtension(context.Replace('\\', '/')), words, options)
+            .Select(match => match.Value).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        // Windows-1251 Ч becomes the non-letter multiplication sign in Latin-1.
+        return Regex.Replace(text, @"(?:[^\x00-\x7F]|[A-Za-z0-9])+", match =>
+        {
+            var word = match.Value;
+            if (word.Any(IsCyrillic) || !word.Any(c => c is 'i' or 'I')) return word;
+            foreach (var encoding in Legacy.Take(2))
+                try
+                {
+                    var bytes = encoding.GetBytes(word);
+                    var candidate = Legacy[2].GetString(bytes);
+                    if (candidate.Count(IsCyrillic) < 4 ||
+                        candidate.Any(c => char.IsLetter(c) && !IsCyrillic(c) && c is not 'i' and not 'I') ||
+                        candidate.Any(char.IsControl) || !filenameWords.Contains(candidate) ||
+                        encoding.GetString(bytes) != word || !Legacy[2].GetBytes(candidate).AsSpan().SequenceEqual(bytes)) continue;
+                    return candidate;
+                }
+                catch (ArgumentException) { }
+            return word;
+        }, options);
     }
 
     internal static byte[] Cue(byte[] bytes, string context, int fallbackCodePage)

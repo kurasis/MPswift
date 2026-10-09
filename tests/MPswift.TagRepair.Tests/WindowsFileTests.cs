@@ -41,6 +41,25 @@ public sealed class WindowsFileTests : IDisposable
         using var read = TagLib.File.Create(path); Assert.Equal("Людзі і сонца", read.Tag.Title); Assert.Equal(2004u, read.Tag.Year); Assert.Equal(8u, read.Tag.Track);
     }
 
+    [WindowsFact] public void FilenameConfirmedAsciiITitlesApplyWithExactBackupsAndIdempotence()
+    {
+        foreach (var title in new[] { "Чарнобыльскi фон", "Гомельскi вальс", "Чарнобыльскi шлях" })
+            foreach (var fixture in new[] { "mp3-cbr.mp3", "flac16.flac" })
+            {
+                var extension = Path.GetExtension(fixture); var path = Path.Combine(root, title + extension);
+                File.Copy(RepairTests.Fixture(fixture), path);
+                using (var file = TagLib.File.Create(path)) { file.Tag.Title = Encoding.Latin1.GetString(Encoding.GetEncoding(1251).GetBytes(title)); file.Save(); }
+                var original = File.ReadAllBytes(path); AudioFingerprint fingerprint;
+                using (var stream = File.OpenRead(path)) fingerprint = AudioFingerprint.Read(stream, extension);
+                var result = FileRepair.Process(root, path, true, 1251);
+                Assert.Equal("repaired", result.Status); Assert.Equal(original, File.ReadAllBytes(result.Backup!));
+                using (var stream = File.OpenRead(path)) Assert.Equal(fingerprint, AudioFingerprint.Read(stream, extension));
+                using (var file = TagLib.File.Create(path)) Assert.Equal(title, file.Tag.Title);
+                Assert.Equal("unchanged", FileRepair.Process(root, path, true, 1251).Status);
+            }
+        Assert.Equal(6, Directory.GetFiles(root, "*.bak").Length); Assert.Empty(Directory.GetFiles(root, "*.tmp"));
+    }
+
     [WindowsFact] public void PartialCommitFailureRestoresOriginalAndKeepsVerifiedBackup()
     {
         var path = Cue(); var original = File.ReadAllBytes(path);

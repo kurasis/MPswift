@@ -1,5 +1,9 @@
 # Requirement and acceptance status
 
+## Owner-provided preview and mixed i titles (2026-10-09)
+
+The 1.0.113-dev.1 owner log confirms the previous batch crash is gone: 17 proposed repairs, zero errors, no apply. Implemented narrow physical-tag recovery for the remaining three mixed ASCII-i title examples, corroborated by the existing filename and strictly reversible bytes; literal i/I and filenames remain unchanged. No public CLI flags, normal player behavior or dependency versions change. Local Release/Core/CLI checks pass; genuine Windows writes, audio/backup checks and packaged EXE gate are mandatory before a new source-specific ZIP. Ambiguous words without basename evidence and irreversibly lost bytes remain outside automatic recovery.
+
 ## Owner-reported CLI failure (2026-10-09)
 
 Fixed the missing InvalidDataException filter that aborted 1.0.112-dev.1. Malformed/unsupported files now report their paths and continue with exit 1. Legacy MPEG prefixes are recognized within a bounded three-frame search, with all prefix/audio bytes still protected by fingerprints and original backups. The exact owner file cannot be classified from its stack trace alone. Real-fixture and fresh-process regression checks plus required Windows/published-EXE controls cover the changes; normal player behavior and CLI options are retained.
