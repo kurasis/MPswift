@@ -9,12 +9,18 @@ public static class MetadataReadGuard
     public const long MaximumMetadataBytes = 32L * 1024 * 1024;
     public static void Validate(string path)
     {
-        try { ValidateCore(path); }
-        catch (OverflowException error) { throw new InvalidDataException("Metadata size cannot be represented safely.", error); }
-    }
-    private static void ValidateCore(string path)
-    {
         using var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+        Validate(file, path);
+    }
+    public static void Validate(Stream file, string path)
+    {
+        var originalPosition = file.Position;
+        try { ValidateCore(file, path); }
+        catch (OverflowException error) { throw new InvalidDataException("Metadata size cannot be represented safely.", error); }
+        finally { file.Position = originalPosition; }
+    }
+    private static void ValidateCore(Stream file, string path)
+    {
         Span<byte> header = stackalloc byte[32];
         header.Clear();
         if (file.Length < 4) return;
@@ -114,7 +120,7 @@ public static class MetadataReadGuard
         }
     }
     private static void Limit(long size, long available) => Require(size >= 0 && size <= MaximumMetadataBytes && size <= available, "Metadata exceeds its safe byte limit or file bounds.");
-    private static void Read(FileStream file, long position, Span<byte> buffer)
+    private static void Read(Stream file, long position, Span<byte> buffer)
     { Require(position >= 0 && position <= file.Length - buffer.Length, "Truncated metadata header."); file.Position = position; file.ReadExactly(buffer); }
     private static void Require(bool condition, string message) { if (!condition) throw new InvalidDataException(message); }
 }

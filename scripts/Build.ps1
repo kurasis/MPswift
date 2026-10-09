@@ -12,4 +12,6 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Build failed.' }
     & dotnet test tests/Player.Core.Tests/Player.Core.Tests.csproj -c Release --no-build --logger trx --results-directory artifacts/test-results
     if ($LASTEXITCODE -ne 0) { throw 'Core tests failed.' }
+    & dotnet test tests/MPswift.TagRepair.Tests/MPswift.TagRepair.Tests.csproj -c Release --no-build --logger trx --results-directory artifacts/tagrepair-test-results
+    if ($LASTEXITCODE -ne 0) { throw 'Tag repair CLI tests failed.' }
 } finally { Pop-Location }

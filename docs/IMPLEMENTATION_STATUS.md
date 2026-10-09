@@ -1,5 +1,10 @@
 # Implementation checkpoint
 
+## Standalone physical tag repair CLI (2026-10-09)
+
+The owner explicitly requests a separate cmd utility for physical encoding repair. MPswift.TagRepair provides recursive read-only preview and explicit Windows --apply for MP3 ID3v2.4/UTF-8, FLAC standard tags and UTF-8 CUE. Verified retained originals, held Windows source/directory objects, private temporary data, original backup access rules, encoded-audio/FLAC STREAMINFO fingerprints, metadata/artwork checks and write-failure rollback preserve source audio and unrelated files. No BASS dependency, shell/network calls or administrator request. Separate self-contained ZIP/checksum and source-specific packaged EXE evidence are added to publication. Baseline: 321 Core tests. Local changed-source locked build: 321 Core passed; CLI 28 passed and 8 genuine Windows tests explicitly unrun/skipped on Linux. Final Windows/package/installer evidence awaits CI. See TAG_REPAIR_CLI.md for ambiguity, device compatibility, recovery and power-loss limits.
+
+
 ## Belarusian metadata and playlist controls (2026-10-09)
 
 Read-only word-level Windows-1251 recovery now covers Latin-1/Windows-1252 mojibake from TagLib and saved playlist/index records. Correct Unicode, mixed Latin words, identities, paths, CUE bounds and audio bytes remain intact; ambiguous or irreversible text is retained. Existing playlists recover on reopening without reimport. Volume clicks move directly to their position; vertical/horizontal scrollbar tracks retain a 36-DIP minimum thumb with matching drag geometry and an 8-DIP visible grip. Locked baseline passed 299 tests; revised Release build passes 321 tests with zero warnings/errors. New mandatory isolated Windows EN/RU workflows assert production TagLib recovery with unchanged owned audio, routed volume clicks in both directions and large-list minimum bounds/full range. Actual Windows/package/installer outcomes require the source-specific CI reports.

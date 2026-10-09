@@ -1,5 +1,10 @@
 # Test evidence — Stages A–G
 
+## Physical tag repair CLI preparation (2026-10-09)
+
+Locked baseline passed 321 Core tests with zero warnings/errors. Changed-source local locked Release build passes 321 Core tests plus 28 CLI tests, with zero failures/build warnings/errors; 8 CLI tests require genuine Windows and are explicitly skipped on Linux. Real CC0 CBR/VBR MP3 and 16/24-bit FLAC bytes are used for metadata writes in owned expandable streams; independent container fingerprints remain equal. Tests cover CP1251/UTF-8 mojibake, Belarusian short words, Unicode/Latin preservation, UTF-8/UTF-16/UTF-32 CUE, FILE/index continuity, malformed bounds, guarded stream ownership, recursive no-write preview and ID3v1-only migration. Windows tests add actual backup/idempotence/RW locking/hardlinks/outside-root/cancellation/partial-write rollback; extracted self-contained CLI invokes ordinary preview/apply on owned real fixtures and independently verifies audio ranges. Those Windows outcomes are pending until this source CI; Linux is not counted as their pass.
+
+
 ## Belarusian metadata and controls regression (2026-10-09)
 
 Before edits: locked Release build, 299 tests passed, zero warnings/errors. After edits: locked Release build, 321 passed, zero failures/skips/warnings/errors; 22 focused controls cover legacy Belarusian words in both western encodings, correct Latin/Unicode/irreversible text, playback metadata and existing SQLite playlist reopening. No dependency/version pins or schemas changed. Added genuine Windows TagLib/owned-source hash and routed-click assertions plus minimum-thumb/full-range assertions on the existing nearly-10k-row virtualization workflow. Windows EN/RU, rebuilt-TagLib, extracted package and installed-app outcomes remain pending until this source's CI finishes. A heuristic cannot recover bytes already replaced by `?`/U+FFFD or reliably resolve every ambiguous language; source music is never edited.

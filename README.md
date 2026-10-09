@@ -70,3 +70,7 @@ Playlist actions include create/rename/duplicate/delete/tab movement, selected-r
 ## Windows integration
 
 Launch with local file/folder paths to append without autoplay; `--play` explicitly plays the first added entry, and `--` ends option parsing. A second launch activates the existing per-user window and forwards paths. Only bounded local open requests are accepted. Tray actions share the player coordinator; close exits by default. Settings Apply switches English/Russian immediately and offers explicit close-to-tray. F1 opens fully local help; Ctrl+N creates a playlist and F2 renames with tab focus. Standard media controls use one Windows SMTC registration.
+
+## Standalone tag repair CLI
+
+[MPswift Tag Repair](docs/TAG_REPAIR_CLI.md) previews a selected folder and can physically repair legacy MP3/FLAC tags and CUE encoding with explicit `--apply` on Windows. Each changed original is backed up and encoded audio is verified unchanged. A separate self-contained Windows x64 ZIP/checksum is published after the regular source-specific gates and actual extracted CLI checks.

@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>MPswift.TagRepair</AssemblyName>
+    <Product>MPswift Tag Repair</Product>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <PublishTrimmed>false</PublishTrimmed>
+    <PublishSingleFile>false</PublishSingleFile>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/Player.Core/Player.Core.csproj" />
+    <PackageReference Include="TagLibSharp" />
+    <Compile Include="../../src/Player.App/Services/Storage/DataDirectoryLease.cs" Link="Safety/DataDirectoryLease.cs" />
+    <Compile Include="../../src/Player.App/Services/Storage/DataFileLease.cs" Link="Safety/DataFileLease.cs" />
+    <InternalsVisibleTo Include="MPswift.TagRepair.Tests" />
+  </ItemGroup>
+</Project>

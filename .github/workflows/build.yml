@@ -62,6 +62,13 @@ jobs:
       - name: Audit local portable development candidate
         shell: pwsh
         run: ./scripts/Package-Candidate.ps1 -SkipBuild
+      - name: Package separate self-contained tag repair CLI
+        shell: pwsh
+        run: ./scripts/Package-TagRepair.ps1
+      - name: Real packaged CLI preview, apply, backups and audio preservation
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/TagRepair-Smoke.ps1 -IsolatedRunner
       - name: Reject modified, missing and extra candidate files
         shell: pwsh
         run: |
@@ -101,6 +108,8 @@ jobs:
             artifacts/portable/*.exe.sha256
             artifacts/portable/installer-audit.json
             artifacts/portable/installer-smoke.json
+            artifacts/portable/tagrepair-audit.json
+            artifacts/portable/tagrepair-smoke.json
           if-no-files-found: error
           retention-days: 14
       - name: Retain test and native decode evidence
@@ -117,6 +126,17 @@ jobs:
             artifacts/smoke/installer-*.log
             artifacts/smoke/*.png
             artifacts/smoke/stage-d-mixer/*.f32
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Retain separate CLI test evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: evidence-tagrepair-${{ matrix.os }}
+          path: |
+            artifacts/tagrepair-test-results/*.trx
+            artifacts/portable/tagrepair-*.json
+            artifacts/smoke/tagrepair-cli.log
           if-no-files-found: warn
           retention-days: 14
 
