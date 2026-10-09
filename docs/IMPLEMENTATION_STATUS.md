@@ -1,5 +1,9 @@
 # Implementation checkpoint
 
+## CLI invalid-data and legacy MPEG prefix repair (2026-10-09)
+
+The owner's 1.0.112-dev.1 screenshot demonstrates an unhandled InvalidDataException during MPEG fingerprinting. That exception derives from SystemException, not IOException; the per-file and scan filters now explicitly include it. Corrupt/unsupported files produce identified errors while other albums continue, retaining originals. A bounded independent three-frame search accepts real CBR/VBR MPEG after legacy prefixes while hashing all prefix/audio bytes. Diagnostics retain the unsupported filename, offset and first bytes. Fresh-process malformed MP3/FLAC/CUE regression, real prefix rewrite/mutation/boundary controls and additional genuine Windows apply/continuation checks are added. Exact owner-file bytes are unavailable; its precise layout is not inferred from the screenshot. See source-specific CI and packaged-EXE reports for actual Windows outcomes.
+
 ## Standalone physical tag repair CLI (2026-10-09)
 
 The owner explicitly requests a separate cmd utility for physical encoding repair. MPswift.TagRepair provides recursive read-only preview and explicit Windows --apply for MP3 ID3v2.4/UTF-8, FLAC standard tags and UTF-8 CUE. Verified retained originals, held Windows source/directory objects, private temporary data, original backup access rules, encoded-audio/FLAC STREAMINFO fingerprints, metadata/artwork checks and write-failure rollback preserve source audio and unrelated files. No BASS dependency, shell/network calls or administrator request. Separate self-contained ZIP/checksum and source-specific packaged EXE evidence are added to publication. Baseline: 321 Core tests. Local changed-source locked build: 321 Core passed; CLI 28 passed and 8 genuine Windows tests explicitly unrun/skipped on Linux. Final Windows/package/installer evidence awaits CI. See TAG_REPAIR_CLI.md for ambiguity, device compatibility, recovery and power-loss limits.

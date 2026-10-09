@@ -1,5 +1,9 @@
 # Requirement and acceptance status
 
+## Owner-reported CLI failure (2026-10-09)
+
+Fixed the missing InvalidDataException filter that aborted 1.0.112-dev.1. Malformed/unsupported files now report their paths and continue with exit 1. Legacy MPEG prefixes are recognized within a bounded three-frame search, with all prefix/audio bytes still protected by fingerprints and original backups. The exact owner file cannot be classified from its stack trace alone. Real-fixture and fresh-process regression checks plus required Windows/published-EXE controls cover the changes; normal player behavior and CLI options are retained.
+
 ## Owner-requested offline tag utility (2026-10-09)
 
 Implemented a separate cmd CLI with folder recursion, explicit preview/apply, physical Unicode tag/CUE writing and retained originals. Existing player interfaces, dependencies and audio payloads are preserved. Local Core 321 + CLI 28 checks pass; 8 Windows file tests and packaged-executable proof require source CI. Automatic publication now includes a separate self-contained CLI ZIP, checksum, package audit and real Windows CLI report. Supported MP3/FLAC/CUE scope, bounded inputs, ambiguous/irreversible tags, ID3v1 removal/device compatibility and nontransactional power-loss recovery are documented in TAG_REPAIR_CLI.md.

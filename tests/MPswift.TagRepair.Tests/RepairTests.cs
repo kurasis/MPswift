@@ -12,6 +12,18 @@ public sealed class RepairTests
     private static string Broken(string text, int from = 1251, int to = 28591)
     { Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); return Encoding.GetEncoding(to).GetString(Encoding.GetEncoding(from).GetBytes(text)); }
     internal static string Fixture(string name) => Path.Combine(AppContext.BaseDirectory, "fixtures", name);
+    internal static byte[] LegacyGapMp3(string name, int gap)
+    {
+        var source = File.ReadAllBytes(Fixture(name));
+        using var file = TagLib.File.Create(Fixture(name));
+        var start = checked((int)file.InvariantStartPosition);
+        Assert.InRange(start, 0, source.Length - 4);
+        var result = new byte[source.Length + gap];
+        source.AsSpan(0, start).CopyTo(result);
+        "Legacy padding"u8.CopyTo(result.AsSpan(start));
+        source.AsSpan(start).CopyTo(result.AsSpan(start + gap));
+        return result;
+    }
     [Theory]
     [InlineData("Гук ў вецеры", 1251, 28591)]
     [InlineData("Людзі і сонца", 1251, 1252)]
@@ -45,6 +57,65 @@ public sealed class RepairTests
         Assert.Equal(preview.After, TagEditor.Read(stream, name).Before);
         if (name.EndsWith(".mp3")) Assert.False(TagEditor.NeedsUnicodeRewrite(stream, name));
         Assert.Equal(original, File.ReadAllBytes(Fixture(name)));
+    }
+
+    [Theory]
+    [InlineData("mp3-cbr.mp3", 32)]
+    [InlineData("mp3-cbr.mp3", 257)]
+    [InlineData("mp3-vbr.mp3", 32)]
+    [InlineData("mp3-vbr.mp3", 257)]
+    [InlineData("mp3-cbr.mp3", 8191)]
+    public void LegacyGapBeforeRealMpegFramesIsPreservedDuringTagRewrite(string name, int gap)
+    {
+        var bytes = LegacyGapMp3(name, gap);
+        using var stream = new MemoryStream(); stream.Write(bytes);
+        var original = AudioFingerprint.Read(stream, ".mp3");
+        var tags = TagEditor.Read(stream, name); TagEditor.Rewrite(stream, name, tags);
+        Assert.Equal(original, AudioFingerprint.Read(stream, ".mp3"));
+        using var source = TagLib.File.Create(Fixture(name));
+        bytes[checked((int)source.InvariantStartPosition)] ^= 1;
+        using var mutated = new MemoryStream(bytes);
+        Assert.NotEqual(original, AudioFingerprint.Read(mutated, ".mp3"));
+    }
+
+    [Fact] public void UnrecognizedMpegSearchIsBoundedAndDoesNotAcceptIsolatedSyncBytes()
+    {
+        using var far = new MemoryStream(LegacyGapMp3("mp3-cbr.mp3", 8193));
+        Assert.Throws<InvalidDataException>(() => AudioFingerprint.Read(far, ".mp3"));
+        var bytes = new byte[8192]; "invalid prefix"u8.CopyTo(bytes);
+        using var fixture = TagLib.File.Create(Fixture("mp3-cbr.mp3"));
+        File.ReadAllBytes(Fixture("mp3-cbr.mp3")).AsSpan(checked((int)fixture.InvariantStartPosition), 4).CopyTo(bytes.AsSpan(32));
+        using var isolated = new MemoryStream(bytes);
+        Assert.Throws<InvalidDataException>(() => AudioFingerprint.Read(isolated, ".mp3"));
+    }
+
+    [Fact] public void ApeHeaderClaimCannotCreateNegativeMpegSearchBounds()
+    {
+        var bytes = new byte[90]; "ID3"u8.CopyTo(bytes); bytes[3] = 4; bytes[9] = 32;
+        "APETAGEX"u8.CopyTo(bytes.AsSpan(10)); "APETAGEX"u8.CopyTo(bytes.AsSpan(58));
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(70), 48);
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(78), 0x80000000);
+        using var stream = new MemoryStream(bytes);
+        Assert.Throws<InvalidDataException>(() => AudioFingerprint.Read(stream, ".mp3"));
+    }
+
+    [Fact] public void UnsupportedMpegPrefixReportsFileAndContinuesPreview()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "cli-mpeg-prefix-owned-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(root);
+        try
+        {
+            var path = Path.Combine(root, "unsupported.mp3"); var bytes = LegacyGapMp3("mp3-cbr.mp3", 8193); File.WriteAllBytes(path, bytes);
+            using (var file = TagLib.File.Create(path)) { file.Tag.Title = Broken("Людзі і сонца"); file.Save(); }
+            bytes = File.ReadAllBytes(path);
+            var album = Directory.CreateDirectory(Path.Combine(root, "next-album")).FullName;
+            File.WriteAllBytes(Path.Combine(album, "valid.cue"), Encoding.GetEncoding(1251).GetBytes("TITLE \"Людзі\"\nFILE \"owned.flac\" WAVE\nTRACK 01 AUDIO\nINDEX 01 00:00:00\n"));
+            using var output = new StringWriter(); using var errors = new StringWriter();
+            Assert.Equal(1, Program.Run([root], output, errors));
+            Assert.Contains("unsupported.mp3", errors.ToString()); Assert.Contains("Unrecognized MPEG audio start", errors.ToString());
+            Assert.Contains("first bytes", errors.ToString()); Assert.Contains("planned=1; unchanged=0; errors=1", output.ToString());
+            Assert.Equal(bytes, File.ReadAllBytes(path)); Assert.Empty(Directory.GetFiles(root, "*.bak", SearchOption.AllDirectories));
+        }
+        finally { Directory.Delete(root, true); }
     }
 
     [Theory]
@@ -131,6 +202,47 @@ public sealed class RepairTests
                 Assert.Equal(0, child.ExitCode); Assert.Empty(await errors);
                 Assert.Contains("planned=1; unchanged=0; errors=0", await output);
                 Assert.Equal(original, File.ReadAllBytes(path)); Assert.Single(Directory.GetFiles(root));
+            }
+            finally { if (!child.HasExited) { child.Kill(true); child.WaitForExit(5000); } }
+        }
+        finally { Directory.Delete(root, true); }
+    }
+
+    [Theory]
+    [InlineData(".cue")]
+    [InlineData(".mp3")]
+    [InlineData(".flac")]
+    public async Task FreshCliReportsInvalidDataAndContinuesToOtherFiles(string extension)
+    {
+        var root = Path.Combine(Path.GetTempPath(), "cli-invalid-owned-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            var broken = Path.Combine(root, "broken" + extension);
+            var bytes = extension switch
+            {
+                ".cue" => Encoding.UTF8.GetBytes("TITLE \"missing structure\"\n"),
+                ".mp3" => new byte[] { 73, 68, 51, 4, 0, 0, 127, 127, 127, 127 },
+                _ => new byte[] { 102, 76, 97, 67, 128, 0, 1, 0 }
+            };
+            File.WriteAllBytes(broken, bytes);
+            var album = Directory.CreateDirectory(Path.Combine(root, "next-album")).FullName;
+            var cue = Path.Combine(album, "valid.cue");
+            var original = Encoding.GetEncoding(1251).GetBytes("TITLE \"Людзі\"\nFILE \"owned.flac\" WAVE\nTRACK 01 AUDIO\nINDEX 01 00:00:00\n");
+            File.WriteAllBytes(cue, original);
+            var start = new System.Diagnostics.ProcessStartInfo(Environment.GetEnvironmentVariable("DOTNET_HOST_PATH") ?? "dotnet")
+            { UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true };
+            start.ArgumentList.Add(Path.Combine(AppContext.BaseDirectory, "MPswift.TagRepair.dll")); start.ArgumentList.Add(root);
+            using var child = System.Diagnostics.Process.Start(start)!;
+            try
+            {
+                var output = child.StandardOutput.ReadToEndAsync(); var errors = child.StandardError.ReadToEndAsync();
+                using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(30)); await child.WaitForExitAsync(timeout.Token);
+                Assert.Equal(1, child.ExitCode); var message = await errors;
+                Assert.Contains("broken" + extension, message); Assert.DoesNotContain("Unhandled exception", message);
+                Assert.Contains("planned=1; unchanged=0; errors=1", await output);
+                Assert.Equal(bytes, File.ReadAllBytes(broken)); Assert.Equal(original, File.ReadAllBytes(cue));
+                Assert.Empty(Directory.GetFiles(root, "*.bak", SearchOption.AllDirectories));
             }
             finally { if (!child.HasExited) { child.Kill(true); child.WaitForExit(5000); } }
         }

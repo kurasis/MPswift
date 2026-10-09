@@ -97,7 +97,7 @@ internal static class Program
             }
         }
     }
-    private static bool IsFileError(Exception error) => error is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException or
+    private static bool IsFileError(Exception error) => error is IOException or InvalidDataException or UnauthorizedAccessException or ArgumentException or NotSupportedException or
         TagLib.CorruptFileException or TagLib.UnsupportedFormatException or NotImplementedException or KeyNotFoundException or System.Reflection.TargetInvocationException;
     private static string Quote(string value) => JsonSerializer.Serialize(value, JsonOptions);
 }

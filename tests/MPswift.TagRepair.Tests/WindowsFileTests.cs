@@ -87,6 +87,45 @@ public sealed class WindowsFileTests : IDisposable
         Assert.Equal("untouched", File.ReadAllText(Path.Combine(root, "private.txt"))); Assert.Equal(original, File.ReadAllBytes(Assert.Single(Directory.GetFiles(root, "*.bak"))));
     }
 
+    [WindowsFact] public void PaddedCbrAndVbrMp3ApplyPreservesPrefixAndAudioWithExactBackups()
+    {
+        foreach (var name in new[] { "mp3-cbr.mp3", "mp3-vbr.mp3" })
+        {
+            var path = Path.Combine(root, name); File.WriteAllBytes(path, RepairTests.LegacyGapMp3(name, 257));
+            using (var file = TagLib.File.Create(path))
+            { file.Tag.Title = Encoding.Latin1.GetString(Encoding.GetEncoding(1251).GetBytes("Людзі і сонца")); file.Save(); }
+            var original = File.ReadAllBytes(path); string hash; AudioFingerprint fingerprint;
+            using (var file = TagLib.File.Create(path))
+            {
+                var range = original.AsSpan(checked((int)file.InvariantStartPosition), checked((int)(file.InvariantEndPosition - file.InvariantStartPosition)));
+                hash = Convert.ToHexStringLower(SHA256.HashData(range));
+                Assert.True(range.StartsWith("Legacy padding"u8));
+            }
+            using (var source = File.OpenRead(path)) fingerprint = AudioFingerprint.Read(source, ".mp3");
+            Assert.Equal(hash, fingerprint.Sha256);
+            var result = FileRepair.Process(root, path, true, 1251);
+            Assert.Equal("repaired", result.Status); Assert.Equal(original, File.ReadAllBytes(result.Backup!));
+            using (var source = File.OpenRead(path)) Assert.Equal(fingerprint, AudioFingerprint.Read(source, ".mp3"));
+            using (var file = TagLib.File.Create(path)) Assert.Equal("Людзі і сонца", file.Tag.Title);
+            Assert.Equal("unchanged", FileRepair.Process(root, path, true, 1251).Status);
+        }
+        Assert.Equal(2, Directory.GetFiles(root, "*.bak").Length); Assert.Empty(Directory.GetFiles(root, "*.tmp"));
+    }
+
+    [WindowsFact] public void ApplyRejectsInvalidDocumentAndContinuesWithoutChangingIt()
+    {
+        var path = Path.Combine(root, "broken.cue"); var original = Encoding.UTF8.GetBytes("TITLE \"no tracks\"\n"); File.WriteAllBytes(path, original);
+        var valid = Cue(); var validOriginal = File.ReadAllBytes(valid);
+        var next = Directory.CreateDirectory(Path.Combine(root, "next-album")).FullName;
+        File.Move(valid, Path.Combine(next, Path.GetFileName(valid)));
+        using var output = new StringWriter(); using var errors = new StringWriter();
+        Assert.Equal(1, Program.Run([root, "--apply"], output, errors));
+        Assert.Contains("broken.cue", errors.ToString()); Assert.Contains("repaired=1; unchanged=0; errors=1", output.ToString());
+        Assert.Equal(original, File.ReadAllBytes(path));
+        Assert.Equal(validOriginal, File.ReadAllBytes(Assert.Single(Directory.GetFiles(root, "*.bak", SearchOption.AllDirectories))));
+        Assert.Empty(Directory.GetFiles(root, "*.tmp"));
+    }
+
     [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("kernel32.dll", EntryPoint = "CreateHardLinkW", CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)] private static extern bool CreateHardLink(string link, string target, nint security);

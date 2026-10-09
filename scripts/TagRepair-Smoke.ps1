@@ -66,6 +66,17 @@ try {
             } finally { $hash.Dispose(); $stream.Dispose() }
         } finally { $file.Dispose() }
     }
+    function AddOwnedMpegPrefix([string]$path, [int]$count) {
+        $file = [TagLib.File]::Create($path)
+        try { $offset = [int]$file.InvariantStartPosition } finally { $file.Dispose() }
+        $bytes = [IO.File]::ReadAllBytes($path)
+        if ($offset -lt 0 -or $offset -gt $bytes.Length - 4 -or $count -lt 14) { throw 'Invalid owned MPEG prefix fixture.' }
+        $padded = [byte[]]::new($bytes.Length + $count)
+        [Array]::Copy($bytes, 0, $padded, 0, $offset)
+        $marker = [Text.Encoding]::ASCII.GetBytes('Legacy padding'); [Array]::Copy($marker, 0, $padded, $offset, $marker.Length)
+        [Array]::Copy($bytes, $offset, $padded, $offset + $count, $bytes.Length - $offset)
+        [IO.File]::WriteAllBytes($path, $padded)
+    }
     $originals = @{}; $audioHashes = @{}; $fixtureHashes = @{}
     foreach ($format in @('mp3','flac')) {
         $fixture = Join-Path $root "tests/fixtures/audio/$(if ($format -eq 'mp3') { 'mp3-cbr.mp3' } else { 'flac16.flac' })"
@@ -73,6 +84,7 @@ try {
         $path = Join-Path $album "Owned Беларускае.$format"; Copy-Item $fixture $path
         $file = [TagLib.File]::Create($path)
         try { $file.Tag.Title = [Text.Encoding]::Latin1.GetString($encoding.GetBytes('Людзі і сонца')); $file.Tag.Performers = @([Text.Encoding]::Latin1.GetString($encoding.GetBytes('Індыга'))); $file.Save() } finally { $file.Dispose() }
+        if ($format -eq 'mp3') { AddOwnedMpegPrefix $path 257 }
         $originals[$path] = (Get-FileHash $path -Algorithm SHA256).Hash; $audioHashes[$path] = AudioHash $path
     }
     $cue = Join-Path $album 'Owned.cue'
@@ -103,13 +115,31 @@ try {
     $again | Add-Content $log -Encoding utf8
     if ($LASTEXITCODE -ne 0 -or -not ($again -match 'repaired=0; unchanged=3;')) { throw 'Physical repairs are not idempotent.' }
     if (@(Get-ChildItem $album -Filter '*.bak').Count -ne 3 -or @(Get-ChildItem $album -Filter '*.tmp').Count -ne 0 -or [IO.File]::ReadAllText($private) -ne 'unknown data retained') { throw 'Unexpected backups/temp files or private-file modification.' }
+    $invalidAlbum = Join-Path $workspace 'Owned unsupported before next album'; New-Item $invalidAlbum -ItemType Directory | Out-Null
+    $bad = Join-Path $invalidAlbum 'Unsupported prefix.mp3'; Copy-Item (Join-Path $root 'tests/fixtures/audio/mp3-cbr.mp3') $bad
+    $file = [TagLib.File]::Create($bad)
+    try { $file.Tag.Title = [Text.Encoding]::Latin1.GetString($encoding.GetBytes('Людзі')); $file.Save() } finally { $file.Dispose() }
+    AddOwnedMpegPrefix $bad 8193; $badHash = (Get-FileHash $bad -Algorithm SHA256).Hash
+    $next = Join-Path $invalidAlbum 'next-album'; New-Item $next -ItemType Directory | Out-Null
+    $valid = Join-Path $next 'valid.cue'; [IO.File]::WriteAllBytes($valid, $encoding.GetBytes("TITLE `"Людзі`"`nFILE `"owned.flac`" WAVE`nTRACK 01 AUDIO`nINDEX 01 00:00:00`n"))
+    $validHash = (Get-FileHash $valid -Algorithm SHA256).Hash
+    $invalidPreview = @(& $exe $invalidAlbum 2>&1); $invalidPreview | Add-Content $log -Encoding utf8
+    if ($LASTEXITCODE -ne 1 -or -not ($invalidPreview -match 'planned=1; unchanged=0; errors=1') -or
+        -not ($invalidPreview -match 'Unsupported prefix.mp3') -or -not ($invalidPreview -match 'Unrecognized MPEG audio start') -or ($invalidPreview -match 'Unhandled exception')) { throw 'Unsupported-file preview did not report and continue.' }
+    if ((Get-FileHash $bad -Algorithm SHA256).Hash -ne $badHash -or (Get-FileHash $valid -Algorithm SHA256).Hash -ne $validHash -or @(Get-ChildItem $invalidAlbum -Filter '*.bak' -Recurse).Count -ne 0) { throw 'Mixed invalid-file preview wrote data.' }
+    $invalidApply = @(& $exe $invalidAlbum --apply 2>&1); $invalidApply | Add-Content $log -Encoding utf8
+    if ($LASTEXITCODE -ne 1 -or -not ($invalidApply -match 'repaired=1; unchanged=0; errors=1') -or ($invalidApply -match 'Unhandled exception') -or
+        (Get-FileHash $bad -Algorithm SHA256).Hash -ne $badHash) { throw 'Unsupported-file apply crashed, stopped or changed rejected bytes.' }
+    $validBackup = @(Get-ChildItem $invalidAlbum -Filter '*.bak' -Recurse)
+    if ($validBackup.Count -ne 1 -or (Get-FileHash $validBackup[0].FullName -Algorithm SHA256).Hash -ne $validHash -or @(Get-ChildItem $invalidAlbum -Filter '*.tmp' -Recurse).Count -ne 0) { throw 'Continued CUE apply did not preserve its original and clean staging.' }
     foreach ($path in $fixtureHashes.Keys) { if ((Get-FileHash $path -Algorithm SHA256).Hash -ne $fixtureHashes[$path]) { throw 'Original CC0 fixture was changed.' } }
     $trx = Get-ChildItem (Join-Path $root 'artifacts/tagrepair-test-results') -Filter '*.trx' | Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
     [xml]$tests = Get-Content $trx.FullName -Raw
     $counters = $tests.SelectSingleNode("//*[local-name()='Counters']")
-    if ([int]$counters.total -lt 37 -or $counters.passed -ne $counters.total -or [int]$counters.failed -ne 0 -or [int]$counters.notExecuted -ne 0) { throw 'CLI Windows tests must all execute and pass.' }
+    if ([int]$counters.total -lt 50 -or $counters.passed -ne $counters.total -or [int]$counters.failed -ne 0 -or [int]$counters.notExecuted -ne 0) { throw 'CLI Windows tests must all execute and pass.' }
     [ordered]@{ Status = 'tagrepair-packaged-cli-passed'; SourceCommit = $audit.SourceCommit; ProductVersion = $audit.ProductVersion; ZipSha256 = $audit.ZipSha256;
         RealExe = $true; RuntimeIncluded = $true; PreviewNoWrites = $true; PhysicalMp3FlacCue = $true; ExactOriginalBackups = $true; IndependentAudioHashes = $true;
-        SourceFixturesUnchanged = $true; PrivateFilesUnchanged = $true; Idempotent = $true; WindowsTests = [int]$counters.total; WindowsTestsFailed = 0; WindowsTestsSkipped = 0 } |
+        SourceFixturesUnchanged = $true; PrivateFilesUnchanged = $true; Idempotent = $true; PaddedMp3PrefixAndAudio = $true; InvalidFileContinuation = $true;
+        WindowsTests = [int]$counters.total; WindowsTestsFailed = 0; WindowsTestsSkipped = 0 } |
         ConvertTo-Json | Set-Content (Join-Path $output 'tagrepair-smoke.json') -Encoding utf8
 } finally { $env:DOTNET_ROOT = $previousRuntime }
