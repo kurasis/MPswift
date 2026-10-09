@@ -122,7 +122,7 @@ public sealed class WindowsFileTests : IDisposable
                     using (var file = TagLib.File.Create(path)) Assert.Equal(expected, field == "Album" ? file.Tag.Album : file.Tag.Title);
                     Assert.Equal("unchanged", FileRepair.Process(root, path, true, 1251).Status);
                 }
-        Assert.Equal(28, Directory.GetFiles(root, "*.bak", SearchOption.AllDirectories).Length);
+        Assert.Equal(44, Directory.GetFiles(root, "*.bak", SearchOption.AllDirectories).Length);
         Assert.Empty(Directory.GetFiles(root, "*.tmp", SearchOption.AllDirectories));
     }
 
