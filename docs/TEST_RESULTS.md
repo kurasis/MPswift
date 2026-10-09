@@ -1,5 +1,10 @@
 # Test evidence — Stages A–G
 
+## Belarusian metadata and controls regression (2026-10-09)
+
+Before edits: locked Release build, 299 tests passed, zero warnings/errors. After edits: locked Release build, 321 passed, zero failures/skips/warnings/errors; 22 focused controls cover legacy Belarusian words in both western encodings, correct Latin/Unicode/irreversible text, playback metadata and existing SQLite playlist reopening. No dependency/version pins or schemas changed. Added genuine Windows TagLib/owned-source hash and routed-click assertions plus minimum-thumb/full-range assertions on the existing nearly-10k-row virtualization workflow. Windows EN/RU, rebuilt-TagLib, extracted package and installed-app outcomes remain pending until this source's CI finishes. A heuristic cannot recover bytes already replaced by `?`/U+FFFD or reliably resolve every ambiguous language; source music is never edited.
+
+
 ## Version 1.0 and per-user installer preparation (2026-10-08)
 
 The owner explicitly requests version 1.0 and an installer. [Release notes](RELEASE_1_0.md) describe current-user installation, separate retained data, manual portable migration, unsigned publisher status and unchanged open acceptance/rights gates. Locked baseline before edits passed 299 tests with zero build warnings/errors. CI adds genuine isolated standard-user install/reinstall/uninstall and real installed EN/RU WPF gates. Final source-specific CI/release evidence is required; this preparation alone is not an observed pass.

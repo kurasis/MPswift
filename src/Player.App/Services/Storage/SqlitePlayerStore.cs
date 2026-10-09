@@ -58,6 +58,7 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
                 if (json.Length > 524288) throw new InvalidDataException("Oversized track metadata.");
                 var track = JsonSerializer.Deserialize<MediaTrack>(json) ?? throw new InvalidDataException("Invalid saved track.");
                 LibraryState.ValidateTrack(track);
+                track = Player.Core.Media.LegacyTagText.Recover(track);
                 entries.Add(new PlaylistEntry(Guid.Parse(reader.GetString(0)), track, reader.GetBoolean(1), reader.GetInt64(3)));
             }
             playlists[i] = playlists[i] with { Entries = entries.ToArray() };

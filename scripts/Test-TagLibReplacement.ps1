@@ -61,7 +61,7 @@ try {
     if ($trx.Count -ne 1) { throw 'Expected exactly one current Core test report.' }
     [xml]$xml = Get-Content $trx[0].FullName -Raw
     $counters = $xml.TestRun.ResultSummary.Counters
-    if ([int]$counters.total -lt 299 -or $counters.total -ne $counters.executed -or $counters.total -ne $counters.passed -or [int]$counters.failed -ne 0 -or [int]$counters.notExecuted -ne 0) { throw 'Core suite was incomplete or skipped.' }
+    if ([int]$counters.total -lt 321 -or $counters.total -ne $counters.executed -or $counters.total -ne $counters.passed -or [int]$counters.failed -ne 0 -or [int]$counters.notExecuted -ne 0) { throw 'Core suite was incomplete or skipped.' }
     $result.CoreTests = @{ Total = [int]$counters.total; Passed = [int]$counters.passed; Failed = [int]$counters.failed; Skipped = [int]$counters.notExecuted; TrxSha256 = Hash $trx[0].FullName }
     $app = Join-Path $owned 'app'
     Copy-Item -LiteralPath $appOriginal -Destination $app -Recurse

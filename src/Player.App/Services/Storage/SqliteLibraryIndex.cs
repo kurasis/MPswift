@@ -109,7 +109,7 @@ public sealed partial class SqlitePlayerStore
     {
         if (json.Length > 524288) throw new InvalidDataException("Index metadata too large.");
         var file = JsonSerializer.Deserialize<IndexedFile>(json) ?? throw new InvalidDataException("Invalid index metadata.");
-        LibraryState.ValidateTrack(file.Track); return file;
+        LibraryState.ValidateTrack(file.Track); return file with { Track = Player.Core.Media.LegacyTagText.Recover(file.Track) };
     }
     private void AddIndexSchema(SqliteConnection connection, bool migrate)
     {

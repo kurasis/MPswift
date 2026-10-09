@@ -40,7 +40,18 @@ public static class PerformanceValidation
             maximumContainers = Math.Max(maximumContainers, Containers(list));
         }
         if (maximumContainers is <= 0 or >= 150) throw new InvalidOperationException("Scroll realized unbounded row containers.");
-        return new { ActualPlaylistRows = list.Items.Count, GlobalCapacity = 10000, Method = "ScrollIntoView + UpdateLayout + Dispatcher ContextIdle; software-driven WPF", MaximumRealizedContainers = maximumContainers, Timings = Timings(samples, 100) };
+        var scrollbar = CustomizationValidation.Descendants(list).OfType<System.Windows.Controls.Primitives.ScrollBar>()
+            .Single(bar => bar.Orientation == Orientation.Vertical && bar.IsVisible);
+        var track = (System.Windows.Controls.Primitives.Track)scrollbar.Template.FindName("PART_Track", scrollbar);
+        if (track.Thumb.ActualHeight < 36 || track.Thumb.ActualHeight > track.ActualHeight || track.Thumb.ActualWidth < 8)
+            throw new InvalidOperationException("Large-playlist thumb has invalid minimum bounds.");
+        var before = scrollbar.Value;
+        scrollbar.Value = scrollbar.Maximum; list.UpdateLayout();
+        await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ContextIdle);
+        if (Math.Abs(track.Value - scrollbar.Maximum) > .01) throw new InvalidOperationException("Minimum thumb changed scroll range.");
+        scrollbar.Value = before;
+        return new { ActualPlaylistRows = list.Items.Count, GlobalCapacity = 10000, Method = "ScrollIntoView + UpdateLayout + Dispatcher ContextIdle; software-driven WPF", MaximumRealizedContainers = maximumContainers,
+            MinimumThumbHeight = track.Thumb.ActualHeight, MinimumThumbBoundsAndFullRange = true, Timings = Timings(samples, 100) };
     }
     public static async Task<object> SearchAsync(MainWindow owner, string output)
     {

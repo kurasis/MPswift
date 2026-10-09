@@ -19,7 +19,7 @@ public static class MediaMetadataReader
             using var read = LocalReadLease.Open(path);
             Player.Core.Media.MetadataReadGuard.Validate(read.Path);
             using var file = TagLib.File.Create(read.Path, TagLib.ReadStyle.Average); var tag = file.Tag;
-            return track with
+            return Player.Core.Media.LegacyTagText.Recover(track with
             {
                 Title = Bounded(tag.Title) ?? track.Title, Artist = Join(tag.Performers), Album = Bounded(tag.Album), AlbumArtist = Join(tag.AlbumArtists),
                 Genre = Join(tag.Genres), TrackNumber = tag.Track, DiscNumber = tag.Disc, Year = tag.Year,
@@ -27,7 +27,7 @@ public static class MediaMetadataReader
                 SampleRateHint = file.Properties.AudioSampleRate, ChannelsHint = file.Properties.AudioChannels, BitrateHint = file.Properties.AudioBitrate,
                 ReplayGain = new(double.IsFinite(tag.ReplayGainTrackGain) ? tag.ReplayGainTrackGain : null, double.IsFinite(tag.ReplayGainAlbumGain) ? tag.ReplayGainAlbumGain : null,
                     double.IsFinite(tag.ReplayGainTrackPeak) && tag.ReplayGainTrackPeak > 0 ? tag.ReplayGainTrackPeak : null, double.IsFinite(tag.ReplayGainAlbumPeak) && tag.ReplayGainAlbumPeak > 0 ? tag.ReplayGainAlbumPeak : null)
-            };
+            });
         }
         catch (Exception e) when (e is TagLib.CorruptFileException or TagLib.UnsupportedFormatException or IOException or InvalidDataException or UnauthorizedAccessException or ArgumentException or NotImplementedException or KeyNotFoundException)
         { diagnostic("Metadata fallback: " + Path.GetFileName(path) + "; " + e.Message); return track; }

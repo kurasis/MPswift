@@ -106,7 +106,7 @@ internal static class CustomizationValidation
             LanguageChange = "immediate; persisted across restarts", UniformVectorIcons = true, VisibleBuildVersion = Player.Core.ProductInfo.Version };
     }
 
-    private static IEnumerable<DependencyObject> Descendants(DependencyObject root)
+    internal static IEnumerable<DependencyObject> Descendants(DependencyObject root)
     {
         for (var i = 0; i < VisualTreeHelper.GetChildrenCount(root); i++)
         {

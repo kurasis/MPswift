@@ -135,11 +135,13 @@
         </ControlTemplate></Setter.Value></Setter>
     </Style>
     <Style TargetType="ScrollBar">
+        <!-- Track computes its minimum thumb length as half of this resource; MinHeight alone does not change drag geometry. -->
+        <Style.Resources><system:Double xmlns:system="clr-namespace:System;assembly=System.Runtime" x:Key="{x:Static SystemParameters.VerticalScrollBarButtonHeightKey}">72</system:Double><system:Double xmlns:system="clr-namespace:System;assembly=System.Runtime" x:Key="{x:Static SystemParameters.HorizontalScrollBarButtonWidthKey}">72</system:Double></Style.Resources>
         <Setter Property="Width" Value="12" /><Setter Property="Background" Value="{DynamicResource BackgroundBrush}" />
         <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ScrollBar"><Grid Background="{TemplateBinding Background}">
             <Track x:Name="PART_Track" IsDirectionReversed="True" Orientation="{TemplateBinding Orientation}">
                 <Track.DecreaseRepeatButton><RepeatButton x:Name="Before" Command="ScrollBar.PageUpCommand" Focusable="False"><RepeatButton.Template><ControlTemplate TargetType="RepeatButton"><Border Background="Transparent" /></ControlTemplate></RepeatButton.Template></RepeatButton></Track.DecreaseRepeatButton>
-                <Track.Thumb><Thumb MinHeight="8" MinWidth="8"><Thumb.Template><ControlTemplate TargetType="Thumb"><Border CornerRadius="4" Margin="3" Background="{DynamicResource TextSecondaryBrush}" /></ControlTemplate></Thumb.Template></Thumb></Track.Thumb>
+                <Track.Thumb><Thumb MinHeight="8" MinWidth="8"><Thumb.Template><ControlTemplate TargetType="Thumb"><Border CornerRadius="4" Margin="2" Background="{DynamicResource TextSecondaryBrush}" /></ControlTemplate></Thumb.Template></Thumb></Track.Thumb>
                 <Track.IncreaseRepeatButton><RepeatButton x:Name="After" Command="ScrollBar.PageDownCommand" Focusable="False"><RepeatButton.Template><ControlTemplate TargetType="RepeatButton"><Border Background="Transparent" /></ControlTemplate></RepeatButton.Template></RepeatButton></Track.IncreaseRepeatButton>
             </Track>
         </Grid><ControlTemplate.Triggers><Trigger Property="Orientation" Value="Horizontal"><Setter TargetName="PART_Track" Property="IsDirectionReversed" Value="False" /><Setter TargetName="Before" Property="Command" Value="ScrollBar.PageLeftCommand" /><Setter TargetName="After" Property="Command" Value="ScrollBar.PageRightCommand" /></Trigger></ControlTemplate.Triggers></ControlTemplate></Setter.Value></Setter>

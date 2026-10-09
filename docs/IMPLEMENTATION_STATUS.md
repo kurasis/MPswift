@@ -1,5 +1,10 @@
 # Implementation checkpoint
 
+## Belarusian metadata and playlist controls (2026-10-09)
+
+Read-only word-level Windows-1251 recovery now covers Latin-1/Windows-1252 mojibake from TagLib and saved playlist/index records. Correct Unicode, mixed Latin words, identities, paths, CUE bounds and audio bytes remain intact; ambiguous or irreversible text is retained. Existing playlists recover on reopening without reimport. Volume clicks move directly to their position; vertical/horizontal scrollbar tracks retain a 36-DIP minimum thumb with matching drag geometry and an 8-DIP visible grip. Locked baseline passed 299 tests; revised Release build passes 321 tests with zero warnings/errors. New mandatory isolated Windows EN/RU workflows assert production TagLib recovery with unchanged owned audio, routed volume clicks in both directions and large-list minimum bounds/full range. Actual Windows/package/installer outcomes require the source-specific CI reports.
+
+
 ## Version 1.0 and per-user installer preparation (2026-10-08)
 
 The owner explicitly requests version 1.0 and an installer. [Release notes](RELEASE_1_0.md) describe current-user installation, separate retained data, manual portable migration, unsigned publisher status and unchanged open acceptance/rights gates. Locked baseline before edits passed 299 tests with zero build warnings/errors. CI adds genuine isolated standard-user install/reinstall/uninstall and real installed EN/RU WPF gates. Final source-specific CI/release evidence is required; this preparation alone is not an observed pass.

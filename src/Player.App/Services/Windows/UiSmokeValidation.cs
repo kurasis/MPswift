@@ -106,6 +106,7 @@ public sealed class UiSmokeValidation : TraceListener
         var waveformEnvelope = await WaveformEnvelopeValidation.RunAsync(window, model, output);
         var desktop = await DesktopAcceptanceValidation.RunAsync(window, model, output);
         var customization = await CustomizationValidation.RunAsync(window, model, output);
+        var metadataControls = await MetadataControlsValidation.RunAsync(window, model, taggedFixture, output);
         var completion = await CompletionValidation.RunAsync(window, model, fixture, output);
         // Real Stage E file/SQLite/WPF workflows use only owned copies under the smoke directory.
         var libraryDirectory = Path.Combine(output, "stage-e-library"); Directory.CreateDirectory(libraryDirectory);
@@ -186,6 +187,7 @@ public sealed class UiSmokeValidation : TraceListener
             FolderDrop = folderDrop,
             CueImage = cueImage,
             Customization = customization, Completion = completion,
+            MetadataControls = metadataControls,
             PlaylistTabs = playlistTabs,
             WaveformEnvelope = waveformEnvelope,
             DesktopAcceptance = desktop,
