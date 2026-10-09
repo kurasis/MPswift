@@ -25,7 +25,7 @@ try {
     foreach ($script in @('Installer-UserValidation.ps1','Verify-Candidate.ps1','Version-Helpers.ps1')) { Copy-Item (Join-Path $PSScriptRoot $script) $owned }
     Copy-Item (Join-Path $output $audit.Installer) $owned
     Copy-Item (Join-Path $output 'installer-audit.json') $owned
-    foreach ($fixture in @('pcm16.wav','flac16.flac')) { Copy-Item (Join-Path $root "tests/fixtures/audio/$fixture") $owned }
+    foreach ($fixture in @('pcm16.wav','flac16.flac','mp3-cbr.mp3')) { Copy-Item (Join-Path $root "tests/fixtures/audio/$fixture") $owned }
     $credential = [pscredential]::new("$env:COMPUTERNAME\$userName", $password)
     $machineKey = 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\{EC91F463-A93D-4DBE-94B7-2199F2F64FA6}_is1'
     if (Test-Path $machineKey) { throw 'Unexpected preexisting machine-wide MPswift registration.' }
