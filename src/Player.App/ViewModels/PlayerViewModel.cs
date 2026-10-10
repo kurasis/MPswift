@@ -46,6 +46,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     [ObservableProperty] private ImageSource? _coverArt;
     public Task ScanCompletion => _scanTask;
     public Task ArtworkCompletion => _artTask;
+    internal Task SaveCompletion => _saveTask;
     public ILibraryIndexStore? LibraryIndex => _index;
     private readonly Dictionary<Guid, PlaylistRowViewModel> _knownRows = [];
     private readonly SemaphoreSlim _saveGate = new(1);
@@ -795,7 +796,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     }
     private async Task SaveAfterDelayAsync(CancellationToken token)
     {
-        try { await Task.Delay(750, token); await SaveNowAsync(); }
+        try { await Task.Delay(750, token); token.ThrowIfCancellationRequested(); await SaveNowAsync(); }
         catch (OperationCanceledException) { }
         catch (Exception error) { SaveStatus = Strings.Get("SaveFailed"); Message = SaveStatus; Details = error.Message; }
     }

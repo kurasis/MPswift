@@ -26,6 +26,7 @@ public partial class MainWindow : Window
     private PlaylistRowViewModel[] _dragRows = [];
     private bool _shutdownComplete;
     private bool _shutdownStarted;
+    internal Task ShutdownCompletion { get; private set; } = Task.CompletedTask;
     private bool _exitRequested;
     private System.Windows.Interop.HwndSource? _powerSource;
     private readonly Player.App.Services.Windows.DesktopPanelController _desktopPanelController;
@@ -322,7 +323,7 @@ public partial class MainWindow : Window
         }
         return false;
     }
-    private async void OnClosing(object? sender, CancelEventArgs e)
+    private void OnClosing(object? sender, CancelEventArgs e)
     {
         if (_shutdownComplete) return;
         e.Cancel = true;
@@ -331,13 +332,32 @@ public partial class MainWindow : Window
         if (_shutdownStarted) return;
         _shutdownStarted = true;
         IsEnabled = false;
-        Model.WindowSettings = Model.WindowSettings with { WindowWidth = RestoreBounds.Width, WindowHeight = RestoreBounds.Height,
-            WindowLeft = RestoreBounds.Left, WindowTop = RestoreBounds.Top, WindowMaximized = WindowState == WindowState.Maximized };
-        try { _trackActionsCancellation.Cancel(); await TrackActionCompletion; await Model.DisposeAsync(); await ((App)Application.Current).FlushDiagnosticsAsync(); _shutdownComplete = true; Close(); }
+        // Keep graceful persistence/resource release, but remove the window before any await.
+        // Disabled selectors must never remain on screen while slow disk/driver work completes.
+        Hide();
+        ShutdownCompletion = FinishShutdownAsync();
+    }
+    private async Task FinishShutdownAsync()
+    {
+        try
+        {
+            // WPF forbids Close() reentrancy from Closing, even when cleanup completes synchronously.
+            await Task.Yield();
+            Model.WindowSettings = Model.WindowSettings with { WindowWidth = RestoreBounds.Width, WindowHeight = RestoreBounds.Height,
+                WindowLeft = RestoreBounds.Left, WindowTop = RestoreBounds.Top, WindowMaximized = WindowState == WindowState.Maximized };
+            _trackActionsCancellation.Cancel();
+            await TrackActionCompletion;
+            await Model.DisposeAsync();
+            await ((App)Application.Current).FlushDiagnosticsAsync();
+            _shutdownComplete = true;
+            Close();
+        }
         catch (Exception error)
         {
             Model.Message = Strings.Get("ErrorUnexpected"); Model.Details = error.Message;
-            _shutdownStarted = false; IsEnabled = true;
+            _shutdownStarted = false;
+            ShowAndActivate();
+            IsEnabled = true;
             if (MessageBox.Show(this, Strings.Get("CloseWithoutSaving"), Strings.Get("SaveFailed"), MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
             {
                 try { await Model.DisposeWithoutSavingAsync(); _shutdownComplete = true; Close(); }
@@ -345,7 +365,7 @@ public partial class MainWindow : Window
             }
         }
     }
-    public void ShowAndActivate() { Show(); if (WindowState == WindowState.Minimized) WindowState = WindowState.Normal; Activate(); }
+    public void ShowAndActivate() { if (_shutdownStarted || _shutdownComplete) return; Show(); if (WindowState == WindowState.Minimized) WindowState = WindowState.Normal; Activate(); }
     public void ExitApplication() { _exitRequested = true; Close(); }
     private void OnPreferences(object sender, RoutedEventArgs e) => new PreferencesWindow(this, Model).ShowDialog();
     private void OnMinimize(object sender, RoutedEventArgs e) => SystemCommands.MinimizeWindow(this);
@@ -525,9 +545,9 @@ public partial class MainWindow : Window
     }
     public async Task CloseForValidationAsync()
     {
-        await Model.DisposeAsync();
-        await ((App)Application.Current).FlushDiagnosticsAsync();
-        _shutdownComplete = true;
+        _exitRequested = true;
         Close();
+        await ShutdownCompletion;
+        if (!_shutdownComplete) throw new InvalidOperationException("The player did not complete graceful shutdown.");
     }
 }

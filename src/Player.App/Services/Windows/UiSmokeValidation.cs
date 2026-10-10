@@ -171,6 +171,7 @@ public sealed class UiSmokeValidation : TraceListener
             NoAutoplay = true, NativeCuePositionRestored = true, RejectedArchiveReopensCurrentModel = true, MediaRebound = true };
         var storageArtwork = await StorageArtworkValidation.RunAsync(fixture, output);
         var resourceShutdown = await ResourceShutdownValidation.RunAsync(fixture, output);
+        var windowShutdown = await WindowShutdownValidation.RunAsync(window, fixture, output);
         var searchPerformance = await PerformanceValidation.SearchAsync(window, output);
         var integration = await IntegrationSmokeValidation.RunAsync(window, model, fixture);
         await model.SaveNowAsync();
@@ -197,7 +198,7 @@ public sealed class UiSmokeValidation : TraceListener
             PlaylistTabs = playlistTabs,
             WaveformEnvelope = waveformEnvelope,
             DesktopAcceptance = desktop,
-            CompleteBackupRestore = backupRestore, StorageArtwork = storageArtwork, ResourceShutdown = resourceShutdown, SearchPerformance = searchPerformance,
+            CompleteBackupRestore = backupRestore, StorageArtwork = storageArtwork, ResourceShutdown = resourceShutdown, WindowShutdown = windowShutdown, SearchPerformance = searchPerformance,
             Status = "ui-smoke-passed", Environment = System.Runtime.InteropServices.RuntimeInformation.OSDescription,
             TagLibAssembly = new {
                 Identity = typeof(TagLib.File).Assembly.GetName().FullName,
