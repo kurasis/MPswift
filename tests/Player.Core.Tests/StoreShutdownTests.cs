@@ -31,11 +31,13 @@ public sealed class StoreShutdownTests
                 { using var lease = DataFileLease.OpenExisting(path)!; Assert.Equal(identity, lease.Identity); }
             }
             // Immutable reading ignores WAL: this proves close still checkpointed the committed data.
-            using var checkpointed = new SqliteConnection(new SqliteConnectionStringBuilder {
-                DataSource = new Uri(database).AbsoluteUri + "?immutable=1", Mode = SqliteOpenMode.ReadOnly, Pooling = false }.ToString());
-            checkpointed.Open(); using var command = checkpointed.CreateCommand();
-            command.CommandText = "SELECT Name FROM Playlists";
-            Assert.Equal("Latest committed close control", command.ExecuteScalar());
+            using (var checkpointed = new SqliteConnection(new SqliteConnectionStringBuilder {
+                DataSource = new Uri(database).AbsoluteUri + "?immutable=1", Mode = SqliteOpenMode.ReadOnly, Pooling = false }.ToString()))
+            {
+                checkpointed.Open(); using var command = checkpointed.CreateCommand();
+                command.CommandText = "SELECT Name FROM Playlists";
+                Assert.Equal("Latest committed close control", command.ExecuteScalar());
+            }
             using (File.Open(database, FileMode.Open, FileAccess.ReadWrite, FileShare.None)) { }
         }
         finally { await store.DisposeAsync(); Directory.Delete(directory, true); }
