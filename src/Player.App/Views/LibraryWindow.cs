@@ -40,6 +40,7 @@ public sealed class LibraryWindow : Window
         {
             var caption = new TextBlock { TextWrapping = TextWrapping.Wrap }; LocalizedStrings.Bind(caption, TextBlock.TextProperty, key);
             var label = new Label { Content = caption, Target = target, Padding = new Thickness(0, 4, 0, 2) };
+            label.MouseLeftButtonDown += (_, _) => target.Focus();
             AutomationProperties.SetLabeledBy(target, label); LocalizedStrings.Bind(target, AutomationProperties.NameProperty, key);
             DockPanel.SetDock(label, Dock.Top); panel.Children.Add(label);
         }

@@ -5,6 +5,7 @@ using System.Windows.Automation;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Player.App.Resources;
@@ -28,6 +29,13 @@ internal static class UiAuditValidation
         "Auxiliary control has no correct localized UIA name: " + expected);
     private static void Polite(TextBlock text) => Check(AutomationProperties.GetLiveSetting(text) == AutomationLiveSetting.Polite,
         "Auxiliary feedback has no polite live-region setting.");
+    private static void LabelFocus(Control control)
+    {
+        var label = AutomationProperties.GetLabeledBy(control);
+        Check(label is Label, "Input has no associated visible label.");
+        label!.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left) { RoutedEvent = UIElement.MouseLeftButtonDownEvent });
+        Check(control.IsKeyboardFocused, "Clicking the visible label did not focus its field.");
+    }
 
     internal static Task RespondToDeletion(Window owner, bool confirm, Action<DeletePlaylistDialog>? inspect = null)
         => owner.Dispatcher.InvokeAsync(() =>
@@ -71,7 +79,7 @@ internal static class UiAuditValidation
             {
                 try
                 {
-                    Named(name.NameBox, Strings.PlaylistName); Polite(name.ValidationText);
+                    Named(name.NameBox, Strings.PlaylistName); Polite(name.ValidationText); LabelFocus(name.NameBox);
                     name.NameBox.Text = "  "; Click(name.SaveButton);
                     Check(name.IsVisible && name.ValidationText.Text == Strings.Get("PlaylistNameRequired") &&
                         AutomationProperties.GetHelpText(name.NameBox) == name.ValidationText.Text && name.NameBox.IsKeyboardFocused,
@@ -89,12 +97,14 @@ internal static class UiAuditValidation
             {
                 audio.Show(); await Idle(owner);
                 Named(audio.DeviceBox, Strings.Get("OutputDevice")); Named(audio.ReplayGainBox, Strings.Get("ReplayGainHelp")); Polite(audio.StatusText);
+                LabelFocus(audio.DeviceBox); LabelFocus(audio.ReplayGainBox);
                 var sliders = CustomizationValidation.Descendants(audio).OfType<Slider>().ToArray();
                 Check(sliders.Length == 12, "Audio form lost an EQ, preamp or crossfade slider.");
                 var names = sliders.Select(slider => UIElementAutomationPeer.CreatePeerForElement(slider)!.GetName()).ToArray();
                 Check(names.Distinct().Count() == 12 && names.All(value => !string.IsNullOrWhiteSpace(value)), "Audio sliders have missing/duplicate UIA names.");
                 foreach (var center in AudioProcessingSettings.Centers)
                     Check(names.Contains(center.ToString(Strings.Culture) + " " + Strings.Get("HzUnit") + ", " + Strings.Get("GainDb")), "An EQ frequency is absent from its accessible name.");
+                foreach (var slider in sliders) LabelFocus(slider);
                 CustomizationValidation.Render((FrameworkElement)audio.Content, output, "audio-settings-" + settings.Language + ".png");
                 Click(audio.ApplyButton); var first = audio.ApplyCompletion;
                 if (!first.IsCompleted) Check(!audio.ApplyButton.IsEnabled && audio.StatusText.Text == Strings.Get("ApplyingAudio"), "Pending audio Apply has no disabled/busy feedback.");
@@ -140,7 +150,7 @@ internal static class UiAuditValidation
             Check(model.Snapshot.EntryId == snapshot.EntryId && model.SourcePlaylistId == source && model.Snapshot.State == snapshot.State &&
                 model.Queue.Select(item => item.Id).SequenceEqual(queue), "UI audit regressions changed source/playback/queue.");
             return new { Status = "ui-audit-passed", CancelDefaultDeletion = true, CancelPreservesOrder = true, StaleDeletionRefused = true,
-                ConfirmedDeletionKeepsMusic = true, LocalizedAuxiliaryNames = true, EmptyNameValidation = true,
+                ConfirmedDeletionKeepsMusic = true, LocalizedAuxiliaryNames = true, ClickableAssociatedLabels = true, EmptyNameValidation = true,
                 NativeAudioRepeatedApplyGuard = true, AudioFailureInlineAndRetryable = true, PoliteAuxiliaryStatuses = true,
                 LibraryPageBoundaries = true, LibraryOffsetReconciled = true, StaleLibraryResponseIgnored = true,
                 InlineCacheValidation = true, AccessiblePanelPositionReset = true, ActualAccentHover = true, PlaybackAndQueuePreserved = true,
@@ -172,6 +182,7 @@ internal static class UiAuditValidation
             foreach (var batch in files.Chunk(64)) await index.UpsertFilesAsync(batch);
             library = new LibraryWindow(owner, model); library.Show(); await Idle(owner); await library.SearchCompletion;
             Named(library.SearchBox, Strings.Get("LibrarySearch")); Named(library.RootsBox, Strings.Get("LibraryRoots")); Polite(library.StatusText);
+            LabelFocus(library.SearchBox); LabelFocus(library.RootsBox);
             foreach (var test in new[] { (Query: "Absent audit title", Total: 0L), (Query: "OnlyOne", Total: 1L), (Query: "First100", Total: 100L), (Query: "UI audit all", Total: 101L) })
             {
                 var page = await library.LoadPageAsync(test.Query, 0);

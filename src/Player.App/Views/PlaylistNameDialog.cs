@@ -21,6 +21,7 @@ public sealed class PlaylistNameDialog : Window
         var panel = new StackPanel { Margin = new Thickness(16) };
         _name = new TextBox { Text = current, MaxLength = 200, Margin = new Thickness(0, 0, 0, 12) };
         var label = new Label { Content = Strings.Get("PlaylistName"), Target = _name, Padding = new Thickness(0, 0, 0, 6) };
+        label.MouseLeftButtonDown += (_, _) => _name.Focus();
         AutomationProperties.SetLabeledBy(_name, label); AutomationProperties.SetName(_name, Strings.Get("PlaylistName"));
         panel.Children.Add(label); panel.Children.Add(_name);
         ValidationText.Margin = new Thickness(0, 0, 0, 12); panel.Children.Add(ValidationText);

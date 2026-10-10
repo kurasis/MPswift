@@ -27,6 +27,7 @@ public sealed class AudioSettingsWindow : Window
         void Label(string key, Control target)
         {
             var caption = new Label { Content = new TextBlock { Text = Strings.Get(key), TextWrapping = TextWrapping.Wrap }, Target = target, Padding = new Thickness(0, 8, 0, 4) };
+            caption.MouseLeftButtonDown += (_, _) => target.Focus();
             AutomationProperties.SetLabeledBy(target, caption); AutomationProperties.SetName(target, Strings.Get(key)); panel.Children.Add(caption);
         }
         if (output.DeviceId is { } saved && devices.All(d => d.Id != saved)) devices = devices.Append(new(saved, Strings.Get("SavedOutputUnavailable"), 0, 0)).ToArray();
@@ -42,6 +43,7 @@ public sealed class AudioSettingsWindow : Window
             var row = new DockPanel(); var frequency = AudioProcessingSettings.Centers[i].ToString(Strings.Culture) + " " + Strings.Get("HzUnit");
             bands[i] = new Slider { Minimum = -12, Maximum = 12, Value = settings.Bands![i], TickFrequency = 1, SmallChange = 1, ToolTip = Strings.Get("GainDb"), Margin = new Thickness(8, 5, 8, 5), IsMoveToPointEnabled = true };
             var name = new Label { Content = frequency, Width = 70, Target = bands[i], Padding = new Thickness(0, 5, 0, 5) };
+            name.MouseLeftButtonDown += (_, _) => name.Target.Focus();
             AutomationProperties.SetLabeledBy(bands[i], name); AutomationProperties.SetName(bands[i], frequency + ", " + Strings.Get("GainDb"));
             row.Children.Add(name); row.Children.Add(bands[i]); panel.Children.Add(row);
         }
