@@ -762,4 +762,49 @@ F1: локальная справка
     <data xml:space="preserve" name="DesktopPanelHelp"><value>Перетаскивайте обложку или название трека, чтобы переместить панель. Она находится под другими окнами. Кнопка со стрелкой возвращает основное окно.</value></data>
     <data xml:space="preserve" name="DesktopPanelRestore"><value>Открыть MPswift</value></data>
     <data xml:space="preserve" name="DesktopPanelUnavailable"><value>Панель управления недоступна. Откройте основное окно для управления.</value></data>
+    <data xml:space="preserve" name="DeletePlaylistPrompt">
+        <value>Удалить плейлист «{0}» с записями: {1:N0}? Плейлист и порядок треков будут удалены. Музыкальные файлы сохранятся.</value>
+    </data>
+    <data xml:space="preserve" name="PlaylistChangedRetry">
+        <value>Плейлист изменился во время подтверждения. Проверьте его и повторите действие.</value>
+    </data>
+    <data xml:space="preserve" name="PlaylistNameRequired">
+        <value>Введите название плейлиста.</value>
+    </data>
+    <data xml:space="preserve" name="ApplyingAudio">
+        <value>Применение настроек звука…</value>
+    </data>
+    <data xml:space="preserve" name="AudioApplyFailed">
+        <value>Не удалось применить настройки звука. Выберите доступное устройство вывода и повторите попытку. Технические подробности доступны в основном окне.</value>
+    </data>
+    <data xml:space="preserve" name="LibraryRoots">
+        <value>Папки с музыкой</value>
+    </data>
+    <data xml:space="preserve" name="LibraryResults">
+        <value>Треки фонотеки</value>
+    </data>
+    <data xml:space="preserve" name="DesktopPanelPosition">
+        <value>Положение мини-панели</value>
+    </data>
+    <data xml:space="preserve" name="DesktopPanelPositionHelp">
+        <value>Выберите положение клавиатурой или мышью и нажмите «Применить». Оно изменится при следующем сворачивании плеера. Панель также можно перетаскивать.</value>
+    </data>
+    <data xml:space="preserve" name="PanelPositionKeep">
+        <value>Сохранить текущее положение</value>
+    </data>
+    <data xml:space="preserve" name="PanelPositionReset">
+        <value>Сбросить: внизу по центру</value>
+    </data>
+    <data xml:space="preserve" name="PanelPositionTopLeft">
+        <value>Слева вверху</value>
+    </data>
+    <data xml:space="preserve" name="PanelPositionTopRight">
+        <value>Справа вверху</value>
+    </data>
+    <data xml:space="preserve" name="PanelPositionBottomLeft">
+        <value>Слева внизу</value>
+    </data>
+    <data xml:space="preserve" name="PanelPositionBottomRight">
+        <value>Справа внизу</value>
+    </data>
 </root>

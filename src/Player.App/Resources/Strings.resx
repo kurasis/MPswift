@@ -762,4 +762,49 @@ Settings include accent, waveform style, startup/session options and local cache
     <data xml:space="preserve" name="DesktopPanelHelp"><value>Drag the cover or track title to move it. The panel stays behind other windows; use its arrow to restore MPswift.</value></data>
     <data xml:space="preserve" name="DesktopPanelRestore"><value>Restore MPswift</value></data>
     <data xml:space="preserve" name="DesktopPanelUnavailable"><value>Desktop controls are unavailable. Restore the main window to continue.</value></data>
+    <data xml:space="preserve" name="DeletePlaylistPrompt">
+        <value>Delete playlist “{0}” with {1:N0} entries? This removes the playlist and its ordering. Music files will be kept.</value>
+    </data>
+    <data xml:space="preserve" name="PlaylistChangedRetry">
+        <value>The playlist changed while confirmation was open. Review it and try again.</value>
+    </data>
+    <data xml:space="preserve" name="PlaylistNameRequired">
+        <value>Enter a playlist name.</value>
+    </data>
+    <data xml:space="preserve" name="ApplyingAudio">
+        <value>Applying audio settings…</value>
+    </data>
+    <data xml:space="preserve" name="AudioApplyFailed">
+        <value>Audio settings could not be applied. Select an available output device and retry. Technical details are available in the main window.</value>
+    </data>
+    <data xml:space="preserve" name="LibraryRoots">
+        <value>Music folders</value>
+    </data>
+    <data xml:space="preserve" name="LibraryResults">
+        <value>Library tracks</value>
+    </data>
+    <data xml:space="preserve" name="DesktopPanelPosition">
+        <value>Desktop panel position</value>
+    </data>
+    <data xml:space="preserve" name="DesktopPanelPositionHelp">
+        <value>Choose a position with the keyboard or mouse, then Apply. It takes effect when the player is next minimized. You can also drag the panel.</value>
+    </data>
+    <data xml:space="preserve" name="PanelPositionKeep">
+        <value>Keep current position</value>
+    </data>
+    <data xml:space="preserve" name="PanelPositionReset">
+        <value>Reset: bottom center</value>
+    </data>
+    <data xml:space="preserve" name="PanelPositionTopLeft">
+        <value>Top left</value>
+    </data>
+    <data xml:space="preserve" name="PanelPositionTopRight">
+        <value>Top right</value>
+    </data>
+    <data xml:space="preserve" name="PanelPositionBottomLeft">
+        <value>Bottom left</value>
+    </data>
+    <data xml:space="preserve" name="PanelPositionBottomRight">
+        <value>Bottom right</value>
+    </data>
 </root>

@@ -1,5 +1,11 @@
 # Test evidence — Stages A–G
 
+## UI audit fix verification (2026-10-10)
+
+Baseline and revised locked Release build both pass with zero warnings/errors: Core 329 passed; CLI 78 passed and 15 genuine Windows-only skipped (93 total). Existing secret controls/current-tree scan, unique EN/RU resource parity/literal references, version agreement and whitespace checks pass. No separate lint task exists; C# compilation supplies the type check. The current Vercel rules were fetched again over verified HTTPS before the fixes were reviewed.
+
+New required WPF smoke checks production playlist cancel/confirm/stale confirmation, name-field validation/trim, auxiliary UIA names and polite status settings, native audio Apply guard/success and inline refusal from a genuinely disposed engine, SQLite paging with 0/1/100/101 results and invalid offsets, disabled navigation/stale responses, inline focused cache validation, file information completion and actual accent cursor hover. Desktop tests check actual corner presets, fitted/persisted coordinates and draft cancellation. Publication requires UiAudit and position-preset reports from actually installed EN/RU executables. Source-specific Windows results remain pending until the revised workflow completes; actual Narrator speech, high-contrast and mixed-DPI/touch are not inferred from peer properties or captures.
+
 ## UI audit evidence (2026-10-10)
 
 The web-design-guidelines live rules returned HTTP 200 over verified HTTPS; the 8055-byte response hash and source scope are recorded in [UI_AUDIT_2026-10-10.md](UI_AUDIT_2026-10-10.md). Reviewed WPF UI source and existing minimum-size/file-information Windows captures from run 38045169563, after confirming no application-code difference between that run's source and the reviewed skill-installation commit. Findings are source-supported, not fresh interactive reproductions. No new application build/tests or Linux WPF execution are claimed. Narrator, full visual-focus/high-contrast and physical mixed-DPI/touch acceptance remain unverified. Documentation checks cover whitespace, report references and unchanged application source.

@@ -107,6 +107,27 @@ internal static class DesktopPanelValidation
             Check(ReferenceEquals(window.DesktopPanel, controls) && controls.IsVisible && DesktopPanelLayer.ReadBounds(handle).Left == bounds.Left,
                 "Repeated minimization recreated the panel or lost its placement.");
             window.ShowAndActivate();
+            for (var preset = 2; preset <= 5; preset++)
+            {
+                var placement = new PreferencesWindow(window, model); placement.Show(); await Idle(window); await placement.CacheRefreshCompletion;
+                placement.DesktopPanelPositionBox.SelectedIndex = preset;
+                placement.ApplyButton.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent)); await placement.ApplyCompletion;
+                window.WindowState = WindowState.Minimized; await Idle(window);
+                var placed = DesktopPanelLayer.ReadBounds(handle);
+                var target = Forms.Screen.FromHandle(new WindowInteropHelper(window).Handle).WorkingArea;
+                Check(placed.Left == (preset is 2 or 4 ? target.Left : target.Right - (placed.Right - placed.Left)) &&
+                    placed.Top == (preset is 2 or 3 ? target.Top : target.Bottom - (placed.Bottom - placed.Top)),
+                    "Accessible position preset did not move the panel to the requested corner.");
+                Check(model.WindowSettings.DesktopPanelLeft == placed.Left && model.WindowSettings.DesktopPanelTop == placed.Top,
+                    "Position preset lost fitted physical coordinates.");
+                await model.SaveNowAsync(); var positioned = new SettingsFile(Path.Combine(Environment.CurrentDirectory, "artifacts", "smoke", "stage-c-data")).Load();
+                Check(positioned.DesktopPanelLeft == placed.Left && positioned.DesktopPanelTop == placed.Top, "Position preset did not persist.");
+                window.ShowAndActivate();
+            }
+            controls.Place(bounds.Left, bounds.Top);
+            var canceledPlacement = new PreferencesWindow(window, model); canceledPlacement.Show(); await Idle(window); await canceledPlacement.CacheRefreshCompletion;
+            canceledPlacement.DesktopPanelPositionBox.SelectedIndex = 1; canceledPlacement.Close();
+            Check(model.WindowSettings.DesktopPanelLeft == bounds.Left && model.WindowSettings.DesktopPanelTop == bounds.Top, "Cancelled preset changed panel coordinates.");
             var preferences = new PreferencesWindow(window, model); preferences.Show(); await Idle(window);
             await preferences.CacheRefreshCompletion;
             Check(preferences.DesktopPanelBox.IsChecked == true, "Preferences lost the enabled desktop-panel option.");
@@ -135,6 +156,7 @@ internal static class DesktopPanelValidation
                 AccessibleVolumeBinding = true, ShuffleBinding = true, ActualNativeSeekRouting = true, PlaybackAndQueuePreserved = true,
                 MonitorBoundsClamped = true, PhysicalPositionPersisted = true, RestoreArrow = true, RepeatedMinimization = true,
                 PreferencesOptionApplied = true, DisabledOptionPersisted = true, DisabledMainWindowHidden = true, ModelRebinding = true, TrayHideRestore = true,
+                AccessiblePositionPresets = true, PositionPresetPersisted = true, PositionDraftCancel = true,
                 DelayedInitialization = true, PanelClosedWithMain = true, OwnedSourceAndDatabaseReleased = true,
                 PhysicalMonitorCount = Forms.Screen.AllScreens.Length,
                 PhysicalPointerDrag = "manual-not-run", MixedDpiMonitorTransitions = "manual-not-run", WindowsShowDesktop = "manual-not-run" };

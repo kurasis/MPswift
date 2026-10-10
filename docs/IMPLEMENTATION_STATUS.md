@@ -1,5 +1,11 @@
 # Implementation checkpoint
 
+## UI audit remediation (2026-10-10)
+
+Implemented all ten source-level findings in [UI_AUDIT_2026-10-10.md](UI_AUDIT_2026-10-10.md), after the owner requested the complete fix. Playlist deletion now has a cancel-default name/count confirmation and stale-target guard. Auxiliary controls have visible associated/localized labels; feedback uses a shared polite UIA helper. Audio Apply guards repeated requests, shows progress and an inline retry message, and handles actual engine refusal. Library page boundaries and empty ranges are valid even after filtering or count changes. Empty playlist names and cache-budget errors receive inline associated validation. Accent buttons have a distinct hover; keyboard-accessible panel position presets/reset apply on the next minimization without activating the panel. Schema, pinned dependencies, music bytes, transport interfaces and installer behavior remain.
+
+Added actual owned Windows WPF/SQLite/native regressions to the required smoke, including the installed EN/RU publication gate. Local locked Release passes with 329 Core and 78 CLI tests, 15 Windows-only skips and zero build warnings/errors. Source-specific Windows evidence must pass before integration/publication; Narrator speech, physical mixed-DPI and touch remain separate acceptance.
+
 ## UI review using web-design-guidelines (2026-10-10)
 
 Completed a source review with freshly fetched Vercel rules and inspected existing Windows captures for unchanged application code. [UI_AUDIT_2026-10-10.md](UI_AUDIT_2026-10-10.md) records ten prioritized findings, minimal fixes and targeted verification: unconfirmed playlist deletion, auxiliary control labels/status announcements, audio Apply feedback, library pagination, name validation, accent hover and a desktop-panel positioning alternative. These fixes are not implemented by this audit. Application source, dependencies and public interfaces remain unchanged; this change records review evidence only.

@@ -1,5 +1,9 @@
 # Requirement and acceptance status
 
+## Owner follow-up: fix all UI audit findings (2026-10-10)
+
+All ten audited source defects now have targeted fixes and required real Windows regression paths, summarized in [UI_AUDIT_2026-10-10.md](UI_AUDIT_2026-10-10.md). Source-level remediation is complete; source-specific WPF/installed EN/RU evidence is required before publication. Library paging, form errors, audio feedback, accessible auxiliary labels/statuses, destructive playlist confirmation, accent hover and a keyboard-accessible mini-panel position alternative are covered without new dependencies or schema/public-interface changes. Local build/tests pass. This does not close actual Narrator, physical mixed-DPI/touch, device-output or other existing manual/hardware acceptance gates.
+
 ## Owner follow-up: explicit UI audit (2026-10-10)
 
 Applied the installed web-design-guidelines skill with fresh live rules and WPF-specific scope. [UI_AUDIT_2026-10-10.md](UI_AUDIT_2026-10-10.md) lists remaining UX/accessibility work with priorities and verification criteria. Confirmed source-level gaps include playlist-deletion recovery, accessible labels in auxiliary dialogs, library-page boundaries and visible/announced error feedback. Existing main-window accessibility and virtualization do not establish full application compliance. This request is fulfilled as a review; listed application fixes and interactive Windows acceptance remain pending. No feature, dependency, installation or public-interface behavior changed.
