@@ -757,4 +757,9 @@ F1: локальная справка
     <data xml:space="preserve" name="CueTrackLabel"><value>Выбранная песня CUE</value></data>
     <data xml:space="preserve" name="CueRangeLabel"><value>Отрезок CUE</value></data>
     <data xml:space="preserve" name="BitUnit"><value>бит</value></data>
+    <data xml:space="preserve" name="DesktopPanelTitle"><value>Панель управления MPswift</value></data>
+    <data xml:space="preserve" name="DesktopPanelEnabled"><value>Показывать панель управления при сворачивании</value></data>
+    <data xml:space="preserve" name="DesktopPanelHelp"><value>Перетаскивайте обложку или название трека, чтобы переместить панель. Она находится под другими окнами. Кнопка со стрелкой возвращает основное окно.</value></data>
+    <data xml:space="preserve" name="DesktopPanelRestore"><value>Открыть MPswift</value></data>
+    <data xml:space="preserve" name="DesktopPanelUnavailable"><value>Панель управления недоступна. Откройте основное окно для управления.</value></data>
 </root>

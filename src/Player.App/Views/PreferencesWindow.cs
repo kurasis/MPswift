@@ -17,6 +17,7 @@ public sealed class PreferencesWindow : Window
     internal CheckBox ShuffleDefaultBox { get; }
     internal CheckBox AlbumSectionsBox { get; }
     internal CheckBox CloseToTrayBox { get; }
+    internal CheckBox DesktopPanelBox { get; }
     internal CheckBox RestoreSessionBox { get; }
     internal CheckBox RestorePositionBox { get; }
     internal ComboBox CueEncodingBox { get; }
@@ -85,6 +86,7 @@ public sealed class PreferencesWindow : Window
         Hint(Strings.Get("RestoreSessionHelp"));
         Section("BehaviorSection");
         CloseToTrayBox = Check("CloseToTray", model.WindowSettings.CloseToTray); Hint(Strings.CloseTrayHelp);
+        DesktopPanelBox = Check("DesktopPanelEnabled", model.WindowSettings.DesktopPanelEnabled); Hint(Strings.Get("DesktopPanelHelp"));
         Section("AudioSection"); Hint(Strings.AudioSettingsHelp);
         var audio = new Button { Content = Strings.Get("AudioSettings"), HorizontalAlignment = HorizontalAlignment.Left }; panel.Children.Add(audio);
         audio.Click += async (_, _) =>
@@ -141,7 +143,7 @@ public sealed class PreferencesWindow : Window
             ApplyButton.IsEnabled = false;
             try
             {
-                await model.SavePreferencesAsync(model.WindowSettings with { Language = LanguageBox.SelectedIndex == 1 ? "ru" : "en", CloseToTray = CloseToTrayBox.IsChecked == true,
+                await model.SavePreferencesAsync(model.WindowSettings with { Language = LanguageBox.SelectedIndex == 1 ? "ru" : "en", CloseToTray = CloseToTrayBox.IsChecked == true, DesktopPanelEnabled = DesktopPanelBox.IsChecked == true,
                     ShowAlbumSections = AlbumSectionsBox.IsChecked == true, CueCodePage = cueCodePages[Math.Clamp(CueEncodingBox.SelectedIndex, 0, cueCodePages.Length - 1)],
                     Accent = accents[Math.Clamp(AccentBox.SelectedIndex, 0, accents.Length - 1)], WaveformCacheMiB = budget,
                     WaveformStyle = WaveformStyleBox.SelectedIndex == 1 ? "peaks" : "energy", DefaultRepeat = (Player.Core.Playback.RepeatMode)RepeatDefaultBox.SelectedValue, DefaultShuffle = ShuffleDefaultBox.IsChecked == true,

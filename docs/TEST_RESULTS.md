@@ -1,5 +1,11 @@
 # Test evidence — Stages A–G
 
+## Desktop control strip source checks (2026-10-10)
+
+Before edits: locked Release build, zero warnings/errors, Core 323 passed and CLI 78 passed/15 Windows-only skipped (93 total). After edits: locked Release build, zero warnings/errors, Core 329 passed; CLI unchanged at 78 passed/15 skipped. Six new settings cases cover schema-1 defaults, the disabled option and negative coordinates, and four invalid/incomplete coordinate pairs. There is no separate lint/type-check task; C# compilation is the type check. Existing secret-control and working-tree audits, resource-key parity and whitespace checks are required.
+
+A new mandatory actual WPF desktop-panel report exercises only owned Windows windows/audio/data: native z-order below another ordinary window, refusal to raise itself above it, NOACTIVATE/TOOLWINDOW styles and WM_MOUSEACTIVATE click delivery without foreground changes; title/transport bindings, accessible volume/shuffle, real native seek routing, offscreen clamping and physical-coordinate persistence; restore, repeat minimization, actual Settings Apply/disable, disabled-owner hiding, DataContext rebinding and tray restoration; delayed initialization while minimized, final HWND destruction and exclusive audio/database reopening. EN/RU screenshots show the actual strip. Source-specific Windows results remain pending until the new main CI completes. Physical mouse dragging, mixed-DPI monitor transitions and Win+D are explicitly manual-not-run; hosted evidence cannot close Windows 11/hardware acceptance.
+
 ## Track actions and mirrored backup verification (2026-10-09)
 
 Locked baseline: zero build warnings/errors, Core 321 passed; CLI 78 passed and 14 Windows-only skipped (92 total). Revised locked Release build compiles the real WPF app on Linux without warnings/errors; Core 323 passed and CLI 78 passed/15 Windows-only skipped (93 total). Two Core tests cover legacy settings defaults and Favorites/previous-playlist GUID round trips without a schema bump. Genuine Windows/WPF, nested backup-link refusal and packaged CLI/installer results require the committed-source workflow. Native Windows recycle confirmation dialogs remain manual-not-run: smoke only verifies loaded-source refusal and cancellation of the app preview without deleting fixture files.

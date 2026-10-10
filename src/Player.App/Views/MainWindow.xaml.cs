@@ -28,12 +28,15 @@ public partial class MainWindow : Window
     private bool _shutdownStarted;
     private bool _exitRequested;
     private System.Windows.Interop.HwndSource? _powerSource;
+    private readonly Player.App.Services.Windows.DesktopPanelController _desktopPanelController;
+    internal DesktopPanelWindow? DesktopPanel => _desktopPanelController.Panel;
     internal Task PowerPauseCompletion { get; private set; } = Task.CompletedTask;
     public Task RestoreCompletion { get; private set; } = Task.CompletedTask;
     private PlayerViewModel Model => (PlayerViewModel)DataContext;
     public MainWindow()
     {
         InitializeComponent();
+        _desktopPanelController = new(this);
         WaveformView.PreviewSeek += seconds => { Model.SeekPreview = true; Model.SeekPosition = seconds; };
         WaveformView.CommitSeek += async seconds => { Model.SeekPreview = false; await Model.CommitSeekAsync(seconds); };
         Width = Math.Min(Width, SystemParameters.WorkArea.Width);

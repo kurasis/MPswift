@@ -10,6 +10,28 @@ public sealed class SettingsRecoveryTests : IDisposable
     private readonly string _directory = Path.Combine(Path.GetTempPath(), "settings-recovery-" + Guid.NewGuid().ToString("N"));
     private string Main => Path.Combine(_directory, "settings.json");
     private string Backup => Main + ".bak";
+    [Fact] public void LegacySettingsEnableDesktopPanelWithoutInventingSavedCoordinates()
+    {
+        var file = Seed(); File.WriteAllText(Main, "{\"SchemaVersion\":1,\"Volume\":23}");
+        var loaded = file.Load();
+        Assert.True(loaded.DesktopPanelEnabled); Assert.Null(loaded.DesktopPanelLeft); Assert.Null(loaded.DesktopPanelTop);
+        Assert.Equal(23, loaded.Volume); Assert.Equal(1, loaded.SchemaVersion);
+    }
+    [Fact] public void DesktopPanelOptionAndNegativeMonitorCoordinatesRoundTrip()
+    {
+        var file = Seed();
+        file.Save(new PlayerSettings(Volume: 23) { DesktopPanelEnabled = false, DesktopPanelLeft = -1920, DesktopPanelTop = -640 });
+        var loaded = file.Load();
+        Assert.False(loaded.DesktopPanelEnabled); Assert.Equal(-1920, loaded.DesktopPanelLeft); Assert.Equal(-640, loaded.DesktopPanelTop);
+        Assert.Equal(23, loaded.Volume); Assert.Equal(1, loaded.SchemaVersion);
+    }
+    [Theory]
+    [InlineData(null, 20)] [InlineData(20, null)] [InlineData(int.MaxValue, 20)] [InlineData(20, int.MinValue)]
+    public void IncompleteOrUnreasonableDesktopPanelCoordinatesResetTogether(int? left, int? top)
+    {
+        var loaded = new PlayerSettings { DesktopPanelEnabled = false, DesktopPanelLeft = left, DesktopPanelTop = top }.Validate();
+        Assert.Null(loaded.DesktopPanelLeft); Assert.Null(loaded.DesktopPanelTop); Assert.False(loaded.DesktopPanelEnabled);
+    }
     [Fact] public void FavoritesAndPreviousPlaylistIdentifiersRoundTripWithoutChangingSchema()
     {
         var file = Seed(); var favorites = Guid.NewGuid(); var previous = Guid.NewGuid();

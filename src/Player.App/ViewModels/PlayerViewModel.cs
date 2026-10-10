@@ -110,12 +110,19 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         {
             var refresh = _windowSettings.ShowAlbumSections != value.ShowAlbumSections;
             _windowSettings = value;
+            OnPropertyChanged(nameof(WindowSettings));
             OnPropertyChanged(nameof(UsePeakWaveform));
             if (refresh && VisibleEntries is not null) UpdatePlaylistStatus();
         }
     }
     public bool Initialized => _initialized;
     public bool UsePeakWaveform => WindowSettings.WaveformStyle == "peaks";
+    public void RememberDesktopPanelPosition(int left, int top)
+    {
+        if (_closing || (WindowSettings.DesktopPanelLeft == left && WindowSettings.DesktopPanelTop == top)) return;
+        WindowSettings = WindowSettings with { DesktopPanelLeft = left, DesktopPanelTop = top };
+        ScheduleSave(false);
+    }
 
     [ObservableProperty] private PlaylistTabViewModel _selectedPlaylist = null!;
     [ObservableProperty] private PlaylistRowViewModel? _selectedEntry;
@@ -199,6 +206,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         ApplySnapshot(_player.Snapshot);
         AppearanceService.Apply(WindowSettings.Accent);
         _initialized = true;
+        OnPropertyChanged(nameof(Initialized));
         AddFilesCommand.NotifyCanExecuteChanged(); AddFolderCommand.NotifyCanExecuteChanged();
         SaveStatus = Strings.Get("Saved");
         if (_index is not null)

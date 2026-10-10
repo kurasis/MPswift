@@ -1,5 +1,11 @@
 # Requirement and acceptance status
 
+## Owner follow-up: controls while minimized (2026-10-10)
+
+Implemented the requested draggable compact strip behind ordinary application windows, with existing transport, seek, shuffle and volume actions and a restore arrow. It appears on minimize/tray hide, disappears on main restoration and can be disabled in settings. Physical screen coordinates persist and are clamped after monitor/DPI changes; old settings remain schema-1 compatible. The app only positions its own nonactivating tool window and never changes Explorer, taskbars, privilege or installation behavior. Playback source, queue and main-window public interfaces remain.
+
+Local locked Release and 329 Core/78 CLI checks pass, with 15 CLI Windows-only tests skipped. Mandatory genuine Windows WPF, extracted/installed packaging and lifecycle evidence must be observed before releasing this source. Physical dragging, mixed-DPI monitor transitions and Win+D remain manual acceptance. Existing physical-device, signing/licensing and clean Windows 11 limitations are unchanged.
+
 ## Owner follow-up: track actions and folder-preserving backups (2026-10-09)
 
 View-only information and an Избранное/Favorites playlist are explicitly selected by the owner. The new track context menu implements the requested action groups except Find-in-library, retaining localization, multi-selection and persistent integer ratings. File information shows actual tags/lyrics/technical details/cover with four read-only tabs and navigation. No tag editing or Save action is introduced. Previous playback playlist records actual source switches, rather than merely viewed tabs. File clipboard and folder/playlist sending are explicit local actions. Del retains non-destructive entry removal; Ctrl+Del requests physical recycling through a cancel-default preview and Windows prompts, with special shared-CUE warning and loaded-source protection.

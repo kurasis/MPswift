@@ -52,6 +52,10 @@ public sealed record PlayerSettings(int SchemaVersion = 1, double Volume = 50, b
     public string? LastFolderDirectory { get; init; }
     public Guid? FavoritesPlaylistId { get; init; }
     public Guid? PreviousPlaylistId { get; init; }
+    public bool DesktopPanelEnabled { get; init; } = true;
+    // Screen-pixel coordinates; bounds are fitted to the current monitor on show.
+    public int? DesktopPanelLeft { get; init; }
+    public int? DesktopPanelTop { get; init; }
 
     public PlayerSettings Validate()
     {
@@ -64,6 +68,8 @@ public sealed record PlayerSettings(int SchemaVersion = 1, double Volume = 50, b
             DefaultRepeat = Enum.IsDefined(DefaultRepeat) ? DefaultRepeat : RepeatMode.Off,
             FavoritesPlaylistId = FavoritesPlaylistId == Guid.Empty ? null : FavoritesPlaylistId,
             PreviousPlaylistId = PreviousPlaylistId == Guid.Empty ? null : PreviousPlaylistId,
+            DesktopPanelLeft = DesktopPanelLeft is >= -100000 and <= 100000 && DesktopPanelTop is >= -100000 and <= 100000 ? DesktopPanelLeft : null,
+            DesktopPanelTop = DesktopPanelLeft is >= -100000 and <= 100000 && DesktopPanelTop is >= -100000 and <= 100000 ? DesktopPanelTop : null,
             LastFileDirectory = ValidateDirectory(LastFileDirectory),
             LastFolderDirectory = ValidateDirectory(LastFolderDirectory),
             CueCodePage = CueCodePage is 0 or 1251 or 1252 or 866 ? CueCodePage : 1251,

@@ -757,4 +757,9 @@ Settings include accent, waveform style, startup/session options and local cache
     <data xml:space="preserve" name="CueTrackLabel"><value>Selected CUE song</value></data>
     <data xml:space="preserve" name="CueRangeLabel"><value>CUE segment</value></data>
     <data xml:space="preserve" name="BitUnit"><value>bit</value></data>
+    <data xml:space="preserve" name="DesktopPanelTitle"><value>MPswift desktop controls</value></data>
+    <data xml:space="preserve" name="DesktopPanelEnabled"><value>Show desktop controls when minimized</value></data>
+    <data xml:space="preserve" name="DesktopPanelHelp"><value>Drag the cover or track title to move it. The panel stays behind other windows; use its arrow to restore MPswift.</value></data>
+    <data xml:space="preserve" name="DesktopPanelRestore"><value>Restore MPswift</value></data>
+    <data xml:space="preserve" name="DesktopPanelUnavailable"><value>Desktop controls are unavailable. Restore the main window to continue.</value></data>
 </root>
