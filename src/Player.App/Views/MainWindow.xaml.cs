@@ -341,6 +341,8 @@ public partial class MainWindow : Window
     {
         try
         {
+            // WPF forbids Close() reentrancy from Closing, even when cleanup completes synchronously.
+            await Task.Yield();
             Model.WindowSettings = Model.WindowSettings with { WindowWidth = RestoreBounds.Width, WindowHeight = RestoreBounds.Height,
                 WindowLeft = RestoreBounds.Left, WindowTop = RestoreBounds.Top, WindowMaximized = WindowState == WindowState.Maximized };
             _trackActionsCancellation.Cancel();

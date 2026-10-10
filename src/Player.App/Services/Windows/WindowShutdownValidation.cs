@@ -117,7 +117,16 @@ internal static class WindowShutdownValidation
                     await waveforms.DisposeAsync(); await player.DisposeAsync(); await store.DisposeAsync();
                 }
             }
-            return new { Status = "window-shutdown-passed", DisabledListsKeepTheme = true, CloseToTrayPreserved = true, Cases = results,
+            var released = ((App)Application.Current).CreateModel(Path.Combine(directory, "already-released"));
+            var releasedWindow = new MainWindow { DataContext = released };
+            try
+            {
+                await released.InitializeAsync(); releasedWindow.Show(); await released.DisposeAsync();
+                await releasedWindow.CloseForValidationAsync().WaitAsync(TimeSpan.FromSeconds(10));
+                Check(!releasedWindow.IsVisible, "Already released model caused reentrant close.");
+            }
+            finally { if (releasedWindow.IsVisible) await releasedWindow.CloseForValidationAsync(); }
+            return new { Status = "window-shutdown-passed", DisabledListsKeepTheme = true, CloseToTrayPreserved = true, AlreadyReleasedModelClose = true, Cases = results,
                 Scope = "Actual WPF/native decode/SQLite; controlled pending save, no physical driver latency guarantee" };
         }
         finally { Directory.Delete(directory, true); original.ShowAndActivate(); }
