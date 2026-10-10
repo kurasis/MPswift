@@ -2,6 +2,8 @@
 
 ## Owner follow-up: fix all UI audit findings (2026-10-10)
 
+Final Windows acceptance for these source fixes is observed at `3e798c5` in [run 38049586964](https://github.com/kurasis/MPswift/actions/runs/38049586964): all required jobs pass, including real ordinary/rebuilt/extracted/installed WPF and installer lifecycle. [Evidence](evidence/ui-audit-windows.json) records successful regression flags and the tested application tree. All ten findings are implemented and automated Windows acceptance passes; Narrator speech, physical mixed-DPI/high-contrast/touch and existing hardware/clean-OS gates remain outside this result. The subsequent evidence-only commit changes no application behavior.
+
 All ten audited source defects now have targeted fixes and required real Windows regression paths, summarized in [UI_AUDIT_2026-10-10.md](UI_AUDIT_2026-10-10.md). Source-level remediation is complete; source-specific WPF/installed EN/RU evidence is required before publication. Library paging, form errors, audio feedback, accessible auxiliary labels/statuses, destructive playlist confirmation, accent hover and a keyboard-accessible mini-panel position alternative are covered without new dependencies or schema/public-interface changes. Local build/tests pass. This does not close actual Narrator, physical mixed-DPI/touch, device-output or other existing manual/hardware acceptance gates.
 
 ## Owner follow-up: explicit UI audit (2026-10-10)
