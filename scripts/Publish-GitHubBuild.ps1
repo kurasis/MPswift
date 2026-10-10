@@ -28,7 +28,8 @@ if ($installer.Status -ne 'installer-compiled' -or $installer.SourceTreeDirty -o
     $installed.ProductVersion -ne $audit.ProductVersion -or $installed.InstallerSha256 -ne $installer.InstallerSha256 -or @($installed.Phases).Count -ne 3 -or @($installed.Wpf).Count -ne 2) { throw 'Installer audit/lifecycle evidence does not agree with the portable build.' }
 foreach ($phase in $installed.Phases) { if ($phase.Status -ne 'standard-user-installer-phase-passed' -or $phase.Administrator -or -not $phase.DataPreserved) { throw 'Installer standard-user lifecycle evidence failed.' } }
 if (($installed.Phases.Phase -join ',') -ne 'Install,Upgrade,Uninstall' -or (($installed.Wpf.Language | Sort-Object) -join ',') -ne 'en,ru') { throw 'Installer lifecycle phases/languages are incomplete.' }
-foreach ($ui in $installed.Wpf) { if ($ui.Status -ne 'ui-smoke-passed' -or $ui.BindingErrors -ne 0) { throw 'Installed executable WPF evidence failed.' } }
+foreach ($ui in $installed.Wpf) { if ($ui.Status -ne 'ui-smoke-passed' -or $ui.BindingErrors -ne 0 -or $ui.UiAudit.Status -ne 'ui-audit-passed' -or
+    -not $ui.DesktopPanel.AccessiblePositionPresets -or -not $ui.DesktopPanel.PositionDraftCancel) { throw 'Installed executable WPF/UI audit evidence failed.' } }
 $setup = Join-Path $Directory $installer.Installer
 $setupHash = (Get-FileHash $setup -Algorithm SHA256).Hash.ToLowerInvariant()
 if ($setupHash -ne $installer.InstallerSha256 -or (Get-Item $setup).Length -ne $installer.Bytes -or (Get-Content ($setup + '.sha256') -Raw).Trim() -ne ($setupHash + '  ' + $installer.Installer)) { throw 'Downloaded installer/checksum differs from the verified Windows build.' }

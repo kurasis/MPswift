@@ -1,5 +1,21 @@
 # Implementation checkpoint
 
+## UI audit remediation (2026-10-10)
+
+Final application source `3e798c5` passed all PR CI jobs in [run 38049586964](https://github.com/kurasis/MPswift/actions/runs/38049586964). Actual ordinary EN/RU, rebuilt-TagLib EN/RU, extracted and installed EN/RU reports pass the new UI audit with zero binding errors; real panel corner/reset/draft checks and standard-user installer lifecycle pass. [Sanitized evidence](evidence/ui-audit-windows.json) records the source/application tree. Reviewed the actual corrected audio-error capture: dark labels and fixed visible error/Apply footer are confirmed. Integration adds only evidence/status documentation after this source, with identical application code; main publication still requires its own full successful workflow.
+
+Implemented all ten source-level findings in [UI_AUDIT_2026-10-10.md](UI_AUDIT_2026-10-10.md), after the owner requested the complete fix. Playlist deletion now has a cancel-default name/count confirmation and stale-target guard. Auxiliary controls have visible associated/localized labels; feedback uses a shared polite UIA helper. Audio Apply guards repeated requests, shows progress and an inline retry message, and handles actual engine refusal. Library page boundaries and empty ranges are valid even after filtering or count changes. Empty playlist names and cache-budget errors receive inline associated validation. Accent buttons have a distinct hover; keyboard-accessible panel position presets/reset apply on the next minimization without activating the panel. Schema, pinned dependencies, music bytes, transport interfaces and installer behavior remain.
+
+Added actual owned Windows WPF/SQLite/native regressions to the required smoke, including the installed EN/RU publication gate. Local locked Release passes with 329 Core and 78 CLI tests, 15 Windows-only skips and zero build warnings/errors. Source-specific Windows evidence must pass before integration/publication; Narrator speech, physical mixed-DPI and touch remain separate acceptance.
+
+## UI review using web-design-guidelines (2026-10-10)
+
+Completed a source review with freshly fetched Vercel rules and inspected existing Windows captures for unchanged application code. [UI_AUDIT_2026-10-10.md](UI_AUDIT_2026-10-10.md) records ten prioritized findings, minimal fixes and targeted verification: unconfirmed playlist deletion, auxiliary control labels/status announcements, audio Apply feedback, library pagination, name validation, accent hover and a desktop-panel positioning alternative. These fixes are not implemented by this audit. Application source, dependencies and public interfaces remain unchanged; this change records review evidence only.
+
+## Repository-local design review skill (2026-10-10)
+
+Vendored the complete Vercel web-design-guidelines directory at commit `063bee94c3f4df8453406c830b0a7df0f2860278` under `.agents/skills/web-design-guidelines/`, with unchanged upstream instructions and a provenance/update README. AGENTS.md requires this skill for web interface changes and explicit UI/UX/accessibility audits, with relevant-rule scope for native WPF. The live rules URL returned HTTP 200. This is repository tooling/documentation only; application code, dependencies and UI are unchanged.
+
 ## Minimized desktop controls (2026-10-10)
 
 Added an optional compact desktop strip for minimized or tray-hidden MPswift: live title/artist/local artwork, previous/stop/play-pause/next, shuffle, time/seek, mute/volume and a main-window restore arrow. Drag the cover, title or empty surface; position is persisted in physical pixels and fitted to the current monitor work area, including a second fit after a possible DPI resize. Settings can disable the strip. Existing schema-1 settings default to enabled without saved coordinates; invalid/partial positions reset together.

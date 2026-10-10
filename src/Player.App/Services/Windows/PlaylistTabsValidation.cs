@@ -57,7 +57,11 @@ internal static class PlaylistTabsValidation
             model.SelectedPlaylist = selected; Action(a, "Duplicate"); var copy = model.SelectedPlaylist;
             Check(copy.Name.StartsWith(a.Name, StringComparison.Ordinal) && copy.Entries.Count == 1 && copy.Entries[0].Id != a.Entries[0].Id,
                 "Tab menu duplicated the current selection instead of its own target.");
-            OpenMenu(b); model.SelectedPlaylist = selected; Action(b, "Delete");
+            OpenMenu(b); model.SelectedPlaylist = selected;
+            var deleteResponse = UiAuditValidation.RespondToDeletion(window, false); Action(b, "Delete"); await deleteResponse;
+            Check(model.Playlists.Contains(b), "Cancelled tab deletion removed its target.");
+            OpenMenu(b); model.SelectedPlaylist = selected;
+            deleteResponse = UiAuditValidation.RespondToDeletion(window, true); Action(b, "Delete"); await deleteResponse;
             Check(!model.Playlists.Contains(b) && model.Playlists.Contains(selected), "Tab menu deleted the wrong playlist.");
             await Idle(); OpenMenu(a); Action(a, "Right"); await Idle();
             Check(model.Playlists.IndexOf(a) == model.Playlists.IndexOf(c) + 1, "Tab-menu movement did not move the target right.");

@@ -392,7 +392,8 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     public async Task ConfigureAudioAsync(AudioProcessingSettings processing, AudioOutputSettings output)
     {
         processing = processing.Validate();
-        if (_player is IAdvancedAudioPlayer advanced) { await advanced.SetProcessingAsync(processing); await advanced.SetOutputAsync(output); }
+        if (_player is IAdvancedAudioPlayer advanced && (!await advanced.SetProcessingAsync(processing) || !await advanced.SetOutputAsync(output)))
+            throw new InvalidOperationException(_player.Snapshot.Error?.Detail ?? Strings.ErrorUnexpected);
         WindowSettings = WindowSettings with { Processing = processing, Output = output }; ScheduleSave(false);
     }
     [RelayCommand(CanExecute = nameof(CanImport))] private Task AddFilesAsync()

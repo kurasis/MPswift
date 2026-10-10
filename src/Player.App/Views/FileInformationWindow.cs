@@ -15,7 +15,8 @@ public sealed class FileInformationWindow : Window
     private long _generation;
     private bool _closed;
     private readonly TextBox _path = new() { IsReadOnly = true, Margin = new Thickness(0, 0, 8, 0) };
-    private readonly TextBlock _status = new() { TextWrapping = TextWrapping.Wrap };
+    private readonly TextBlock _status = AccessibleStatus.Create();
+    internal TextBlock StatusText => _status;
     private readonly TextBlock _position = new() { VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(8, 0, 8, 0) };
     private readonly StackPanel _general = new(), _v1 = new(), _v2 = new();
     private readonly TextBox _lyrics = new() { IsReadOnly = true, TextWrapping = TextWrapping.Wrap, VerticalScrollBarVisibility = ScrollBarVisibility.Auto, MaxLength = 65536 };
@@ -67,7 +68,7 @@ public sealed class FileInformationWindow : Window
         var request = ++_generation; var row = _rows[_index]; Snapshot = null; _cover.Source = null;
         _path.Text = row.Path; _position.Text = $"{_index + 1} / {_rows.Length}";
         _previous.IsEnabled = _index > 0; _next.IsEnabled = _index + 1 < _rows.Length;
-        _status.Text = Strings.Get("LoadingFileInformation"); _general.Children.Clear(); _v1.Children.Clear(); _v2.Children.Clear(); _lyrics.Text = "";
+        AccessibleStatus.Update(_status, Strings.Get("LoadingFileInformation")); _general.Children.Clear(); _v1.Children.Clear(); _v2.Children.Clear(); _lyrics.Text = "";
         try
         {
             var value = await Task.Run(() => FileInformationReader.Read(row.Entry.Track));
@@ -93,12 +94,12 @@ public sealed class FileInformationWindow : Window
             }
             ShowFields(_v1, value.Id3v1); ShowFields(_v2, value.Id3v2); _lyrics.Text = value.Lyrics;
             if (string.IsNullOrWhiteSpace(_lyrics.Text)) _lyrics.Text = Strings.Get("NoLyrics");
-            _status.Text = Strings.Get("ReadOnlyInformation");
+            AccessibleStatus.Update(_status, Strings.Get("ReadOnlyInformation"));
             var cover = await new ArtworkService().LoadAsync(row.Path, CancellationToken.None);
             if (!_closed && request == _generation) _cover.Source = cover;
         }
         catch (Exception error) when (error is IOException or InvalidDataException or UnauthorizedAccessException or ArgumentException or NotSupportedException or TagLib.CorruptFileException or TagLib.UnsupportedFormatException or NotImplementedException or KeyNotFoundException or ObjectDisposedException or Microsoft.Data.Sqlite.SqliteException)
-        { if (!_closed && request == _generation) _status.Text = Strings.Get("FileInformationUnavailable") + " " + error.Message; }
+        { if (!_closed && request == _generation) AccessibleStatus.Update(_status, Strings.Get("FileInformationUnavailable") + " " + error.Message); }
     }
     private static void ShowFields(StackPanel panel, IReadOnlyDictionary<string, string> fields)
     {

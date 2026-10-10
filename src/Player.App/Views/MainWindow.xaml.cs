@@ -381,7 +381,16 @@ public partial class MainWindow : Window
     private void OnRenamePlaylist(object sender, RoutedEventArgs e)
     { var dialog = new PlaylistNameDialog(this, Model.SelectedPlaylist.Name); if (dialog.ShowDialog() == true) Model.RenamePlaylist(dialog.PlaylistName); }
     private void OnDuplicatePlaylist(object sender, RoutedEventArgs e) => Model.DuplicatePlaylist();
-    private void OnDeletePlaylist(object sender, RoutedEventArgs e) => Model.DeletePlaylist();
+    private void OnDeletePlaylist(object sender, RoutedEventArgs e)
+    {
+        if (Model.IsImporting) return;
+        var playlist = Model.SelectedPlaylist;
+        var entries = playlist.Entries.Select(row => row.Id).ToArray();
+        if (new DeletePlaylistDialog(this, playlist.Name, entries.Length).ShowDialog() != true) return;
+        if (ReferenceEquals(Model.SelectedPlaylist, playlist) && playlist.Entries.Select(row => row.Id).SequenceEqual(entries))
+            Model.DeletePlaylist();
+        else Model.Message = Strings.Get("PlaylistChangedRetry");
+    }
     private void OnTabLeft(object sender, RoutedEventArgs e) => Model.MoveTab(-1);
     private void OnTabRight(object sender, RoutedEventArgs e) => Model.MoveTab(1);
     private void OnMoveUp(object sender, RoutedEventArgs e) => Model.MoveEntries(PlaylistList.SelectedItems.Cast<PlaylistRowViewModel>(), -1);

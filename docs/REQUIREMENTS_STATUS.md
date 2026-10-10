@@ -1,5 +1,19 @@
 # Requirement and acceptance status
 
+## Owner follow-up: fix all UI audit findings (2026-10-10)
+
+Final Windows acceptance for these source fixes is observed at `3e798c5` in [run 38049586964](https://github.com/kurasis/MPswift/actions/runs/38049586964): all required jobs pass, including real ordinary/rebuilt/extracted/installed WPF and installer lifecycle. [Evidence](evidence/ui-audit-windows.json) records successful regression flags and the tested application tree. All ten findings are implemented and automated Windows acceptance passes; Narrator speech, physical mixed-DPI/high-contrast/touch and existing hardware/clean-OS gates remain outside this result. The subsequent evidence-only commit changes no application behavior.
+
+All ten audited source defects now have targeted fixes and required real Windows regression paths, summarized in [UI_AUDIT_2026-10-10.md](UI_AUDIT_2026-10-10.md). Source-level remediation is complete; source-specific WPF/installed EN/RU evidence is required before publication. Library paging, form errors, audio feedback, accessible auxiliary labels/statuses, destructive playlist confirmation, accent hover and a keyboard-accessible mini-panel position alternative are covered without new dependencies or schema/public-interface changes. Local build/tests pass. This does not close actual Narrator, physical mixed-DPI/touch, device-output or other existing manual/hardware acceptance gates.
+
+## Owner follow-up: explicit UI audit (2026-10-10)
+
+Applied the installed web-design-guidelines skill with fresh live rules and WPF-specific scope. [UI_AUDIT_2026-10-10.md](UI_AUDIT_2026-10-10.md) lists remaining UX/accessibility work with priorities and verification criteria. Confirmed source-level gaps include playlist-deletion recovery, accessible labels in auxiliary dialogs, library-page boundaries and visible/announced error feedback. Existing main-window accessibility and virtualization do not establish full application compliance. This request is fulfilled as a review; listed application fixes and interactive Windows acceptance remain pending. No feature, dependency, installation or public-interface behavior changed.
+
+## Owner follow-up: repository-local Vercel skill (2026-10-10)
+
+Installed the full pinned web-design-guidelines skill as ordinary repository files, retained original instructions, added explicit AGENTS.md review triggers and documented source SHA, hashes and reproducible updates in a separate README. Confirmed real access to the live rules URL. Application code is unchanged; this setup is not a UI/accessibility compliance audit.
+
 ## Owner follow-up: controls while minimized (2026-10-10)
 
 Implemented the requested draggable compact strip behind ordinary application windows, with existing transport, seek, shuffle and volume actions and a restore arrow. It appears on minimize/tray hide, disappears on main restoration and can be disabled in settings. Physical screen coordinates persist and are clamped after monitor/DPI changes; old settings remain schema-1 compatible. The app only positions its own nonactivating tool window and never changes Explorer, taskbars, privilege or installation behavior. Playback source, queue and main-window public interfaces remain.
