@@ -21,7 +21,10 @@ public sealed class AudioSettingsWindow : Window
     {
         SetResourceReference(StyleProperty, typeof(Window));
         Owner = owner; Title = Strings.Get("AudioTitle"); Width = 600; Height = 700; MinWidth = 420; MinHeight = 400;
-        var panel = new StackPanel { Margin = new Thickness(16) }; Content = new ScrollViewer { Content = panel };
+        var root = new DockPanel { Margin = new Thickness(16) };
+        var surface = new Border { Child = root }; surface.SetResourceReference(Border.BackgroundProperty, "BackgroundBrush"); Content = surface;
+        var footer = new StackPanel(); DockPanel.SetDock(footer, Dock.Bottom); root.Children.Add(footer);
+        var panel = new StackPanel(); root.Children.Add(new ScrollViewer { Content = panel, VerticalScrollBarVisibility = ScrollBarVisibility.Auto, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled });
         var settings = (model.WindowSettings.Processing ?? new()).Validate(); var output = model.WindowSettings.Output ?? new();
         void Hint(string text) => panel.Children.Add(new TextBlock { Text = text, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 8, 0, 4) });
         void Label(string key, Control target)
@@ -50,8 +53,8 @@ public sealed class AudioSettingsWindow : Window
         Hint(Strings.Get("EqPolicy"));
         var preamp = new Slider { Minimum = -24, Maximum = 12, Value = settings.PreampDb, SmallChange = 1, IsMoveToPointEnabled = true }; Label("Preamp", preamp); panel.Children.Add(preamp);
         var fade = new Slider { Minimum = 0, Maximum = 10, Value = settings.CrossfadeSeconds, SmallChange = 1, TickFrequency = 1, IsSnapToTickEnabled = true, IsMoveToPointEnabled = true }; Label("CrossfadeHelp", fade); panel.Children.Add(fade);
-        StatusText.Margin = new Thickness(0, 12, 0, 0); panel.Children.Add(StatusText);
-        var buttons = new WrapPanel { Margin = new Thickness(0, 16, 0, 0) }; panel.Children.Add(buttons);
+        StatusText.Margin = new Thickness(0, 12, 0, 0); footer.Children.Add(StatusText);
+        var buttons = new WrapPanel { Margin = new Thickness(0, 16, 0, 0) }; footer.Children.Add(buttons);
         AudioProcessingSettings Capture() => new(eq.IsChecked == true, preamp.Value, bands.Select(b => b.Value).ToArray(), (ReplayGainMode)gain.SelectedValue, fade.Value);
         void Set(AudioProcessingSettings preset) { preset = preset.Validate(); eq.IsChecked = preset.EqualizerEnabled; preamp.Value = preset.PreampDb; for (var i = 0; i < 10; i++) bands[i].Value = preset.Bands![i]; gain.SelectedValue = preset.ReplayGain; fade.Value = preset.CrossfadeSeconds; }
         Button Button(string title, RoutedEventHandler handler) { var b = new Button { Content = title, Margin = new Thickness(4) }; b.Click += handler; buttons.Children.Add(b); return b; }
@@ -76,7 +79,7 @@ public sealed class AudioSettingsWindow : Window
         Closing += (_, args) => { if (busy) args.Cancel = true; };
         async Task ApplyAsync()
         {
-            busy = true; ApplyButton.IsEnabled = false; cancel.IsEnabled = false; panel.IsEnabled = false;
+            busy = true; ApplyButton.IsEnabled = false; cancel.IsEnabled = false; panel.IsEnabled = false; buttons.IsEnabled = false;
             ApplyButton.Content = Strings.Get("ApplyingAudio"); AccessibleStatus.Update(StatusText, Strings.Get("ApplyingAudio"));
             var succeeded = false;
             try { await model.ConfigureAudioAsync(Capture(), new((device.SelectedItem as AudioDevice)?.Id, exclusive.IsChecked == true)); succeeded = true; }
@@ -88,7 +91,7 @@ public sealed class AudioSettingsWindow : Window
             finally
             {
                 busy = false;
-                if (!closed) { panel.IsEnabled = true; ApplyButton.IsEnabled = true; cancel.IsEnabled = true; ApplyButton.Content = Strings.Get("Apply"); }
+                if (!closed) { panel.IsEnabled = true; buttons.IsEnabled = true; ApplyButton.IsEnabled = true; cancel.IsEnabled = true; ApplyButton.Content = Strings.Get("Apply"); }
             }
             if (succeeded && !closed) Close();
         }

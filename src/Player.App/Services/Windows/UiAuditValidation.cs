@@ -33,6 +33,8 @@ internal static class UiAuditValidation
     {
         var label = AutomationProperties.GetLabeledBy(control);
         Check(label is Label, "Input has no associated visible label.");
+        Check(((Label)label!).Foreground is SolidColorBrush foreground && foreground.Color == ((SolidColorBrush)control.FindResource("TextPrimaryBrush")).Color,
+            "Visible label has the system light-theme foreground in the dark dialog.");
         label!.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left) { RoutedEvent = UIElement.MouseLeftButtonDownEvent });
         Check(control.IsKeyboardFocused, "Clicking the visible label did not focus its field.");
     }
@@ -210,6 +212,14 @@ internal static class UiAuditValidation
             failed.Show(); await Idle(owner); Click(failed.ApplyButton); await failed.ApplyCompletion;
             Check(failed.IsVisible && failed.ApplyButton.IsEnabled && failed.StatusText.Text == Strings.Get("AudioApplyFailed"),
                 "Refused engine configuration closed the dialog or hid its error.");
+            failed.UpdateLayout();
+            var surface = (FrameworkElement)failed.Content;
+            foreach (var element in new FrameworkElement[] { failed.StatusText, failed.ApplyButton })
+            {
+                var bounds = element.TransformToAncestor(surface).TransformBounds(new Rect(element.RenderSize));
+                Check(bounds.Width > 0 && bounds.Height > 0 && bounds.Left >= 0 && bounds.Top >= 0 &&
+                    bounds.Right <= surface.ActualWidth && bounds.Bottom <= surface.ActualHeight, "Audio failure/retry feedback is clipped below the viewport.");
+            }
             Polite(failed.StatusText); CustomizationValidation.Render((FrameworkElement)failed.Content, output, "audio-settings-error-" + Strings.Culture.TwoLetterISOLanguageName + ".png");
         }
         finally { failed.Close(); }
