@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Diagnostics;
 using Microsoft.Data.Sqlite;
 using Player.App.Services.Storage;
 using Player.Core.Library;
@@ -8,6 +9,37 @@ namespace Player.Core.Tests;
 
 public sealed class StoreShutdownTests
 {
+    [Fact]
+    public async Task CloseCheckpointsSavedDataWithoutDeletingPinnedWindowsSidecars()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "player-close-tests-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+        var database = Path.Combine(directory, "library.db");
+        var store = new SqlitePlayerStore(database);
+        try
+        {
+            var state = await store.LoadAsync();
+            state = state with { Playlists = [state.Playlists[0] with { Name = "Latest committed close control" }] };
+            await store.SaveAsync(state, true);
+            var sidecars = OperatingSystem.IsWindows() ? new[] { database + "-wal", database + "-shm" }.ToDictionary(path => path, path =>
+            { using var lease = DataFileLease.OpenExisting(path, true)!; return lease.Identity; }) : [];
+            var timer = Stopwatch.StartNew(); await store.DisposeAsync(); timer.Stop();
+            if (OperatingSystem.IsWindows())
+            {
+                Assert.True(timer.Elapsed < TimeSpan.FromSeconds(2), "SQLite retried deletion of the pinned WAL/SHM files.");
+                foreach (var (path, identity) in sidecars)
+                { using var lease = DataFileLease.OpenExisting(path)!; Assert.Equal(identity, lease.Identity); }
+            }
+            // Immutable reading ignores WAL: this proves close still checkpointed the committed data.
+            using var checkpointed = new SqliteConnection(new SqliteConnectionStringBuilder {
+                DataSource = new Uri(database).AbsoluteUri + "?immutable=1", Mode = SqliteOpenMode.ReadOnly, Pooling = false }.ToString());
+            checkpointed.Open(); using var command = checkpointed.CreateCommand();
+            command.CommandText = "SELECT Name FROM Playlists";
+            Assert.Equal("Latest committed close control", command.ExecuteScalar());
+            using (File.Open(database, FileMode.Open, FileAccess.ReadWrite, FileShare.None)) { }
+        }
+        finally { await store.DisposeAsync(); Directory.Delete(directory, true); }
+    }
     [Theory]
     [InlineData(1)]
     [InlineData(2)]

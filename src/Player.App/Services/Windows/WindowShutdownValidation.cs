@@ -74,6 +74,8 @@ internal static class WindowShutdownValidation
                     model.Enqueue(model.Entries, false);
                     var entry = model.Entries.Single().Id; var tab = model.SelectedPlaylist.Id;
                     var queue = model.Queue.Select(item => item.Id).ToArray();
+                    var sidecars = new[] { database + "-wal", database + "-shm" }.ToDictionary(path => path, path =>
+                    { using var lease = DataFileLease.OpenExisting(path, true)!; return lease.Identity; });
                     var nativeHandle = new WindowInteropHelper(window).Handle;
                     if (failSave) response = DeclineUnsavedExitAsync(window);
                     store.Arm(failSave);
@@ -94,10 +96,14 @@ internal static class WindowShutdownValidation
                             "Declined unsaved exit did not restore the window with its playlist.");
                         await window.CloseForValidationAsync();
                     }
+                    var closeMilliseconds = timer.Elapsed.TotalMilliseconds;
+                    Check(closeMilliseconds < 2000, "Owned graceful close retained the Windows SQLite deletion retry delay.");
                     closed = true;
                     Check(!IsWindow(nativeHandle), "Graceful close retained the native window.");
                     using (File.Open(music, FileMode.Open, FileAccess.ReadWrite, FileShare.None)) { }
                     using (File.Open(database, FileMode.Open, FileAccess.ReadWrite, FileShare.None)) { }
+                    foreach (var (path, identity) in sidecars)
+                    { using var lease = DataFileLease.OpenExisting(path)!; Check(lease.Identity == identity, "Close deleted or replaced a pinned WAL/SHM file."); }
                     await using (var reopened = new SqlitePlayerStore(database))
                     {
                         var saved = await reopened.LoadAsync();
@@ -107,7 +113,8 @@ internal static class WindowShutdownValidation
                     }
                     Check(new SettingsFile(data).Load().Volume == 72, "Close lost the latest settings.");
                     results.Add(new { SaveFailure = failSave, SameTurnHidden = true, HideMilliseconds = hideMilliseconds,
-                        GracefulCloseMilliseconds = timer.Elapsed.TotalMilliseconds, PendingSavePreserved = true, RepeatedCloseAndRestoreGuard = true,
+                        GracefulCloseMilliseconds = closeMilliseconds, ReopenVerificationMilliseconds = timer.Elapsed.TotalMilliseconds - closeMilliseconds,
+                        WalSidecarIdentitiesRetained = true, PendingSavePreserved = true, RepeatedCloseAndRestoreGuard = true,
                         SaveFailureDialogRestoresWindow = failSave, NativeFilesReleased = true, LatestDataReopened = true });
                 }
                 finally

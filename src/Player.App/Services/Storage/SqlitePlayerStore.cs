@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.IO;
 using System.Text.Json;
+using System.Runtime.InteropServices;
 using Microsoft.Data.Sqlite;
 using Player.Core.Library;
 using Player.Core.Playback;
@@ -158,6 +159,14 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
                         if (path == databasePath) existed = !file.Created;
                     }
             connection.Open();
+            if (OperatingSystem.IsWindows() && !ReadOnlyValidation)
+            {
+                // These sidecars are pinned without delete sharing until SQLite is closed.
+                // Keep normal close-time checkpointing, but avoid Windows deletion retry sleeps.
+                // https://www.sqlite.org/c3ref/c_fcntl_begin_atomic_write.html#sqlitefcntlpersistwal
+                var persist = 1;
+                SqliteException.ThrowExceptionForRC(PersistWalFiles(connection.Handle!, "main", 10, ref persist), connection.Handle);
+            }
             DatabaseRecovery.ConfigureReadLimits(connection);
             using var validationBudget = new DatabaseValidationBudget(connection);
             DatabaseRecovery.ValidateSchemaSize(connection);
@@ -240,6 +249,12 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
     }
     public ValueTask DisposeAsync()
     { lock (_gate) { if (!_closing) { _closing = true; _work.CompleteAdding(); } } return new(_exit.Task); }
+
+    // SQLitePCLRaw's pinned provider uses this same bundled e_sqlite3 library but does not expose file_control.
+    [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory | DllImportSearchPath.SafeDirectories)]
+    [DllImport("e_sqlite3", EntryPoint = "sqlite3_file_control", CallingConvention = CallingConvention.Cdecl)]
+    private static extern int PersistWalFiles(SQLitePCL.sqlite3 connection, [MarshalAs(UnmanagedType.LPUTF8Str)] string database,
+        int operation, ref int value);
 }
 
 public sealed class PlayerStoreInUseException(Exception inner) : IOException("The data directory is already in use. Close the other player instance before opening it.", inner);
