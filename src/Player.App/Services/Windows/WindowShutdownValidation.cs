@@ -70,14 +70,17 @@ internal static class WindowShutdownValidation
                         "Close-to-tray began resource shutdown.");
                     window.ShowAndActivate();
                     model.WindowSettings = model.WindowSettings with { CloseToTray = false };
-                    model.RenamePlaylist("Latest unsaved close control"); model.Volume = 72;
-                    model.Enqueue(model.Entries, false);
                     var entry = model.Entries.Single().Id; var tab = model.SelectedPlaylist.Id;
-                    var queue = model.Queue.Select(item => item.Id).ToArray();
                     var sidecars = new[] { database + "-wal", database + "-shm" }.ToDictionary(path => path, path =>
                     { using var lease = DataFileLease.OpenExisting(path, true)!; return lease.Identity; });
                     var nativeHandle = new WindowInteropHelper(window).Handle;
+                    // Quiesce earlier debounce work before arming a one-shot final-save fault.
+                    // Otherwise an old autosave can consume the fault and the final save legitimately succeeds.
+                    await model.SaveCompletion;
                     if (failSave) response = DeclineUnsavedExitAsync(window);
+                    model.RenamePlaylist("Latest unsaved close control"); model.Volume = 72;
+                    model.Enqueue(model.Entries, false);
+                    var queue = model.Queue.Select(item => item.Id).ToArray();
                     store.Arm(failSave);
                     var timer = Stopwatch.StartNew(); window.Close(); var hideMilliseconds = timer.Elapsed.TotalMilliseconds;
                     Check(!window.IsVisible && !window.IsEnabled && !window.ShutdownCompletion.IsCompleted,
@@ -98,6 +101,7 @@ internal static class WindowShutdownValidation
                     }
                     var closeMilliseconds = timer.Elapsed.TotalMilliseconds;
                     Check(closeMilliseconds < 2000, "Owned graceful close retained the Windows SQLite deletion retry delay.");
+                    Check(store.ArmedSaveCalls == (failSave ? 2 : 1), "A cancelled autosave competed with the final close save.");
                     closed = true;
                     Check(!IsWindow(nativeHandle), "Graceful close retained the native window.");
                     using (File.Open(music, FileMode.Open, FileAccess.ReadWrite, FileShare.None)) { }
@@ -144,11 +148,14 @@ internal static class WindowShutdownValidation
         public TaskCompletionSource Entered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         public TaskCompletionSource Release { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         public int GatedCalls { get; private set; }
+        public int ArmedSaveCalls { get; private set; }
         private bool _armed, _fail;
-        public void Arm(bool fail) { _armed = true; _fail = fail; }
+        private bool _countSaves;
+        public void Arm(bool fail) { _armed = true; _fail = fail; _countSaves = true; }
         public Task<LibraryState> LoadAsync() => inner.LoadAsync();
         public async Task SaveAsync(LibraryState state, bool playlistsChanged)
         {
+            if (_countSaves) ArmedSaveCalls++;
             if (_armed)
             {
                 _armed = false; GatedCalls++; Entered.TrySetResult(); await Release.Task;
