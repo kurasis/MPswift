@@ -1,5 +1,9 @@
 # Implementation checkpoint
 
+## Observed Windows close acceptance (2026-10-10)
+
+Final application/test source `532822d` passed all required PR jobs in [run 38054900465](https://github.com/kurasis/MPswift/actions/runs/38054900465). [Sanitized evidence](evidence/window-shutdown-windows.json) verifies seven real ordinary/rebuilt/extracted/installed EN/RU WPF reports: same-turn hiding, themed disabled lists, successful and failed final saves with the actual owned warning/retry, close-to-tray, repeated requests, already released models, stable WAL/SHM identities and reopened latest data. Windows Core 330 and all 93 CLI tests pass; the standard-user installer lifecycle passes. Owned close time is measured before independent reopen verification and stays below the two-second regression limit. Physical user disk/audio-driver latency remains outside hosted acceptance. This evidence-only update changes no tested application or test source.
+
 ## Immediate graceful window close (2026-10-10)
 
 The actual Closing handler now hides the main window synchronously before awaiting file actions, persistence, native/database release or diagnostic flush. Repeated close and tray/IPC restore requests cannot reshow a shutting-down window. Failed saving restores and enables the window before the existing unsaved-exit warning; declining retains the model and permits a retry. Close-to-tray behavior remains unchanged. The disabled ListBox template retains theme brushes, logical scrolling and recycling instead of the system light background. Validation closes now exercise this same production exit path.

@@ -1,5 +1,9 @@
 # Test evidence — Stages A–G
 
+## Observed Windows close acceptance (2026-10-10)
+
+Final application/test source `532822d` passed all required PR jobs in [run 38054900465](https://github.com/kurasis/MPswift/actions/runs/38054900465). [Sanitized evidence](evidence/window-shutdown-windows.json) verifies seven real ordinary/rebuilt/extracted/installed EN/RU WPF reports: same-turn hiding, themed disabled lists, successful and failed final saves with the actual owned warning/retry, close-to-tray, repeated requests, already released models, stable WAL/SHM identities and reopened latest data. Windows Core 330 and all 93 CLI tests pass; the standard-user installer lifecycle passes. Owned close time is measured before independent reopen verification and stays below the two-second regression limit. Physical user disk/audio-driver latency remains outside hosted acceptance. This evidence-only update changes no tested application or test source.
+
 ## Window close regression (2026-10-10)
 
 Before edits: scripts/Build.ps1 locked Release passes, zero warnings/errors, Core 329 passed, CLI 78 passed/15 Windows-only skipped. Changed-source local build/tests pass with 330 Core tests and the same CLI counts. C# compilation is the type check; no separate lint task exists. Linux cannot execute WPF. Fresh web-design-guidelines rules were retrieved successfully over verified HTTPS; native dark-theme/state principles apply, browser DOM rules do not.

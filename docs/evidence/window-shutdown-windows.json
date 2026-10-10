@@ -1,0 +1,306 @@
+{
+  "Status": "window-shutdown-windows-passed",
+  "SourceCommit": "532822d4f56042e27a1c84093bb089f152f09864",
+  "ApplicationTree": "22948871fe7f54c1105d6e0747eb8ddc8e6e499f",
+  "RunId": 38054900465,
+  "RunUrl": "https://github.com/kurasis/MPswift/actions/runs/38054900465",
+  "RequiredJobs": "all-success",
+  "StandardUserInstallerLifecycle": true,
+  "CoreCloseControl": [
+    {
+      "testName": "Player.Core.Tests.StoreShutdownTests.CloseCheckpointsSavedDataWithoutDeletingPinnedWindowsSidecars",
+      "outcome": "Passed",
+      "duration": "00:00:00.6533382"
+    }
+  ],
+  "Reports": [
+    {
+      "Report": "ui-ru.json",
+      "Sha256": "92b6735c9d511041e1bfb78e6467e38ce3c469cf17fea826d8ae8bdb35501094",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "WindowShutdown": {
+        "Status": "window-shutdown-passed",
+        "DisabledListsKeepTheme": true,
+        "CloseToTrayPreserved": true,
+        "AlreadyReleasedModelClose": true,
+        "Cases": [
+          {
+            "SaveFailure": false,
+            "SameTurnHidden": true,
+            "HideMilliseconds": 16.4405,
+            "GracefulCloseMilliseconds": 52.0744,
+            "ReopenVerificationMilliseconds": 7.2271,
+            "WalSidecarIdentitiesRetained": true,
+            "PendingSavePreserved": true,
+            "RepeatedCloseAndRestoreGuard": true,
+            "SaveFailureDialogRestoresWindow": false,
+            "NativeFilesReleased": true,
+            "LatestDataReopened": true
+          },
+          {
+            "SaveFailure": true,
+            "SameTurnHidden": true,
+            "HideMilliseconds": 6.4147,
+            "GracefulCloseMilliseconds": 91.3011,
+            "ReopenVerificationMilliseconds": 6.6511,
+            "WalSidecarIdentitiesRetained": true,
+            "PendingSavePreserved": true,
+            "RepeatedCloseAndRestoreGuard": true,
+            "SaveFailureDialogRestoresWindow": true,
+            "NativeFilesReleased": true,
+            "LatestDataReopened": true
+          }
+        ],
+        "Scope": "Actual WPF/native decode/SQLite; controlled pending save, no physical driver latency guarantee"
+      }
+    },
+    {
+      "Report": "installed-ui-ru.json",
+      "Sha256": "c4741d70f96cbcc65f04d59688cfc4c0ae32c9580abf5de9dcda6deca2a2bcb8",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "WindowShutdown": {
+        "Status": "window-shutdown-passed",
+        "DisabledListsKeepTheme": true,
+        "CloseToTrayPreserved": true,
+        "AlreadyReleasedModelClose": true,
+        "Cases": [
+          {
+            "SaveFailure": false,
+            "SameTurnHidden": true,
+            "HideMilliseconds": 14.1288,
+            "GracefulCloseMilliseconds": 38.7825,
+            "ReopenVerificationMilliseconds": 7.447499999999998,
+            "WalSidecarIdentitiesRetained": true,
+            "PendingSavePreserved": true,
+            "RepeatedCloseAndRestoreGuard": true,
+            "SaveFailureDialogRestoresWindow": false,
+            "NativeFilesReleased": true,
+            "LatestDataReopened": true
+          },
+          {
+            "SaveFailure": true,
+            "SameTurnHidden": true,
+            "HideMilliseconds": 17.1225,
+            "GracefulCloseMilliseconds": 93.4462,
+            "ReopenVerificationMilliseconds": 5.6965,
+            "WalSidecarIdentitiesRetained": true,
+            "PendingSavePreserved": true,
+            "RepeatedCloseAndRestoreGuard": true,
+            "SaveFailureDialogRestoresWindow": true,
+            "NativeFilesReleased": true,
+            "LatestDataReopened": true
+          }
+        ],
+        "Scope": "Actual WPF/native decode/SQLite; controlled pending save, no physical driver latency guarantee"
+      }
+    },
+    {
+      "Report": "ui-en.json",
+      "Sha256": "0d3450a994baf0e29afe6f0509ee1f00ecbc7b5d00e6a4f099bc5b1ac1267506",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "WindowShutdown": {
+        "Status": "window-shutdown-passed",
+        "DisabledListsKeepTheme": true,
+        "CloseToTrayPreserved": true,
+        "AlreadyReleasedModelClose": true,
+        "Cases": [
+          {
+            "SaveFailure": false,
+            "SameTurnHidden": true,
+            "HideMilliseconds": 14.8853,
+            "GracefulCloseMilliseconds": 49.1267,
+            "ReopenVerificationMilliseconds": 7.3108,
+            "WalSidecarIdentitiesRetained": true,
+            "PendingSavePreserved": true,
+            "RepeatedCloseAndRestoreGuard": true,
+            "SaveFailureDialogRestoresWindow": false,
+            "NativeFilesReleased": true,
+            "LatestDataReopened": true
+          },
+          {
+            "SaveFailure": true,
+            "SameTurnHidden": true,
+            "HideMilliseconds": 12.7417,
+            "GracefulCloseMilliseconds": 80.3844,
+            "ReopenVerificationMilliseconds": 6.220100000000002,
+            "WalSidecarIdentitiesRetained": true,
+            "PendingSavePreserved": true,
+            "RepeatedCloseAndRestoreGuard": true,
+            "SaveFailureDialogRestoresWindow": true,
+            "NativeFilesReleased": true,
+            "LatestDataReopened": true
+          }
+        ],
+        "Scope": "Actual WPF/native decode/SQLite; controlled pending save, no physical driver latency guarantee"
+      }
+    },
+    {
+      "Report": "installed-ui-en.json",
+      "Sha256": "ff631bdbb7e87a4f65e41bc5c2cb4619a6a6519272c7897c066d8bbfe21d636d",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "WindowShutdown": {
+        "Status": "window-shutdown-passed",
+        "DisabledListsKeepTheme": true,
+        "CloseToTrayPreserved": true,
+        "AlreadyReleasedModelClose": true,
+        "Cases": [
+          {
+            "SaveFailure": false,
+            "SameTurnHidden": true,
+            "HideMilliseconds": 14.9513,
+            "GracefulCloseMilliseconds": 35.9763,
+            "ReopenVerificationMilliseconds": 10.609200000000001,
+            "WalSidecarIdentitiesRetained": true,
+            "PendingSavePreserved": true,
+            "RepeatedCloseAndRestoreGuard": true,
+            "SaveFailureDialogRestoresWindow": false,
+            "NativeFilesReleased": true,
+            "LatestDataReopened": true
+          },
+          {
+            "SaveFailure": true,
+            "SameTurnHidden": true,
+            "HideMilliseconds": 13.1765,
+            "GracefulCloseMilliseconds": 109.345,
+            "ReopenVerificationMilliseconds": 6.004000000000005,
+            "WalSidecarIdentitiesRetained": true,
+            "PendingSavePreserved": true,
+            "RepeatedCloseAndRestoreGuard": true,
+            "SaveFailureDialogRestoresWindow": true,
+            "NativeFilesReleased": true,
+            "LatestDataReopened": true
+          }
+        ],
+        "Scope": "Actual WPF/native decode/SQLite; controlled pending save, no physical driver latency guarantee"
+      }
+    },
+    {
+      "Report": "packaged-ui.json",
+      "Sha256": "4d4e5dffcd1e9a09e782c0d23228c75f6cf4cab7c3930f0a8024f9eaf1445eb2",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "WindowShutdown": {
+        "Status": "window-shutdown-passed",
+        "DisabledListsKeepTheme": true,
+        "CloseToTrayPreserved": true,
+        "AlreadyReleasedModelClose": true,
+        "Cases": [
+          {
+            "SaveFailure": false,
+            "SameTurnHidden": true,
+            "HideMilliseconds": 15.7414,
+            "GracefulCloseMilliseconds": 38.5072,
+            "ReopenVerificationMilliseconds": 8.154000000000003,
+            "WalSidecarIdentitiesRetained": true,
+            "PendingSavePreserved": true,
+            "RepeatedCloseAndRestoreGuard": true,
+            "SaveFailureDialogRestoresWindow": false,
+            "NativeFilesReleased": true,
+            "LatestDataReopened": true
+          },
+          {
+            "SaveFailure": true,
+            "SameTurnHidden": true,
+            "HideMilliseconds": 9.0147,
+            "GracefulCloseMilliseconds": 91.7395,
+            "ReopenVerificationMilliseconds": 6.707399999999993,
+            "WalSidecarIdentitiesRetained": true,
+            "PendingSavePreserved": true,
+            "RepeatedCloseAndRestoreGuard": true,
+            "SaveFailureDialogRestoresWindow": true,
+            "NativeFilesReleased": true,
+            "LatestDataReopened": true
+          }
+        ],
+        "Scope": "Actual WPF/native decode/SQLite; controlled pending save, no physical driver latency guarantee"
+      }
+    },
+    {
+      "Report": "taglib-replacement-ui-ru.json",
+      "Sha256": "98a6c7d8346c141eb949b988e4eb33bc4ba152d57dbb723a6563ad983f7aa885",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "WindowShutdown": {
+        "Status": "window-shutdown-passed",
+        "DisabledListsKeepTheme": true,
+        "CloseToTrayPreserved": true,
+        "AlreadyReleasedModelClose": true,
+        "Cases": [
+          {
+            "SaveFailure": false,
+            "SameTurnHidden": true,
+            "HideMilliseconds": 12.7494,
+            "GracefulCloseMilliseconds": 42.1418,
+            "ReopenVerificationMilliseconds": 5.707599999999999,
+            "WalSidecarIdentitiesRetained": true,
+            "PendingSavePreserved": true,
+            "RepeatedCloseAndRestoreGuard": true,
+            "SaveFailureDialogRestoresWindow": false,
+            "NativeFilesReleased": true,
+            "LatestDataReopened": true
+          },
+          {
+            "SaveFailure": true,
+            "SameTurnHidden": true,
+            "HideMilliseconds": 15.3755,
+            "GracefulCloseMilliseconds": 85.1795,
+            "ReopenVerificationMilliseconds": 4.149000000000001,
+            "WalSidecarIdentitiesRetained": true,
+            "PendingSavePreserved": true,
+            "RepeatedCloseAndRestoreGuard": true,
+            "SaveFailureDialogRestoresWindow": true,
+            "NativeFilesReleased": true,
+            "LatestDataReopened": true
+          }
+        ],
+        "Scope": "Actual WPF/native decode/SQLite; controlled pending save, no physical driver latency guarantee"
+      }
+    },
+    {
+      "Report": "taglib-replacement-ui-en.json",
+      "Sha256": "7b9d66e3530595c847076b37098bf7ded1a83d1b43760a30abfece35ab2403aa",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "WindowShutdown": {
+        "Status": "window-shutdown-passed",
+        "DisabledListsKeepTheme": true,
+        "CloseToTrayPreserved": true,
+        "AlreadyReleasedModelClose": true,
+        "Cases": [
+          {
+            "SaveFailure": false,
+            "SameTurnHidden": true,
+            "HideMilliseconds": 14.81,
+            "GracefulCloseMilliseconds": 46.7224,
+            "ReopenVerificationMilliseconds": 5.747399999999999,
+            "WalSidecarIdentitiesRetained": true,
+            "PendingSavePreserved": true,
+            "RepeatedCloseAndRestoreGuard": true,
+            "SaveFailureDialogRestoresWindow": false,
+            "NativeFilesReleased": true,
+            "LatestDataReopened": true
+          },
+          {
+            "SaveFailure": true,
+            "SameTurnHidden": true,
+            "HideMilliseconds": 3.8993,
+            "GracefulCloseMilliseconds": 65.9327,
+            "ReopenVerificationMilliseconds": 4.694400000000002,
+            "WalSidecarIdentitiesRetained": true,
+            "PendingSavePreserved": true,
+            "RepeatedCloseAndRestoreGuard": true,
+            "SaveFailureDialogRestoresWindow": true,
+            "NativeFilesReleased": true,
+            "LatestDataReopened": true
+          }
+        ],
+        "Scope": "Actual WPF/native decode/SQLite; controlled pending save, no physical driver latency guarantee"
+      }
+    }
+  ],
+  "Scope": "Owned real Windows WPF/native decode/SQLite with controlled pending/failing saves; physical user disk/audio driver latency remains unmeasured."
+}

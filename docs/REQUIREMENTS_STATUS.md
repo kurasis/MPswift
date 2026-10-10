@@ -1,5 +1,9 @@
 # Requirement and acceptance status
 
+## Observed Windows close acceptance (2026-10-10)
+
+Final application/test source `532822d` passed all required PR jobs in [run 38054900465](https://github.com/kurasis/MPswift/actions/runs/38054900465). [Sanitized evidence](evidence/window-shutdown-windows.json) verifies seven real ordinary/rebuilt/extracted/installed EN/RU WPF reports: same-turn hiding, themed disabled lists, successful and failed final saves with the actual owned warning/retry, close-to-tray, repeated requests, already released models, stable WAL/SHM identities and reopened latest data. Windows Core 330 and all 93 CLI tests pass; the standard-user installer lifecycle passes. Owned close time is measured before independent reopen verification and stays below the two-second regression limit. Physical user disk/audio-driver latency remains outside hosted acceptance. This evidence-only update changes no tested application or test source.
+
 ## Owner follow-up: slow close and white disabled playlist (2026-10-10)
 
 Implemented immediate removal of the visible window before graceful asynchronous shutdown, guarded repeated close/restore, visible recovery on save failure, and themed disabled lists without changing public interfaces, settings schema or dependency pins. Saving and native/file release remain mandatory; no forced termination or silent loss is introduced. Close-to-tray is preserved. Genuine pending-save/failure/retained-data Windows controls and installed publication gates are added. Local locked checks pass; source-specific Windows acceptance must be observed before releasing. End-to-end exit time on the owner's disk and audio driver remains a physical-machine check.
