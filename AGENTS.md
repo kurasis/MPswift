@@ -7,4 +7,5 @@
 - Stack: .NET 10, WPF, CommunityToolkit.Mvvm, ManagedBass/BASS, TagLibSharp, Microsoft.Data.Sqlite, xUnit. Core must stay platform-independent.
 - Use pinned dependencies and locked restores for verification. Do not disable signatures, hashes, TLS verification or tests. Do not commit native DLLs, generated artifacts, credentials, private music or local databases.
 - Windows-only tests cannot pass on Linux. Do not replace real decoding/waveform/output with simulations. Keep source audio unchanged.
+- When developing or changing a web interface, use [web-design-guidelines](.agents/skills/web-design-guidelines/SKILL.md) to review the result. Explicitly apply this skill for UI, UX and accessibility audit requests, fetching its current guidelines before each review. For native WPF UI, apply relevant design/accessibility principles and identify browser-specific rules that do not apply. If the guidelines cannot be fetched, report the network limitation instead of claiming a completed review.
 - Update implementation status, test results and applicable requirement statuses before handoff. No delegation is requested by this file.

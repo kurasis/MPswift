@@ -1,5 +1,9 @@
 # Implementation checkpoint
 
+## Repository-local design review skill (2026-10-10)
+
+Vendored the complete Vercel web-design-guidelines directory at commit `063bee94c3f4df8453406c830b0a7df0f2860278` under `.agents/skills/web-design-guidelines/`, with unchanged upstream instructions and a provenance/update README. AGENTS.md requires this skill for web interface changes and explicit UI/UX/accessibility audits, with relevant-rule scope for native WPF. The live rules URL returned HTTP 200. This is repository tooling/documentation only; application code, dependencies and UI are unchanged.
+
 ## Minimized desktop controls (2026-10-10)
 
 Added an optional compact desktop strip for minimized or tray-hidden MPswift: live title/artist/local artwork, previous/stop/play-pause/next, shuffle, time/seek, mute/volume and a main-window restore arrow. Drag the cover, title or empty surface; position is persisted in physical pixels and fitted to the current monitor work area, including a second fit after a possible DPI resize. Settings can disable the strip. Existing schema-1 settings default to enabled without saved coordinates; invalid/partial positions reset together.

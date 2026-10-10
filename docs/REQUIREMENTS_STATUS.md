@@ -1,5 +1,9 @@
 # Requirement and acceptance status
 
+## Owner follow-up: repository-local Vercel skill (2026-10-10)
+
+Installed the full pinned web-design-guidelines skill as ordinary repository files, retained original instructions, added explicit AGENTS.md review triggers and documented source SHA, hashes and reproducible updates in a separate README. Confirmed real access to the live rules URL. Application code is unchanged; this setup is not a UI/accessibility compliance audit.
+
 ## Owner follow-up: controls while minimized (2026-10-10)
 
 Implemented the requested draggable compact strip behind ordinary application windows, with existing transport, seek, shuffle and volume actions and a restore arrow. It appears on minimize/tray hide, disappears on main restoration and can be disabled in settings. Physical screen coordinates persist and are clamped after monitor/DPI changes; old settings remain schema-1 compatible. The app only positions its own nonactivating tool window and never changes Explorer, taskbars, privilege or installation behavior. Playback source, queue and main-window public interfaces remain.
