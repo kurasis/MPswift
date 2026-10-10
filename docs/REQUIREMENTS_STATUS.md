@@ -1,5 +1,9 @@
 # Requirement and acceptance status
 
+## Owner follow-up: explicit UI audit (2026-10-10)
+
+Applied the installed web-design-guidelines skill with fresh live rules and WPF-specific scope. [UI_AUDIT_2026-10-10.md](UI_AUDIT_2026-10-10.md) lists remaining UX/accessibility work with priorities and verification criteria. Confirmed source-level gaps include playlist-deletion recovery, accessible labels in auxiliary dialogs, library-page boundaries and visible/announced error feedback. Existing main-window accessibility and virtualization do not establish full application compliance. This request is fulfilled as a review; listed application fixes and interactive Windows acceptance remain pending. No feature, dependency, installation or public-interface behavior changed.
+
 ## Owner follow-up: repository-local Vercel skill (2026-10-10)
 
 Installed the full pinned web-design-guidelines skill as ordinary repository files, retained original instructions, added explicit AGENTS.md review triggers and documented source SHA, hashes and reproducible updates in a separate README. Confirmed real access to the live rules URL. Application code is unchanged; this setup is not a UI/accessibility compliance audit.

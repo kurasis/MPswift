@@ -1,5 +1,9 @@
 # Test evidence — Stages A–G
 
+## UI audit evidence (2026-10-10)
+
+The web-design-guidelines live rules returned HTTP 200 over verified HTTPS; the 8055-byte response hash and source scope are recorded in [UI_AUDIT_2026-10-10.md](UI_AUDIT_2026-10-10.md). Reviewed WPF UI source and existing minimum-size/file-information Windows captures from run 38045169563, after confirming no application-code difference between that run's source and the reviewed skill-installation commit. Findings are source-supported, not fresh interactive reproductions. No new application build/tests or Linux WPF execution are claimed. Narrator, full visual-focus/high-contrast and physical mixed-DPI/touch acceptance remain unverified. Documentation checks cover whitespace, report references and unchanged application source.
+
 ## Design review skill installation (2026-10-10)
 
 Verified the complete pinned upstream tree against local regular files, exact Git blob/SHA-256 content, SKILL.md YAML metadata and repository-relative discovery path. The live rules address returned HTTP 200 over verified HTTPS (8055 bytes). Existing AGENTS.md instructions are retained. Whitespace and existing secret-pattern checks pass. No application UI audit or new application build is claimed: this change contains only skill instructions and documentation; the prior application build evidence remains source-specific.

@@ -1,5 +1,9 @@
 # Implementation checkpoint
 
+## UI review using web-design-guidelines (2026-10-10)
+
+Completed a source review with freshly fetched Vercel rules and inspected existing Windows captures for unchanged application code. [UI_AUDIT_2026-10-10.md](UI_AUDIT_2026-10-10.md) records ten prioritized findings, minimal fixes and targeted verification: unconfirmed playlist deletion, auxiliary control labels/status announcements, audio Apply feedback, library pagination, name validation, accent hover and a desktop-panel positioning alternative. These fixes are not implemented by this audit. Application source, dependencies and public interfaces remain unchanged; this change records review evidence only.
+
 ## Repository-local design review skill (2026-10-10)
 
 Vendored the complete Vercel web-design-guidelines directory at commit `063bee94c3f4df8453406c830b0a7df0f2860278` under `.agents/skills/web-design-guidelines/`, with unchanged upstream instructions and a provenance/update README. AGENTS.md requires this skill for web interface changes and explicit UI/UX/accessibility audits, with relevant-rule scope for native WPF. The live rules URL returned HTTP 200. This is repository tooling/documentation only; application code, dependencies and UI are unchanged.
