@@ -1,5 +1,9 @@
 # Requirement and acceptance status
 
+## Owner follow-up: slow close and white disabled playlist (2026-10-10)
+
+Implemented immediate removal of the visible window before graceful asynchronous shutdown, guarded repeated close/restore, visible recovery on save failure, and themed disabled lists without changing public interfaces, settings schema or dependency pins. Saving and native/file release remain mandatory; no forced termination or silent loss is introduced. Close-to-tray is preserved. Genuine pending-save/failure/retained-data Windows controls and installed publication gates are added. Local locked checks pass; source-specific Windows acceptance must be observed before releasing. End-to-end exit time on the owner's disk and audio driver remains a physical-machine check.
+
 ## Owner follow-up: fix all UI audit findings (2026-10-10)
 
 Final Windows acceptance for these source fixes is observed at `3e798c5` in [run 38049586964](https://github.com/kurasis/MPswift/actions/runs/38049586964): all required jobs pass, including real ordinary/rebuilt/extracted/installed WPF and installer lifecycle. [Evidence](evidence/ui-audit-windows.json) records successful regression flags and the tested application tree. All ten findings are implemented and automated Windows acceptance passes; Narrator speech, physical mixed-DPI/high-contrast/touch and existing hardware/clean-OS gates remain outside this result. The subsequent evidence-only commit changes no application behavior.

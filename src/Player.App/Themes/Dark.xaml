@@ -131,7 +131,21 @@
     <Style x:Key="{x:Static MenuItem.SeparatorStyleKey}" TargetType="Separator">
         <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Separator"><Border Height="1" Margin="9,5" Background="{DynamicResource BorderBrush}" /></ControlTemplate></Setter.Value></Setter>
     </Style>
-    <Style TargetType="ListBox"><Setter Property="Background" Value="{DynamicResource BackgroundBrush}" /><Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" /><Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" /></Style>
+    <Style TargetType="ListBox">
+        <Setter Property="Background" Value="{DynamicResource BackgroundBrush}" /><Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" /><Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+        <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" /><Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+        <!-- The system template replaces disabled backgrounds with a light system brush. -->
+        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListBox">
+            <Border x:Name="ListSurface" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
+                <ScrollViewer x:Name="PART_ScrollViewer" Focusable="False" CanContentScroll="{TemplateBinding ScrollViewer.CanContentScroll}"
+                              HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}" VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
+                    <ItemsPresenter />
+                </ScrollViewer>
+            </Border>
+            <ControlTemplate.Triggers><Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.6" /></Trigger></ControlTemplate.Triggers>
+        </ControlTemplate></Setter.Value></Setter>
+    </Style>
     <Style TargetType="Slider" BasedOn="{StaticResource {x:Type Control}}">
         <Setter Property="MinHeight" Value="20" /><Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Slider">
             <Grid Background="Transparent" Margin="4,0">

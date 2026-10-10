@@ -1,5 +1,11 @@
 # Implementation checkpoint
 
+## Immediate graceful window close (2026-10-10)
+
+The actual Closing handler now hides the main window synchronously before awaiting file actions, persistence, native/database release or diagnostic flush. Repeated close and tray/IPC restore requests cannot reshow a shutting-down window. Failed saving restores and enables the window before the existing unsaved-exit warning; declining retains the model and permits a retry. Close-to-tray behavior remains unchanged. The disabled ListBox template retains theme brushes, logical scrolling and recycling instead of the system light background. Validation closes now exercise this same production exit path.
+
+New required owned Windows controls hold a real SQLite save pending, verify same-turn hiding and one shutdown, check disabled list surfaces, then release and reopen the latest playlist/session/queue/settings and exclusive native/database files. A second case injects one pre-write save failure and declines the actual owned Windows warning before retrying. This does not impose a forced process timeout or abandon data; physical disk/driver cleanup time is not guaranteed. Locked Linux baseline and changed-source builds pass with zero warnings/errors, 329 Core and 78 CLI tests (15 Windows-only skipped). Source-specific ordinary/rebuilt/extracted/installed EN/RU Windows evidence is required before publication.
+
 ## UI audit remediation (2026-10-10)
 
 Final application source `3e798c5` passed all PR CI jobs in [run 38049586964](https://github.com/kurasis/MPswift/actions/runs/38049586964). Actual ordinary EN/RU, rebuilt-TagLib EN/RU, extracted and installed EN/RU reports pass the new UI audit with zero binding errors; real panel corner/reset/draft checks and standard-user installer lifecycle pass. [Sanitized evidence](evidence/ui-audit-windows.json) records the source/application tree. Reviewed the actual corrected audio-error capture: dark labels and fixed visible error/Apply footer are confirmed. Integration adds only evidence/status documentation after this source, with identical application code; main publication still requires its own full successful workflow.

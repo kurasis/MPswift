@@ -61,8 +61,8 @@ try {
             $ui = Get-Content (Join-Path $working 'artifacts/smoke/ui.json') -Raw | ConvertFrom-Json
             Copy-Item (Join-Path $working 'artifacts/smoke/ui.json') (Join-Path $evidence "installed-ui-$language.json")
             if ($process.ExitCode -ne 0 -or $ui.Status -ne 'ui-smoke-passed' -or $ui.BindingErrors -ne 0 -or $ui.UiAudit.Status -ne 'ui-audit-passed' -or
-                -not $ui.DesktopPanel.AccessiblePositionPresets -or -not $ui.DesktopPanel.PositionDraftCancel) { throw 'Actually installed WPF/native/UI audit workflow failed.' }
-            $report.Wpf += @{ Language = $language; Status = $ui.Status; BindingErrors = $ui.BindingErrors; UiAudit = $ui.UiAudit; DesktopPanel = $ui.DesktopPanel;
+                -not $ui.DesktopPanel.AccessiblePositionPresets -or -not $ui.DesktopPanel.PositionDraftCancel -or $ui.WindowShutdown.Status -ne 'window-shutdown-passed') { throw 'Actually installed WPF/native/UI audit workflow failed.' }
+            $report.Wpf += @{ Language = $language; Status = $ui.Status; BindingErrors = $ui.BindingErrors; UiAudit = $ui.UiAudit; DesktopPanel = $ui.DesktopPanel; WindowShutdown = $ui.WindowShutdown;
                 Runtime = 'bundled self-contained'; Identity = 'existing hosted desktop user, not the installer standard-user identity' }
         } finally { $process.Dispose() }
     }
