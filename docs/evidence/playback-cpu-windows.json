@@ -1,0 +1,369 @@
+{
+  "SourceCommit": "ba57fabd59179017dfd63eb77f0aa3b8f3817ebb",
+  "ApplicationTree": "f12b54b235ad37957ab318e6e940780251428833",
+  "TestTree": "3363ef779bce3025f103f2e7bf92fa4cb3650bc1",
+  "ScriptTree": "6272efe6c2ccb532a04b1985ad68695860790a1d",
+  "PR": "https://github.com/kurasis/MPswift/pull/5",
+  "PRRun": "https://github.com/kurasis/MPswift/actions/runs/38589870592",
+  "MainRun": "https://github.com/kurasis/MPswift/actions/runs/38591692334",
+  "Attempt": 1,
+  "Conclusion": "success",
+  "ProductVersion": "1.0.143-dev.1",
+  "WindowsTests": {
+    "Core": {
+      "total": 366,
+      "passed": 366,
+      "failed": 0,
+      "notExecuted": 0
+    },
+    "CLI": {
+      "total": 93,
+      "passed": 93,
+      "failed": 0,
+      "notExecuted": 0
+    }
+  },
+  "Reports": [
+    {
+      "Report": "taglib-replacement-ui-en.json",
+      "Sha256": "822b4d1b2f64746d4a0a4ed6523f2e65006cef813dc43452c21ec7d6bf3b321a",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaybackPerformance": {
+        "Status": "playback-performance-passed",
+        "LargeSourceRows": 10000,
+        "FullCandidateReference": {
+          "Calls": 200,
+          "WallMilliseconds": 90.9207,
+          "AllocatedBytes": 32060840,
+          "ProcessCpuMilliseconds": 93.75
+        },
+        "FirstCandidate": {
+          "Calls": 200,
+          "WallMilliseconds": 0.1466,
+          "AllocatedBytes": 19240,
+          "ProcessCpuMilliseconds": 0
+        },
+        "CandidateAllocationRatio": 0.0006001090426825997,
+        "FirstCandidateEquivalent": true,
+        "PositionOnlyUi": {
+          "Calls": 200,
+          "WallMilliseconds": 5.3275,
+          "AllocatedBytes": 177240,
+          "StableLabelNotifications": 0,
+          "SeekNotifications": 200,
+          "ElapsedNotifications": 3
+        },
+        "SessionOnlyWritesWithoutLibraryCapture": true,
+        "SessionReopened": true,
+        "Waveform": {
+          "PositionUpdates": 100,
+          "renders": 40,
+          "renderRequests": 40,
+          "PrecisePosition": true,
+          "StartInvalidation": true
+        },
+        "Scope": "Controlled same-process hot paths and real paused-source WPF/SQLite/native-decoded waveform; no physical playing-device CPU reduction claim"
+      }
+    },
+    {
+      "Report": "taglib-replacement-ui-ru.json",
+      "Sha256": "56a6d23b1e013880433b145c96ebbbe45625149cd828d79a1d0dd356b327c802",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaybackPerformance": {
+        "Status": "playback-performance-passed",
+        "LargeSourceRows": 10000,
+        "FullCandidateReference": {
+          "Calls": 200,
+          "WallMilliseconds": 90.2646,
+          "AllocatedBytes": 32060840,
+          "ProcessCpuMilliseconds": 93.75
+        },
+        "FirstCandidate": {
+          "Calls": 200,
+          "WallMilliseconds": 0.1841,
+          "AllocatedBytes": 19240,
+          "ProcessCpuMilliseconds": 0
+        },
+        "CandidateAllocationRatio": 0.0006001090426825997,
+        "FirstCandidateEquivalent": true,
+        "PositionOnlyUi": {
+          "Calls": 200,
+          "WallMilliseconds": 10.2782,
+          "AllocatedBytes": 177240,
+          "StableLabelNotifications": 0,
+          "SeekNotifications": 200,
+          "ElapsedNotifications": 3
+        },
+        "SessionOnlyWritesWithoutLibraryCapture": true,
+        "SessionReopened": true,
+        "Waveform": {
+          "PositionUpdates": 100,
+          "renders": 40,
+          "renderRequests": 40,
+          "PrecisePosition": true,
+          "StartInvalidation": true
+        },
+        "Scope": "Controlled same-process hot paths and real paused-source WPF/SQLite/native-decoded waveform; no physical playing-device CPU reduction claim"
+      }
+    },
+    {
+      "Report": "installed-ui-en.json",
+      "Sha256": "0f2cc56a3c973b8d160be53177489f4e576ee1da8ff1ab7f5cb120b372bc79c6",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaybackPerformance": {
+        "Status": "playback-performance-passed",
+        "LargeSourceRows": 10000,
+        "FullCandidateReference": {
+          "Calls": 200,
+          "WallMilliseconds": 68.7007,
+          "AllocatedBytes": 32060840,
+          "ProcessCpuMilliseconds": 62.5
+        },
+        "FirstCandidate": {
+          "Calls": 200,
+          "WallMilliseconds": 0.1403,
+          "AllocatedBytes": 19240,
+          "ProcessCpuMilliseconds": 0
+        },
+        "CandidateAllocationRatio": 0.0006001090426825997,
+        "FirstCandidateEquivalent": true,
+        "PositionOnlyUi": {
+          "Calls": 200,
+          "WallMilliseconds": 5.0825,
+          "AllocatedBytes": 177240,
+          "StableLabelNotifications": 0,
+          "SeekNotifications": 200,
+          "ElapsedNotifications": 3
+        },
+        "SessionOnlyWritesWithoutLibraryCapture": true,
+        "SessionReopened": true,
+        "Waveform": {
+          "PositionUpdates": 100,
+          "renders": 40,
+          "renderRequests": 40,
+          "PrecisePosition": true,
+          "StartInvalidation": true
+        },
+        "Scope": "Controlled same-process hot paths and real paused-source WPF/SQLite/native-decoded waveform; no physical playing-device CPU reduction claim"
+      }
+    },
+    {
+      "Report": "installed-ui-ru.json",
+      "Sha256": "1f7fa0fefa7d4729aaabe704a1459a3da89e4925e4488e14d5d3d742af2ef68f",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaybackPerformance": {
+        "Status": "playback-performance-passed",
+        "LargeSourceRows": 10000,
+        "FullCandidateReference": {
+          "Calls": 200,
+          "WallMilliseconds": 63.6548,
+          "AllocatedBytes": 32060840,
+          "ProcessCpuMilliseconds": 62.5
+        },
+        "FirstCandidate": {
+          "Calls": 200,
+          "WallMilliseconds": 0.1377,
+          "AllocatedBytes": 19240,
+          "ProcessCpuMilliseconds": 0
+        },
+        "CandidateAllocationRatio": 0.0006001090426825997,
+        "FirstCandidateEquivalent": true,
+        "PositionOnlyUi": {
+          "Calls": 200,
+          "WallMilliseconds": 3.4154,
+          "AllocatedBytes": 177240,
+          "StableLabelNotifications": 0,
+          "SeekNotifications": 200,
+          "ElapsedNotifications": 3
+        },
+        "SessionOnlyWritesWithoutLibraryCapture": true,
+        "SessionReopened": true,
+        "Waveform": {
+          "PositionUpdates": 100,
+          "renders": 40,
+          "renderRequests": 40,
+          "PrecisePosition": true,
+          "StartInvalidation": true
+        },
+        "Scope": "Controlled same-process hot paths and real paused-source WPF/SQLite/native-decoded waveform; no physical playing-device CPU reduction claim"
+      }
+    },
+    {
+      "Report": "packaged-ui.json",
+      "Sha256": "b3e67d88211ddf042767354bf4ad10a00cc6beb657041cfd182dbf03681fd0b8",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaybackPerformance": {
+        "Status": "playback-performance-passed",
+        "LargeSourceRows": 10000,
+        "FullCandidateReference": {
+          "Calls": 200,
+          "WallMilliseconds": 73.7659,
+          "AllocatedBytes": 32060840,
+          "ProcessCpuMilliseconds": 62.5
+        },
+        "FirstCandidate": {
+          "Calls": 200,
+          "WallMilliseconds": 0.1362,
+          "AllocatedBytes": 19240,
+          "ProcessCpuMilliseconds": 0
+        },
+        "CandidateAllocationRatio": 0.0006001090426825997,
+        "FirstCandidateEquivalent": true,
+        "PositionOnlyUi": {
+          "Calls": 200,
+          "WallMilliseconds": 4.547,
+          "AllocatedBytes": 177240,
+          "StableLabelNotifications": 0,
+          "SeekNotifications": 200,
+          "ElapsedNotifications": 3
+        },
+        "SessionOnlyWritesWithoutLibraryCapture": true,
+        "SessionReopened": true,
+        "Waveform": {
+          "PositionUpdates": 100,
+          "renders": 40,
+          "renderRequests": 40,
+          "PrecisePosition": true,
+          "StartInvalidation": true
+        },
+        "Scope": "Controlled same-process hot paths and real paused-source WPF/SQLite/native-decoded waveform; no physical playing-device CPU reduction claim"
+      }
+    },
+    {
+      "Report": "ui-en.json",
+      "Sha256": "fe8aefacd47acaecfdbcb1ad547313c5818e8a68ac15263244f8749ee26ce008",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaybackPerformance": {
+        "Status": "playback-performance-passed",
+        "LargeSourceRows": 10000,
+        "FullCandidateReference": {
+          "Calls": 200,
+          "WallMilliseconds": 95.9667,
+          "AllocatedBytes": 32060840,
+          "ProcessCpuMilliseconds": 93.75
+        },
+        "FirstCandidate": {
+          "Calls": 200,
+          "WallMilliseconds": 0.1749,
+          "AllocatedBytes": 19240,
+          "ProcessCpuMilliseconds": 0
+        },
+        "CandidateAllocationRatio": 0.0006001090426825997,
+        "FirstCandidateEquivalent": true,
+        "PositionOnlyUi": {
+          "Calls": 200,
+          "WallMilliseconds": 4.3078,
+          "AllocatedBytes": 177240,
+          "StableLabelNotifications": 0,
+          "SeekNotifications": 200,
+          "ElapsedNotifications": 3
+        },
+        "SessionOnlyWritesWithoutLibraryCapture": true,
+        "SessionReopened": true,
+        "Waveform": {
+          "PositionUpdates": 100,
+          "renders": 40,
+          "renderRequests": 40,
+          "PrecisePosition": true,
+          "StartInvalidation": true
+        },
+        "Scope": "Controlled same-process hot paths and real paused-source WPF/SQLite/native-decoded waveform; no physical playing-device CPU reduction claim"
+      }
+    },
+    {
+      "Report": "ui-ru.json",
+      "Sha256": "8930268e4d033632f5f59779080f1bb28c2123e85076b3afe3379a5a3e9b0c69",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaybackPerformance": {
+        "Status": "playback-performance-passed",
+        "LargeSourceRows": 10000,
+        "FullCandidateReference": {
+          "Calls": 200,
+          "WallMilliseconds": 100.9145,
+          "AllocatedBytes": 32060840,
+          "ProcessCpuMilliseconds": 93.75
+        },
+        "FirstCandidate": {
+          "Calls": 200,
+          "WallMilliseconds": 0.1504,
+          "AllocatedBytes": 19240,
+          "ProcessCpuMilliseconds": 0
+        },
+        "CandidateAllocationRatio": 0.0006001090426825997,
+        "FirstCandidateEquivalent": true,
+        "PositionOnlyUi": {
+          "Calls": 200,
+          "WallMilliseconds": 3.8926,
+          "AllocatedBytes": 177240,
+          "StableLabelNotifications": 0,
+          "SeekNotifications": 200,
+          "ElapsedNotifications": 3
+        },
+        "SessionOnlyWritesWithoutLibraryCapture": true,
+        "SessionReopened": true,
+        "Waveform": {
+          "PositionUpdates": 100,
+          "renders": 40,
+          "renderRequests": 40,
+          "PrecisePosition": true,
+          "StartInvalidation": true
+        },
+        "Scope": "Controlled same-process hot paths and real paused-source WPF/SQLite/native-decoded waveform; no physical playing-device CPU reduction claim"
+      }
+    }
+  ],
+  "Installer": {
+    "Status": "installer-lifecycle-passed",
+    "StandardUser": true,
+    "Phases": [
+      {
+        "Phase": "Install",
+        "Status": "standard-user-installer-phase-passed",
+        "Administrator": false,
+        "DataPreserved": true,
+        "PerUserRegistration": true,
+        "UnknownFilesPreserved": true
+      },
+      {
+        "Phase": "Upgrade",
+        "Status": "standard-user-installer-phase-passed",
+        "Administrator": false,
+        "DataPreserved": true,
+        "PerUserRegistration": true,
+        "UnknownFilesPreserved": true
+      },
+      {
+        "Phase": "Uninstall",
+        "Status": "standard-user-installer-phase-passed",
+        "Administrator": false,
+        "DataPreserved": true,
+        "PerUserRegistration": true,
+        "UnknownFilesPreserved": true
+      }
+    ]
+  },
+  "Portable": "packaged-executable-smoke-passed",
+  "Publication": {
+    "Release": "https://github.com/kurasis/MPswift/releases/tag/build-38591692334-attempt-1",
+    "DownloadedAssetsMatchPublishedChecksumsAndCI": [
+      {
+        "Name": "MPswift-1.0.143-dev.1-ba57fabd5917-win-x64.zip",
+        "Sha256": "d7669ca1fb2cc66c8083f3a0ca1bf4d3c96e2902a9b6251e26f1bef6b96ad249",
+        "Url": "https://github.com/kurasis/MPswift/releases/download/build-38591692334-attempt-1/MPswift-1.0.143-dev.1-ba57fabd5917-win-x64.zip"
+      },
+      {
+        "Name": "MPswift-1.0.143-dev.1-setup-win-x64.exe",
+        "Sha256": "8f62ab7634fb54c509b2a1aa3ecabee11e60a99a27c80aa64888318781ed3e13",
+        "Url": "https://github.com/kurasis/MPswift/releases/download/build-38591692334-attempt-1/MPswift-1.0.143-dev.1-setup-win-x64.exe"
+      }
+    ]
+  },
+  "Limitations": "Controlled same-process component benchmarks and owned native-decoded/paused-source WPF/SQLite acceptance; not overall playing-device CPU measurement on the owner PC. Process CPU timing has OS resolution and competing-thread effects; a reported 0 ms does not imply zero CPU. This evidence-only update changes no application, test or script source."
+}
