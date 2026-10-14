@@ -98,6 +98,15 @@ public partial class MainWindow : Window
         catch (Exception error) { model.Message = Strings.Get("SaveFailed"); model.Details = error.Message; }
     }
     private void OnRemove(object sender, RoutedEventArgs e) => Model.RemoveEntriesCommand.Execute(PlaylistList.SelectedItems.Cast<PlaylistRowViewModel>().ToArray());
+    private void OnSelectAlbum(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button { DataContext: PlaylistRowViewModel row } || !row.HasSection || !Model.Entries.Contains(row)) return;
+        var album = Model.VisibleEntries.Cast<PlaylistRowViewModel>()
+            .Where(candidate => Player.Core.Playback.AlbumSections.IsSameAlbum(row.Entry.Track, candidate.Entry.Track)).ToArray();
+        PlaylistList.SelectedItems.Clear();
+        foreach (var member in album) PlaylistList.SelectedItems.Add(member);
+        e.Handled = true;
+    }
     private void OnHelp(object sender, RoutedEventArgs e) => new HelpWindow(this, ((App)Application.Current).DataDirectory).Show();
     private void OnDragOver(object sender, DragEventArgs e)
     {
@@ -291,9 +300,8 @@ public partial class MainWindow : Window
         else if (PlaylistList.IsKeyboardFocusWithin && e.Key == Key.Enter) { await Model.PlayEntryCommand.ExecuteAsync(Model.SelectedEntry); e.Handled = true; }
         else if (PlaylistList.IsKeyboardFocusWithin && e.Key == Key.F4 && Keyboard.Modifiers == ModifierKeys.None) { OnProperties(sender, e); e.Handled = true; }
         else if (PlaylistList.IsKeyboardFocusWithin && (e.Key == Key.System ? e.SystemKey : e.Key) == Key.O && Keyboard.Modifiers == ModifierKeys.Alt) { OnShowFile(sender, e); e.Handled = true; }
-        else if (PlaylistList.IsKeyboardFocusWithin && e.Key == Key.Delete && Keyboard.Modifiers == ModifierKeys.Control)
-        { BeginTrackAction(() => RecycleSelectedAsync(PlaylistList.SelectedItems.Cast<PlaylistRowViewModel>().ToArray())); e.Handled = true; }
-        else if (PlaylistList.IsKeyboardFocusWithin && e.Key == Key.Delete && Keyboard.Modifiers == ModifierKeys.None) { OnRemove(sender, e); e.Handled = true; }
+        else if (PlaylistList.IsKeyboardFocusWithin && e.Key == Key.Delete && Keyboard.Modifiers is ModifierKeys.None or ModifierKeys.Control)
+        { OnRemove(sender, e); e.Handled = true; }
         else if (PlaylistList.IsKeyboardFocusWithin && e.Key == Key.A && Keyboard.Modifiers == ModifierKeys.Control) { PlaylistList.SelectAll(); e.Handled = true; }
         else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key is Key.Left or Key.Right) { await Model.CommitSeekAsync(Model.SeekPosition + (e.Key == Key.Right ? 5 : -5)); e.Handled = true; }
         else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key is Key.Up or Key.Down) { Model.Volume = Math.Clamp(Model.Volume + (e.Key == Key.Up ? 5 : -5), 0, 100); e.Handled = true; }

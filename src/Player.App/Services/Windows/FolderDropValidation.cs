@@ -71,7 +71,7 @@ internal static class FolderDropValidation
                 "Nested/same-name folders did not produce distinct album headings.");
             var list = (ListBox)window.FindName("PlaylistList"); window.UpdateLayout();
             var firstRow = (ListBoxItem)list.ItemContainerGenerator.ContainerFromItem(model.Entries[0]);
-            Check(firstRow.Template.FindName("AlbumHeading", firstRow) is Border { IsVisible: true }, "Album heading was not rendered.");
+            Check(firstRow.Template.FindName("AlbumHeading", firstRow) is Button { IsVisible: true, Focusable: true }, "Selectable album heading was not rendered.");
             CustomizationValidation.Render((FrameworkElement)window.Content, output, "album-sections-" + model.WindowSettings.Language + ".png");
             model.Search = "two.wav";
             Check(model.VisibleEntries.Cast<PlaylistRowViewModel>().Single() is { HasSection: true, SectionTitle: "Disc 2" },
