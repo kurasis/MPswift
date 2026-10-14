@@ -15,11 +15,16 @@ public sealed record LibraryState(PlaylistState[] Playlists, SessionState Sessio
         var entries = Playlists.SelectMany(p => p.Entries).ToArray();
         if (entries.Any(e => e.Id == Guid.Empty || e.Track.Id == Guid.Empty || e.AddedUtcTicks < 0 || e.AddedUtcTicks > DateTime.MaxValue.Ticks) || entries.Select(e => e.Id).Distinct().Count() != entries.Length)
             throw new InvalidDataException("Invalid entry identity.");
-        foreach (var track in entries.Select(e => e.Track).Append(Session.ActiveEntry?.Track).Concat(Session.Order?.Queue.Select(q => q.Entry.Track) ?? []).Concat(Session.Order?.History.Select(e => e.Track) ?? []).OfType<MediaTrack>())
-            ValidateTrack(track);
-        if (Session.Order is { } order) { var validator = new PlaybackOrder(); validator.Restore(order); }
-        if (Session.ActiveEntry is { Id: var activeId } && activeId == Guid.Empty) throw new InvalidDataException("Invalid session identity.");
-        if (Session.PositionTicks < 0 || Session.PositionTicks > TimeSpan.FromDays(365).Ticks) throw new InvalidDataException("Invalid session position.");
+        foreach (var entry in entries) ValidateTrack(entry.Track);
+        ValidateSession(Session);
+    }
+    public static void ValidateSession(SessionState session)
+    {
+        foreach (var track in new[] { session.ActiveEntry?.Track }.Concat(session.Order?.Queue.Select(item => item.Entry.Track) ?? [])
+            .Concat(session.Order?.History.Select(entry => entry.Track) ?? []).OfType<MediaTrack>()) ValidateTrack(track);
+        if (session.Order is { } order) { var validator = new PlaybackOrder(); validator.Restore(order); }
+        if (session.ActiveEntry is { Id: var activeId } && activeId == Guid.Empty) throw new InvalidDataException("Invalid session identity.");
+        if (session.PositionTicks < 0 || session.PositionTicks > TimeSpan.FromDays(365).Ticks) throw new InvalidDataException("Invalid session position.");
     }
     public static void ValidateTrack(MediaTrack track)
     {

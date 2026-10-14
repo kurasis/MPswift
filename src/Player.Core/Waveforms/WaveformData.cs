@@ -71,19 +71,30 @@ public sealed class WaveformAccumulator
     public void Add(ReadOnlySpan<float> interleaved)
     {
         if (interleaved.Length % _channels != 0) throw new InvalidDataException("Incomplete PCM frame.");
-        for (var frame = 0; frame < interleaved.Length / _channels; frame++)
+        var remaining = interleaved;
+        while (!remaining.IsEmpty)
         {
             var bucket = (int)(_frames / _bucketFrames);
             if (bucket >= _minimum.Length) throw new InvalidDataException("Decoder exceeded the validated waveform range.");
-            for (var c = 0; c < _channels; c++)
+            var frames = (int)Math.Min(remaining.Length / _channels, _bucketFrames - _frames % _bucketFrames);
+            var samples = remaining[..(frames * _channels)];
+            var minimum = _minimum[bucket]; var maximum = _maximum[bucket]; var energy = _energy[bucket];
+            // Keep sample/energy addition order identical, including partial progress on invalid input.
+            try
             {
-                var value = interleaved[frame * _channels + c];
-                if (!float.IsFinite(value) || value is < -16 or > 16) throw new InvalidDataException("Invalid decoded PCM sample.");
-                _minimum[bucket] = Math.Min(_minimum[bucket], value);
-                _maximum[bucket] = Math.Max(_maximum[bucket], value);
-                _energy[bucket] += (double)value * value;
+                for (var frame = 0; frame < frames; frame++)
+                {
+                    for (var channel = 0; channel < _channels; channel++)
+                    {
+                        var value = samples[frame * _channels + channel];
+                        if (!float.IsFinite(value) || value is < -16 or > 16) throw new InvalidDataException("Invalid decoded PCM sample.");
+                        minimum = Math.Min(minimum, value); maximum = Math.Max(maximum, value); energy += (double)value * value;
+                    }
+                    _frames++;
+                }
             }
-            _frames++;
+            finally { _minimum[bucket] = minimum; _maximum[bucket] = maximum; _energy[bucket] = energy; }
+            remaining = remaining[samples.Length..];
         }
     }
     public WaveformData Complete()

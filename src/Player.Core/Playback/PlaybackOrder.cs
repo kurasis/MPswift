@@ -44,6 +44,28 @@ public sealed class PlaybackOrder
     public void Move(Guid id, int delta)
     { var i = _queue.FindIndex(q => q.Id == id); if (i < 0) return; var item = _queue[i]; _queue.RemoveAt(i); _queue.Insert(Math.Clamp(i + delta, 0, _queue.Count), item); }
     public bool IsDetached(QueueItem item) => item.OriginEntryId is { } id && _source.All(e => e.Id != id);
+    /// <summary>The same first candidate as Candidates, without materializing the rest of the source/queue.</summary>
+    public PlaylistEntry? FirstCandidate(PlaylistEntry? active, bool natural)
+    {
+        // Candidates may refill a shuffle cycle even when a queued entry takes precedence.
+        var repeatOne = natural && Repeat == RepeatMode.One && active is not null &&
+            (_source.Any(e => e.Id == active.Id) || _source.Length > 0 && _cursor != active.Id);
+        if (!repeatOne && _shuffle && _remaining.Count == 0 && Repeat == RepeatMode.All) Refill(active?.Id);
+        if (_queue.Count > 0) return _queue[0].Entry;
+        if (repeatOne) return active;
+        if (_shuffle)
+        {
+            foreach (var id in _remaining)
+                if (Array.Find(_source, entry => entry.Id == id) is { } next) return next;
+            return null;
+        }
+        var index = Array.FindIndex(_source, entry => entry.Id == _cursor);
+        var start = _cursor is null ? 0 : index >= 0 ? index + 1 : _removed;
+        for (var i = start; i < _source.Length; i++) if (IsEligible(_source[i])) return _source[i];
+        if (Repeat == RepeatMode.All)
+            for (var i = 0; i < Math.Min(start, _source.Length); i++) if (IsEligible(_source[i])) return _source[i];
+        return null;
+    }
     public PlaylistEntry[] Candidates(PlaylistEntry? active, bool natural)
     {
         var queued = _queue.Select(q => q.Entry).ToArray();

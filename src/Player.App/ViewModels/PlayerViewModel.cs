@@ -70,6 +70,13 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     private long _savedLibraryVersion;
     private DateTime _lastSessionSave = DateTime.UtcNow;
     private PlaybackState _previousState;
+    private PlaybackSnapshot? _labelSnapshot;
+    private MediaTrack? _labelTrack;
+    private string? _labelSourceName, _labelCulture;
+    private long _elapsedSecond = long.MinValue;
+    private (AudioFormatInfo? Source, AudioFormatInfo? Output, int Encoded, string? Culture) _formatKey;
+    private bool? _transportEntryPresent;
+    internal long LibraryCaptures { get; private set; }
     public ObservableCollection<QueueItem> Queue { get; } = [];
     public RepeatMode[] RepeatModes { get; } = Enum.GetValues<RepeatMode>();
     [ObservableProperty] private RepeatMode _repeat;
@@ -707,13 +714,19 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         _revision = snapshot.Revision; _applyingSnapshot = true;
         try
         {
-            IsPlaying = snapshot.State == PlaybackState.Playing; State = Strings.Get("State" + snapshot.State);
+            var culture = Strings.Culture.Name;
+            IsPlaying = snapshot.State == PlaybackState.Playing;
+            if (_labelSnapshot?.State != snapshot.State || _labelCulture != culture) State = Strings.Get("State" + snapshot.State);
             CanSeek = snapshot.CanSeek && snapshot.State is not (PlaybackState.Loading or PlaybackState.Error);
-            DurationSeconds = Math.Max(0, snapshot.Duration?.TotalSeconds ?? 0); DurationText = FormatTime(snapshot.Duration); Elapsed = FormatTime(snapshot.Position);
+            DurationSeconds = Math.Max(0, snapshot.Duration?.TotalSeconds ?? 0);
+            if (_labelSnapshot is null || _labelSnapshot.Duration != snapshot.Duration) DurationText = FormatTime(snapshot.Duration);
+            var second = snapshot.Position.Ticks / TimeSpan.TicksPerSecond;
+            if (_elapsedSecond != second) { _elapsedSecond = second; Elapsed = FormatTime(snapshot.Position); }
             if (!SeekPreview && !_pendingSeek) SeekPosition = Math.Clamp(snapshot.Position.TotalSeconds, 0, DurationSeconds);
             Volume = snapshot.Volume * 100; Muted = snapshot.Muted;
             var sourceTab = Playlists.FirstOrDefault(p => p.Id == _sourcePlaylistId);
-            PlaybackSource = snapshot.EntryId is null ? "" : sourceTab is null ? Strings.Get("DetachedSource") : string.Format(Strings.Culture, Strings.Get("PlaybackSource"), sourceTab.Name);
+            if (_labelSnapshot is null || _labelSnapshot.EntryId != snapshot.EntryId || _labelSourceName != sourceTab?.Name || _labelCulture != culture)
+                PlaybackSource = snapshot.EntryId is null ? "" : sourceTab is null ? Strings.Get("DetachedSource") : string.Format(Strings.Culture, Strings.Get("PlaybackSource"), sourceTab.Name);
             if (snapshot.EntryId != _waveEntry && (snapshot.State == PlaybackState.Loading || snapshot.SourceFormat is null))
             {
                 _waveCancellation?.Cancel(); ++_waveGeneration; _waveEntry = null;
@@ -724,7 +737,8 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
             { decodedRow.UpdateTrack(track with { DurationHint = decodedDuration }); ScheduleSave(true); }
             if (track is not null && snapshot.EntryId != _artEntry) { _artEntry = snapshot.EntryId; _artTask = LoadArtworkAsync(track.Path); }
             if (_index is not null && _listening.Update(snapshot, track?.Id, Stopwatch.GetElapsedTime(_clockOrigin), DateTime.UtcNow) is { } occurrence) _statisticsTask = SaveListeningAfterAsync(_statisticsTask, occurrence);
-            if (track is not null) { Title = track.Title; Artist = track.Artist ?? Strings.Get("UnknownArtist"); Album = track.Album ?? ""; }
+            if (track is not null && (!ReferenceEquals(_labelTrack, track) || _labelCulture != culture))
+            { Title = track.Title; Artist = track.Artist ?? Strings.Get("UnknownArtist"); Album = track.Album ?? ""; }
             RefreshFormatLabels(snapshot);
             if (snapshot.Error is { } error) { Message = Strings.Get(error.ResourceKey); Details = error.Detail; }
             else if (snapshot.EntryId is not null && !IsImporting) { Message = ""; Details = ""; }
@@ -733,19 +747,26 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
             { if (_playingRow is not null) _playingRow.IsPlaying = false; _playingRow = active; if (active is not null) active.IsPlaying = true; }
             if (track is not null && snapshot.SourceFormat is not null && snapshot.EntryId != _waveEntry && snapshot.State != PlaybackState.Loading)
             { _waveEntry = snapshot.EntryId; _waveTask = LoadWaveformAsync(track.Path, false); }
+            _labelSnapshot = snapshot; _labelTrack = track; _labelSourceName = sourceTab?.Name; _labelCulture = culture;
         }
         finally { _applyingSnapshot = false; }
-        OnPropertyChanged(nameof(CanTransport));
+        if (_transportEntryPresent != (snapshot.EntryId is not null))
+        { _transportEntryPresent = snapshot.EntryId is not null; OnPropertyChanged(nameof(CanTransport)); }
         if (snapshot.State != _previousState || DateTime.UtcNow - _lastSessionSave >= TimeSpan.FromSeconds(10))
         { _previousState = snapshot.State; _lastSessionSave = DateTime.UtcNow; ScheduleSave(false); }
     }
     private void RefreshFormatLabels(PlaybackSnapshot snapshot)
     {
-        Format = snapshot.SourceFormat is { } source ? string.Format(Strings.Culture, Strings.Get("SourceFormat"), source.Codec, source.SampleRate, source.Channels) : "";
-        if (snapshot.SourceFormat?.BitDepth is { } bits) Format += " · " + string.Format(Strings.Culture, Strings.Get("SourceBitDepth"), bits);
-        if (_coordinator.ActiveEntry?.Track.ChannelsHint is > 0 and var encoded && snapshot.SourceFormat is { } decoded && encoded != decoded.Channels)
-            Format += " · " + string.Format(Strings.Culture, Strings.Get("EncodedChannelCount"), encoded);
-        if (snapshot.OutputFormat is { } output) Format += " · " + string.Format(Strings.Culture, Strings.Get("OutputFormat"), output.SampleRate, output.Channels);
+        var encoded = _coordinator.ActiveEntry?.Track.ChannelsHint ?? 0;
+        var key = (snapshot.SourceFormat, snapshot.OutputFormat, encoded, Strings.Culture.Name);
+        if (_formatKey == key) return;
+        _formatKey = key;
+        var format = snapshot.SourceFormat is { } source ? string.Format(Strings.Culture, Strings.Get("SourceFormat"), source.Codec, source.SampleRate, source.Channels) : "";
+        if (snapshot.SourceFormat?.BitDepth is { } bits) format += " · " + string.Format(Strings.Culture, Strings.Get("SourceBitDepth"), bits);
+        if (encoded > 0 && snapshot.SourceFormat is { } decoded && encoded != decoded.Channels)
+            format += " · " + string.Format(Strings.Culture, Strings.Get("EncodedChannelCount"), encoded);
+        if (snapshot.OutputFormat is { } output) format += " · " + string.Format(Strings.Culture, Strings.Get("OutputFormat"), output.SampleRate, output.Channels);
+        Format = format;
     }
     private async Task SaveListeningAfterAsync(Task preceding, ListeningEvent occurrence) { await preceding; await ObserveAsync(_index!.RecordListeningAsync(occurrence)); }
     private async Task LoadArtworkAsync(string path)
@@ -797,8 +818,10 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
             rows[i].Section = sectionIndex < sections.Count && sections[sectionIndex].StartIndex == i ? sections[sectionIndex++] : null;
         PlaylistStatus = string.Format(Strings.Culture, Strings.Get("PlaylistCount"), rows.Length, Entries.Count);
     }
-    private LibraryState Capture() => new(Playlists.Select(p => p.Capture()).ToArray(),
-        new(SelectedPlaylist.Id, _sourcePlaylistId, _coordinator.ActiveEntry, _player.Snapshot.Position.Ticks, _coordinator.CaptureOrder()));
+    private SessionState CaptureSession() => new(SelectedPlaylist.Id, _sourcePlaylistId, _coordinator.ActiveEntry,
+        _player.Snapshot.Position.Ticks, _coordinator.CaptureOrder());
+    private LibraryState Capture()
+    { LibraryCaptures++; return new(Playlists.Select(p => p.Capture()).ToArray(), CaptureSession()); }
     private void ScheduleSave(bool libraryChanged)
     {
         if (!_initialized || _closing) return;
@@ -819,9 +842,11 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         await _saveGate.WaitAsync();
         try
         {
-            var state = Capture(); var version = _libraryVersion;
+            var version = _libraryVersion;
             var settings = WindowSettings with { Volume = Volume, Muted = Muted };
-            await _store.SaveAsync(state, version != _savedLibraryVersion);
+            if (version == _savedLibraryVersion && _store is ISessionPlayerStore sessions)
+                await sessions.SaveSessionAsync(CaptureSession());
+            else await _store.SaveAsync(Capture(), version != _savedLibraryVersion);
             if (_index is not null)
             {
                 foreach (var (track, rating) in _pendingRatings.ToArray()) { await _index.SetRatingAsync(track, rating); if (_pendingRatings.GetValueOrDefault(track) == rating) _pendingRatings.Remove(track); }
