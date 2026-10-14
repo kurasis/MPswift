@@ -16,6 +16,8 @@
     <Compile Include="../../src/Player.App/Services/Audio/BassSmokeSession.cs" Link="Audio/BassSmokeSession.cs" />
     <Compile Include="../../src/Player.App/Services/Audio/BassMixerGraph.cs" Link="Audio/BassMixerGraph.cs" />
     <Compile Include="../../src/Player.App/Services/Audio/BassAudioBackend.cs" Link="Audio/BassAudioBackend.cs" />
+    <Compile Include="../../src/Player.App/Services/Audio/DeviceSelectionCache.cs" Link="Audio/DeviceSelectionCache.cs" />
+    <Compile Include="../../src/Player.App/Services/Audio/WasapiDeviceNotifications.cs" Link="Audio/WasapiDeviceNotifications.cs" />
     <Compile Include="../../src/Player.App/Services/Audio/OutputBufferReset.cs" Link="Audio/OutputBufferReset.cs" />
     <Compile Include="../../src/Player.App/Services/Audio/NativeDecoderPlugins.cs" Link="Audio/NativeDecoderPlugins.cs" />
     <Compile Include="../../src/Player.App/Services/Audio/LocalFileAccess.cs" Link="Audio/LocalFileAccess.cs" />

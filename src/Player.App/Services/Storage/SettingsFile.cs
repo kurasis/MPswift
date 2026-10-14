@@ -8,6 +8,9 @@ public sealed class SettingsFile(string directory)
 {
     private static readonly object IoGate = new();
     private readonly string _path = Path.Combine(directory, "settings.json");
+    private long _writes, _unchangedSaves;
+    internal long Writes => Interlocked.Read(ref _writes);
+    internal long UnchangedSaves => Interlocked.Read(ref _unchangedSaves);
     public PlayerSettings Load()
     {
         lock (IoGate)
@@ -93,13 +96,33 @@ public sealed class SettingsFile(string directory)
             settings = settings.Validate();
             using var lease = DataDirectoryLease.Create(Path.GetDirectoryName(_path)!);
             var path = Path.Combine(lease.DirectoryPath, "settings.json");
-            bool existed;
-            using (var current = DataFileLease.OpenExisting(path)) existed = current is not null;
-            using var previous = existed ? null : DataFileLease.OpenExisting(path + ".bak");
             using var content = new MemoryStream(); JsonSerializer.Serialize(content, settings);
+            bool existed;
+            using (var current = DataFileLease.OpenExisting(path))
+            {
+                existed = current is not null;
+                // Validate the backup name too, even when no rotation/write is needed.
+                using var previous = DataFileLease.OpenExisting(path + ".bak");
+                if (current is not null && Matches(current.Stream, content))
+                { Interlocked.Increment(ref _unchangedSaves); return; }
+            }
             RestoreFileTransaction.Install([(path, content)], existed ?
                 [(path + ".bak", path + ".bak.previous-" + Guid.NewGuid().ToString("N"), true), (path, path + ".bak", false)] : []);
+            Interlocked.Increment(ref _writes);
         }
+    }
+    private static bool Matches(Stream current, MemoryStream expected)
+    {
+        if (current.Length != expected.Length) return false;
+        var bytes = expected.GetBuffer().AsSpan(0, checked((int)expected.Length));
+        Span<byte> buffer = stackalloc byte[4096];
+        while (!bytes.IsEmpty)
+        {
+            var part = buffer[..Math.Min(buffer.Length, bytes.Length)]; current.ReadExactly(part);
+            if (!part.SequenceEqual(bytes[..part.Length])) return false;
+            bytes = bytes[part.Length..];
+        }
+        return current.ReadByte() < 0;
     }
 }
 
