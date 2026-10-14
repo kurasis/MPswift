@@ -1,5 +1,11 @@
 # Requirement and acceptance status
 
+## Owner follow-up: scroll overflowing playlists and drag albums (2026-10-14)
+
+Implemented arrows, wheel and an all-playlists menu for overflowing tabs, selected-tab visibility on changes/resizing, and album-heading drag/drop with a boundary indicator and edge scrolling. The entire displayed contiguous block moves without changing song order; separately located same-name albums remain distinct. Heading context-menu up/down actions provide a keyboard alternative. Search/import/closing and stale/foreign payload checks prevent unintended movement; files, CUE images, playback/queue and existing persistent interfaces remain. [Usage](PLAYLIST_NAVIGATION.md).
+
+Local checks pass; source-specific Windows WPF/native, packaged/installed EN/RU and installer acceptance must be observed before publication. Physical mouse/touch and Narrator speech remain separate manual acceptance.
+
 ## Observed Windows album selection and removal acceptance (2026-10-14)
 
 Final source `9f2b071dd3c5e9f9e67fbba7394958f655a2cf0f` passed the Windows, Linux and rebuilt-TagLib jobs in [main run 38564116925, attempt 2](https://github.com/kurasis/MPswift/actions/runs/38564116925). [Sanitized evidence](evidence/album-selection-windows.json) records all seven real ordinary/rebuilt/extracted/installed EN/RU WPF reports with zero binding errors and every album-selection/removal control passing. Root-menu, Delete and Ctrl+Delete preserve physical audio/CUE files, other playlists, source and queue; repeated album occurrences, visible filtering, keyboard/UIA activation, stale actions and saved SQLite removal pass. Windows Core 337 and all 93 CLI tests pass. Genuine standard-user install/reinstall/uninstall and packaged-executable checks pass. [Build 1.0.139-dev.2](https://github.com/kurasis/MPswift/releases/tag/build-38564116925-attempt-2) is published; downloaded player ZIP and installer match both their published SHA-256 files and the original CI evidence. Physical pointer/touch and Narrator speech remain manual acceptance; this documentation update changes no application, test or script source.

@@ -110,6 +110,7 @@ public partial class MainWindow : Window
     private void OnHelp(object sender, RoutedEventArgs e) => new HelpWindow(this, ((App)Application.Current).DataDirectory).Show();
     private void OnDragOver(object sender, DragEventArgs e)
     {
+        if (e.Data.GetDataPresent(AlbumDragFormat)) { OnAlbumDragOver(e); return; }
         if (e.Data.GetDataPresent(PlaylistTabDragFormat))
         {
             var valid = TryTabPayload(e.Data, out _) && HasAncestor(e.OriginalSource as DependencyObject, PlaylistTabs);
@@ -135,6 +136,7 @@ public partial class MainWindow : Window
     {
         e.Handled = true;
         ClearTabInsertion();
+        if (e.Data.GetDataPresent(AlbumDragFormat)) { OnAlbumDrop(e); return; }
         if (e.Data.GetDataPresent(PlaylistTabDragFormat))
         {
             if (TryTabPayload(e.Data, out var payload) && HasAncestor(e.OriginalSource as DependencyObject, PlaylistTabs))
@@ -187,7 +189,9 @@ public partial class MainWindow : Window
     {
         var now = Environment.TickCount64;
         if (now - _lastTabScroll < 100 || VisualChild<ScrollViewer>(PlaylistTabs) is not { } scroll) return;
-        if (x < 24) scroll.LineLeft(); else if (x > PlaylistTabs.ActualWidth - 24) scroll.LineRight(); else return;
+        if (x < 24) scroll.ScrollToHorizontalOffset(scroll.HorizontalOffset - 48);
+        else if (x > PlaylistTabs.ActualWidth - 24) scroll.ScrollToHorizontalOffset(scroll.HorizontalOffset + 48);
+        else return;
         _lastTabScroll = now;
     }
     private static T? VisualChild<T>(DependencyObject parent) where T : DependencyObject
@@ -391,17 +395,34 @@ public partial class MainWindow : Window
     }
     private void OnRowDragStart(object sender, MouseButtonEventArgs e)
     {
-        _dragOrigin = null;
+        _dragOrigin = null; _albumDrag = null;
+        if (e.ClickCount == 1 && Model.CanReorder && AlbumHeader(e.OriginalSource as DependencyObject) is { DataContext: PlaylistRowViewModel heading } &&
+            heading.HasSection && Model.Entries.Contains(heading))
+        {
+            _dragOrigin = e.GetPosition(PlaylistList);
+            _albumDrag = new(this, Model.SelectedPlaylist.Id, heading, Model.Entries.Select(row => row.Id).ToArray());
+            return;
+        }
         if (e.ClickCount != 1 || OwnsInput(e.OriginalSource as DependencyObject) || !Model.CanReorder) return;
         if (ItemsControl.ContainerFromElement(PlaylistList, e.OriginalSource as DependencyObject) is ListBoxItem { DataContext: PlaylistRowViewModel row })
         { _dragOrigin = e.GetPosition(PlaylistList); _dragRows = PlaylistList.SelectedItems.Contains(row) ? PlaylistList.SelectedItems.Cast<PlaylistRowViewModel>().ToArray() : [row]; }
     }
     private void OnRowDragMove(object sender, MouseEventArgs e)
     {
-        if (_dragOrigin is not { } origin || e.LeftButton != MouseButtonState.Pressed) return;
+        if (e.LeftButton != MouseButtonState.Pressed) { _dragOrigin = null; _albumDrag = null; return; }
+        if (_dragOrigin is not { } origin || !Model.CanReorder) return;
         var point = e.GetPosition(PlaylistList);
         if (Math.Abs(point.X - origin.X) < SystemParameters.MinimumHorizontalDragDistance && Math.Abs(point.Y - origin.Y) < SystemParameters.MinimumVerticalDragDistance) return;
         _dragOrigin = null;
+        if (_albumDrag is { } album)
+        {
+            _albumDrag = null;
+            // End the heading button press before OLE owns the drag; release must not select the album as a click.
+            AlbumHeader(Mouse.Captured as DependencyObject)?.ReleaseMouseCapture();
+            try { DragDrop.DoDragDrop(PlaylistList, new DataObject(AlbumDragFormat, album), DragDropEffects.Move); }
+            finally { ClearAlbumInsertion(); }
+            return;
+        }
         DragDrop.DoDragDrop(PlaylistList, new DataObject(EntryDragFormat, _dragRows), DragDropEffects.Move);
     }
     private void OnCreatePlaylist(object sender, RoutedEventArgs e)

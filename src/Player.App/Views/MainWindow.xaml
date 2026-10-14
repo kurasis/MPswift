@@ -163,9 +163,14 @@
                     </ContextMenu></Button.ContextMenu>
                 </Button>
             </StackPanel>
-            <ListBox x:Name="PlaylistTabs" ItemsSource="{Binding Playlists}" SelectedItem="{Binding SelectedPlaylist}" BorderThickness="0" Background="{DynamicResource BackgroundBrush}" Foreground="{DynamicResource TextPrimaryBrush}"
+            <Grid MinHeight="40">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                <Button x:Name="TabsPrevious" Grid.Column="0" Click="OnScrollTabs" Style="{StaticResource IconButton}" Margin="0,2,4,2" Visibility="Collapsed" IsEnabled="False"
+                        ToolTip="{r:Loc ScrollPlaylistsLeft}" AutomationProperties.Name="{r:Loc ScrollPlaylistsLeft}"><c:AppIcon Kind="ChevronLeft" /></Button>
+            <ListBox x:Name="PlaylistTabs" Grid.Column="1" ItemsSource="{Binding Playlists}" SelectedItem="{Binding SelectedPlaylist}" BorderThickness="0" Background="{DynamicResource BackgroundBrush}" Foreground="{DynamicResource TextPrimaryBrush}"
                      ContextMenuOpening="OnTabContextMenuOpening" PreviewMouseLeftButtonDown="OnTabDragStart" PreviewMouseMove="OnTabDragMove" DragLeave="OnTabDragLeave"
-                     ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Disabled" AutomationProperties.Name="{r:Loc Playlists}">
+                     Loaded="OnTabsLoaded" SizeChanged="OnTabStripSizeChanged" SelectionChanged="OnTabSelectionChanged" PreviewMouseWheel="OnTabWheel" ScrollViewer.ScrollChanged="OnTabScrollChanged"
+                     ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.CanContentScroll="False" AutomationProperties.Name="{r:Loc Playlists}">
                 <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem">
                     <Setter Property="AutomationProperties.Name" Value="{Binding Name}" />
                     <Setter Property="ContextMenu" Value="{StaticResource PlaylistTabMenu}" />
@@ -175,12 +180,16 @@
                 <ListBox.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></ListBox.ItemsPanel>
                 <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Name}" MinWidth="70" MaxWidth="200" TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}" Padding="8,6" /></DataTemplate></ListBox.ItemTemplate>
             </ListBox>
+                <Button x:Name="TabsNext" Grid.Column="2" Click="OnScrollTabs" Style="{StaticResource IconButton}" Margin="4,2,2,2" Visibility="Collapsed" IsEnabled="False"
+                        ToolTip="{r:Loc ScrollPlaylistsRight}" AutomationProperties.Name="{r:Loc ScrollPlaylistsRight}"><c:AppIcon Kind="ChevronRight" /></Button>
+                <Button x:Name="AllPlaylists" Grid.Column="3" Click="OnAllPlaylists" Style="{StaticResource IconButton}" Margin="2" ToolTip="{r:Loc AllPlaylists}" AutomationProperties.Name="{r:Loc AllPlaylists}"><c:AppIcon Kind="Down" /></Button>
+            </Grid>
         </DockPanel>
         <Grid Grid.Row="5" Margin="16,4,16,0">
             <ListBox x:Name="PlaylistList" ItemsSource="{Binding VisibleEntries}" SelectedItem="{Binding SelectedEntry}" SelectionMode="Extended"
                      Background="{DynamicResource BackgroundBrush}" Foreground="{DynamicResource TextPrimaryBrush}" BorderThickness="0"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
-                     MouseDoubleClick="OnTrackDoubleClick" PreviewMouseRightButtonDown="OnTrackRightButtonDown" ContextMenuOpening="OnTrackContextMenuOpening" PreviewMouseLeftButtonDown="OnRowDragStart" PreviewMouseMove="OnRowDragMove" HorizontalContentAlignment="Stretch" AutomationProperties.Name="{Binding SelectedPlaylist.Name}">
+                     MouseDoubleClick="OnTrackDoubleClick" PreviewMouseRightButtonDown="OnTrackRightButtonDown" ContextMenuOpening="OnTrackContextMenuOpening" PreviewMouseLeftButtonDown="OnRowDragStart" PreviewMouseMove="OnRowDragMove" DragLeave="OnAlbumDragLeave" HorizontalContentAlignment="Stretch" AutomationProperties.Name="{Binding SelectedPlaylist.Name}">
                 <ListBox.ContextMenu><ContextMenu /></ListBox.ContextMenu>
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
@@ -189,7 +198,8 @@
                         <Setter Property="Background" Value="{DynamicResource AlternateRowBrush}" />
                         <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListBoxItem"><StackPanel>
                             <Button x:Name="AlbumHeading" Style="{StaticResource AlbumHeaderButton}" Click="OnSelectAlbum" ToolTip="{Binding SelectAlbumLabel}"
-                                    AutomationProperties.Name="{Binding SelectAlbumLabel}" AutomationProperties.HelpText="{r:Loc SelectAlbumHelp}">
+                                    ContextMenuOpening="OnAlbumContextMenuOpening" AutomationProperties.Name="{Binding SelectAlbumLabel}" AutomationProperties.HelpText="{r:Loc SelectAlbumHelp}">
+                                <Button.ContextMenu><ContextMenu /></Button.ContextMenu>
                                 <StackPanel><TextBlock Text="{Binding SectionTitle}" Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold" FontSize="14" TextTrimming="CharacterEllipsis" /><TextBlock Text="{Binding SectionInfo}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Margin="0,3,0,0" TextTrimming="CharacterEllipsis" /></StackPanel>
                             </Button>
                             <Border x:Name="Row" CornerRadius="7" Background="{TemplateBinding Background}" BorderThickness="1" BorderBrush="Transparent" Padding="{TemplateBinding Padding}"><ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" /></Border></StackPanel><ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Row" Property="Background" Value="{DynamicResource HoverBrush}" /></Trigger><Trigger Property="IsSelected" Value="True"><Setter TargetName="Row" Property="Background" Value="{DynamicResource SelectedRowBrush}" /><Setter TargetName="Row" Property="BorderBrush" Value="{DynamicResource AccentBrush}" /></Trigger><Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Row" Property="BorderBrush" Value="{DynamicResource TextPrimaryBrush}" /></Trigger></ControlTemplate.Triggers></ControlTemplate></Setter.Value></Setter>
