@@ -809,5 +809,10 @@ F1: локальная справка
     </data>
     <data name="RemoveSelectedFromPlaylist" xml:space="preserve"><value>Удалить выбранные из плейлиста</value></data>
     <data name="SelectAlbumTracks" xml:space="preserve"><value>Выделить песни альбома «{0}»</value></data>
-    <data name="SelectAlbumHelp" xml:space="preserve"><value>Выделяет все видимые песни этого альбома в текущем плейлисте.</value></data>
+    <data name="SelectAlbumHelp" xml:space="preserve"><value>Выделяет все видимые песни этого альбома в текущем плейлисте. Перетаскивайте заголовок для переноса блока альбома. Правый клик или Shift+F10: переместить выше/ниже.</value></data>
+  <data name="ScrollPlaylistsLeft" xml:space="preserve"><value>Прокрутить плейлисты влево</value></data>
+  <data name="ScrollPlaylistsRight" xml:space="preserve"><value>Прокрутить плейлисты вправо</value></data>
+  <data name="AllPlaylists" xml:space="preserve"><value>Все плейлисты</value></data>
+  <data name="MoveAlbumUp" xml:space="preserve"><value>Переместить альбом выше</value></data>
+  <data name="MoveAlbumDown" xml:space="preserve"><value>Переместить альбом ниже</value></data>
 </root>

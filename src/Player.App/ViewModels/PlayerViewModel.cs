@@ -154,7 +154,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     public bool SeekPreview { get; set; }
     public bool CanTransport => HasEntries || _player.Snapshot.EntryId is not null;
     public bool HasVisibleEntries => VisibleEntries is not null && !VisibleEntries.IsEmpty;
-    public bool CanReorder => string.IsNullOrEmpty(Search) && !IsImporting;
+    public bool CanReorder => !_closing && string.IsNullOrEmpty(Search) && !IsImporting;
     public Task ImportCompletion => _importTask;
     public PlaybackSnapshot Snapshot => _player.Snapshot;
     public Task HandleMediaAsync(string button)
@@ -663,6 +663,19 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         foreach (var row in ordered) Entries.Remove(row);
         foreach (var row in ordered) Entries.Insert(adjusted++, row);
         UpdateEntries();
+    }
+    internal bool MoveAlbum(PlaylistRowViewModel heading, int insertion)
+    {
+        if (!CanReorder || !WindowSettings.ShowAlbumSections || !Entries.Contains(heading)) return false;
+        var order = AlbumSections.MoveRun(Entries.Select(row => row.Entry).ToArray(), heading.Id, insertion);
+        if (Entries.Select(row => row.Id).SequenceEqual(order.Select(entry => entry.Id))) return false;
+        var rows = Entries.ToDictionary(row => row.Id);
+        for (var i = 0; i < order.Length; i++)
+        {
+            var index = Entries.IndexOf(rows[order[i].Id]);
+            if (index != i) Entries.Move(index, i);
+        }
+        UpdateEntries(); return true;
     }
     private static string ValidateName(string name)
     { name = name.Trim(); if (name.Length is < 1 or > 200) throw new ArgumentException("Playlist name must contain 1–200 characters."); return name; }

@@ -20,6 +20,7 @@ public partial class MainWindow
     private void OnTrackRightButtonDown(object sender, MouseButtonEventArgs args)
     {
         if (args.OriginalSource is not DependencyObject element || ItemsControl.ContainerFromElement(PlaylistList, element) is not ListBoxItem { DataContext: PlaylistRowViewModel row }) return;
+        if (AlbumHeader(element) is not null) return;
         SelectTrackContext(row);
     }
     internal void SelectTrackContext(PlaylistRowViewModel row)

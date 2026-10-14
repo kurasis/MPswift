@@ -809,5 +809,10 @@ Settings include accent, waveform style, startup/session options and local cache
     </data>
     <data name="RemoveSelectedFromPlaylist" xml:space="preserve"><value>Remove selected from playlist</value></data>
     <data name="SelectAlbumTracks" xml:space="preserve"><value>Select tracks from album “{0}”</value></data>
-    <data name="SelectAlbumHelp" xml:space="preserve"><value>Selects all visible tracks from this album in the current playlist.</value></data>
+    <data name="SelectAlbumHelp" xml:space="preserve"><value>Selects all visible tracks from this album in the current playlist. Drag the heading to move this album block. Right-click or Shift+F10 for Move album up/down.</value></data>
+  <data name="ScrollPlaylistsLeft" xml:space="preserve"><value>Scroll playlists left</value></data>
+  <data name="ScrollPlaylistsRight" xml:space="preserve"><value>Scroll playlists right</value></data>
+  <data name="AllPlaylists" xml:space="preserve"><value>All playlists</value></data>
+  <data name="MoveAlbumUp" xml:space="preserve"><value>Move album up</value></data>
+  <data name="MoveAlbumDown" xml:space="preserve"><value>Move album down</value></data>
 </root>

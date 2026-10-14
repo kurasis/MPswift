@@ -2,9 +2,23 @@ namespace Player.Core.Playback;
 
 public sealed record AlbumSection(int StartIndex, int Count, string Title, string Folder);
 
-/// <summary>Headings for contiguous visible runs only; never sorts or merges playlist occurrences.</summary>
+/// <summary>Album identity, contiguous headings and explicit block movement; heading generation never sorts occurrences.</summary>
 public static class AlbumSections
 {
+    /// <summary>Moves one contiguous album run to an existing album boundary; occurrence order and IDs are retained.</summary>
+    public static PlaylistEntry[] MoveRun(IReadOnlyList<PlaylistEntry> entries, Guid headingId, int insertionIndex)
+    {
+        var original = entries.ToArray();
+        var sections = Create(entries.Select(entry => entry.Track));
+        var source = sections.FirstOrDefault(section => entries[section.StartIndex].Id == headingId);
+        if (source is null || insertionIndex < 0 || insertionIndex > entries.Count ||
+            (insertionIndex != entries.Count && !sections.Any(section => section.StartIndex == insertionIndex)) ||
+            (insertionIndex >= source.StartIndex && insertionIndex <= source.StartIndex + source.Count)) return original;
+        var moved = original.Skip(source.StartIndex).Take(source.Count).ToArray();
+        var remaining = original.Take(source.StartIndex).Concat(original.Skip(source.StartIndex + source.Count)).ToList();
+        remaining.InsertRange(insertionIndex > source.StartIndex ? insertionIndex - source.Count : insertionIndex, moved);
+        return remaining.ToArray();
+    }
     public static bool IsSameAlbum(MediaTrack first, MediaTrack second)
     {
         var left = AlbumKey(first); var right = AlbumKey(second);
