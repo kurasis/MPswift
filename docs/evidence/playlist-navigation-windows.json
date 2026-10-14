@@ -1,0 +1,261 @@
+{
+  "SourceCommit": "c0debc6cf51409a30d449968bcb3512d68e376a3",
+  "ApplicationTree": "102ed84e16a06407010b69c7c70149fe06de183a",
+  "TestTree": "4bc5c54d02b8f383cf658067b91dfb63572833be",
+  "ScriptTree": "070776e772d4ebad48a0b08272dfa94465d7982d",
+  "PR": "https://github.com/kurasis/MPswift/pull/4",
+  "PRRun": "https://github.com/kurasis/MPswift/actions/runs/38572314970",
+  "MainRun": "https://github.com/kurasis/MPswift/actions/runs/38574012924",
+  "Attempt": 1,
+  "RunConclusion": "success",
+  "ProductVersion": "1.0.141-dev.1",
+  "WindowsTests": {
+    "Core": {
+      "total": 345,
+      "passed": 345,
+      "failed": 0,
+      "notExecuted": 0
+    },
+    "CLI": {
+      "total": 93,
+      "passed": 93,
+      "failed": 0,
+      "notExecuted": 0
+    }
+  },
+  "Reports": [
+    {
+      "Report": "taglib-replacement-ui-en.json",
+      "Sha256": "7e087de9b378efc5c3858191041bc86e05342930fbd5456930bf213fa367a538",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaylistNavigation": {
+        "Status": "playlist-navigation-passed",
+        "OverflowArrows": true,
+        "HorizontalWheel": true,
+        "SelectedTabVisible": true,
+        "SelectedTabVisibleAfterResize": true,
+        "BoundedAllPlaylists": true,
+        "LocalizedAccessiblePicker": true,
+        "BeforeAndAfterAlbumDrop": true,
+        "WholeBlockOrder": true,
+        "AlbumEdgeScrolling": true,
+        "CueSharedImageOrder": true,
+        "SelfForeignStaleOutsideFilteredRefused": true,
+        "KeyboardMenuAlternative": true,
+        "SelectionRetained": true,
+        "SQLiteOrder": true,
+        "SourceHashesUnchanged": true,
+        "PlaybackAndQueuePreserved": true,
+        "SoftwareRoutedWpfEvents": true
+      }
+    },
+    {
+      "Report": "taglib-replacement-ui-ru.json",
+      "Sha256": "cc556fe7816d26da6deec9b20716aa0015265dfe8526955b47f169d1655db2a2",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaylistNavigation": {
+        "Status": "playlist-navigation-passed",
+        "OverflowArrows": true,
+        "HorizontalWheel": true,
+        "SelectedTabVisible": true,
+        "SelectedTabVisibleAfterResize": true,
+        "BoundedAllPlaylists": true,
+        "LocalizedAccessiblePicker": true,
+        "BeforeAndAfterAlbumDrop": true,
+        "WholeBlockOrder": true,
+        "AlbumEdgeScrolling": true,
+        "CueSharedImageOrder": true,
+        "SelfForeignStaleOutsideFilteredRefused": true,
+        "KeyboardMenuAlternative": true,
+        "SelectionRetained": true,
+        "SQLiteOrder": true,
+        "SourceHashesUnchanged": true,
+        "PlaybackAndQueuePreserved": true,
+        "SoftwareRoutedWpfEvents": true
+      }
+    },
+    {
+      "Report": "installed-ui-en.json",
+      "Sha256": "ead027c205bb58029d8c14c0f5483b4691a4f520dd0a91040c4fa27249741b54",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaylistNavigation": {
+        "Status": "playlist-navigation-passed",
+        "OverflowArrows": true,
+        "HorizontalWheel": true,
+        "SelectedTabVisible": true,
+        "SelectedTabVisibleAfterResize": true,
+        "BoundedAllPlaylists": true,
+        "LocalizedAccessiblePicker": true,
+        "BeforeAndAfterAlbumDrop": true,
+        "WholeBlockOrder": true,
+        "AlbumEdgeScrolling": true,
+        "CueSharedImageOrder": true,
+        "SelfForeignStaleOutsideFilteredRefused": true,
+        "KeyboardMenuAlternative": true,
+        "SelectionRetained": true,
+        "SQLiteOrder": true,
+        "SourceHashesUnchanged": true,
+        "PlaybackAndQueuePreserved": true,
+        "SoftwareRoutedWpfEvents": true
+      }
+    },
+    {
+      "Report": "installed-ui-ru.json",
+      "Sha256": "cc3135ee402db4f7101d2573e87adb6a1aa98bdd2b9d4bea29c131c629b623a8",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaylistNavigation": {
+        "Status": "playlist-navigation-passed",
+        "OverflowArrows": true,
+        "HorizontalWheel": true,
+        "SelectedTabVisible": true,
+        "SelectedTabVisibleAfterResize": true,
+        "BoundedAllPlaylists": true,
+        "LocalizedAccessiblePicker": true,
+        "BeforeAndAfterAlbumDrop": true,
+        "WholeBlockOrder": true,
+        "AlbumEdgeScrolling": true,
+        "CueSharedImageOrder": true,
+        "SelfForeignStaleOutsideFilteredRefused": true,
+        "KeyboardMenuAlternative": true,
+        "SelectionRetained": true,
+        "SQLiteOrder": true,
+        "SourceHashesUnchanged": true,
+        "PlaybackAndQueuePreserved": true,
+        "SoftwareRoutedWpfEvents": true
+      }
+    },
+    {
+      "Report": "packaged-ui.json",
+      "Sha256": "dc95ab58a3b0c83882e0314852d86879acdb95b3a4a2e894f5a230a6e94fe099",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaylistNavigation": {
+        "Status": "playlist-navigation-passed",
+        "OverflowArrows": true,
+        "HorizontalWheel": true,
+        "SelectedTabVisible": true,
+        "SelectedTabVisibleAfterResize": true,
+        "BoundedAllPlaylists": true,
+        "LocalizedAccessiblePicker": true,
+        "BeforeAndAfterAlbumDrop": true,
+        "WholeBlockOrder": true,
+        "AlbumEdgeScrolling": true,
+        "CueSharedImageOrder": true,
+        "SelfForeignStaleOutsideFilteredRefused": true,
+        "KeyboardMenuAlternative": true,
+        "SelectionRetained": true,
+        "SQLiteOrder": true,
+        "SourceHashesUnchanged": true,
+        "PlaybackAndQueuePreserved": true,
+        "SoftwareRoutedWpfEvents": true
+      }
+    },
+    {
+      "Report": "ui-en.json",
+      "Sha256": "d127dfc5ac1932aaa4005dd01dc2bb71c98b34b1bdf7ecd31ef0fba95dc879f8",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaylistNavigation": {
+        "Status": "playlist-navigation-passed",
+        "OverflowArrows": true,
+        "HorizontalWheel": true,
+        "SelectedTabVisible": true,
+        "SelectedTabVisibleAfterResize": true,
+        "BoundedAllPlaylists": true,
+        "LocalizedAccessiblePicker": true,
+        "BeforeAndAfterAlbumDrop": true,
+        "WholeBlockOrder": true,
+        "AlbumEdgeScrolling": true,
+        "CueSharedImageOrder": true,
+        "SelfForeignStaleOutsideFilteredRefused": true,
+        "KeyboardMenuAlternative": true,
+        "SelectionRetained": true,
+        "SQLiteOrder": true,
+        "SourceHashesUnchanged": true,
+        "PlaybackAndQueuePreserved": true,
+        "SoftwareRoutedWpfEvents": true
+      }
+    },
+    {
+      "Report": "ui-ru.json",
+      "Sha256": "7a8d129188beeba05210323037845dad52c62b102993c31b0b4d470ac5c6abcc",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaylistNavigation": {
+        "Status": "playlist-navigation-passed",
+        "OverflowArrows": true,
+        "HorizontalWheel": true,
+        "SelectedTabVisible": true,
+        "SelectedTabVisibleAfterResize": true,
+        "BoundedAllPlaylists": true,
+        "LocalizedAccessiblePicker": true,
+        "BeforeAndAfterAlbumDrop": true,
+        "WholeBlockOrder": true,
+        "AlbumEdgeScrolling": true,
+        "CueSharedImageOrder": true,
+        "SelfForeignStaleOutsideFilteredRefused": true,
+        "KeyboardMenuAlternative": true,
+        "SelectionRetained": true,
+        "SQLiteOrder": true,
+        "SourceHashesUnchanged": true,
+        "PlaybackAndQueuePreserved": true,
+        "SoftwareRoutedWpfEvents": true
+      }
+    }
+  ],
+  "Installer": {
+    "Status": "installer-lifecycle-passed",
+    "StandardUser": true,
+    "Phases": [
+      {
+        "Phase": "Install",
+        "Status": "standard-user-installer-phase-passed",
+        "Administrator": false,
+        "DataPreserved": true,
+        "PerUserRegistration": true,
+        "UnknownFilesPreserved": true
+      },
+      {
+        "Phase": "Upgrade",
+        "Status": "standard-user-installer-phase-passed",
+        "Administrator": false,
+        "DataPreserved": true,
+        "PerUserRegistration": true,
+        "UnknownFilesPreserved": true
+      },
+      {
+        "Phase": "Uninstall",
+        "Status": "standard-user-installer-phase-passed",
+        "Administrator": false,
+        "DataPreserved": true,
+        "PerUserRegistration": true,
+        "UnknownFilesPreserved": true
+      }
+    ]
+  },
+  "PortableSmoke": "packaged-executable-smoke-passed",
+  "ReviewedCaptures": [
+    "playlist-overflow-ru.png",
+    "album-insertion-ru.png"
+  ],
+  "Scope": "Actual owned Windows WPF/native audio/SQLite in ordinary EN/RU, rebuilt TagLib EN/RU, extracted portable and installed EN/RU. Software-routed wheel/drag and menu events with real layouts, files and storage; physical pointer/touch, OLE initiation/dragging and Narrator speech remain manual acceptance. This evidence-only update changes no application, test or script source.",
+  "Publication": {
+    "Release": "https://github.com/kurasis/MPswift/releases/tag/build-38574012924-attempt-1",
+    "DownloadedAssetsVerifiedAgainstCIEvidence": [
+      {
+        "Name": "MPswift-1.0.141-dev.1-c0debc6cf514-win-x64.zip",
+        "Sha256": "eb4e8e336303cffec342ad5d56a63f7a65d6384bd40a1e76d390f0f9bbb96dba",
+        "Url": "https://github.com/kurasis/MPswift/releases/download/build-38574012924-attempt-1/MPswift-1.0.141-dev.1-c0debc6cf514-win-x64.zip"
+      },
+      {
+        "Name": "MPswift-1.0.141-dev.1-setup-win-x64.exe",
+        "Sha256": "9207e906a7b3a8ad4f4ac377d53cfafddce7e0bdbd210079c1dc72c9167fe17a",
+        "Url": "https://github.com/kurasis/MPswift/releases/download/build-38574012924-attempt-1/MPswift-1.0.141-dev.1-setup-win-x64.exe"
+      }
+    ]
+  }
+}

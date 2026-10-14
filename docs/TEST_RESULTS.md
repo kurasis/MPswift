@@ -1,10 +1,14 @@
 # Test evidence — Stages A–G
 
+## Observed Windows playlist navigation acceptance (2026-10-14)
+
+Merged [PR #4](https://github.com/kurasis/MPswift/pull/4) after all jobs in [PR run 38572314970](https://github.com/kurasis/MPswift/actions/runs/38572314970) passed. Final main source `c0debc6cf51409a30d449968bcb3512d68e376a3` independently passed every build/proof/publication job in [run 38574012924](https://github.com/kurasis/MPswift/actions/runs/38574012924). [Sanitized evidence](evidence/playlist-navigation-windows.json) records seven actual ordinary/rebuilt/extracted/installed EN/RU WPF reports with zero binding errors and all new navigation/movement flags passing. Windows Core 345 and all 93 CLI tests pass; genuine standard-user install/reinstall/uninstall and portable Unicode-path startup pass. Reviewed current Russian overflow-tab and album-insertion captures. [Build 1.0.141-dev.1](https://github.com/kurasis/MPswift/releases/tag/build-38574012924-attempt-1) is published; downloaded player ZIP/installer SHA-256 values match published checksums and original CI evidence. Physical pointer/touch, OLE drag initiation and Narrator speech remain manual acceptance. This evidence-only update changes no application, test or script source.
+
 ## Playlist navigation and album movement verification (2026-10-14)
 
 Baseline locked Linux Release: zero warnings/errors, 337 Core passed, CLI 78 passed and 15 Windows-only skipped. Changed-source locked Release: zero warnings/errors, 345 Core passed, same CLI counts. Eight targeted Core cases cover forward/backward boundaries, self/interior/invalid/stale headings, separate folders, repeated album runs and CUE segment/occurrence preservation. XAML and EN/RU parity/references, version agreement, secret-pattern controls, PowerShell parsing and whitespace checks pass. Required real WPF controls cover overflow arrows/wheel/picker, selected-tab visibility/resize, before/after album drops, selection/order, rejected payloads/filter, context-menu alternative, edge scrolling, genuine shared CUE images, SQLite order and source hashes. Installed EN/RU publication requires playlist-navigation-passed. Compilation is the type check; there is no separate lint task. Fresh Vercel guidelines were fetched over verified HTTPS and relevant native interaction/focus/accessibility rules applied; browser-specific rules do not apply.
 
-Local checks pass; source-specific Windows WPF/native, packaged/installed EN/RU and installer acceptance must be observed before publication. Physical mouse/touch and Narrator speech remain separate manual acceptance.
+Local checks and source-specific Windows WPF/native, packaged/installed EN/RU and installer acceptance pass as recorded above. Physical mouse/touch, OLE drag initiation and Narrator speech remain separate manual acceptance.
 
 ## Observed Windows album selection and removal acceptance (2026-10-14)
 

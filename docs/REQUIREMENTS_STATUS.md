@@ -1,10 +1,14 @@
 # Requirement and acceptance status
 
+## Observed Windows playlist navigation acceptance (2026-10-14)
+
+Merged [PR #4](https://github.com/kurasis/MPswift/pull/4) after all jobs in [PR run 38572314970](https://github.com/kurasis/MPswift/actions/runs/38572314970) passed. Final main source `c0debc6cf51409a30d449968bcb3512d68e376a3` independently passed every build/proof/publication job in [run 38574012924](https://github.com/kurasis/MPswift/actions/runs/38574012924). [Sanitized evidence](evidence/playlist-navigation-windows.json) records seven actual ordinary/rebuilt/extracted/installed EN/RU WPF reports with zero binding errors and all new navigation/movement flags passing. Windows Core 345 and all 93 CLI tests pass; genuine standard-user install/reinstall/uninstall and portable Unicode-path startup pass. Reviewed current Russian overflow-tab and album-insertion captures. [Build 1.0.141-dev.1](https://github.com/kurasis/MPswift/releases/tag/build-38574012924-attempt-1) is published; downloaded player ZIP/installer SHA-256 values match published checksums and original CI evidence. Physical pointer/touch, OLE drag initiation and Narrator speech remain manual acceptance. This evidence-only update changes no application, test or script source.
+
 ## Owner follow-up: scroll overflowing playlists and drag albums (2026-10-14)
 
 Implemented arrows, wheel and an all-playlists menu for overflowing tabs, selected-tab visibility on changes/resizing, and album-heading drag/drop with a boundary indicator and edge scrolling. The entire displayed contiguous block moves without changing song order; separately located same-name albums remain distinct. Heading context-menu up/down actions provide a keyboard alternative. Search/import/closing and stale/foreign payload checks prevent unintended movement; files, CUE images, playback/queue and existing persistent interfaces remain. [Usage](PLAYLIST_NAVIGATION.md).
 
-Local checks pass; source-specific Windows WPF/native, packaged/installed EN/RU and installer acceptance must be observed before publication. Physical mouse/touch and Narrator speech remain separate manual acceptance.
+Local checks and source-specific Windows WPF/native, packaged/installed EN/RU and installer acceptance pass as recorded above. Physical mouse/touch, OLE drag initiation and Narrator speech remain separate manual acceptance.
 
 ## Observed Windows album selection and removal acceptance (2026-10-14)
 
