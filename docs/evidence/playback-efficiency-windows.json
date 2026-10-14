@@ -1,0 +1,457 @@
+{
+  "SourceCommit": "911c367ff5ef2a65ee8061767f52ff9fc9bcbaf9",
+  "ApplicationTree": "a620c9be2d513132bd6362d430fdd7cbbaa66d53",
+  "TestTree": "720d620aaf9582c598504a1c178e4f1c762a825b",
+  "ScriptTree": "b97908264e39d642b454899015143c70d1c32602",
+  "ToolTree": "2f3e2395b36fdecf36c2629d06ccd273e64e4c9f",
+  "PR": "https://github.com/kurasis/MPswift/pull/6",
+  "PRRun": "https://github.com/kurasis/MPswift/actions/runs/38602321562",
+  "MainRun": "https://github.com/kurasis/MPswift/actions/runs/38604369923",
+  "Attempt": 1,
+  "Conclusion": "success",
+  "ProductVersion": "1.0.145-dev.1",
+  "WindowsTests": {
+    "Core": {
+      "total": 394,
+      "passed": 394,
+      "failed": 0,
+      "notExecuted": 0
+    },
+    "CLI": {
+      "total": 93,
+      "passed": 93,
+      "failed": 0,
+      "notExecuted": 0
+    }
+  },
+  "Reports": [
+    {
+      "Report": "taglib-replacement-ui-en.json",
+      "Sha256": "a7feb6786c0d2ae73b9fdebe5bad2cef4f1028f27735a9680f490a1f1e701185",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaybackEfficiency": {
+        "Status": "playback-efficiency-passed",
+        "Pcm": {
+          "NativeDecodedSamples": 32768,
+          "Original": {
+            "Blocks": 200,
+            "WallMilliseconds": 19.7328,
+            "AllocatedBytes": 40,
+            "ProcessCpuMilliseconds": 15.625,
+            "IncludesBufferCopy": true
+          },
+          "ConstantGain": {
+            "Blocks": 200,
+            "WallMilliseconds": 14.8595,
+            "AllocatedBytes": 40,
+            "ProcessCpuMilliseconds": 0,
+            "IncludesBufferCopy": true
+          },
+          "BitExact": true,
+          "ProtectedSamplesPreserved": true
+        },
+        "Settings": {
+          "Saves": 100,
+          "Writes": 0,
+          "TotalMilliseconds": 200.8533,
+          "BytesIdentityTimestampAndBackupPreserved": true
+        },
+        "Devices": {
+          "UnchangedLookups": 10000,
+          "InitialResolutions": 1,
+          "NotificationAndRetryInvalidation": true,
+          "NativeNotificationRegistrationAvailable": true,
+          "SharedNativeSubscriptionLifecycle": true,
+          "RegistrationFailureUsesLegacyChecks": true,
+          "CachedEndpointIdentityCheckedEachPoll": true,
+          "PhysicalDefaultChangeAndUnplug": "not-run"
+        },
+        "Delivery": {
+          "received": 502,
+          "applied": 3,
+          "listening": 502,
+          "playCount": 1,
+          "CriticalErrorAndEndPreserved": true,
+          "SourceHashPreserved": true
+        },
+        "Scope": "Native-decoded PCM, actual settings leases, real native notification registration and isolated WPF/SQLite with controlled stamped snapshots. Device changes and overall physical playback CPU remain manual acceptance."
+      },
+      "PreviousPlaybackPerformanceStatus": "playback-performance-passed"
+    },
+    {
+      "Report": "taglib-replacement-ui-ru.json",
+      "Sha256": "6e6e112f7153a9123d52a6aebd4978f6ceced3bc0b08f0437e6aaed906252761",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaybackEfficiency": {
+        "Status": "playback-efficiency-passed",
+        "Pcm": {
+          "NativeDecodedSamples": 32768,
+          "Original": {
+            "Blocks": 200,
+            "WallMilliseconds": 17.4493,
+            "AllocatedBytes": 40,
+            "ProcessCpuMilliseconds": 15.625,
+            "IncludesBufferCopy": true
+          },
+          "ConstantGain": {
+            "Blocks": 200,
+            "WallMilliseconds": 12.5331,
+            "AllocatedBytes": 40,
+            "ProcessCpuMilliseconds": 15.625,
+            "IncludesBufferCopy": true
+          },
+          "BitExact": true,
+          "ProtectedSamplesPreserved": true
+        },
+        "Settings": {
+          "Saves": 100,
+          "Writes": 0,
+          "TotalMilliseconds": 178.0198,
+          "BytesIdentityTimestampAndBackupPreserved": true
+        },
+        "Devices": {
+          "UnchangedLookups": 10000,
+          "InitialResolutions": 1,
+          "NotificationAndRetryInvalidation": true,
+          "NativeNotificationRegistrationAvailable": true,
+          "SharedNativeSubscriptionLifecycle": true,
+          "RegistrationFailureUsesLegacyChecks": true,
+          "CachedEndpointIdentityCheckedEachPoll": true,
+          "PhysicalDefaultChangeAndUnplug": "not-run"
+        },
+        "Delivery": {
+          "received": 502,
+          "applied": 3,
+          "listening": 502,
+          "playCount": 1,
+          "CriticalErrorAndEndPreserved": true,
+          "SourceHashPreserved": true
+        },
+        "Scope": "Native-decoded PCM, actual settings leases, real native notification registration and isolated WPF/SQLite with controlled stamped snapshots. Device changes and overall physical playback CPU remain manual acceptance."
+      },
+      "PreviousPlaybackPerformanceStatus": "playback-performance-passed"
+    },
+    {
+      "Report": "ui-en.json",
+      "Sha256": "fd7059a840b0b08620f5d5baee8393f8347447f249ddee90ed6a0e7b137badd9",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaybackEfficiency": {
+        "Status": "playback-efficiency-passed",
+        "Pcm": {
+          "NativeDecodedSamples": 32768,
+          "Original": {
+            "Blocks": 200,
+            "WallMilliseconds": 17.5082,
+            "AllocatedBytes": 40,
+            "ProcessCpuMilliseconds": 15.625,
+            "IncludesBufferCopy": true
+          },
+          "ConstantGain": {
+            "Blocks": 200,
+            "WallMilliseconds": 12.1561,
+            "AllocatedBytes": 40,
+            "ProcessCpuMilliseconds": 15.625,
+            "IncludesBufferCopy": true
+          },
+          "BitExact": true,
+          "ProtectedSamplesPreserved": true
+        },
+        "Settings": {
+          "Saves": 100,
+          "Writes": 0,
+          "TotalMilliseconds": 167.5258,
+          "BytesIdentityTimestampAndBackupPreserved": true
+        },
+        "Devices": {
+          "UnchangedLookups": 10000,
+          "InitialResolutions": 1,
+          "NotificationAndRetryInvalidation": true,
+          "NativeNotificationRegistrationAvailable": true,
+          "SharedNativeSubscriptionLifecycle": true,
+          "RegistrationFailureUsesLegacyChecks": true,
+          "CachedEndpointIdentityCheckedEachPoll": true,
+          "PhysicalDefaultChangeAndUnplug": "not-run"
+        },
+        "Delivery": {
+          "received": 502,
+          "applied": 3,
+          "listening": 502,
+          "playCount": 1,
+          "CriticalErrorAndEndPreserved": true,
+          "SourceHashPreserved": true
+        },
+        "Scope": "Native-decoded PCM, actual settings leases, real native notification registration and isolated WPF/SQLite with controlled stamped snapshots. Device changes and overall physical playback CPU remain manual acceptance."
+      },
+      "PreviousPlaybackPerformanceStatus": "playback-performance-passed"
+    },
+    {
+      "Report": "ui-ru.json",
+      "Sha256": "e0718d89554e56039164ac9d19ca294d2f493050b9a2a849c4a422320778a7bc",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaybackEfficiency": {
+        "Status": "playback-efficiency-passed",
+        "Pcm": {
+          "NativeDecodedSamples": 32768,
+          "Original": {
+            "Blocks": 200,
+            "WallMilliseconds": 17.4337,
+            "AllocatedBytes": 40,
+            "ProcessCpuMilliseconds": 31.25,
+            "IncludesBufferCopy": true
+          },
+          "ConstantGain": {
+            "Blocks": 200,
+            "WallMilliseconds": 13.3322,
+            "AllocatedBytes": 40,
+            "ProcessCpuMilliseconds": 0,
+            "IncludesBufferCopy": true
+          },
+          "BitExact": true,
+          "ProtectedSamplesPreserved": true
+        },
+        "Settings": {
+          "Saves": 100,
+          "Writes": 0,
+          "TotalMilliseconds": 181.5314,
+          "BytesIdentityTimestampAndBackupPreserved": true
+        },
+        "Devices": {
+          "UnchangedLookups": 10000,
+          "InitialResolutions": 1,
+          "NotificationAndRetryInvalidation": true,
+          "NativeNotificationRegistrationAvailable": true,
+          "SharedNativeSubscriptionLifecycle": true,
+          "RegistrationFailureUsesLegacyChecks": true,
+          "CachedEndpointIdentityCheckedEachPoll": true,
+          "PhysicalDefaultChangeAndUnplug": "not-run"
+        },
+        "Delivery": {
+          "received": 502,
+          "applied": 3,
+          "listening": 502,
+          "playCount": 1,
+          "CriticalErrorAndEndPreserved": true,
+          "SourceHashPreserved": true
+        },
+        "Scope": "Native-decoded PCM, actual settings leases, real native notification registration and isolated WPF/SQLite with controlled stamped snapshots. Device changes and overall physical playback CPU remain manual acceptance."
+      },
+      "PreviousPlaybackPerformanceStatus": "playback-performance-passed"
+    },
+    {
+      "Report": "installed-ui-en.json",
+      "Sha256": "95508aa2bf40f7b7646c825bd6529a3e38ca0803d598314f71f897321e55d0c0",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaybackEfficiency": {
+        "Status": "playback-efficiency-passed",
+        "Pcm": {
+          "NativeDecodedSamples": 32768,
+          "Original": {
+            "Blocks": 200,
+            "WallMilliseconds": 30.3374,
+            "AllocatedBytes": 40,
+            "ProcessCpuMilliseconds": 31.25,
+            "IncludesBufferCopy": true
+          },
+          "ConstantGain": {
+            "Blocks": 200,
+            "WallMilliseconds": 15.828,
+            "AllocatedBytes": 40,
+            "ProcessCpuMilliseconds": 15.625,
+            "IncludesBufferCopy": true
+          },
+          "BitExact": true,
+          "ProtectedSamplesPreserved": true
+        },
+        "Settings": {
+          "Saves": 100,
+          "Writes": 0,
+          "TotalMilliseconds": 265.3006,
+          "BytesIdentityTimestampAndBackupPreserved": true
+        },
+        "Devices": {
+          "UnchangedLookups": 10000,
+          "InitialResolutions": 1,
+          "NotificationAndRetryInvalidation": true,
+          "NativeNotificationRegistrationAvailable": true,
+          "SharedNativeSubscriptionLifecycle": true,
+          "RegistrationFailureUsesLegacyChecks": true,
+          "CachedEndpointIdentityCheckedEachPoll": true,
+          "PhysicalDefaultChangeAndUnplug": "not-run"
+        },
+        "Delivery": {
+          "received": 502,
+          "applied": 3,
+          "listening": 502,
+          "playCount": 1,
+          "CriticalErrorAndEndPreserved": true,
+          "SourceHashPreserved": true
+        },
+        "Scope": "Native-decoded PCM, actual settings leases, real native notification registration and isolated WPF/SQLite with controlled stamped snapshots. Device changes and overall physical playback CPU remain manual acceptance."
+      },
+      "PreviousPlaybackPerformanceStatus": "playback-performance-passed"
+    },
+    {
+      "Report": "installed-ui-ru.json",
+      "Sha256": "15e25fc83e67f1db6419e1d11fc32e3136e958e0ae5e244ef667ad5231886071",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaybackEfficiency": {
+        "Status": "playback-efficiency-passed",
+        "Pcm": {
+          "NativeDecodedSamples": 32768,
+          "Original": {
+            "Blocks": 200,
+            "WallMilliseconds": 17.4787,
+            "AllocatedBytes": 40,
+            "ProcessCpuMilliseconds": 15.625,
+            "IncludesBufferCopy": true
+          },
+          "ConstantGain": {
+            "Blocks": 200,
+            "WallMilliseconds": 13.7157,
+            "AllocatedBytes": 40,
+            "ProcessCpuMilliseconds": 15.625,
+            "IncludesBufferCopy": true
+          },
+          "BitExact": true,
+          "ProtectedSamplesPreserved": true
+        },
+        "Settings": {
+          "Saves": 100,
+          "Writes": 0,
+          "TotalMilliseconds": 209.9581,
+          "BytesIdentityTimestampAndBackupPreserved": true
+        },
+        "Devices": {
+          "UnchangedLookups": 10000,
+          "InitialResolutions": 1,
+          "NotificationAndRetryInvalidation": true,
+          "NativeNotificationRegistrationAvailable": true,
+          "SharedNativeSubscriptionLifecycle": true,
+          "RegistrationFailureUsesLegacyChecks": true,
+          "CachedEndpointIdentityCheckedEachPoll": true,
+          "PhysicalDefaultChangeAndUnplug": "not-run"
+        },
+        "Delivery": {
+          "received": 502,
+          "applied": 3,
+          "listening": 502,
+          "playCount": 1,
+          "CriticalErrorAndEndPreserved": true,
+          "SourceHashPreserved": true
+        },
+        "Scope": "Native-decoded PCM, actual settings leases, real native notification registration and isolated WPF/SQLite with controlled stamped snapshots. Device changes and overall physical playback CPU remain manual acceptance."
+      },
+      "PreviousPlaybackPerformanceStatus": "playback-performance-passed"
+    },
+    {
+      "Report": "packaged-ui.json",
+      "Sha256": "2c33ba9d9a7ba896cc9213c6e33457462853ebdbc8a28c76e83220e200f10287",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaybackEfficiency": {
+        "Status": "playback-efficiency-passed",
+        "Pcm": {
+          "NativeDecodedSamples": 32768,
+          "Original": {
+            "Blocks": 200,
+            "WallMilliseconds": 17.9471,
+            "AllocatedBytes": 40,
+            "ProcessCpuMilliseconds": 15.625,
+            "IncludesBufferCopy": true
+          },
+          "ConstantGain": {
+            "Blocks": 200,
+            "WallMilliseconds": 13.9447,
+            "AllocatedBytes": 40,
+            "ProcessCpuMilliseconds": 15.625,
+            "IncludesBufferCopy": true
+          },
+          "BitExact": true,
+          "ProtectedSamplesPreserved": true
+        },
+        "Settings": {
+          "Saves": 100,
+          "Writes": 0,
+          "TotalMilliseconds": 215.4679,
+          "BytesIdentityTimestampAndBackupPreserved": true
+        },
+        "Devices": {
+          "UnchangedLookups": 10000,
+          "InitialResolutions": 1,
+          "NotificationAndRetryInvalidation": true,
+          "NativeNotificationRegistrationAvailable": true,
+          "SharedNativeSubscriptionLifecycle": true,
+          "RegistrationFailureUsesLegacyChecks": true,
+          "CachedEndpointIdentityCheckedEachPoll": true,
+          "PhysicalDefaultChangeAndUnplug": "not-run"
+        },
+        "Delivery": {
+          "received": 502,
+          "applied": 3,
+          "listening": 502,
+          "playCount": 1,
+          "CriticalErrorAndEndPreserved": true,
+          "SourceHashPreserved": true
+        },
+        "Scope": "Native-decoded PCM, actual settings leases, real native notification registration and isolated WPF/SQLite with controlled stamped snapshots. Device changes and overall physical playback CPU remain manual acceptance."
+      },
+      "PreviousPlaybackPerformanceStatus": "playback-performance-passed"
+    }
+  ],
+  "Installer": {
+    "Status": "installer-lifecycle-passed",
+    "StandardUser": true,
+    "Phases": [
+      {
+        "Phase": "Install",
+        "Status": "standard-user-installer-phase-passed",
+        "Administrator": false,
+        "DataPreserved": true,
+        "PerUserRegistration": true,
+        "UnknownFilesPreserved": true
+      },
+      {
+        "Phase": "Upgrade",
+        "Status": "standard-user-installer-phase-passed",
+        "Administrator": false,
+        "DataPreserved": true,
+        "PerUserRegistration": true,
+        "UnknownFilesPreserved": true
+      },
+      {
+        "Phase": "Uninstall",
+        "Status": "standard-user-installer-phase-passed",
+        "Administrator": false,
+        "DataPreserved": true,
+        "PerUserRegistration": true,
+        "UnknownFilesPreserved": true
+      }
+    ],
+    "InstalledWpfIdentity": "Existing hosted desktop user; not the installer standard-user identity",
+    "PublisherSignature": "not-configured",
+    "CleanWindows11": "not-run"
+  },
+  "Portable": "packaged-executable-smoke-passed",
+  "Publication": {
+    "Release": "https://github.com/kurasis/MPswift/releases/tag/build-38604369923-attempt-1",
+    "DownloadedAssetsMatchPublishedChecksumsAndCI": [
+      {
+        "Name": "MPswift-1.0.145-dev.1-911c367ff5ef-win-x64.zip",
+        "Sha256": "d44768d2ad9e55e549d960f6814e0671736fcb5f988ab06891625ef9a88b521c",
+        "Url": "https://github.com/kurasis/MPswift/releases/download/build-38604369923-attempt-1/MPswift-1.0.145-dev.1-911c367ff5ef-win-x64.zip"
+      },
+      {
+        "Name": "MPswift-1.0.145-dev.1-setup-win-x64.exe",
+        "Sha256": "9db4609d5593dbb973ac20770258f4540d55e5d59dc17083ca4abb6b1ee970e3",
+        "Url": "https://github.com/kurasis/MPswift/releases/download/build-38604369923-attempt-1/MPswift-1.0.145-dev.1-setup-win-x64.exe"
+      }
+    ]
+  },
+  "Limitations": "Controlled native-decoded PCM, actual settings leases, native notification registration and isolated WPF/SQLite delivery. Physical default-device changes/unplug and overall owner-PC playing-device CPU remain manual acceptance. Process CPU clocks are coarse; zero measured milliseconds does not imply zero CPU. Evidence-only update changes no application, test, script or tool source."
+}
