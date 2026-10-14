@@ -78,14 +78,25 @@ public sealed class PlaybackFirstCandidateTests
         coordinator.ClearQueue(); Assert.Equal(entries[1].Id, player.Prepared.Last()!.EntryId);
         coordinator.SetEntries(entries.Where(entry => entry.Id != entries[1].Id)); Assert.Equal(entries[2].Id, player.Prepared.Last()!.EntryId);
     }
+    [Fact]
+    public async Task ObservedNaturalEndArrivesBeforeTheNextSynchronousLoad()
+    {
+        var entries = new[] { Entry(1), Entry(2) }; var player = new TickPlayer(); await using var coordinator = new PlaybackCoordinator(player);
+        coordinator.SetEntries(entries); await coordinator.LoadAsync(entries[0].Id);
+        var observed = new List<PlaybackSnapshot>(); coordinator.SnapshotObserved += observed.Add;
+        player.End();
+        Assert.True(observed.Count >= 2); Assert.True(observed[0].Ended); Assert.Equal(entries[0].Id, observed[0].EntryId);
+        Assert.Equal(entries[1].Id, observed[1].EntryId); Assert.True(observed[1].Revision > observed[0].Revision);
+    }
     private sealed class TickPlayer : IAudioPlayer, IAdvancedAudioPlayer
     {
         public PlaybackSnapshot Snapshot { get; private set; } = PlaybackSnapshot.Empty;
         public event Action<PlaybackSnapshot>? SnapshotChanged;
         public List<AudioRequest?> Prepared { get; } = [];
         public void Tick(int position) { Snapshot = Snapshot with { Revision = Snapshot.Revision + 1, Position = TimeSpan.FromMilliseconds(position) }; SnapshotChanged?.Invoke(Snapshot); }
+        public void End() { Snapshot = Snapshot with { State = PlaybackState.Stopped, Ended = true }; Tick(3000); }
         public Task<bool> LoadAsync(AudioRequest request, bool autoPlay, CancellationToken cancellationToken = default)
-        { Snapshot = Snapshot with { Generation = Snapshot.Generation + 1, EntryId = request.EntryId, State = autoPlay ? PlaybackState.Playing : PlaybackState.Stopped, Duration = TimeSpan.FromMinutes(3), CanSeek = true }; Tick(0); return Task.FromResult(true); }
+        { Snapshot = Snapshot with { Generation = Snapshot.Generation + 1, EntryId = request.EntryId, State = autoPlay ? PlaybackState.Playing : PlaybackState.Stopped, Duration = TimeSpan.FromMinutes(3), CanSeek = true, Ended = false }; Tick(0); return Task.FromResult(true); }
         public Task<bool> PrepareNextAsync(AudioRequest? request, bool repeatOne) { Prepared.Add(request); return Task.FromResult(true); }
         public Task<bool> SeekAsync(TimeSpan position) { Tick((int)position.TotalMilliseconds); return Task.FromResult(true); }
         public Task<bool> StopAsync() { Snapshot = Snapshot with { State = PlaybackState.Stopped }; Tick(0); return Task.FromResult(true); }

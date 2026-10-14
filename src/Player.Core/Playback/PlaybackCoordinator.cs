@@ -18,6 +18,8 @@ public sealed class PlaybackCoordinator : IAsyncDisposable
 
     public PlaybackCoordinator(IAudioPlayer player, Random? random = null) { _player = player; _order = new(random); _player.SnapshotChanged += OnSnapshot; }
     public event Action? OrderChanged;
+    // Deliver receipt/statistics after adopting a native transition, before natural end can publish another load.
+    internal event Action<PlaybackSnapshot>? SnapshotObserved;
     public RepeatMode Repeat { get { lock (_gate) return _order.Repeat; } set { lock (_gate) _order.Repeat = value; Changed(); } }
     public bool Shuffle { get { lock (_gate) return _order.Shuffle; } set { lock (_gate) _order.Shuffle = value; Changed(); } }
     public QueueItem[] Queue { get { lock (_gate) return _order.Queue; } }
@@ -193,6 +195,7 @@ public sealed class PlaybackCoordinator : IAsyncDisposable
                 _order.Started(transitioned, _order.Queue.Any(q => q.Entry.Id == transitioned.Id));
                 _preparedEntry = null; Changed();
             }
+            SnapshotObserved?.Invoke(snapshot);
             if (snapshot.State == PlaybackState.Playing) RefreshPrepared();
             if (!snapshot.Ended || snapshot.Generation == _handledEnd || snapshot.Generation != _player.Snapshot.Generation) return;
             _handledEnd = snapshot.Generation;

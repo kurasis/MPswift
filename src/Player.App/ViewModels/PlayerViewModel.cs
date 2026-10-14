@@ -185,7 +185,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         _index = store as ILibraryIndexStore; _scanner = _index is null ? null : new(_index);
         _watcher = new(ids => { if (!_closing && !_dispatcher.HasShutdownStarted) _dispatcher.BeginInvoke(() => ScanRoots(ids)); });
         var tab = new PlaylistTabViewModel(Guid.NewGuid(), Strings.Get("DefaultPlaylist")); Playlists.Add(tab); SelectedPlaylist = tab;
-        _player.SnapshotChanged += OnSnapshot;
+        _coordinator.SnapshotObserved += OnSnapshot;
         _coordinator.OrderChanged += OnOrderChanged;
         ApplySnapshot(player.Snapshot);
     }
@@ -703,12 +703,8 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     partial void OnIsImportingChanged(bool value)
     { AddFilesCommand.NotifyCanExecuteChanged(); AddFolderCommand.NotifyCanExecuteChanged(); OnPropertyChanged(nameof(CanReorder)); }
     partial void OnSearchChanged(string value) { VisibleEntries?.Refresh(); UpdatePlaylistStatus(); OnPropertyChanged(nameof(CanReorder)); }
-    private void OnSnapshot(PlaybackSnapshot snapshot)
-    {
-        if (_closing || _dispatcher.HasShutdownStarted) return;
-        _dispatcher.BeginInvoke(() => ApplySnapshot(snapshot), DispatcherPriority.Background);
-    }
-    public void ApplySnapshot(PlaybackSnapshot snapshot)
+    public void ApplySnapshot(PlaybackSnapshot snapshot) => ApplySnapshot(snapshot, true);
+    private void ApplySnapshot(PlaybackSnapshot snapshot, bool observeListening)
     {
         if (_closing || snapshot.Revision < _revision) return;
         _revision = snapshot.Revision; _applyingSnapshot = true;
@@ -736,7 +732,8 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
             if (track is not null && snapshot.Duration is { } decodedDuration && snapshot.State != PlaybackState.Loading && snapshot.EntryId is { } decodedEntry && _knownRows.TryGetValue(decodedEntry, out var decodedRow) && decodedRow.Entry.Track.DurationHint != decodedDuration)
             { decodedRow.UpdateTrack(track with { DurationHint = decodedDuration }); ScheduleSave(true); }
             if (track is not null && snapshot.EntryId != _artEntry) { _artEntry = snapshot.EntryId; _artTask = LoadArtworkAsync(track.Path); }
-            if (_index is not null && _listening.Update(snapshot, track?.Id, Stopwatch.GetElapsedTime(_clockOrigin), DateTime.UtcNow) is { } occurrence) _statisticsTask = SaveListeningAfterAsync(_statisticsTask, occurrence);
+            if (observeListening)
+                lock (_snapshotGate) ObserveListening(snapshot, track?.Id, Stopwatch.GetElapsedTime(_clockOrigin), DateTime.UtcNow);
             if (track is not null && (!ReferenceEquals(_labelTrack, track) || _labelCulture != culture))
             { Title = track.Title; Artist = track.Artist ?? Strings.Get("UnknownArtist"); Album = track.Album ?? ""; }
             RefreshFormatLabels(snapshot);
@@ -768,7 +765,6 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         if (snapshot.OutputFormat is { } output) format += " · " + string.Format(Strings.Culture, Strings.Get("OutputFormat"), output.SampleRate, output.Channels);
         Format = format;
     }
-    private async Task SaveListeningAfterAsync(Task preceding, ListeningEvent occurrence) { await preceding; await ObserveAsync(_index!.RecordListeningAsync(occurrence)); }
     private async Task LoadArtworkAsync(string path)
     {
         _artCancellation?.Cancel(); _artCancellation?.Dispose(); _artCancellation = new(); var token = _artCancellation.Token; CoverArt = null;
@@ -866,11 +862,12 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     private async ValueTask CloseAsync(bool save)
     {
         if (_closing) return;
-        _closing = true; _player.SnapshotChanged -= OnSnapshot; _coordinator.OrderChanged -= OnOrderChanged;
+        _closing = true; _coordinator.SnapshotObserved -= OnSnapshot; _coordinator.OrderChanged -= OnOrderChanged;
+        lock (_snapshotGate) _snapshotQueue.Clear(); // Synchronize with in-flight statistics before awaiting their chain.
         _scanCancellation?.Cancel(); _artCancellation?.Cancel(); _importCancellation?.Cancel(); _waveCancellation?.Cancel(); _saveCancellation?.Cancel();
         await _importTask; await _waveTask; await _saveTask; await _scanTask; await _artTask; await _statisticsTask;
         try { if (save) await SaveNowAsync(); }
-        catch { _closing = false; _player.SnapshotChanged += OnSnapshot; _coordinator.OrderChanged += OnOrderChanged; throw; }
+        catch { _closing = false; _coordinator.SnapshotObserved += OnSnapshot; _coordinator.OrderChanged += OnOrderChanged; throw; }
         foreach (var row in _knownRows.Values) { row.EligibilityChanged -= RowChanged; row.RatingChanged -= RatingChanged; }
         var failures = new List<Exception>();
         void Release(IDisposable? resource)

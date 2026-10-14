@@ -10,6 +10,8 @@ public sealed class BassAudioBackend : IAudioBackend, IAdvancedAudioBackend
 {
     private readonly WasapiProcedure _render;
     private readonly NativeDecodeContext _context;
+    private readonly WasapiDeviceNotifications _notifications;
+    private readonly DeviceSelectionCache _deviceSelection;
     private BassMixerGraph? _graph;
     private AudioRequest? _request, _prepared;
     private AudioSourceInfo? _info;
@@ -28,6 +30,8 @@ public sealed class BassAudioBackend : IAudioBackend, IAdvancedAudioBackend
         _render = Render;
         try { _context = new NativeDecodeContext(); }
         catch (Exception e) when (e is not AudioBackendException) { throw new AudioBackendException(AudioErrorCategory.Dependency, e.Message); }
+        try { _notifications = new(); _deviceSelection = new(FindDevice); }
+        catch { _context.Dispose(); throw; }
     }
     public AudioSourceInfo Open(string path) => Open(new AudioRequest(Guid.NewGuid(), path));
     public AudioSourceInfo Open(AudioRequest request)
@@ -78,6 +82,7 @@ public sealed class BassAudioBackend : IAudioBackend, IAdvancedAudioBackend
     }
     private void EnsureOutput()
     {
+        _deviceSelection.Invalidate(); // Explicit Play always re-evaluates current device policy.
         var device = FindDevice(); var deviceInfo = BassWasapi.GetDeviceInfo(device);
         if (_wasapi && _settings.CanReuse(deviceInfo.ID, _actualDevice, _output, _info!.Format)) return;
         if (_wasapi) CloseOutput();
@@ -150,8 +155,9 @@ public sealed class BassAudioBackend : IAudioBackend, IAdvancedAudioBackend
         var error = Interlocked.Exchange(ref _callbackError, 0);
         if (error != 0) throw new AudioBackendException(AudioErrorCategory.OutputUnavailable, "WASAPI render callback failed.", error);
         if (!BassWasapi.IsStarted) throw new AudioBackendException(AudioErrorCategory.OutputUnavailable, "Output endpoint stopped. Select/retry output; context is retained.");
-        var device = FindDevice();
-        if (BassWasapi.GetDeviceInfo(device).ID != _actualDevice)
+        var device = _notifications.Available ? _deviceSelection.Resolve(WasapiDeviceNotifications.Revision) : FindDevice();
+        if (!BassWasapi.GetDeviceInfo(device, out var deviceInfo) || !deviceInfo.IsEnabled || deviceInfo.IsInput || deviceInfo.IsLoopback ||
+            deviceInfo.ID != _actualDevice || (_settings.DeviceId is null && !deviceInfo.IsDefault))
         { PauseForDeviceChange(); throw new AudioBackendException(AudioErrorCategory.OutputUnavailable, "Windows default output changed. Playback is paused; Play reconnects to the new default."); }
         var latency = BassWasapi.GetData(nint.Zero, (int)DataFlags.Available); if (latency < 0) throw Error("Read output latency");
         var position = _graph.ReadPosition(latency); _position = position.Position;
@@ -170,6 +176,7 @@ public sealed class BassAudioBackend : IAudioBackend, IAdvancedAudioBackend
     {
         if (_wasapi) { Check(BassWasapi.Free(), "Quiesce/free WASAPI"); _wasapi = false; }
         _running = false; _graph?.Dispose(); _graph = null; _output = null; _actualDevice = null;
+        _deviceSelection.Invalidate();
     }
     private void FlushOutput()
     {
@@ -191,7 +198,7 @@ public sealed class BassAudioBackend : IAudioBackend, IAdvancedAudioBackend
         _request = null; _prepared = null; _info = null; _position = TimeSpan.Zero; Interlocked.Exchange(ref _callbackError, 0);
     }
     public void Dispose()
-    { if (_disposed) return; CloseSource(); CloseOutput(); _context.Dispose(); _disposed = true; GC.KeepAlive(_render); }
+    { if (_disposed) return; CloseSource(); CloseOutput(); _notifications.Dispose(); _context.Dispose(); _disposed = true; GC.KeepAlive(_render); }
     private static void Check(bool success, string operation) { if (!success) throw Error(operation); }
     private static AudioBackendException Error(string operation) { var error = Bass.LastError; return new(AudioErrorCategory.OutputUnavailable, $"{operation}: {error} ({(int)error}).", (int)error); }
 }

@@ -60,6 +60,19 @@ public sealed class PcmProcessor
     public void Process(Span<float> samples, float gainStart = 1, float gainEnd = 1)
     {
         var frames = samples.Length / _channels;
+        if (!_enabled && _previous is null && gainStart == gainEnd && float.IsFinite(gainStart))
+        {
+            // The ordinary ramp expression adds +0 even for -0 gain. Keep its exact IEEE result.
+            var gain = gainStart + 0f;
+            foreach (ref var sample in samples[..(frames * _channels)])
+            {
+                double value = (double)sample * gain;
+                if (!double.IsFinite(value)) { value = 0; ProtectedSamples++; }
+                else if (value is > 1 or < -1) { value = Math.Clamp(value, -1, 1); ProtectedSamples++; }
+                sample = (float)value;
+            }
+            return;
+        }
         for (var frame = 0; frame < frames; frame++)
         {
             var gain = gainStart + (gainEnd - gainStart) * (frame + 1f) / Math.Max(1, frames);
