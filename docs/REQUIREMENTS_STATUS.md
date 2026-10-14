@@ -1,5 +1,11 @@
 # Requirement and acceptance status
 
+## Owner follow-up: playlist-only deletion and album selection (2026-10-14)
+
+Implemented selected-entry removal instead of physical file deletion in the root track menu, Delete and Ctrl+Delete. The internal destructive UI route/preview is removed; files, other playlists, public file APIs, schema and dependency pins are preserved. Clicking an album heading selects its visible matching folder/album occurrences across repeated blocks, without sorting or interrupting playback; Enter/Space and UIA Invoke offer equivalent activation. Same-named albums in distinct folders/discs remain separate, and filtered-out songs are not silently selected/deleted.
+
+Local locked Release and targeted Core controls pass (337 Core, 78 CLI and 15 Windows-only skips). Genuine owned Windows controls and installed EN/RU publication gates are added; final-source CI must pass before release. Narrator and physical pointer/touch remain manual acceptance.
+
 ## Observed Windows close acceptance (2026-10-10)
 
 Final application/test source `532822d` passed all required PR jobs in [run 38054900465](https://github.com/kurasis/MPswift/actions/runs/38054900465). [Sanitized evidence](evidence/window-shutdown-windows.json) verifies seven real ordinary/rebuilt/extracted/installed EN/RU WPF reports: same-turn hiding, themed disabled lists, successful and failed final saves with the actual owned warning/retry, close-to-tray, repeated requests, already released models, stable WAL/SHM identities and reopened latest data. Windows Core 330 and all 93 CLI tests pass; the standard-user installer lifecycle passes. Owned close time is measured before independent reopen verification and stays below the two-second regression limit. Physical user disk/audio-driver latency remains outside hosted acceptance. This evidence-only update changes no tested application or test source.

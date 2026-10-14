@@ -13,6 +13,22 @@
     <shell:WindowChrome.WindowChrome><shell:WindowChrome CaptionHeight="36" ResizeBorderThickness="6" GlassFrameThickness="0" CornerRadius="0" UseAeroCaptionButtons="False" /></shell:WindowChrome.WindowChrome>
     <Window.Resources>
         <r:EnumLabelConverter x:Key="EnumLabel" />
+        <Style x:Key="AlbumHeaderButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Background" Value="{DynamicResource BackgroundBrush}" /><Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Padding" Value="9,11,9,7" /><Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
+                <Border x:Name="AlbumHeaderSurface" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="{TemplateBinding Padding}">
+                    <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                </Border>
+                <ControlTemplate.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="AlbumHeaderSurface" Property="Background" Value="{DynamicResource HoverBrush}" /></Trigger>
+                    <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="AlbumHeaderSurface" Property="BorderBrush" Value="{DynamicResource AccentBrush}" /></Trigger>
+                    <Trigger Property="IsPressed" Value="True"><Setter TargetName="AlbumHeaderSurface" Property="Opacity" Value="0.7" /></Trigger>
+                    <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.4" /></Trigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate></Setter.Value></Setter>
+            <Style.Triggers><DataTrigger Binding="{Binding HasSection}" Value="False"><Setter Property="Visibility" Value="Collapsed" /></DataTrigger></Style.Triggers>
+        </Style>
         <ContextMenu x:Key="PlaylistTabMenu">
             <MenuItem Header="{r:Loc RenamePlaylist}" Tag="Rename" Click="OnTabMenuAction" ><MenuItem.Icon><c:AppIcon Kind="Edit" /></MenuItem.Icon></MenuItem>
             <MenuItem Header="{r:Loc DuplicatePlaylist}" Tag="Duplicate" Click="OnTabMenuAction" ><MenuItem.Icon><c:AppIcon Kind="Copy" /></MenuItem.Icon></MenuItem>
@@ -172,10 +188,10 @@
                         <Setter Property="MinHeight" Value="56" /><Setter Property="Margin" Value="0,1" /><Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
                         <Setter Property="Background" Value="{DynamicResource AlternateRowBrush}" />
                         <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListBoxItem"><StackPanel>
-                            <Border x:Name="AlbumHeading" Background="{DynamicResource BackgroundBrush}" Padding="10,12,10,8" ToolTip="{Binding SectionFolder}">
-                                <Border.Style><Style TargetType="Border"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding HasSection}" Value="True"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></Border.Style>
+                            <Button x:Name="AlbumHeading" Style="{StaticResource AlbumHeaderButton}" Click="OnSelectAlbum" ToolTip="{Binding SelectAlbumLabel}"
+                                    AutomationProperties.Name="{Binding SelectAlbumLabel}" AutomationProperties.HelpText="{r:Loc SelectAlbumHelp}">
                                 <StackPanel><TextBlock Text="{Binding SectionTitle}" Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold" FontSize="14" TextTrimming="CharacterEllipsis" /><TextBlock Text="{Binding SectionInfo}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Margin="0,3,0,0" TextTrimming="CharacterEllipsis" /></StackPanel>
-                            </Border>
+                            </Button>
                             <Border x:Name="Row" CornerRadius="7" Background="{TemplateBinding Background}" BorderThickness="1" BorderBrush="Transparent" Padding="{TemplateBinding Padding}"><ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" /></Border></StackPanel><ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Row" Property="Background" Value="{DynamicResource HoverBrush}" /></Trigger><Trigger Property="IsSelected" Value="True"><Setter TargetName="Row" Property="Background" Value="{DynamicResource SelectedRowBrush}" /><Setter TargetName="Row" Property="BorderBrush" Value="{DynamicResource AccentBrush}" /></Trigger><Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Row" Property="BorderBrush" Value="{DynamicResource TextPrimaryBrush}" /></Trigger></ControlTemplate.Triggers></ControlTemplate></Setter.Value></Setter>
                         <Setter Property="AutomationProperties.Name" Value="{Binding Title}" />
                         <Setter Property="AutomationProperties.HelpText" Value="{Binding Availability}" />

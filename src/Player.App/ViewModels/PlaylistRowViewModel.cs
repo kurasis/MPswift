@@ -11,11 +11,12 @@ public partial class PlaylistRowViewModel : ObservableObject
     public void UpdateTrack(MediaTrack track) { entry = entry with { Track = track }; OnPropertyChanged(nameof(Entry)); OnPropertyChanged(nameof(Title)); OnPropertyChanged(nameof(Path)); OnPropertyChanged(nameof(Metadata)); OnPropertyChanged(nameof(Duration)); OnPropertyChanged(nameof(Availability)); }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasSection), nameof(SectionTitle), nameof(SectionInfo), nameof(SectionFolder))]
+    [NotifyPropertyChangedFor(nameof(HasSection), nameof(SectionTitle), nameof(SectionInfo), nameof(SectionFolder), nameof(SelectAlbumLabel))]
     private AlbumSection? _section;
     public bool HasSection => Section is not null;
     public string SectionTitle => Section?.Title ?? "";
     public string SectionFolder => Section?.Folder ?? "";
+    public string SelectAlbumLabel => string.Format(Strings.Culture, Strings.Get("SelectAlbumTracks"), SectionTitle);
     public string SectionInfo => Section is { } section
         ? string.Format(Strings.Culture, Strings.AlbumSectionCount, section.Count) + " · " + string.Join(" / ", section.Folder.Split('/').TakeLast(2)) : "";
 
@@ -27,7 +28,7 @@ public partial class PlaylistRowViewModel : ObservableObject
     public string Metadata => string.Join(" · ", new[] { entry.Track.Artist, entry.Track.Album, entry.Track.FormatHint }.Where(v => !string.IsNullOrEmpty(v)));
     public string Duration => PlayerViewModel.FormatTime(entry.Track.DurationHint);
     public string Availability => entry.Track.Available ? "" : Strings.Get("Unavailable");
-    public void RefreshLanguage() { OnPropertyChanged(nameof(SectionInfo)); OnPropertyChanged(nameof(Availability)); }
+    public void RefreshLanguage() { OnPropertyChanged(nameof(SectionInfo)); OnPropertyChanged(nameof(SelectAlbumLabel)); OnPropertyChanged(nameof(Availability)); }
     [ObservableProperty] private bool _enabled;
     [ObservableProperty] private int _rating;
     public event Action<PlaylistRowViewModel>? RatingChanged;

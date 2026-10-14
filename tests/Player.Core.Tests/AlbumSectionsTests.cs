@@ -8,6 +8,30 @@ public sealed class AlbumSectionsTests
 {
     private static MediaTrack Track(string path, string? album = null) => new(Guid.NewGuid(), path, "Song", Album: album);
 
+    [Theory]
+    [InlineData(@"C:\Music\Album\one.flac", " Album ", "c:/music/album/two.flac", "album", true)]
+    [InlineData(@"C:\Music\Album\one.flac", null, @"C:\Music\Album\two.flac", "   ", true)]
+    [InlineData(@"C:\Music\A\one.flac", "Album", @"C:\Music\B\two.flac", "Album", false)]
+    [InlineData(@"C:\Music\A\one.flac", "Album", @"C:\Music\A\two.flac", "Other", false)]
+    [InlineData(@"C:\Music\A\CD1\one.flac", "Album", @"C:\Music\A\CD2\two.flac", "Album", false)]
+    [InlineData("/music/Беларускае/one.flac", "Дні", "/music/Беларускае/two.flac", " Дні ", true)]
+    public void SelectionUsesTheSameFolderAndAlbumIdentityAsHeadings(string first, string? album, string second, string? other, bool same)
+    {
+        Assert.Equal(same, AlbumSections.IsSameAlbum(Track(first, album), Track(second, other)));
+        Assert.Equal(same ? 1 : 2, AlbumSections.Create([Track(first, album), Track(second, other)]).Count);
+    }
+
+    [Fact]
+    public void AlbumSelectionIncludesRepeatedOccurrencesAndCueSegmentsWithoutReordering()
+    {
+        var first = Track(@"C:\Music\Album\image.flac", "Album") with { Segment = new(TimeSpan.Zero, TimeSpan.FromSeconds(1)) };
+        var second = first with { Id = Guid.NewGuid(), Segment = new(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2)) };
+        var other = Track(@"C:\Music\Other\song.flac", "Album");
+        var tracks = new[] { first, other, second, first }; var ids = tracks.Select(track => track.Id).ToArray();
+        Assert.Equal([first, second, first], tracks.Where(track => AlbumSections.IsSameAlbum(first, track)));
+        Assert.Equal(ids, tracks.Select(track => track.Id));
+    }
+
     [Fact]
     public void NestedDiscsRemainSeparateEvenWithTheSameAlbumTag()
     {

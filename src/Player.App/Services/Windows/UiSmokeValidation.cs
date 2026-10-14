@@ -108,6 +108,7 @@ public sealed class UiSmokeValidation : TraceListener
         var customization = await CustomizationValidation.RunAsync(window, model, output);
         var metadataControls = await MetadataControlsValidation.RunAsync(window, model, taggedFixture, output);
         var trackActions = await TrackActionsValidation.RunAsync(window, model, taggedFixture, output);
+        var albumSelection = await AlbumSelectionValidation.RunAsync(window, model, taggedFixture, output);
         var desktopPanel = await DesktopPanelValidation.RunAsync(window, model, fixture, output);
         var uiAudit = await UiAuditValidation.RunAsync(window, model, fixture, output);
         var completion = await CompletionValidation.RunAsync(window, model, fixture, output);
@@ -193,6 +194,7 @@ public sealed class UiSmokeValidation : TraceListener
             Customization = customization, Completion = completion,
             MetadataControls = metadataControls,
             TrackActions = trackActions,
+            AlbumSelection = albumSelection,
             DesktopPanel = desktopPanel,
             UiAudit = uiAudit,
             PlaylistTabs = playlistTabs,

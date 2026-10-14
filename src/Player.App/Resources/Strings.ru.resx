@@ -807,4 +807,7 @@ F1: локальная справка
     <data xml:space="preserve" name="PanelPositionBottomRight">
         <value>Справа внизу</value>
     </data>
+    <data name="RemoveSelectedFromPlaylist" xml:space="preserve"><value>Удалить выбранные из плейлиста</value></data>
+    <data name="SelectAlbumTracks" xml:space="preserve"><value>Выделить песни альбома «{0}»</value></data>
+    <data name="SelectAlbumHelp" xml:space="preserve"><value>Выделяет все видимые песни этого альбома в текущем плейлисте.</value></data>
 </root>

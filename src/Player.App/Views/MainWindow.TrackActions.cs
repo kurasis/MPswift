@@ -111,7 +111,7 @@ public partial class MainWindow
         deletion.Items.Add(Item("RemoveDuplicates", "RemoveDuplicates", () => Done(() => OnRemoveDuplicates(this, new RoutedEventArgs())), AppIconKind.Delete));
         deletion.Items.Add(Item("ClearPlaylist", "ClearPlaylist", () => Done(() =>
         { if (MessageBox.Show(this, Strings.Get("ClearPlaylistConfirm"), Strings.Get("ClearPlaylist"), MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes) Model.RemoveEntriesCommand.Execute(Model.Entries.ToArray()); }), AppIconKind.Delete)); Add(deletion);
-        Add(Item("RecycleFiles", "Recycle", () => RecycleSelectedAsync(rows), AppIconKind.Delete, "Ctrl+Del"));
+        Add(Item("RemoveSelectedFromPlaylist", "RemoveSelected", () => Done(() => Model.RemoveEntriesCommand.Execute(rows)), AppIconKind.Delete, "Del"));
         Separator();
         var enabled = !rows.Any(row => row.Enabled);
         Add(Item(enabled ? "EnableSelected" : "DisableSelected", "Enabled", () => Done(() => Model.SetEntriesEnabled(rows, enabled)), AppIconKind.Stop));
@@ -173,15 +173,5 @@ public partial class MainWindow
             }
         }
         Model.Message = Strings.Get("Exported");
-    }
-    private async Task RecycleSelectedAsync(PlaylistRowViewModel[] rows)
-    {
-        if (rows.Length == 0) return;
-        var preview = new RecycleFilesWindow(this, rows);
-        if (preview.ShowDialog() != true) return;
-        var active = Model.ActiveSourcePath;
-        var result = await Task.Run(() => TrackFileOperations.Recycle(preview.Paths, active));
-        Model.MarkFilesUnavailable(result.Completed);
-        Model.Message = string.Format(Strings.Culture, Strings.Get("FilesRecycled"), result.Completed.Length, result.Errors.Length); Model.Details = string.Join(Environment.NewLine, result.Errors);
     }
 }

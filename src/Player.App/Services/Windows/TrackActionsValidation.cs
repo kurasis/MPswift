@@ -16,7 +16,7 @@ using Player.Core.Playback;
 
 namespace Player.App.Services.Windows;
 
-/// <summary>Real WPF/SQLite and owned file controls; native recycle dialogs require manual confirmation.</summary>
+/// <summary>Real WPF/SQLite and owned file controls; playlist removal never recycles audio.</summary>
 internal static class TrackActionsValidation
 {
     internal static async Task<object> RunAsync(MainWindow window, PlayerViewModel model, string taggedFixture, string output)
@@ -63,12 +63,12 @@ internal static class TrackActionsValidation
             menu = list.ContextMenu; menu.PlacementTarget = container; menu.IsOpen = true; await Idle();
             var actions = Items(menu).ToArray();
             foreach (var name in new[] { "Play", "Add", "Favorites", "Queue", "Information", "Location", "PreviousPlaylist", "CopyFiles", "Rating",
-                "AfterPlaying", "Send", "SendPlaylist", "Deletion", "Recycle", "Enabled" })
+                "AfterPlaying", "Send", "SendPlaylist", "Deletion", "RemoveSelected", "Enabled" })
                 Check(actions.Any(item => Equals(item.Tag, name)), "Missing track action: " + name);
-            Check(actions.All(item => item.Tag is not "FindLibrary") && actions.Where(item => item.Icon is not null).All(item => item.Icon is AppIcon { Width: 18, Height: 18 }), "Track menu contains an excluded action or inconsistent icons.");
+            Check(actions.All(item => item.Tag is not ("FindLibrary" or "Recycle")) && actions.Where(item => item.Icon is not null).All(item => item.Icon is AppIcon { Width: 18, Height: 18 }), "Track menu contains an excluded action or inconsistent icons.");
             Check(actions.Single(item => Equals(item.Tag, "Information")).InputGestureText == "F4" &&
                 actions.Single(item => Equals(item.Tag, "Location")).InputGestureText == "Alt+O" &&
-                actions.Single(item => Equals(item.Tag, "Recycle")).InputGestureText == "Ctrl+Del" && menu.ActualHeight > 200, "Track popup shortcuts/layout were not rendered.");
+                actions.Single(item => Equals(item.Tag, "RemoveSelected")).InputGestureText == "Del" && menu.ActualHeight > 200, "Track popup shortcuts/layout were not rendered.");
             CustomizationValidation.Render(menu, output, "track-menu-" + settings.Language + ".png"); menu.IsOpen = false;
             await Invoke("Rating4"); Check(rows.All(row => row.Rating == 4), "Menu rating did not update selected and duplicate tracks.");
             await Invoke("Enabled"); Check(!rows[0].Enabled && !rows[1].Enabled && rows[2].Enabled, "Disable changed unselected occurrences.");
@@ -112,12 +112,6 @@ internal static class TrackActionsValidation
             }
             var protectedFile = TrackFileOperations.Recycle([flac], flac);
             Check(protectedFile.Completed.Length == 0 && protectedFile.Errors.Length == 1, "Recycle did not protect the loaded source.");
-            var cueRow = new PlaylistRowViewModel(new PlaylistEntry(Guid.NewGuid(), rows[0].Entry.Track with { Segment = new TrackSegment(TimeSpan.Zero, TimeSpan.FromSeconds(1)) }));
-            var preview = new RecycleFilesWindow(window, [rows[0], cueRow]); preview.Show(); await Idle();
-            Check(preview.Paths.Length == 1 && preview.CancelButton.IsDefault && !preview.ConfirmButton.IsDefault &&
-                ((DockPanel)preview.Content).Children.OfType<TextBlock>().Single().Text.Contains(Strings.Get("RecycleCueWarning"), StringComparison.Ordinal), "Recycle preview lacks safe cancellation, physical deduplication or CUE warning.");
-            preview.CancelButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-            Check(!preview.IsVisible && hashes.All(pair => Hash(pair.Key) == pair.Value), "Cancelling recycle changed audio bytes.");
             model.SelectedPlaylist = selected; await Invoke("Rating5");
             Check(rows.All(row => row.Rating == 4), "A stale track popup changed a different playlist.");
             Check(model.SourcePlaylistId == source && model.Snapshot.EntryId == snapshot.EntryId && model.Snapshot.State == snapshot.State && model.Snapshot.Position == snapshot.Position,
@@ -142,8 +136,8 @@ internal static class TrackActionsValidation
             return new { Status = "track-actions-passed", RoutedRightClick = true, MultiSelectionPreserved = true, LocalizedPopup = true, MenuHierarchyAndShortcuts = true,
                 FavoritesDeduplicatedAndPersisted = true, IndependentPlaylistCopies = true, QueueSelectionOnly = true, RatingAndEnabledSelection = true,
                 ClipboardFileDropList = true, ActualReadOnlyTagsAndLyrics = true, FileNavigation = true, MetadataHandlesReleased = true, CopiedHashes = true,
-                ExistingCopiesPreserved = true, DuplicateCopyNamesRefused = true, CancelledCopy = true, LoadedSourceRecycleRefused = true, CancelledRecyclePreservesSources = true,
-                SharedCueWarning = true, StaleSelectionRefused = true, PlaceAfterPlayingStableAndFiltered = true, PlaybackPreserved = true, NativeRecycleDialogs = "manual-not-run" };
+                ExistingCopiesPreserved = true, DuplicateCopyNamesRefused = true, CancelledCopy = true, LoadedSourceRecycleRefused = true,
+                PhysicalDeletionNotExposed = true, StaleSelectionRefused = true, PlaceAfterPlayingStableAndFiltered = true, PlaybackPreserved = true };
         }
         finally
         {
