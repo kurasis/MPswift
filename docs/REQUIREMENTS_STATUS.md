@@ -1,14 +1,18 @@
 # Requirement and acceptance status
 
-## GitHub Actions infrastructure block (2026-10-14)
+## Observed Windows album selection and removal acceptance (2026-10-14)
 
-Playlist-only removal and album selection are implemented and locally verified: locked Release has zero warnings/errors, Core 337 and CLI 78 pass, 15 Windows-only CLI tests skip on Linux. The first PR run [38563135421](https://github.com/kurasis/MPswift/actions/runs/38563135421) never assigned a runner or executed a step: all build/proof checks report account payment/spending-limit restrictions. [Sanitized receipt](evidence/album-selection-ci-blocked.json) records this infrastructure failure separately from code/test failures. Windows WPF/native, packaged/installed EN/RU and installer checks have not run for this change; no new binary release is published. The owner must restore Actions availability in GitHub Billing & plans before the existing required gates can run. Folder-drop heading acceptance was also updated from the old decorative Border to the new focusable Button; this updated source still requires Windows acceptance. Existing published build 1.0.136-dev.1 remains unchanged.
+Final source `9f2b071dd3c5e9f9e67fbba7394958f655a2cf0f` passed the Windows, Linux and rebuilt-TagLib jobs in [main run 38564116925, attempt 2](https://github.com/kurasis/MPswift/actions/runs/38564116925). [Sanitized evidence](evidence/album-selection-windows.json) records all seven real ordinary/rebuilt/extracted/installed EN/RU WPF reports with zero binding errors and every album-selection/removal control passing. Root-menu, Delete and Ctrl+Delete preserve physical audio/CUE files, other playlists, source and queue; repeated album occurrences, visible filtering, keyboard/UIA activation, stale actions and saved SQLite removal pass. Windows Core 337 and all 93 CLI tests pass. Genuine standard-user install/reinstall/uninstall and packaged-executable checks pass. [Build 1.0.139-dev.2](https://github.com/kurasis/MPswift/releases/tag/build-38564116925-attempt-2) is published; downloaded player ZIP and installer match both their published SHA-256 files and the original CI evidence. Physical pointer/touch and Narrator speech remain manual acceptance; this documentation update changes no application, test or script source.
+
+## Resolved GitHub Actions infrastructure block (2026-10-14)
+
+The initial PR/main attempts never assigned runners because GitHub reported account payment/spending-limit restrictions. [Sanitized initial receipt](evidence/album-selection-ci-blocked.json) retains that infrastructure failure. After the owner requested a retry, main attempt 2 executed the genuine Windows/Linux checks successfully; the observed evidence above supersedes the earlier pending-acceptance statements.
 
 ## Owner follow-up: playlist-only deletion and album selection (2026-10-14)
 
 Implemented selected-entry removal instead of physical file deletion in the root track menu, Delete and Ctrl+Delete. The internal destructive UI route/preview is removed; files, other playlists, public file APIs, schema and dependency pins are preserved. Clicking an album heading selects its visible matching folder/album occurrences across repeated blocks, without sorting or interrupting playback; Enter/Space and UIA Invoke offer equivalent activation. Same-named albums in distinct folders/discs remain separate, and filtered-out songs are not silently selected/deleted.
 
-Local locked Release and targeted Core controls pass (337 Core, 78 CLI and 15 Windows-only skips). Genuine owned Windows controls and installed EN/RU publication gates are added; final-source CI must pass before release. Narrator and physical pointer/touch remain manual acceptance.
+Local locked Release and targeted Core controls pass (337 Core, 78 CLI and 15 Windows-only skips). Genuine owned Windows controls and installed EN/RU publication gates pass in the observed main run above. Narrator and physical pointer/touch remain manual acceptance.
 
 ## Observed Windows close acceptance (2026-10-10)
 

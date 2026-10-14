@@ -1,0 +1,249 @@
+{
+  "SourceCommit": "9f2b071dd3c5e9f9e67fbba7394958f655a2cf0f",
+  "ApplicationTree": "55cdb89dfe68cea38e5f2cf243b7ef14dfdd94ed",
+  "TestTree": "b313728ae04aa6069af5f767476044131de21d4f",
+  "ScriptTree": "729123c90ae4a43f9b57fc6658cf3a484fbc46cc",
+  "Run": "https://github.com/kurasis/MPswift/actions/runs/38564116925",
+  "Attempt": 2,
+  "ProductVersion": "1.0.139-dev.2",
+  "WindowsCore": {
+    "Passed": 337,
+    "Failed": 0
+  },
+  "WindowsCLI": {
+    "Passed": 93,
+    "Failed": 0,
+    "Skipped": 0
+  },
+  "Reports": [
+    {
+      "Report": "taglib-replacement-ui-en.json",
+      "Sha256": "bcb1094c61b620431615f382cb7b2f506f08d06f360612df6093364588141692",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "AlbumSelection": {
+        "Status": "album-selection-passed",
+        "RepeatedOccurrences": true,
+        "SameNamesInOtherFoldersExcluded": true,
+        "VisibleFilterOnly": true,
+        "RoutedHeaderClick": true,
+        "EnterAndSpace": true,
+        "AccessibleInvokeAndFocus": true,
+        "NoReorder": true,
+        "MenuPlaylistOnlyDeletion": true,
+        "DeletePlaylistOnly": true,
+        "ControlDeletePlaylistOnly": true,
+        "OtherPlaylistsPreserved": true,
+        "SavedRemoval": true,
+        "CueSharedImagePreserved": true,
+        "SourceHashesUnchanged": true,
+        "StaleMenuRefused": true,
+        "PlaybackAndQueuePreserved": true
+      },
+      "PhysicalDeletionNotExposed": true
+    },
+    {
+      "Report": "taglib-replacement-ui-ru.json",
+      "Sha256": "97dc006f5956234008d14b607b676d472a9be61ed257ee9736faafd72918308b",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "AlbumSelection": {
+        "Status": "album-selection-passed",
+        "RepeatedOccurrences": true,
+        "SameNamesInOtherFoldersExcluded": true,
+        "VisibleFilterOnly": true,
+        "RoutedHeaderClick": true,
+        "EnterAndSpace": true,
+        "AccessibleInvokeAndFocus": true,
+        "NoReorder": true,
+        "MenuPlaylistOnlyDeletion": true,
+        "DeletePlaylistOnly": true,
+        "ControlDeletePlaylistOnly": true,
+        "OtherPlaylistsPreserved": true,
+        "SavedRemoval": true,
+        "CueSharedImagePreserved": true,
+        "SourceHashesUnchanged": true,
+        "StaleMenuRefused": true,
+        "PlaybackAndQueuePreserved": true
+      },
+      "PhysicalDeletionNotExposed": true
+    },
+    {
+      "Report": "installed-ui-en.json",
+      "Sha256": "540f783ce74ee5b4b829c5c62b6c2ffd0e6729b6a8800569349a8b9ce098afc2",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "AlbumSelection": {
+        "Status": "album-selection-passed",
+        "RepeatedOccurrences": true,
+        "SameNamesInOtherFoldersExcluded": true,
+        "VisibleFilterOnly": true,
+        "RoutedHeaderClick": true,
+        "EnterAndSpace": true,
+        "AccessibleInvokeAndFocus": true,
+        "NoReorder": true,
+        "MenuPlaylistOnlyDeletion": true,
+        "DeletePlaylistOnly": true,
+        "ControlDeletePlaylistOnly": true,
+        "OtherPlaylistsPreserved": true,
+        "SavedRemoval": true,
+        "CueSharedImagePreserved": true,
+        "SourceHashesUnchanged": true,
+        "StaleMenuRefused": true,
+        "PlaybackAndQueuePreserved": true
+      },
+      "PhysicalDeletionNotExposed": true
+    },
+    {
+      "Report": "installed-ui-ru.json",
+      "Sha256": "fb40e893bd2d34fc2651f1311a6133bcfad12e9ca8e46e48bc6ead1aab5735a0",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "AlbumSelection": {
+        "Status": "album-selection-passed",
+        "RepeatedOccurrences": true,
+        "SameNamesInOtherFoldersExcluded": true,
+        "VisibleFilterOnly": true,
+        "RoutedHeaderClick": true,
+        "EnterAndSpace": true,
+        "AccessibleInvokeAndFocus": true,
+        "NoReorder": true,
+        "MenuPlaylistOnlyDeletion": true,
+        "DeletePlaylistOnly": true,
+        "ControlDeletePlaylistOnly": true,
+        "OtherPlaylistsPreserved": true,
+        "SavedRemoval": true,
+        "CueSharedImagePreserved": true,
+        "SourceHashesUnchanged": true,
+        "StaleMenuRefused": true,
+        "PlaybackAndQueuePreserved": true
+      },
+      "PhysicalDeletionNotExposed": true
+    },
+    {
+      "Report": "packaged-ui.json",
+      "Sha256": "9f8c6fbd84ff2e502298ecdb8b8e9d4ab7810142e8c8773e4799231513820832",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "AlbumSelection": {
+        "Status": "album-selection-passed",
+        "RepeatedOccurrences": true,
+        "SameNamesInOtherFoldersExcluded": true,
+        "VisibleFilterOnly": true,
+        "RoutedHeaderClick": true,
+        "EnterAndSpace": true,
+        "AccessibleInvokeAndFocus": true,
+        "NoReorder": true,
+        "MenuPlaylistOnlyDeletion": true,
+        "DeletePlaylistOnly": true,
+        "ControlDeletePlaylistOnly": true,
+        "OtherPlaylistsPreserved": true,
+        "SavedRemoval": true,
+        "CueSharedImagePreserved": true,
+        "SourceHashesUnchanged": true,
+        "StaleMenuRefused": true,
+        "PlaybackAndQueuePreserved": true
+      },
+      "PhysicalDeletionNotExposed": true
+    },
+    {
+      "Report": "ui-en.json",
+      "Sha256": "8d36df02562d5032eb7b9f6bbca2de38e30b33d8aa3b4e86b2823f0c46c48f09",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "AlbumSelection": {
+        "Status": "album-selection-passed",
+        "RepeatedOccurrences": true,
+        "SameNamesInOtherFoldersExcluded": true,
+        "VisibleFilterOnly": true,
+        "RoutedHeaderClick": true,
+        "EnterAndSpace": true,
+        "AccessibleInvokeAndFocus": true,
+        "NoReorder": true,
+        "MenuPlaylistOnlyDeletion": true,
+        "DeletePlaylistOnly": true,
+        "ControlDeletePlaylistOnly": true,
+        "OtherPlaylistsPreserved": true,
+        "SavedRemoval": true,
+        "CueSharedImagePreserved": true,
+        "SourceHashesUnchanged": true,
+        "StaleMenuRefused": true,
+        "PlaybackAndQueuePreserved": true
+      },
+      "PhysicalDeletionNotExposed": true
+    },
+    {
+      "Report": "ui-ru.json",
+      "Sha256": "573e296e60ed4aefca7583c194d96c6b48652e687a40f0f770187e67f6ac69eb",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "AlbumSelection": {
+        "Status": "album-selection-passed",
+        "RepeatedOccurrences": true,
+        "SameNamesInOtherFoldersExcluded": true,
+        "VisibleFilterOnly": true,
+        "RoutedHeaderClick": true,
+        "EnterAndSpace": true,
+        "AccessibleInvokeAndFocus": true,
+        "NoReorder": true,
+        "MenuPlaylistOnlyDeletion": true,
+        "DeletePlaylistOnly": true,
+        "ControlDeletePlaylistOnly": true,
+        "OtherPlaylistsPreserved": true,
+        "SavedRemoval": true,
+        "CueSharedImagePreserved": true,
+        "SourceHashesUnchanged": true,
+        "StaleMenuRefused": true,
+        "PlaybackAndQueuePreserved": true
+      },
+      "PhysicalDeletionNotExposed": true
+    }
+  ],
+  "Installer": {
+    "Status": "installer-lifecycle-passed",
+    "StandardUser": true,
+    "Phases": [
+      {
+        "Phase": "Install",
+        "Status": "standard-user-installer-phase-passed",
+        "Administrator": false,
+        "DataPreserved": true,
+        "PerUserRegistration": true,
+        "UnknownFilesPreserved": true
+      },
+      {
+        "Phase": "Upgrade",
+        "Status": "standard-user-installer-phase-passed",
+        "Administrator": false,
+        "DataPreserved": true,
+        "PerUserRegistration": true,
+        "UnknownFilesPreserved": true
+      },
+      {
+        "Phase": "Uninstall",
+        "Status": "standard-user-installer-phase-passed",
+        "Administrator": false,
+        "DataPreserved": true,
+        "PerUserRegistration": true,
+        "UnknownFilesPreserved": true
+      }
+    ]
+  },
+  "Scope": "Actual owned Windows WPF/native audio/SQLite, ordinary EN/RU, rebuilt TagLib EN/RU, extracted portable and installed EN/RU. Routed click, keyboard and UIA activation are verified; physical pointer/touch and Narrator speech remain manual acceptance. No application/test/script changes in this evidence-only update.",
+  "Publication": {
+    "RunConclusion": "success",
+    "Release": "https://github.com/kurasis/MPswift/releases/tag/build-38564116925-attempt-2",
+    "DownloadedAssetsVerifiedAgainstCIEvidence": [
+      {
+        "Name": "MPswift-1.0.139-dev.2-setup-win-x64.exe",
+        "Sha256": "9641e37344c9a7f9fa8c30eefbafbe096022ce883652a6fd9c0332862330a70d",
+        "Url": "https://github.com/kurasis/MPswift/releases/download/build-38564116925-attempt-2/MPswift-1.0.139-dev.2-setup-win-x64.exe"
+      },
+      {
+        "Name": "MPswift-1.0.139-dev.2-9f2b071dd3c5-win-x64.zip",
+        "Sha256": "86f10f1cb0a4feebd6af1486b96ec3b4a5a7504ea58a42735a34812d472a3d4d",
+        "Url": "https://github.com/kurasis/MPswift/releases/download/build-38564116925-attempt-2/MPswift-1.0.139-dev.2-9f2b071dd3c5-win-x64.zip"
+      }
+    ]
+  }
+}
