@@ -9,7 +9,7 @@ using Player.Core.Playback;
 namespace Player.App.Services.Storage;
 
 /// <summary>One bounded dedicated owner, real synchronous SQLite I/O off the dispatcher.</summary>
-public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
+public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore, ISessionPlayerStore
 {
     private readonly BlockingCollection<Action> _work = new(64);
     private readonly TaskCompletionSource _exit = new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -17,6 +17,8 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
     private readonly string _path;
     private readonly string _defaultPlaylistName;
     private bool _closing;
+    private long _sessionOnlyWrites;
+    internal long SessionOnlyWrites => Interlocked.Read(ref _sessionOnlyWrites);
     private SqliteConnection? _connection;
     private FileStream? _ownership;
     private DataDirectoryLease? _directoryLease;
@@ -104,10 +106,24 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
                     }
                 }
             }
-            using var session = Command(connection, transaction, "INSERT INTO Session(Id,Json) VALUES(1,$json) ON CONFLICT(Id) DO UPDATE SET Json=excluded.Json");
-            session.Parameters.AddWithValue("$json", sessionJson); session.ExecuteNonQuery();
+            WriteSession(connection, transaction, sessionJson);
             transaction.Commit(); return true;
         });
+    }
+    Task ISessionPlayerStore.SaveSessionAsync(SessionState session)
+    {
+        LibraryState.ValidateSession(session);
+        var json = SessionJson.Serialize(session);
+        return Queue(() =>
+        {
+            var connection = Open(); using var transaction = connection.BeginTransaction();
+            WriteSession(connection, transaction, json); transaction.Commit(); Interlocked.Increment(ref _sessionOnlyWrites); return true;
+        });
+    }
+    private static void WriteSession(SqliteConnection connection, SqliteTransaction transaction, string json)
+    {
+        using var command = Command(connection, transaction, "INSERT INTO Session(Id,Json) VALUES(1,$json) ON CONFLICT(Id) DO UPDATE SET Json=excluded.Json");
+        command.Parameters.AddWithValue("$json", json); command.ExecuteNonQuery();
     }
     public Task BackupAsync(string destination) => Queue(() =>
     {

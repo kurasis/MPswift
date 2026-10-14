@@ -13,7 +13,7 @@ namespace Player.App.Controls;
 public sealed class WaveformControl : FrameworkElement
 {
     public static readonly DependencyProperty DataProperty = DependencyProperty.Register(nameof(Data), typeof(WaveformData), typeof(WaveformControl), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, GeometryChanged));
-    public static readonly DependencyProperty PositionProperty = DependencyProperty.Register(nameof(Position), typeof(double), typeof(WaveformControl), new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsRender));
+    public static readonly DependencyProperty PositionProperty = DependencyProperty.Register(nameof(Position), typeof(double), typeof(WaveformControl), new FrameworkPropertyMetadata(0d, PositionChanged));
     public static readonly DependencyProperty DurationProperty = DependencyProperty.Register(nameof(Duration), typeof(double), typeof(WaveformControl), new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsRender));
     public static readonly DependencyProperty CanSeekProperty = DependencyProperty.Register(nameof(CanSeek), typeof(bool), typeof(WaveformControl), new PropertyMetadata(false));
     public static readonly DependencyProperty UsePeaksProperty = DependencyProperty.Register(nameof(UsePeaks), typeof(bool), typeof(WaveformControl), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender, GeometryChanged));
@@ -28,13 +28,25 @@ public sealed class WaveformControl : FrameworkElement
     private StreamGeometry? _peakGeometry;
     private bool _dragging;
     private double _preview;
+    internal long RenderPasses { get; private set; }
+    internal long PositionRenderRequests { get; private set; }
     public WaveformControl() { Cursor = Cursors.Hand; Focusable = true; }
     protected override AutomationPeer OnCreateAutomationPeer() => new SeekPeer(this);
     private static void GeometryChanged(DependencyObject owner, DependencyPropertyChangedEventArgs args) => ((WaveformControl)owner).ClearGeometry();
     private void ClearGeometry() { _geometry = null; _peakGeometry = null; }
+    private static void PositionChanged(DependencyObject owner, DependencyPropertyChangedEventArgs args)
+    {
+        var control = (WaveformControl)owner;
+        if (control._dragging) return; // Pointer preview already invalidates explicitly.
+        var width = control.ActualWidth * VisualTreeHelper.GetDpi(control).DpiScaleX;
+        double Pixel(double position) => control.Duration > 0 ? Math.Floor(Math.Clamp(position / control.Duration, 0, 1) * width) : 0;
+        if (Pixel((double)args.OldValue) != Pixel((double)args.NewValue) || (double)args.NewValue == 0 || (double)args.NewValue == control.Duration)
+        { control.PositionRenderRequests++; control.InvalidateVisual(); }
+    }
     protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo) { ClearGeometry(); base.OnRenderSizeChanged(sizeInfo); }
     protected override void OnRender(DrawingContext drawing)
     {
+        RenderPasses++;
         drawing.DrawRectangle(Brushes.Transparent, null, new Rect(RenderSize));
         if (ActualWidth <= 0 || ActualHeight <= 0 || Data is null) return;
         if (_geometry is null) BuildGeometry(Data);

@@ -14,6 +14,7 @@ public sealed class PlaybackCoordinator : IAsyncDisposable
     private Task _advance = Task.CompletedTask;
     private PlaylistEntry? _preparedEntry;
     private bool _loading;
+    private bool _preparationDirty = true;
 
     public PlaybackCoordinator(IAudioPlayer player, Random? random = null) { _player = player; _order = new(random); _player.SnapshotChanged += OnSnapshot; }
     public event Action? OrderChanged;
@@ -32,14 +33,15 @@ public sealed class PlaybackCoordinator : IAsyncDisposable
     public void ClearHistory() { lock (_gate) _order.ClearHistory(); Changed(); }
     public PlaybackOrderState CaptureOrder() { lock (_gate) return _order.Capture(); }
     public void RestoreOrder(PlaybackOrderState state) { lock (_gate) _order.Restore(state); Changed(); }
-    private void Changed() { OrderChanged?.Invoke(); RefreshPrepared(); }
+    private void Changed() { lock (_gate) _preparationDirty = true; OrderChanged?.Invoke(); RefreshPrepared(); }
     private void RefreshPrepared()
     {
         if (_player is not IAdvancedAudioPlayer advanced) return;
         lock (_gate)
         {
-            if (_disposed || _loading || _player.Snapshot.State is not (PlaybackState.Playing or PlaybackState.Paused)) return;
-            var next = _order.Candidates(_cursor, true).FirstOrDefault();
+            if (_disposed || _loading || !_preparationDirty || _player.Snapshot.State is not (PlaybackState.Playing or PlaybackState.Paused)) return;
+            var next = _order.FirstCandidate(_cursor, true);
+            _preparationDirty = false;
             if (next == _preparedEntry) return;
             _preparedEntry = next;
             _ = advanced.PrepareNextAsync(next is null ? null : new(next.Id, next.Track.Path, next.Track.Segment, next.Track.ReplayGain), _order.Repeat == RepeatMode.One && next?.Id == _cursor?.Id);
@@ -56,6 +58,7 @@ public sealed class PlaybackCoordinator : IAsyncDisposable
             if (_cursor is { } active && array.FirstOrDefault(e => e.Id == active.Id) is { } updated) _cursor = updated;
             _order.SetSource(array);
             _preparedEntry = null;
+            _preparationDirty = true;
         }
         RefreshPrepared();
     }
@@ -118,9 +121,9 @@ public sealed class PlaybackCoordinator : IAsyncDisposable
     }
 
     public Task<bool> PauseAsync() => _player.PauseAsync();
-    public async Task<bool> SeekAsync(TimeSpan position) { var result = await _player.SeekAsync(position).ConfigureAwait(false); lock (_gate) _preparedEntry = null; RefreshPrepared(); return result; }
+    public async Task<bool> SeekAsync(TimeSpan position) { var result = await _player.SeekAsync(position).ConfigureAwait(false); lock (_gate) { _preparedEntry = null; _preparationDirty = true; } RefreshPrepared(); return result; }
     public Task<bool> SetVolumeAsync(double volume, bool muted) => _player.SetVolumeAsync(volume, muted);
-    public Task<bool> StopAsync() { lock (_gate) { ++_intent; _preparedEntry = null; _loading = false; return _player.StopAsync(); } }
+    public Task<bool> StopAsync() { lock (_gate) { ++_intent; _preparedEntry = null; _preparationDirty = true; _loading = false; return _player.StopAsync(); } }
     public Task<bool> NextAsync() { long intent; lock (_gate) intent = ++_intent; return AdvanceAsync(intent); }
 
     public async Task<bool> PreviousAsync()
@@ -169,7 +172,7 @@ public sealed class PlaybackCoordinator : IAsyncDisposable
         foreach (var candidate in candidates.DistinctBy(e => e.Id))
         {
             if (await LoadEntryAsync(candidate, intent, true, !fromHistory).ConfigureAwait(false)) { Changed(); return true; }
-            lock (_gate) _order.Failed(candidate);
+            lock (_gate) { _order.Failed(candidate); _preparationDirty = true; }
             lock (_gate) if (_disposed || intent != _intent) return false;
             if (_player.Snapshot.Error?.Category is not (AudioErrorCategory.FileUnavailable or AudioErrorCategory.Decoder)) return false;
         }
@@ -183,7 +186,7 @@ public sealed class PlaybackCoordinator : IAsyncDisposable
         lock (_gate)
         {
             if (_disposed) return;
-            if (snapshot.State == PlaybackState.Loading) _preparedEntry = null;
+            if (snapshot.State == PlaybackState.Loading) { _preparedEntry = null; _preparationDirty = true; }
             if (snapshot.Transitioned && _preparedEntry is { } transitioned)
             {
                 _cursor = transitioned;
