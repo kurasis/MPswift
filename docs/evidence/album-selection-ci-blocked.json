@@ -1,0 +1,40 @@
+{
+  "Status": "blocked-before-runner-start",
+  "RunId": 38563135421,
+  "RunUrl": "https://github.com/kurasis/MPswift/actions/runs/38563135421",
+  "AttemptSourceCommit": "c23a556ac0c8561ae2b59a0f08213bb593065981",
+  "Reason": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the Billing & plans section in your settings.",
+  "Checks": [
+    {
+      "JobId": 115848979482,
+      "Name": "build (ubuntu-24.04)",
+      "Conclusion": "failure",
+      "RunnerAssigned": false,
+      "ExecutedSteps": 0
+    },
+    {
+      "JobId": 115848979779,
+      "Name": "build (windows-2022)",
+      "Conclusion": "failure",
+      "RunnerAssigned": false,
+      "ExecutedSteps": 0
+    },
+    {
+      "JobId": 115848980516,
+      "Name": "Windows rebuilt TagLib replacement proof",
+      "Conclusion": "failure",
+      "RunnerAssigned": false,
+      "ExecutedSteps": 0
+    }
+  ],
+  "LocalValidation": {
+    "LockedRelease": "passed",
+    "Warnings": 0,
+    "Errors": 0,
+    "CorePassed": 337,
+    "CliPassed": 78,
+    "CliWindowsSkipped": 15
+  },
+  "WindowsUiAndInstaller": "not-run",
+  "NewRelease": "not-published"
+}

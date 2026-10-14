@@ -1,5 +1,9 @@
 # Implementation checkpoint
 
+## GitHub Actions infrastructure block (2026-10-14)
+
+Playlist-only removal and album selection are implemented and locally verified: locked Release has zero warnings/errors, Core 337 and CLI 78 pass, 15 Windows-only CLI tests skip on Linux. The first PR run [38563135421](https://github.com/kurasis/MPswift/actions/runs/38563135421) never assigned a runner or executed a step: all build/proof checks report account payment/spending-limit restrictions. [Sanitized receipt](evidence/album-selection-ci-blocked.json) records this infrastructure failure separately from code/test failures. Windows WPF/native, packaged/installed EN/RU and installer checks have not run for this change; no new binary release is published. The owner must restore Actions availability in GitHub Billing & plans before the existing required gates can run. Folder-drop heading acceptance was also updated from the old decorative Border to the new focusable Button; this updated source still requires Windows acceptance. Existing published build 1.0.136-dev.1 remains unchanged.
+
 ## Playlist-only removal and album heading selection (2026-10-14)
 
 The owner's selected-file deletion request now removes only selected entries from the current playlist. The root action is explicitly localized as Remove selected from playlist; Delete and Ctrl+Delete share playlist removal. The private physical recycle route and its internal preview window are removed; the public low-level file-operation API and legacy resource keys remain compatible. Other playlists and physical audio/CUE documents stay intact, and existing source/queue preservation applies.
