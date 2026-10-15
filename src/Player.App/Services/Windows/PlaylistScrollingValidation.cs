@@ -32,7 +32,7 @@ internal static class PlaylistScrollingValidation
             var body = (Border)track.Thumb.Template.FindName("ThumbBody", track.Thumb);
             Check(VirtualizingPanel.GetScrollUnit(list) == ScrollUnit.Pixel && ScrollViewer.GetCanContentScroll(list) && VirtualizingPanel.GetIsVirtualizing(list), "Smooth scroll disabled recycling or pixel units.");
             Check(body.ActualWidth is >= 3 and <= 5 && track.Thumb.ActualWidth >= 8 && track.Thumb.ActualHeight >= 36,
-                "Thin painted scrollbar lost its larger drag target or minimum thumb length.");
+                $"Thin scrollbar bounds: paint={body.ActualWidth}, target={track.Thumb.ActualWidth}, length={track.Thumb.ActualHeight}, track={track.ActualWidth}x{track.ActualHeight}, bar={bar.ActualWidth}.");
             viewer.ScrollToTop(); await Idle(); list.ScrollAnimationOverride = true;
             list.ScrollWheelBy(240); Check(list.IsScrollAnimating, "Wheel input did not subscribe an animation.");
             list.ApplyScrollFrame(45); list.UpdateLayout(); var first = viewer.VerticalOffset;
