@@ -1,0 +1,371 @@
+{
+  "SourceCommit": "a349f08cead999f5436c2e17fcbf1cfb160a3003",
+  "ApplicationTree": "53ff21a3c8bbdf22afaf8394acbe7f97e6bd620a",
+  "TestTree": "768d69c1f2f4cc44a1fc48286e9d197fb282c5fc",
+  "ScriptTree": "176189e14de673ad6430417d2f5b4f0840a5ce1e",
+  "ToolTree": "2f3e2395b36fdecf36c2629d06ccd273e64e4c9f",
+  "PR": "https://github.com/kurasis/MPswift/pull/7",
+  "PRRun": "https://github.com/kurasis/MPswift/actions/runs/38720280423",
+  "MainRun": "https://github.com/kurasis/MPswift/actions/runs/38721938927",
+  "Attempt": 1,
+  "Conclusion": "success",
+  "ProductVersion": "1.0.148-dev.1",
+  "WindowsTests": {
+    "Core": {
+      "total": 406,
+      "passed": 406,
+      "failed": 0,
+      "notExecuted": 0
+    },
+    "CLI": {
+      "total": 93,
+      "passed": 93,
+      "failed": 0,
+      "notExecuted": 0
+    }
+  },
+  "ContinuationRegressionCases": {
+    "Count": 12,
+    "Method": "Core coordinator/order with controlled player events: natural album/playlist end, cursor reset, native transition adoption and in-flight identity, repeat/shuffle, queue/history, order updates, detached/manual stop, file versus output failures and standalone interface isolation",
+    "PhysicalEndpointContinuation": "not-run"
+  },
+  "Reports": [
+    {
+      "Report": "taglib-replacement-ui-en.json",
+      "Sha256": "b8a9cc02c2102c74c1953b6bc2e1aff7ff284d23e14f94c01f62f56e303f0ae0",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaylistScrolling": {
+        "Status": "playlist-scrolling-passed",
+        "Rows": 1000,
+        "Dataset": "Owned metadata occurrences over an existing native fixture; not 1000 physical files",
+        "PaintedThumbWidth": 4,
+        "DragTargetWidth": 17,
+        "MinimumThumbLength": true,
+        "PixelRecycling": true,
+        "IntermediateOffsets": [
+          139,
+          210
+        ],
+        "ControlledElapsedFramesMilliseconds": [
+          45,
+          90,
+          180
+        ],
+        "InterruptibleReverseAndKeyboard": true,
+        "ReducedMotionImmediate": true,
+        "HighResolutionWheelRoute": true,
+        "FullRangeAndBoundaries": true,
+        "ScrollIntoViewAndBoundedContainers": true,
+        "FilterAndHiddenCancel": true,
+        "NoIdleRenderSubscription": true,
+        "PlaybackAndQueuePreserved": true,
+        "PhysicalWheelTouchAndNarrator": "not-run"
+      },
+      "ExistingAcceptanceStatuses": {
+        "PlaybackEfficiency": "playback-efficiency-passed",
+        "PlaybackPerformance": "playback-performance-passed",
+        "PlaylistNavigation": "playlist-navigation-passed",
+        "AlbumSelection": "album-selection-passed",
+        "WindowShutdown": "window-shutdown-passed",
+        "UiAudit": "ui-audit-passed"
+      }
+    },
+    {
+      "Report": "taglib-replacement-ui-ru.json",
+      "Sha256": "6721c98174904e46d75677284ae12969ac2cb7d7b2ab246b2b7ec02b49ba97cd",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaylistScrolling": {
+        "Status": "playlist-scrolling-passed",
+        "Rows": 1000,
+        "Dataset": "Owned metadata occurrences over an existing native fixture; not 1000 physical files",
+        "PaintedThumbWidth": 4,
+        "DragTargetWidth": 17,
+        "MinimumThumbLength": true,
+        "PixelRecycling": true,
+        "IntermediateOffsets": [
+          139,
+          210
+        ],
+        "ControlledElapsedFramesMilliseconds": [
+          45,
+          90,
+          180
+        ],
+        "InterruptibleReverseAndKeyboard": true,
+        "ReducedMotionImmediate": true,
+        "HighResolutionWheelRoute": true,
+        "FullRangeAndBoundaries": true,
+        "ScrollIntoViewAndBoundedContainers": true,
+        "FilterAndHiddenCancel": true,
+        "NoIdleRenderSubscription": true,
+        "PlaybackAndQueuePreserved": true,
+        "PhysicalWheelTouchAndNarrator": "not-run"
+      },
+      "ExistingAcceptanceStatuses": {
+        "PlaybackEfficiency": "playback-efficiency-passed",
+        "PlaybackPerformance": "playback-performance-passed",
+        "PlaylistNavigation": "playlist-navigation-passed",
+        "AlbumSelection": "album-selection-passed",
+        "WindowShutdown": "window-shutdown-passed",
+        "UiAudit": "ui-audit-passed"
+      }
+    },
+    {
+      "Report": "ui-en.json",
+      "Sha256": "346a95b1cb3cf1c20f5e0abfd962d893b6cebb934f072ea118179841634cb688",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaylistScrolling": {
+        "Status": "playlist-scrolling-passed",
+        "Rows": 1000,
+        "Dataset": "Owned metadata occurrences over an existing native fixture; not 1000 physical files",
+        "PaintedThumbWidth": 4,
+        "DragTargetWidth": 17,
+        "MinimumThumbLength": true,
+        "PixelRecycling": true,
+        "IntermediateOffsets": [
+          139,
+          210
+        ],
+        "ControlledElapsedFramesMilliseconds": [
+          45,
+          90,
+          180
+        ],
+        "InterruptibleReverseAndKeyboard": true,
+        "ReducedMotionImmediate": true,
+        "HighResolutionWheelRoute": true,
+        "FullRangeAndBoundaries": true,
+        "ScrollIntoViewAndBoundedContainers": true,
+        "FilterAndHiddenCancel": true,
+        "NoIdleRenderSubscription": true,
+        "PlaybackAndQueuePreserved": true,
+        "PhysicalWheelTouchAndNarrator": "not-run"
+      },
+      "ExistingAcceptanceStatuses": {
+        "PlaybackEfficiency": "playback-efficiency-passed",
+        "PlaybackPerformance": "playback-performance-passed",
+        "PlaylistNavigation": "playlist-navigation-passed",
+        "AlbumSelection": "album-selection-passed",
+        "WindowShutdown": "window-shutdown-passed",
+        "UiAudit": "ui-audit-passed"
+      }
+    },
+    {
+      "Report": "ui-ru.json",
+      "Sha256": "9d2e4c7f5d82a7bbf595feaa3b95f59f776e59e760192b94243dbe8dfc433cb4",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaylistScrolling": {
+        "Status": "playlist-scrolling-passed",
+        "Rows": 1000,
+        "Dataset": "Owned metadata occurrences over an existing native fixture; not 1000 physical files",
+        "PaintedThumbWidth": 4,
+        "DragTargetWidth": 17,
+        "MinimumThumbLength": true,
+        "PixelRecycling": true,
+        "IntermediateOffsets": [
+          139,
+          210
+        ],
+        "ControlledElapsedFramesMilliseconds": [
+          45,
+          90,
+          180
+        ],
+        "InterruptibleReverseAndKeyboard": true,
+        "ReducedMotionImmediate": true,
+        "HighResolutionWheelRoute": true,
+        "FullRangeAndBoundaries": true,
+        "ScrollIntoViewAndBoundedContainers": true,
+        "FilterAndHiddenCancel": true,
+        "NoIdleRenderSubscription": true,
+        "PlaybackAndQueuePreserved": true,
+        "PhysicalWheelTouchAndNarrator": "not-run"
+      },
+      "ExistingAcceptanceStatuses": {
+        "PlaybackEfficiency": "playback-efficiency-passed",
+        "PlaybackPerformance": "playback-performance-passed",
+        "PlaylistNavigation": "playlist-navigation-passed",
+        "AlbumSelection": "album-selection-passed",
+        "WindowShutdown": "window-shutdown-passed",
+        "UiAudit": "ui-audit-passed"
+      }
+    },
+    {
+      "Report": "installed-ui-en.json",
+      "Sha256": "b357ca3dc55930a0584ed77ff5ff99810d2ce7ac88c08667b1c5cc695bef49f6",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaylistScrolling": {
+        "Status": "playlist-scrolling-passed",
+        "Rows": 1000,
+        "Dataset": "Owned metadata occurrences over an existing native fixture; not 1000 physical files",
+        "PaintedThumbWidth": 4,
+        "DragTargetWidth": 17,
+        "MinimumThumbLength": true,
+        "PixelRecycling": true,
+        "IntermediateOffsets": [
+          139,
+          210
+        ],
+        "ControlledElapsedFramesMilliseconds": [
+          45,
+          90,
+          180
+        ],
+        "InterruptibleReverseAndKeyboard": true,
+        "ReducedMotionImmediate": true,
+        "HighResolutionWheelRoute": true,
+        "FullRangeAndBoundaries": true,
+        "ScrollIntoViewAndBoundedContainers": true,
+        "FilterAndHiddenCancel": true,
+        "NoIdleRenderSubscription": true,
+        "PlaybackAndQueuePreserved": true,
+        "PhysicalWheelTouchAndNarrator": "not-run"
+      },
+      "ExistingAcceptanceStatuses": {
+        "PlaybackEfficiency": "playback-efficiency-passed",
+        "PlaybackPerformance": "playback-performance-passed",
+        "PlaylistNavigation": "playlist-navigation-passed",
+        "AlbumSelection": "album-selection-passed",
+        "WindowShutdown": "window-shutdown-passed",
+        "UiAudit": "ui-audit-passed"
+      }
+    },
+    {
+      "Report": "installed-ui-ru.json",
+      "Sha256": "ad984cf4bdded84cdf052d1eda0d31f9f564eb663b95274da754c32f31f8cb42",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaylistScrolling": {
+        "Status": "playlist-scrolling-passed",
+        "Rows": 1000,
+        "Dataset": "Owned metadata occurrences over an existing native fixture; not 1000 physical files",
+        "PaintedThumbWidth": 4,
+        "DragTargetWidth": 17,
+        "MinimumThumbLength": true,
+        "PixelRecycling": true,
+        "IntermediateOffsets": [
+          139,
+          210
+        ],
+        "ControlledElapsedFramesMilliseconds": [
+          45,
+          90,
+          180
+        ],
+        "InterruptibleReverseAndKeyboard": true,
+        "ReducedMotionImmediate": true,
+        "HighResolutionWheelRoute": true,
+        "FullRangeAndBoundaries": true,
+        "ScrollIntoViewAndBoundedContainers": true,
+        "FilterAndHiddenCancel": true,
+        "NoIdleRenderSubscription": true,
+        "PlaybackAndQueuePreserved": true,
+        "PhysicalWheelTouchAndNarrator": "not-run"
+      },
+      "ExistingAcceptanceStatuses": {
+        "PlaybackEfficiency": "playback-efficiency-passed",
+        "PlaybackPerformance": "playback-performance-passed",
+        "PlaylistNavigation": "playlist-navigation-passed",
+        "AlbumSelection": "album-selection-passed",
+        "WindowShutdown": "window-shutdown-passed",
+        "UiAudit": "ui-audit-passed"
+      }
+    },
+    {
+      "Report": "packaged-ui.json",
+      "Sha256": "fad1265e767441270063641a7c11ebb651929011cdba6c2d34c8d3d0f07fbdb5",
+      "Status": "ui-smoke-passed",
+      "BindingErrors": 0,
+      "PlaylistScrolling": {
+        "Status": "playlist-scrolling-passed",
+        "Rows": 1000,
+        "Dataset": "Owned metadata occurrences over an existing native fixture; not 1000 physical files",
+        "PaintedThumbWidth": 4,
+        "DragTargetWidth": 17,
+        "MinimumThumbLength": true,
+        "PixelRecycling": true,
+        "IntermediateOffsets": [
+          139,
+          210
+        ],
+        "ControlledElapsedFramesMilliseconds": [
+          45,
+          90,
+          180
+        ],
+        "InterruptibleReverseAndKeyboard": true,
+        "ReducedMotionImmediate": true,
+        "HighResolutionWheelRoute": true,
+        "FullRangeAndBoundaries": true,
+        "ScrollIntoViewAndBoundedContainers": true,
+        "FilterAndHiddenCancel": true,
+        "NoIdleRenderSubscription": true,
+        "PlaybackAndQueuePreserved": true,
+        "PhysicalWheelTouchAndNarrator": "not-run"
+      },
+      "ExistingAcceptanceStatuses": {
+        "PlaybackEfficiency": "playback-efficiency-passed",
+        "PlaybackPerformance": "playback-performance-passed",
+        "PlaylistNavigation": "playlist-navigation-passed",
+        "AlbumSelection": "album-selection-passed",
+        "WindowShutdown": "window-shutdown-passed",
+        "UiAudit": "ui-audit-passed"
+      }
+    }
+  ],
+  "Installer": {
+    "Status": "installer-lifecycle-passed",
+    "StandardUser": true,
+    "Phases": [
+      {
+        "Phase": "Install",
+        "Status": "standard-user-installer-phase-passed",
+        "Administrator": false,
+        "DataPreserved": true,
+        "PerUserRegistration": true,
+        "UnknownFilesPreserved": true
+      },
+      {
+        "Phase": "Upgrade",
+        "Status": "standard-user-installer-phase-passed",
+        "Administrator": false,
+        "DataPreserved": true,
+        "PerUserRegistration": true,
+        "UnknownFilesPreserved": true
+      },
+      {
+        "Phase": "Uninstall",
+        "Status": "standard-user-installer-phase-passed",
+        "Administrator": false,
+        "DataPreserved": true,
+        "PerUserRegistration": true,
+        "UnknownFilesPreserved": true
+      }
+    ],
+    "InstalledWpfIdentity": "Existing hosted desktop user; not the installer standard-user identity",
+    "PublisherSignature": "not-configured",
+    "CleanWindows11": "not-run"
+  },
+  "Portable": "packaged-executable-smoke-passed",
+  "Publication": {
+    "Release": "https://github.com/kurasis/MPswift/releases/tag/build-38721938927-attempt-1",
+    "DownloadedAssetsMatchPublishedChecksumsAndCI": [
+      {
+        "Name": "MPswift-1.0.148-dev.1-a349f08cead9-win-x64.zip",
+        "Sha256": "84e775e4cb81c60d63b35ca894ee3c33502a6b816f2c7b62df265bbec592f119",
+        "Url": "https://github.com/kurasis/MPswift/releases/download/build-38721938927-attempt-1/MPswift-1.0.148-dev.1-a349f08cead9-win-x64.zip"
+      },
+      {
+        "Name": "MPswift-1.0.148-dev.1-setup-win-x64.exe",
+        "Sha256": "77d3e82a3f84c6d34337373705c4c7630031192e76c85a6475974b5c0c933715",
+        "Url": "https://github.com/kurasis/MPswift/releases/download/build-38721938927-attempt-1/MPswift-1.0.148-dev.1-setup-win-x64.exe"
+      }
+    ]
+  },
+  "Limitations": "Controlled elapsed-frame WPF wheel/template/recycling checks and Core continuation regressions; physical wheel/touch latency, Narrator speech and cross-playlist playback on physical audio endpoints remain manual acceptance. Existing genuine native decode/installed/portable gates passed. Evidence-only commit changes no application, test, script or tool source."
+}
