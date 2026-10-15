@@ -186,9 +186,9 @@
             </Grid>
         </DockPanel>
         <Grid Grid.Row="5" Margin="16,4,16,0">
-            <ListBox x:Name="PlaylistList" ItemsSource="{Binding VisibleEntries}" SelectedItem="{Binding SelectedEntry}" SelectionMode="Extended"
+            <c:SmoothPlaylistListBox x:Name="PlaylistList" Style="{StaticResource {x:Type ListBox}}" ItemsSource="{Binding VisibleEntries}" SelectedItem="{Binding SelectedEntry}" SelectionMode="Extended"
                      Background="{DynamicResource BackgroundBrush}" Foreground="{DynamicResource TextPrimaryBrush}" BorderThickness="0"
-                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.ScrollUnit="Pixel"
                      MouseDoubleClick="OnTrackDoubleClick" PreviewMouseRightButtonDown="OnTrackRightButtonDown" ContextMenuOpening="OnTrackContextMenuOpening" PreviewMouseLeftButtonDown="OnRowDragStart" PreviewMouseMove="OnRowDragMove" DragLeave="OnAlbumDragLeave" HorizontalContentAlignment="Stretch" AutomationProperties.Name="{Binding SelectedPlaylist.Name}">
                 <ListBox.ContextMenu><ContextMenu /></ListBox.ContextMenu>
                 <ListBox.ItemContainerStyle>
@@ -227,7 +227,7 @@
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
-            </ListBox>
+            </c:SmoothPlaylistListBox>
             <TextBlock Text="{r:Loc EmptyPlaylist}" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="360" Margin="16" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
                 <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding HasEntries}" Value="False"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></TextBlock.Style>
             </TextBlock>

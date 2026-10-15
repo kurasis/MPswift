@@ -33,6 +33,11 @@ public sealed class PlaybackOrder
             foreach (var entry in Eligible().Where(e => !previous.Contains(e.Id) && e.Id != _cursor))
                 _remaining.Insert(_random.Next(_remaining.Count + 1), entry.Id);
     }
+    // A new playlist starts at its first eligible entry, retaining explicit queue and actual-playback history.
+    internal void ContinueWith(PlaylistEntry[] entries)
+    {
+        _cursor = null; _removed = 0; _source = []; _remaining.Clear(); SetSource(entries);
+    }
     public void Enqueue(IEnumerable<PlaylistEntry> entries, bool next)
     {
         var array = entries.Take(10001).Select(e => { var id = Guid.NewGuid(); return new QueueItem(id, e with { Id = id }, e.Id); }).ToArray();

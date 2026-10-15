@@ -63,7 +63,6 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     private long _seekRequest;
     private bool _pendingSeek;
     private PlaylistRowViewModel? _playingRow;
-    private Guid? _sourcePlaylistId;
     private Guid? _waveEntry;
     private long _waveGeneration;
     private long _libraryVersion;
@@ -99,7 +98,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     {
         State = Strings.Get("State" + Snapshot.State);
         OnPropertyChanged(nameof(PlayPauseLabel));
-        var source = Playlists.FirstOrDefault(p => p.Id == _sourcePlaylistId);
+        var source = Playlists.FirstOrDefault(p => p.Id == SourcePlaylistId);
         PlaybackSource = Snapshot.EntryId is null ? "" : source is null ? Strings.Get("DetachedSource") : string.Format(Strings.Culture, Strings.Get("PlaybackSource"), source.Name);
         var track = Snapshot.EntryId is { } id ? _knownRows.GetValueOrDefault(id)?.Entry.Track ?? _coordinator.ActiveEntry?.Track : null;
         if (track is null) Title = Strings.Get("NothingPlaying");
@@ -175,7 +174,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         };
     }
     public Task WaveformCompletion => _waveTask;
-    public Guid? SourcePlaylistId => _sourcePlaylistId;
+    public Guid? SourcePlaylistId => _coordinator.SourcePlaylistId;
 
     public PlayerViewModel(IAudioPlayer player, PlaybackCoordinator coordinator, IMediaImportService importer, IFileDialogService dialogs,
         Dispatcher dispatcher, IPlayerStore store, SettingsFile settings, IWaveformService waveforms)
@@ -202,8 +201,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         }
         _importer.RememberTracks(state.Playlists.SelectMany(p => p.Entries).Select(e => e.Track));
         SelectedPlaylist = Playlists.FirstOrDefault(p => p.Id == state.Session.SelectedPlaylistId) ?? Playlists[0];
-        _sourcePlaylistId = state.Session.SourcePlaylistId;
-        SyncSource();
+        SyncSource(state.Session.SourcePlaylistId, true);
         if (WindowSettings.RestoreSession && state.Session.Order is { } order) _coordinator.RestoreOrder(order);
         else { _coordinator.Repeat = WindowSettings.DefaultRepeat; _coordinator.Shuffle = WindowSettings.DefaultShuffle; }
         Repeat = _coordinator.Repeat; Shuffle = _coordinator.Shuffle; RefreshQueue();
@@ -239,16 +237,13 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     }
     private bool _batchRowChanges;
     private void RowChanged() { if (!_batchRowChanges) UpdateEntries(); }
-    private void SyncSource()
-    {
-        var source = Playlists.FirstOrDefault(p => p.Id == _sourcePlaylistId);
-        _coordinator.SetEntries(source?.Entries.Select(e => e.Entry) ?? []);
-    }
+    private void SyncSource(Guid? chosen = null, bool chooseSource = false) =>
+        _coordinator.SetPlaylistSources(Playlists.Select(tab => new PlaybackPlaylistSource(tab.Id, tab.Entries.Select(row => row.Entry).ToArray())).ToArray(), chosen, chooseSource);
     private void ChooseSource()
     {
-        if (_sourcePlaylistId is { } previous && previous != SelectedPlaylist.Id && Playlists.Any(tab => tab.Id == previous))
+        if (SourcePlaylistId is { } previous && previous != SelectedPlaylist.Id && Playlists.Any(tab => tab.Id == previous))
             WindowSettings = WindowSettings with { PreviousPlaylistId = previous };
-        _sourcePlaylistId = SelectedPlaylist.Id; SyncSource();
+        SyncSource(SelectedPlaylist.Id, true);
     }
 
     public async Task AddLibraryRootAsync(string path)
@@ -645,7 +640,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         if (!CanMovePlaylists || from < 0 || insertionIndex < 0 || insertionIndex > Playlists.Count) return false;
         var to = insertionIndex > from ? insertionIndex - 1 : insertionIndex;
         if (to == from) return false;
-        Playlists.Move(from, to); ScheduleSave(true);
+        Playlists.Move(from, to); SyncSource(); ScheduleSave(true);
         return true;
     }
     public void MoveEntries(IEnumerable<PlaylistRowViewModel> rows, int delta)
@@ -720,7 +715,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
             if (_elapsedSecond != second) { _elapsedSecond = second; Elapsed = FormatTime(snapshot.Position); }
             if (!SeekPreview && !_pendingSeek) SeekPosition = Math.Clamp(snapshot.Position.TotalSeconds, 0, DurationSeconds);
             Volume = snapshot.Volume * 100; Muted = snapshot.Muted;
-            var sourceTab = Playlists.FirstOrDefault(p => p.Id == _sourcePlaylistId);
+            var sourceTab = Playlists.FirstOrDefault(p => p.Id == SourcePlaylistId);
             if (_labelSnapshot is null || _labelSnapshot.EntryId != snapshot.EntryId || _labelSourceName != sourceTab?.Name || _labelCulture != culture)
                 PlaybackSource = snapshot.EntryId is null ? "" : sourceTab is null ? Strings.Get("DetachedSource") : string.Format(Strings.Culture, Strings.Get("PlaybackSource"), sourceTab.Name);
             if (snapshot.EntryId != _waveEntry && (snapshot.State == PlaybackState.Loading || snapshot.SourceFormat is null))
@@ -814,8 +809,11 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
             rows[i].Section = sectionIndex < sections.Count && sections[sectionIndex].StartIndex == i ? sections[sectionIndex++] : null;
         PlaylistStatus = string.Format(Strings.Culture, Strings.Get("PlaylistCount"), rows.Length, Entries.Count);
     }
-    private SessionState CaptureSession() => new(SelectedPlaylist.Id, _sourcePlaylistId, _coordinator.ActiveEntry,
-        _player.Snapshot.Position.Ticks, _coordinator.CaptureOrder());
+    private SessionState CaptureSession()
+    {
+        var source = _coordinator.CaptureSourceState();
+        return new(SelectedPlaylist.Id, source.SourceId, source.Active, _player.Snapshot.Position.Ticks, source.Order);
+    }
     private LibraryState Capture()
     { LibraryCaptures++; return new(Playlists.Select(p => p.Capture()).ToArray(), CaptureSession()); }
     private void ScheduleSave(bool libraryChanged)
