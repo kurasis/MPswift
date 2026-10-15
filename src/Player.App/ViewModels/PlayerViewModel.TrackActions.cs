@@ -7,7 +7,7 @@ public partial class PlayerViewModel
 {
     public string? ActiveSourcePath => _coordinator.ActiveEntry?.Track.Path;
     public bool CanPlayPreviousPlaylist => Playlists.Any(tab => tab.Id == WindowSettings.PreviousPlaylistId &&
-        tab.Id != _sourcePlaylistId && tab.Entries.Any(row => row.Enabled && row.Entry.Track.Available));
+        tab.Id != SourcePlaylistId && tab.Entries.Any(row => row.Enabled && row.Entry.Track.Available));
 
     public bool CopyEntriesToPlaylist(IEnumerable<PlaylistRowViewModel> selected, Guid targetId)
     {
@@ -56,7 +56,7 @@ public partial class PlayerViewModel
 
     public void PlaceAfterPlaying(IEnumerable<PlaylistRowViewModel> selected)
     {
-        if (!CanReorder || _sourcePlaylistId != SelectedPlaylist.Id || Snapshot.EntryId is not { } active) return;
+        if (!CanReorder || SourcePlaylistId != SelectedPlaylist.Id || Snapshot.EntryId is not { } active) return;
         var current = Entries.FirstOrDefault(row => row.Id == active);
         if (current is null) return;
         DropEntries(selected.Where(row => row.Id != active), Entries.IndexOf(current) + 1);

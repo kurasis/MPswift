@@ -1,7 +1,7 @@
 namespace Player.Core.Playback;
 
 /// <summary>Source order, snapshot queue, repeat/shuffle and actual-playback history; search is never a source.</summary>
-public sealed class PlaybackCoordinator : IAsyncDisposable
+public sealed partial class PlaybackCoordinator : IAsyncDisposable
 {
     private readonly IAudioPlayer _player;
     private readonly object _gate = new();
@@ -43,19 +43,22 @@ public sealed class PlaybackCoordinator : IAsyncDisposable
         {
             if (_disposed || _loading || !_preparationDirty || _player.Snapshot.State is not (PlaybackState.Playing or PlaybackState.Paused)) return;
             var next = _order.FirstCandidate(_cursor, true);
+            var nextSource = next is null ? FollowingSource() : null;
+            next ??= nextSource?.Entries.FirstOrDefault(entry => entry.Enabled && entry.Track.Available);
             _preparationDirty = false;
-            if (next == _preparedEntry) return;
-            _preparedEntry = next;
+            if (next == _preparedEntry && _preparedPlaylistId == nextSource?.Id) return;
+            _preparedEntry = next; _preparedPlaylistId = nextSource?.Id;
             _ = advanced.PrepareNextAsync(next is null ? null : new(next.Id, next.Track.Path, next.Track.Segment, next.Track.ReplayGain), _order.Repeat == RepeatMode.One && next?.Id == _cursor?.Id);
         }
     }
     public PlaylistEntry? ActiveEntry { get { lock (_gate) return _cursor; } }
-    public void SetEntries(IEnumerable<PlaylistEntry> entries)
+    public void SetEntries(IEnumerable<PlaylistEntry> entries) => SetSourceEntries(entries.ToArray(), true);
+    private void SetSourceEntries(PlaylistEntry[] array, bool standalone = false)
     {
-        var array = entries.ToArray();
         if (array.Select(e => e.Id).Distinct().Count() != array.Length) throw new ArgumentException("Entry IDs must be unique.");
         lock (_gate)
         {
+            if (standalone) { _playlistSources = []; _playlistSourceId = null; _preparedPlaylistId = null; }
             _entries = array;
             if (_cursor is { } active && array.FirstOrDefault(e => e.Id == active.Id) is { } updated) _cursor = updated;
             _order.SetSource(array);
@@ -160,7 +163,7 @@ public sealed class PlaybackCoordinator : IAsyncDisposable
         return success;
     }
 
-    private async Task<bool> AdvanceAsync(long intent, bool natural = false)
+    private async Task<bool> AdvanceAsync(long intent, bool natural = false, HashSet<Guid>? visited = null)
     {
         PlaylistEntry[] candidates;
         bool fromHistory;
@@ -178,7 +181,19 @@ public sealed class PlaybackCoordinator : IAsyncDisposable
             lock (_gate) if (_disposed || intent != _intent) return false;
             if (_player.Snapshot.Error?.Category is not (AudioErrorCategory.FileUnavailable or AudioErrorCategory.Decoder)) return false;
         }
-        lock (_gate) if (_disposed || intent != _intent) return false;
+        bool continued = false;
+        lock (_gate)
+        {
+            if (_disposed || intent != _intent) return false;
+            if (natural)
+            {
+                visited ??= [];
+                if (_playlistSourceId is { } current) visited.Add(current);
+                if (visited.Count < 100 && FollowingSource(visited) is { } following)
+                { BeginFollowingSource(following); _cursor = null; continued = true; }
+            }
+        }
+        if (continued) return await AdvanceAsync(intent, true, visited).ConfigureAwait(false);
         if (_player.Snapshot.Error is null) await _player.StopAsync().ConfigureAwait(false);
         return false;
     }
@@ -189,8 +204,10 @@ public sealed class PlaybackCoordinator : IAsyncDisposable
         {
             if (_disposed) return;
             if (snapshot.State == PlaybackState.Loading) { _preparedEntry = null; _preparationDirty = true; }
-            if (snapshot.Transitioned && _preparedEntry is { } transitioned)
+            if (snapshot.Transitioned && TransitionEntry(snapshot.EntryId) is { } transitioned)
             {
+                if (_playlistSources.FirstOrDefault(source => source.Entries.Any(entry => entry.Id == transitioned.Id)) is { } following && following.Id != _playlistSourceId)
+                    BeginFollowingSource(following);
                 _cursor = transitioned;
                 _order.Started(transitioned, _order.Queue.Any(q => q.Entry.Id == transitioned.Id));
                 _preparedEntry = null; Changed();

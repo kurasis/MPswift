@@ -110,6 +110,7 @@ public sealed class UiSmokeValidation : TraceListener
         var trackActions = await TrackActionsValidation.RunAsync(window, model, taggedFixture, output);
         var albumSelection = await AlbumSelectionValidation.RunAsync(window, model, taggedFixture, output);
         var playlistNavigation = await PlaylistNavigationValidation.RunAsync(window, model, taggedFixture, output);
+        var playlistScrolling = await PlaylistScrollingValidation.RunAsync(window, model, taggedFixture, output);
         var playbackPerformance = await PlaybackPerformanceValidation.RunAsync(window, model);
         var playbackEfficiency = await PlaybackEfficiencyValidation.RunAsync(window, taggedFixture, output);
         var desktopPanel = await DesktopPanelValidation.RunAsync(window, model, fixture, output);
@@ -199,6 +200,7 @@ public sealed class UiSmokeValidation : TraceListener
             TrackActions = trackActions,
             AlbumSelection = albumSelection,
             PlaylistNavigation = playlistNavigation,
+            PlaylistScrolling = playlistScrolling,
             PlaybackPerformance = playbackPerformance,
             PlaybackEfficiency = playbackEfficiency,
             DesktopPanel = desktopPanel,
