@@ -8,10 +8,13 @@ public sealed record PlaylistEntry(Guid Id, MediaTrack Track, bool Enabled = tru
 
 public static class PlaylistSearch
 {
+    // Runs for every row on each search keystroke: no per-row arrays, and the file name is only extracted when needed.
     public static bool Matches(MediaTrack track, string query)
     {
+        if (query.Length == 0) return true;
         query = query.Normalize(System.Text.NormalizationForm.FormC);
-        return new[] { track.Title, track.Artist, track.Album, Path.GetFileName(track.Path) }
-            .Any(value => value?.Normalize(System.Text.NormalizationForm.FormC).Contains(query, StringComparison.OrdinalIgnoreCase) == true);
+        return Contains(track.Title, query) || Contains(track.Artist, query) || Contains(track.Album, query) || Contains(Path.GetFileName(track.Path), query);
     }
+    private static bool Contains(string? value, string query) =>
+        value?.Normalize(System.Text.NormalizationForm.FormC).Contains(query, StringComparison.OrdinalIgnoreCase) == true;
 }

@@ -53,17 +53,35 @@ public sealed partial class SqlitePlayerStore
         var normalized = LibrarySearch.Normalize(query);
         return Queue(() =>
         {
-            var connection = Open(); long total; using (var count = Command(connection, null, "SELECT COUNT(*) FROM MediaIndex WHERE instr(Search,$query)>0")) { count.Parameters.AddWithValue("$query", normalized); total = (long)count.ExecuteScalar()!; }
-            using var command = Command(connection, null, "SELECT Json,Available FROM MediaIndex WHERE instr(Search,$query)>0 ORDER BY Path LIMIT $limit OFFSET $offset"); Set(command, ("$query", normalized), ("$limit", limit), ("$offset", offset));
-            using var reader = command.ExecuteReader(); var records = new List<IndexedFile>();
-            while (reader.Read()) { var file = ReadIndex(reader.GetString(0)); records.Add(file with { Available = reader.GetBoolean(1), Track = file.Track with { Available = reader.GetBoolean(1) } }); }
-            return new LibraryPage(records.ToArray(), total, offset);
+            // One scan returns the page and the match count; only a page past the end needs a separate count.
+            var connection = Open(); long? total = null;
+            using (var command = Command(connection, null, "SELECT Json,Available,COUNT(*) OVER() FROM MediaIndex WHERE instr(Search,$query)>0 ORDER BY Path LIMIT $limit OFFSET $offset"))
+            {
+                Set(command, ("$query", normalized), ("$limit", limit), ("$offset", offset));
+                using var reader = command.ExecuteReader(); var records = new List<IndexedFile>();
+                while (reader.Read()) { total ??= reader.GetInt64(2); var file = ReadIndex(reader.GetString(0)); records.Add(file with { Available = reader.GetBoolean(1), Track = file.Track with { Available = reader.GetBoolean(1) } }); }
+                if (total is { } matched) return new LibraryPage(records.ToArray(), matched, offset);
+            }
+            using var count = Command(connection, null, "SELECT COUNT(*) FROM MediaIndex WHERE instr(Search,$query)>0"); count.Parameters.AddWithValue("$query", normalized);
+            return new LibraryPage([], (long)count.ExecuteScalar()!, offset);
         });
     }
     public Task<TrackStatistics[]> GetStatisticsAsync(Guid[] tracks)
     {
         if (tracks.Length > 10000) throw new ArgumentException("Track limit exceeded.");
-        return Queue(() => { var records = new List<TrackStatistics>(); foreach (var id in tracks.Distinct()) { using var command = Command(Open(), null, "SELECT Rating,PlayCount,LastPlayed FROM TrackStatistics WHERE TrackId=$id"); command.Parameters.AddWithValue("$id", id.ToString()); using var reader = command.ExecuteReader(); if (reader.Read()) records.Add(new(id, reader.GetInt32(0), reader.GetInt64(1), reader.IsDBNull(2) ? null : reader.GetInt64(2))); } return records.ToArray(); });
+        return Queue(() =>
+        {
+            var found = new Dictionary<Guid, TrackStatistics>();
+            var ids = tracks.Distinct().ToArray();
+            foreach (var batch in ids.Chunk(500))
+            {
+                using var command = Command(Open(), null, "SELECT TrackId,Rating,PlayCount,LastPlayed FROM TrackStatistics WHERE TrackId IN (" + string.Join(',', batch.Select((_, i) => "$id" + i)) + ")");
+                for (var i = 0; i < batch.Length; i++) command.Parameters.AddWithValue("$id" + i, batch[i].ToString());
+                using var reader = command.ExecuteReader();
+                while (reader.Read()) { var id = Guid.Parse(reader.GetString(0)); found[id] = new(id, reader.GetInt32(1), reader.GetInt64(2), reader.IsDBNull(3) ? null : reader.GetInt64(3)); }
+            }
+            return ids.Where(found.ContainsKey).Select(id => found[id]).ToArray();
+        });
     }
     public Task SetRatingAsync(Guid track, int rating)
     {
@@ -89,6 +107,7 @@ public sealed partial class SqlitePlayerStore
         path = Player.Core.Media.LocalMediaPath.Parse(path).Value;
         return Queue(() =>
         {
+            _saved = null; // Track JSON changes outside the playlist save; the next save rewrites everything.
             var connection = Open(); using var transaction = connection.BeginTransaction();
             using var read = Command(connection, transaction, "SELECT Json FROM Tracks WHERE Id=$id"); read.Parameters.AddWithValue("$id", trackId.ToString());
             if (read.ExecuteScalar() is string json) { var track = JsonSerializer.Deserialize<MediaTrack>(json)! with { Path = path, Available = true }; using var update = Command(connection, transaction, "UPDATE Tracks SET Json=$json WHERE Id=$id"); Set(update, ("$json", JsonSerializer.Serialize(track)), ("$id", trackId.ToString())); update.ExecuteNonQuery(); }

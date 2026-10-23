@@ -85,4 +85,44 @@ public sealed class AlbumSectionsTests
         Assert.False(reopened.ShowAlbumSections);
         Assert.Equal("ru", reopened.Language);
     }
+
+    [Fact]
+    public void AllocationFreeHeadingsMatchTheNormalizedStringDefinition()
+    {
+        // Reference: the original definition normalizes separators, then compares folder and trimmed album ignoring case.
+        static (string Folder, string Album) Key(MediaTrack track)
+        {
+            var path = track.Path.Replace('\\', '/'); var slash = path.LastIndexOf('/');
+            return (slash >= 0 ? path[..slash] : "", track.Album?.Trim() ?? "");
+        }
+        var random = new Random(11);
+        string[] folders = [@"C:\Music\A", "C:/Music/A", @"c:\music\a", @"C:\Music\Ä", @"C:\Music/ä", @"C:\Music\AB", "", @"D:\x"];
+        string?[] albums = ["One", " one ", "ONE", "Two", null, "", "ä", "Ä"];
+        for (var attempt = 0; attempt < 300; attempt++)
+        {
+            var tracks = Enumerable.Range(0, random.Next(1, 40)).Select(i =>
+            {
+                var folder = folders[random.Next(folders.Length)];
+                return new MediaTrack(Guid.NewGuid(), (folder.Length > 0 ? folder + "\\" : "") + i + ".flac", "T", Album: albums[random.Next(albums.Length)]);
+            }).ToArray();
+            var expected = new List<AlbumSection>();
+            for (var i = 0; i < tracks.Length; i++)
+            {
+                var (folder, album) = Key(tracks[i]);
+                var start = expected.Count == 0 ? null : tracks[expected[^1].StartIndex];
+                if (start is null || !string.Equals(folder, Key(start).Folder, StringComparison.OrdinalIgnoreCase) || !string.Equals(album, Key(start).Album, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (expected.Count > 0) expected[^1] = expected[^1] with { Count = i - expected[^1].StartIndex };
+                    expected.Add(new(i, 0, album.Length > 0 ? album : folder[(folder.LastIndexOf('/') + 1)..], folder));
+                }
+            }
+            expected[^1] = expected[^1] with { Count = tracks.Length - expected[^1].StartIndex };
+            Assert.Equal(expected, AlbumSections.Create(tracks));
+            for (var i = 1; i < tracks.Length; i++)
+                Assert.Equal(string.Equals(Key(tracks[i]).Folder, Key(tracks[0]).Folder, StringComparison.OrdinalIgnoreCase) && string.Equals(Key(tracks[i]).Album, Key(tracks[0]).Album, StringComparison.OrdinalIgnoreCase),
+                    AlbumSections.IsSameAlbum(tracks[0], tracks[i]));
+        }
+        Assert.True(PlaylistSearch.Matches(new(Guid.NewGuid(), @"C:\Music\Café.flac", "Title"), ""));
+        Assert.True(PlaylistSearch.Matches(new(Guid.NewGuid(), "C:\\Music\\Cafe\u0301.flac", "Title"), "café"));
+    }
 }

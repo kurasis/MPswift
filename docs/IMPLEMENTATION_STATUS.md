@@ -1,5 +1,9 @@
 # Implementation checkpoint
 
+## Responsiveness audit fixes (2026-10-23)
+
+Implemented every confirmed finding of the owner-requested static audit of source `9b3cf7e`: validation/serialization and incremental playlist/track writes on the database thread, no view Reset without an active search, coalesced import updates, bulk reorder/removal, linear metadata/rating/selection paths, disk probes and CUE waveform slicing off the dispatcher, resize-stable waveform drawing, per-frame scrolling, single-query library search pages, a stamped bounded import cache, a locked statistics chain and location validation before existence probes. [Design and scope](RESPONSIVENESS_AUDIT_FIXES.md). Local locked Release builds with zero warnings/errors; Core 414 and CLI 78 pass with 15 genuine Windows-only skips. Windows WPF/native/packaged/installer acceptance is pending the pull-request CI run and is not claimed here.
+
 ## Observed continuous-playlist and scrolling acceptance (2026-10-15)
 
 [PR #7](https://github.com/kurasis/MPswift/pull/7) passed the corrected [PR run 38720280423](https://github.com/kurasis/MPswift/actions/runs/38720280423) before merge. Main source `a349f08cead999f5436c2e17fcbf1cfb160a3003` independently passed all build/proof/publication jobs in [run 38721938927](https://github.com/kurasis/MPswift/actions/runs/38721938927). [Sanitized evidence](evidence/continuous-playlists-scrolling-windows.json) retains seven actual ordinary/rebuilt/extracted/installed EN/RU WPF reports with zero binding errors and passing new and previous gates. Windows Core 406 (including twelve continuation regressions) and CLI 93 pass; native decode, Unicode-path portable startup and genuine standard-user installation/upgrade/uninstall also pass. Installed WPF ran under the existing hosted desktop user, separately from the installer standard-user identity.

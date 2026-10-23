@@ -62,6 +62,12 @@ public sealed class AppIcon : Control
     {
         base.OnRender(drawingContext);
         var filled = Kind is AppIconKind.Play or AppIconKind.Pause or AppIconKind.Stop or AppIconKind.Previous or AppIconKind.Next or AppIconKind.More;
-        drawingContext.DrawGeometry(filled ? Foreground : null, filled ? null : new Pen(Foreground, 1.5) { StartLineCap = PenLineCap.Round, EndLineCap = PenLineCap.Round, LineJoin = PenLineJoin.Round }, Shapes[Kind]);
+        if (!filled && (_pen is null || !ReferenceEquals(_pen.Brush, Foreground)))
+        {
+            _pen = new Pen(Foreground, 1.5) { StartLineCap = PenLineCap.Round, EndLineCap = PenLineCap.Round, LineJoin = PenLineJoin.Round };
+            if (_pen.CanFreeze) _pen.Freeze();
+        }
+        drawingContext.DrawGeometry(filled ? Foreground : null, filled ? null : _pen, Shapes[Kind]);
     }
+    private Pen? _pen;
 }

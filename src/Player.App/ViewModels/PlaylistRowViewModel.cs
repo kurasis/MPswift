@@ -8,7 +8,11 @@ public partial class PlaylistRowViewModel : ObservableObject
 {
     private PlaylistEntry entry;
     public PlaylistRowViewModel(PlaylistEntry value) { entry = value; _enabled = value.Enabled; }
-    public void UpdateTrack(MediaTrack track) { entry = entry with { Track = track }; OnPropertyChanged(nameof(Entry)); OnPropertyChanged(nameof(Title)); OnPropertyChanged(nameof(Path)); OnPropertyChanged(nameof(Metadata)); OnPropertyChanged(nameof(Duration)); OnPropertyChanged(nameof(Availability)); }
+    public void UpdateTrack(MediaTrack track)
+    {
+        if (track == entry.Track) return;
+        entry = entry with { Track = track }; OnPropertyChanged(nameof(Entry)); OnPropertyChanged(nameof(Title)); OnPropertyChanged(nameof(Path)); OnPropertyChanged(nameof(Metadata)); OnPropertyChanged(nameof(Duration)); OnPropertyChanged(nameof(Availability));
+    }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasSection), nameof(SectionTitle), nameof(SectionInfo), nameof(SectionFolder), nameof(SelectAlbumLabel))]
@@ -21,7 +25,8 @@ public partial class PlaylistRowViewModel : ObservableObject
         ? string.Format(Strings.Culture, Strings.AlbumSectionCount, section.Count) + " · " + string.Join(" / ", section.Folder.Split('/').TakeLast(2)) : "";
 
     public static int[] RatingOptions { get; } = [0, 1, 2, 3, 4, 5];
-    public PlaylistEntry Entry => entry with { Enabled = Enabled };
+    // Kept in sync with Enabled so reading it (every source sync, capture and filter pass) allocates nothing.
+    public PlaylistEntry Entry => entry;
     public Guid Id => entry.Id;
     public string Title => entry.Track.Title;
     public string Path => entry.Track.Path;
@@ -35,5 +40,5 @@ public partial class PlaylistRowViewModel : ObservableObject
     partial void OnRatingChanged(int value) => RatingChanged?.Invoke(this);
     [ObservableProperty] private bool _isPlaying;
     public event Action? EligibilityChanged;
-    partial void OnEnabledChanged(bool value) => EligibilityChanged?.Invoke();
+    partial void OnEnabledChanged(bool value) { entry = entry with { Enabled = value }; EligibilityChanged?.Invoke(); }
 }

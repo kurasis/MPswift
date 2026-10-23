@@ -5,9 +5,10 @@ public readonly record struct WaveformColumn(float Minimum, float Maximum, float
 /// <summary>Time-weighted energy, not the loudest transient, determines the solid envelope.</summary>
 public static class WaveformProjection
 {
-    public static WaveformColumn[] Create(WaveformData data, int requestedColumns)
+    /// <param name="validate">False only when the caller already validated this unchanged instance.</param>
+    public static WaveformColumn[] Create(WaveformData data, int requestedColumns, bool validate = true)
     {
-        data.Validate();
+        if (validate) data.Validate();
         var count = Math.Clamp(requestedColumns, 1, Math.Min(4096, data.Minimum.Length));
         var columns = new WaveformColumn[count];
         for (var column = 0; column < count; column++)
