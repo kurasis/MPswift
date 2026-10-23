@@ -26,18 +26,35 @@ public sealed class RatingStars : Control
         var geometry = Geometry.Parse("M9,1 L11.4,6.2 17,6.9 12.9,10.8 14,16.5 9,13.7 4,16.5 5.1,10.8 1,6.9 6.6,6.2 Z");
         geometry.Freeze(); return geometry;
     }
+    // Rows are recycled and re-rendered while scrolling; reuse pens and offsets until the brush or height changes.
+    private Pen? _filledPen, _outlinePen, _focusPen;
+    private TranslateTransform[]? _offsets;
+    private double _offsetHeight = double.NaN;
     protected override void OnRender(DrawingContext context)
     {
         base.OnRender(context);
         context.DrawRectangle(Brushes.Transparent, null, new Rect(RenderSize));
         var outline = (Brush)FindResource("TextSecondaryBrush");
+        var filled = CachedPen(ref _filledPen, Foreground, 1.2); var empty = CachedPen(ref _outlinePen, outline, 1.2);
+        if (_offsets is null || _offsetHeight != ActualHeight)
+        {
+            _offsetHeight = ActualHeight;
+            _offsets = Enumerable.Range(0, 5).Select(index => { var offset = new TranslateTransform(index * 22 + 2, (ActualHeight - 18) / 2); offset.Freeze(); return offset; }).ToArray();
+        }
         for (var index = 0; index < 5; index++)
         {
-            context.PushTransform(new TranslateTransform(index * 22 + 2, (ActualHeight - 18) / 2));
-            context.DrawGeometry(index < Rating ? Foreground : null, new Pen(index < Rating ? Foreground : outline, 1.2), Star);
+            context.PushTransform(_offsets[index]);
+            context.DrawGeometry(index < Rating ? Foreground : null, index < Rating ? filled : empty, Star);
             context.Pop();
         }
-        if (IsKeyboardFocused) context.DrawRoundedRectangle(null, new Pen(outline, 1), new Rect(0.5, 0.5, ActualWidth - 1, ActualHeight - 1), 4, 4);
+        if (IsKeyboardFocused) context.DrawRoundedRectangle(null, CachedPen(ref _focusPen, outline, 1), new Rect(0.5, 0.5, ActualWidth - 1, ActualHeight - 1), 4, 4);
+    }
+    internal static Pen CachedPen(ref Pen? pen, Brush brush, double thickness)
+    {
+        if (pen is not null && ReferenceEquals(pen.Brush, brush)) return pen;
+        pen = new Pen(brush, thickness);
+        if (pen.CanFreeze) pen.Freeze();
+        return pen;
     }
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
     {

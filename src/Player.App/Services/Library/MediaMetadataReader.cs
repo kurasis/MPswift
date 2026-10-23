@@ -10,6 +10,7 @@ public static class MediaMetadataReader
     { ".mp3", ".wav", ".aif", ".aiff", ".flac", ".ogg", ".opus", ".m4a", ".aac", ".alac", ".m4b", ".wma", ".ape", ".wv", ".mpc", ".tta", ".dsf", ".dff" };
     public static MediaTrack Read(string path, Guid id, Action<string> diagnostic)
     {
+        LocalFileAccess.ValidateFileLocation(path);
         var available = File.Exists(path);
         var track = new MediaTrack(id, path, Path.GetFileNameWithoutExtension(path), FormatHint: Path.GetExtension(path).TrimStart('.').ToUpperInvariant(), Available: available);
         if (!available) return track;

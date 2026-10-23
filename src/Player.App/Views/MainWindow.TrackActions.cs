@@ -38,12 +38,19 @@ public partial class MainWindow
         PlaylistList.ContextMenu = CreateTrackContextMenu(focus);
         _trackContextRow = null;
     }
+    /// <summary>Selected rows in playlist order; a set lookup keeps Ctrl+A on large playlists linear.</summary>
+    internal PlaylistRowViewModel[] SelectedRowsInOrder()
+    {
+        if (PlaylistList.SelectedItems.Count == 0) return [];
+        var selected = PlaylistList.SelectedItems.Cast<PlaylistRowViewModel>().ToHashSet();
+        return Model.Entries.Where(selected.Contains).ToArray();
+    }
     internal ContextMenu CreateTrackContextMenu(PlaylistRowViewModel focus)
     {
-        var rows = Model.Entries.Where(row => PlaylistList.SelectedItems.Contains(row)).ToArray();
+        var rows = SelectedRowsInOrder();
         if (!rows.Contains(focus)) rows = [focus];
         var sourceId = Model.SelectedPlaylist.Id;
-        bool Current() => Model.SelectedPlaylist.Id == sourceId && rows.All(row => Model.Entries.Contains(row));
+        bool Current() { var entries = Model.Entries.ToHashSet(); return Model.SelectedPlaylist.Id == sourceId && rows.All(entries.Contains); }
         var menu = new ContextMenu { Tag = "TrackMenu", MaxHeight = Math.Max(260, Math.Min(660, SystemParameters.WorkArea.Height - 40)) };
         MenuItem Item(string key, string action, Func<Task>? callback = null, AppIconKind? icon = null, string? shortcut = null)
         {
@@ -77,7 +84,7 @@ public partial class MainWindow
         Add(Item("ShowFile", "Location", () => Done(() => System.Diagnostics.Process.Start(CreateShowFileStartInfo(focus.Path))), AppIconKind.Folder, "Alt+O"));
         var previous = Item("PlayPreviousPlaylist", "PreviousPlaylist", Model.PlayPreviousPlaylistAsync, AppIconKind.Previous);
         previous.IsEnabled = Model.CanPlayPreviousPlaylist; Add(previous);
-        Add(Item("CopySelectedFiles", "CopyFiles", () => Done(() => CopyFilesToClipboard(rows)), AppIconKind.Copy));
+        Add(Item("CopySelectedFiles", "CopyFiles", () => CopyFilesToClipboardAsync(rows), AppIconKind.Copy));
         Separator();
         var rating = Item("Rating", "Rating", icon: AppIconKind.Favorite);
         foreach (var value in Enumerable.Range(0, 6))
@@ -131,15 +138,18 @@ public partial class MainWindow
     }
     internal void OpenFileInformation(PlaylistRowViewModel row)
     {
-        var rows = Model.Entries.Where(entry => PlaylistList.SelectedItems.Contains(entry)).ToArray();
+        var rows = SelectedRowsInOrder();
         if (rows.Length <= 1) rows = Model.VisibleEntries.Cast<PlaylistRowViewModel>().ToArray();
         if (!rows.Contains(row)) rows = [row];
         InformationWindow = new FileInformationWindow(this, rows, row.Id); InformationWindow.Show();
     }
-    private static void CopyFilesToClipboard(IEnumerable<PlaylistRowViewModel> rows)
+    private static async Task CopyFilesToClipboardAsync(IEnumerable<PlaylistRowViewModel> rows)
     {
+        var sources = rows.Select(row => row.Path).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+        // Validation probes every ancestor directory and link of each file; keep it off the dispatcher.
+        var validated = await Task.Run(() => sources.Select(Services.Audio.BassSmokeSession.ValidateSourcePath).ToArray());
         var paths = new StringCollection();
-        foreach (var path in rows.Select(row => row.Path).Distinct(StringComparer.OrdinalIgnoreCase)) paths.Add(Services.Audio.BassSmokeSession.ValidateSourcePath(path));
+        paths.AddRange(validated);
         Clipboard.SetFileDropList(paths);
     }
     private async Task CopyFilesToFolderAsync(PlaylistRowViewModel[] rows)
@@ -163,7 +173,8 @@ public partial class MainWindow
         try
         {
             Services.Storage.DataFileLease.Check(output.SafeFileHandle);
-            await output.WriteAsync(System.Text.Encoding.UTF8.GetBytes(text), _trackActionsCancellation.Token); output.Flush(true); completed = true;
+            await output.WriteAsync(System.Text.Encoding.UTF8.GetBytes(text), _trackActionsCancellation.Token);
+            await Task.Run(() => output.Flush(true)); completed = true;
         }
         finally
         {

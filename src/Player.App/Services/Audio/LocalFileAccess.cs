@@ -26,6 +26,17 @@ public static class LocalFileAccess
             ValidateParents(new FileInfo(path).Directory, new HashSet<string>(StringComparer.OrdinalIgnoreCase), 0);
         }
     }
+    /// <summary>
+    /// Path, drive and existing-ancestor checks for a file that may not exist. Run before any existence probe of an
+    /// untrusted path (playlist, CUE) so network drives and redirecting directory links are rejected without touching them.
+    /// </summary>
+    public static string ValidateFileLocation(string input)
+    {
+        var path = LocalMediaPath.Parse(input).Value;
+        ValidateDrive(path);
+        ValidateExistingParents(new FileInfo(path).Directory, new HashSet<string>(StringComparer.OrdinalIgnoreCase), 0);
+        return path;
+    }
     public static void ValidateDirectory(string input)
     {
         ValidateDrive(input.TrimEnd('\\') + "\\local-validation");
@@ -35,6 +46,24 @@ public static class LocalFileAccess
     {
         LocalMediaPath.Parse(path);
         if (new DriveInfo(Path.GetPathRoot(path)!).DriveType == DriveType.Network) throw new IOException("Mapped network drives are unsupported.");
+    }
+    // Like ValidateParents, but a missing directory ends the walk: nothing below it can exist.
+    private static bool ValidateExistingParents(DirectoryInfo? directory, HashSet<string> links, int depth)
+    {
+        if (directory is null) return true;
+        if (++depth > 256) throw new IOException("Directory/reparse traversal limit reached.");
+        if (!ValidateExistingParents(directory.Parent, links, depth)) return false;
+        var attributes = directory.Attributes;
+        if ((int)attributes == -1) return false;
+        if ((attributes & (FileAttributes.Offline | RecallAttributes)) != 0) throw new IOException("The directory is unavailable offline.");
+        if ((attributes & FileAttributes.ReparsePoint) != 0)
+        {
+            if (!links.Add(directory.FullName)) throw new IOException("Reparse loop detected.");
+            var target = directory.ResolveLinkTarget(false) ?? throw new IOException("Unresolved directory reparse point.");
+            ValidateDrive(target.FullName.TrimEnd('\\') + "\\local-validation");
+            ValidateParents(new DirectoryInfo(target.FullName), links, depth);
+        }
+        return true;
     }
     private static void ValidateParents(DirectoryInfo? directory, HashSet<string> links, int depth)
     {

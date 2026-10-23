@@ -1,5 +1,4 @@
 using System.IO;
-using System.Collections.Concurrent;
 using System.Text;
 using Player.App.Services.Audio;
 using Player.Core.Media;
@@ -18,14 +17,15 @@ public interface IMediaImportService
 /// <summary>One cancellable background worker, bounded entries/errors, read-only metadata.</summary>
 public sealed class MediaImportService : IMediaImportService
 {
-    private readonly ConcurrentDictionary<string, MediaTrack> _tracks = new(StringComparer.OrdinalIgnoreCase);
+    private readonly TrackCache _tracks = new();
     private static readonly HashSet<string> Extensions = new(StringComparer.OrdinalIgnoreCase)
         { ".mp3", ".wav", ".aif", ".aiff", ".flac", ".ogg", ".opus", ".m4a", ".aac", ".alac", ".cue", ".m3u", ".m3u8", ".pls", ".m4b", ".wma", ".ape", ".wv", ".mpc", ".tta", ".dsf", ".dff" };
     private const int MaximumEntries = 10000;
 
     public void RememberTracks(IEnumerable<MediaTrack> tracks)
     {
-        foreach (var track in tracks.Take(MaximumEntries)) _tracks[Identity(track)] = track;
+        // Saved playlists carry no file stamp, so the next import of such a file re-reads its tags under the same ID.
+        foreach (var track in tracks.Take(MaximumEntries)) _tracks.Remember(Identity(track), track, null);
     }
 
     public Task<ImportSummary> ImportAsync(IEnumerable<string> paths, IProgress<ImportProgress> progress, CancellationToken token, int maximumItems = MaximumEntries, Encoding? fallbackEncoding = null) =>
@@ -49,7 +49,7 @@ public sealed class MediaImportService : IMediaImportService
             var discovery = new CueAlbumDiscovery(Error, token, fallbackEncoding);
             string? FindCue(string path)
             {
-                try { return File.Exists(path) ? discovery.Find(path) : null; }
+                try { LocalFileAccess.ValidateFileLocation(path); return File.Exists(path) ? discovery.Find(path) : null; }
                 catch (Exception error) when (error is IOException or InvalidDataException or ArgumentException or UnauthorizedAccessException)
                 { Error("Companion CUE: " + error.Message); return null; }
             }
@@ -72,24 +72,26 @@ public sealed class MediaImportService : IMediaImportService
                         foreach (var song in sheet.Songs)
                         {
                             if (processed >= maximumItems) { limit = true; break; }
+                            LocalFileAccess.ValidateFileLocation(song.Path);
                             var exists = File.Exists(song.Path);
                             if (exists) BassSmokeSession.ValidateSourcePath(song.Path); else Error("Missing CUE source: " + song.Path);
                             var segment = new TrackSegment(TrackSegment.FromCueFrames(song.StartFrame), song.EndFrame is { } end ? TrackSegment.FromCueFrames(end) : null);
                             var durationHint = segment.Duration ?? (imageDuration is { } full ? full - segment.Start : (TimeSpan?)null);
                             var cue = new MediaTrack(CueSheet.TrackId(path, song), song.Path, song.Title, song.Performer, song.Album, durationHint, "CUE", exists, segment, path, song.Number);
-                            _tracks[Identity(cue)] = cue; batch.Add(new(Guid.NewGuid(), cue, AddedUtcTicks: DateTime.UtcNow.Ticks)); processed++; if (batch.Count == 32) Flush();
+                            _tracks.Remember(Identity(cue), cue, null); batch.Add(new(Guid.NewGuid(), cue, AddedUtcTicks: DateTime.UtcNow.Ticks)); processed++; if (batch.Count == 32) Flush();
                         }
                         continue;
                     }
+                    // Reject network drives and redirecting links before an untrusted path is probed.
+                    LocalFileAccess.ValidateFileLocation(path);
                     var available = File.Exists(path);
-                    if (available) BassSmokeSession.ValidateSourcePath(path);
+                    FileStamp? stamp = null;
+                    if (available) stamp = FileStamp.Read(BassSmokeSession.ValidateSourcePath(path));
                     else Error("File unavailable: " + path);
-                    if (!_tracks.TryGetValue(path, out var track))
-                    {
-                        track = MediaMetadataReader.Read(path, Guid.NewGuid(), Error);
-                        if (_tracks.Count >= MaximumEntries) _tracks.TryRemove(_tracks.Keys.First(), out _);
-                        track = _tracks.GetOrAdd(path, track);
-                    }
+                    var known = _tracks.Find(path);
+                    // Tags edited since the file was last read are re-read; logical identity (ratings, duplicates) is kept.
+                    var track = known is { } cached && (!available || cached.Stamp == stamp) ? cached.Track :
+                        _tracks.Refresh(path, MediaMetadataReader.Read(path, known?.Track.Id ?? Guid.NewGuid(), Error), stamp);
                     track = track with { Available = available };
                     // Duplicate tracks share logical identity, but every playlist occurrence has its own entry ID.
                     batch.Add(new PlaylistEntry(Guid.NewGuid(), track, AddedUtcTicks: DateTime.UtcNow.Ticks));
@@ -127,6 +129,41 @@ public sealed class MediaImportService : IMediaImportService
             }
             catch (Exception e) when (e is IOException or ArgumentException or DecoderFallbackException) { error("Playlist import: " + e.Message + "; choose an explicit legacy encoding for non-Unicode files."); }
             if (document is not null) foreach (var path in document.Paths) yield return path;
+        }
+    }
+    private readonly record struct FileStamp(long Length, long LastWriteUtcTicks)
+    {
+        public static FileStamp Read(string path) { var file = new FileInfo(path); return new(file.Length, file.LastWriteTimeUtc.Ticks); }
+    }
+    /// <summary>Bounded first-in-first-out track cache shared by concurrent imports.</summary>
+    private sealed class TrackCache
+    {
+        private readonly object _gate = new();
+        private readonly Dictionary<string, (MediaTrack Track, FileStamp? Stamp)> _tracks = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Queue<string> _order = new();
+        public (MediaTrack Track, FileStamp? Stamp)? Find(string key) { lock (_gate) return _tracks.TryGetValue(key, out var value) ? value : null; }
+        public void Remember(string key, MediaTrack track, FileStamp? stamp) { lock (_gate) Store(key, track, stamp); }
+        /// <summary>Stores freshly read metadata unless a concurrent import already stored the same file version.</summary>
+        public MediaTrack Refresh(string key, MediaTrack track, FileStamp? stamp)
+        {
+            lock (_gate)
+            {
+                if (_tracks.TryGetValue(key, out var existing))
+                {
+                    if (stamp is not null && existing.Stamp == stamp) return existing.Track;
+                    track = track with { Id = existing.Track.Id };
+                }
+                Store(key, track, stamp); return track;
+            }
+        }
+        private void Store(string key, MediaTrack track, FileStamp? stamp)
+        {
+            if (!_tracks.ContainsKey(key))
+            {
+                while (_tracks.Count >= MaximumEntries) _tracks.Remove(_order.Dequeue());
+                _order.Enqueue(key);
+            }
+            _tracks[key] = (track, stamp);
         }
     }
     private static string Identity(MediaTrack track) => track.CueDocument is null ? track.Path : track.CueDocument + "|" + track.CueNumber;

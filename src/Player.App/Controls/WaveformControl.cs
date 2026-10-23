@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using Player.Core.Waveforms;
 using System.Windows.Automation;
 using System.Windows.Automation.Peers;
@@ -26,6 +27,10 @@ public sealed class WaveformControl : FrameworkElement
     public event Action<double>? CommitSeek;
     private StreamGeometry? _geometry;
     private StreamGeometry? _peakGeometry;
+    private Size _geometrySize;
+    private WaveformData? _validated;
+    private DispatcherTimer? _resizeSettled;
+    private Pen? _centerPen, _cursorPen, _focusPen;
     private bool _dragging;
     private double _preview;
     internal long RenderPasses { get; private set; }
@@ -43,7 +48,15 @@ public sealed class WaveformControl : FrameworkElement
         if (Pixel((double)args.OldValue) != Pixel((double)args.NewValue) || (double)args.NewValue == 0 || (double)args.NewValue == control.Duration)
         { control.PositionRenderRequests++; control.InvalidateVisual(); }
     }
-    protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo) { ClearGeometry(); base.OnRenderSizeChanged(sizeInfo); }
+    protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
+    {
+        base.OnRenderSizeChanged(sizeInfo);
+        if (_geometry is null) return;
+        // While the window is being resized, stretch the cached envelope; rebuild once the size has settled.
+        _resizeSettled ??= new DispatcherTimer(TimeSpan.FromMilliseconds(120), DispatcherPriority.Background, (_, _) =>
+        { _resizeSettled!.Stop(); ClearGeometry(); InvalidateVisual(); }, Dispatcher);
+        _resizeSettled.Stop(); _resizeSettled.Start();
+    }
     protected override void OnRender(DrawingContext drawing)
     {
         RenderPasses++;
@@ -53,18 +66,26 @@ public sealed class WaveformControl : FrameworkElement
         var remaining = SystemParameters.HighContrast ? SystemColors.WindowTextBrush : (Brush?)TryFindResource("WaveformRemainingBrush") ?? Brushes.LightGray;
         var played = SystemParameters.HighContrast ? SystemColors.HighlightBrush : (Brush?)TryFindResource("AccentBrush") ?? Brushes.Orange;
         var center = ActualHeight / 2;
-        drawing.PushOpacity(0.2); drawing.DrawLine(new Pen(remaining, 1), new Point(0, center), new Point(ActualWidth, center)); drawing.Pop();
+        var stretch = _geometrySize == RenderSize ? null : new ScaleTransform(ActualWidth / _geometrySize.Width, ActualHeight / _geometrySize.Height);
+        drawing.PushOpacity(0.2); drawing.DrawLine(RatingStars.CachedPen(ref _centerPen, remaining, 1), new Point(0, center), new Point(ActualWidth, center)); drawing.Pop();
         DrawEnvelope(remaining);
         var fraction = Duration > 0 ? Math.Clamp((_dragging ? _preview : Position) / Duration, 0, 1) : 0;
         drawing.PushClip(new RectangleGeometry(new Rect(0, 0, ActualWidth * fraction, ActualHeight)));
         DrawEnvelope(played); drawing.Pop();
-        drawing.DrawLine(new Pen(played, 1), new Point(ActualWidth * fraction, 4), new Point(ActualWidth * fraction, Math.Max(4, ActualHeight - 4)));
-        if (IsKeyboardFocused) drawing.DrawRectangle(null, new Pen(remaining, 1) { DashStyle = DashStyles.Dot }, new Rect(1, 1, Math.Max(0, ActualWidth - 2), Math.Max(0, ActualHeight - 2)));
+        drawing.DrawLine(RatingStars.CachedPen(ref _cursorPen, played, 1), new Point(ActualWidth * fraction, 4), new Point(ActualWidth * fraction, Math.Max(4, ActualHeight - 4)));
+        if (IsKeyboardFocused)
+        {
+            if (_focusPen is null || !ReferenceEquals(_focusPen.Brush, remaining))
+            { _focusPen = new Pen(remaining, 1) { DashStyle = DashStyles.Dot }; if (_focusPen.CanFreeze) _focusPen.Freeze(); }
+            drawing.DrawRectangle(null, _focusPen, new Rect(1, 1, Math.Max(0, ActualWidth - 2), Math.Max(0, ActualHeight - 2)));
+        }
         void DrawEnvelope(Brush brush)
         {
+            if (stretch is not null) drawing.PushTransform(stretch);
             drawing.PushOpacity(SystemParameters.HighContrast ? 0.35 : 0.18);
             drawing.DrawGeometry(brush, null, _peakGeometry); drawing.Pop();
             drawing.DrawGeometry(brush, null, _geometry);
+            if (stretch is not null) drawing.Pop();
         }
     }
     private void BuildGeometry(WaveformData data)
@@ -73,7 +94,9 @@ public sealed class WaveformControl : FrameworkElement
         using (var context = geometry.Open())
         using (var peakContext = peaks.Open())
         {
-            var columns = WaveformProjection.Create(data, (int)Math.Ceiling(ActualWidth / 2));
+            // Validate each data instance once; resizing only re-projects it.
+            if (!ReferenceEquals(_validated, data)) { data.Validate(); _validated = data; }
+            var columns = WaveformProjection.Create(data, (int)Math.Ceiling(ActualWidth / 2), validate: false);
             var center = ActualHeight / 2; var half = Math.Max(0, (ActualHeight - 12) / 2);
             for (var column = 0; column < columns.Length; column++)
             {
@@ -86,7 +109,7 @@ public sealed class WaveformControl : FrameworkElement
                     center - Math.Clamp(columns[column].Minimum, -1, 0) * half);
             }
         }
-        geometry.Freeze(); peaks.Freeze(); _geometry = geometry; _peakGeometry = peaks;
+        geometry.Freeze(); peaks.Freeze(); _geometry = geometry; _peakGeometry = peaks; _geometrySize = RenderSize;
         static void Bar(StreamGeometryContext context, double x, double width, double top, double bottom)
         {
             context.BeginFigure(new Point(x, top), true, true);

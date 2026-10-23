@@ -80,46 +80,97 @@ public sealed partial class SqlitePlayerStore : IPlayerStore, ILibraryIndexStore
         var state = new LibraryState(playlists.ToArray(), session); state.Validate(); return state;
     });
 
-    public Task SaveAsync(LibraryState state, bool playlistsChanged)
+    public Task SaveAsync(LibraryState state, bool playlistsChanged) => Queue(() =>
     {
+        // Validation and serialization scale with the library; keep them on the database owner, off the dispatcher.
         state.Validate();
         var sessionJson = SessionJson.Serialize(state.Session);
-        return Queue(() =>
+        var connection = Open();
+        try
         {
-            var connection = Open();
             using var transaction = connection.BeginTransaction();
-            if (playlistsChanged)
-            {
-                Execute(connection, transaction, "DELETE FROM PlaylistEntries; DELETE FROM Playlists; DELETE FROM Tracks;");
-                using var tabs = Command(connection, transaction, "INSERT INTO Playlists(Id,Name,TabOrder) VALUES($id,$name,$order)");
-                using var tracks = Command(connection, transaction, "INSERT INTO Tracks(Id,Json) VALUES($id,$json) ON CONFLICT(Id) DO UPDATE SET Json=excluded.Json");
-                using var entries = Command(connection, transaction, "INSERT INTO PlaylistEntries(Id,PlaylistId,TrackId,EntryOrder,Enabled,AddedUtcTicks) VALUES($id,$playlist,$track,$order,$enabled,$added)");
-                for (var i = 0; i < state.Playlists.Length; i++)
-                {
-                    var tab = state.Playlists[i];
-                    Set(tabs, ("$id", tab.Id.ToString()), ("$name", tab.Name), ("$order", i)); tabs.ExecuteNonQuery();
-                    for (var j = 0; j < tab.Entries.Length; j++)
-                    {
-                        var entry = tab.Entries[j];
-                        Set(tracks, ("$id", entry.Track.Id.ToString()), ("$json", JsonSerializer.Serialize(entry.Track))); tracks.ExecuteNonQuery();
-                        Set(entries, ("$id", entry.Id.ToString()), ("$playlist", tab.Id.ToString()), ("$track", entry.Track.Id.ToString()), ("$order", j), ("$enabled", entry.Enabled), ("$added", entry.AddedUtcTicks)); entries.ExecuteNonQuery();
-                    }
-                }
-            }
+            SavedPlaylists? saved = null;
+            if (playlistsChanged) saved = _saved is { } previous ? WriteChangedPlaylists(connection, transaction, state, previous) : WriteAllPlaylists(connection, transaction, state);
             WriteSession(connection, transaction, sessionJson);
-            transaction.Commit(); return true;
-        });
+            transaction.Commit();
+            if (saved is not null) _saved = saved;
+        }
+        catch { _saved = null; throw; }
+        return true;
+    });
+    private static SavedPlaylists WriteAllPlaylists(SqliteConnection connection, SqliteTransaction transaction, LibraryState state)
+    {
+        Execute(connection, transaction, "DELETE FROM PlaylistEntries; DELETE FROM Playlists; DELETE FROM Tracks;");
+        using var tabs = Command(connection, transaction, "INSERT INTO Playlists(Id,Name,TabOrder) VALUES($id,$name,$order)");
+        for (var i = 0; i < state.Playlists.Length; i++) { Set(tabs, ("$id", state.Playlists[i].Id.ToString()), ("$name", state.Playlists[i].Name), ("$order", i)); tabs.ExecuteNonQuery(); }
+        var tracks = LatestTracks(state);
+        WriteTracks(connection, transaction, tracks.Values);
+        foreach (var tab in state.Playlists) WriteEntries(connection, transaction, tab);
+        return new(state.Playlists, tracks);
     }
-    Task ISessionPlayerStore.SaveSessionAsync(SessionState session)
+    /// <summary>Rewrites only playlists whose rows changed and tracks whose metadata changed since the last committed save.</summary>
+    private static SavedPlaylists WriteChangedPlaylists(SqliteConnection connection, SqliteTransaction transaction, LibraryState state, SavedPlaylists previous)
+    {
+        var before = previous.Playlists.ToDictionary(tab => tab.Id);
+        var current = state.Playlists.Select(tab => tab.Id).ToHashSet();
+        var rewritten = state.Playlists.Where(tab => !before.TryGetValue(tab.Id, out var old) || !SameEntries(old.Entries, tab.Entries)).ToArray();
+        using (var clear = Command(connection, transaction, "DELETE FROM PlaylistEntries WHERE PlaylistId=$id"))
+            foreach (var id in previous.Playlists.Select(tab => tab.Id).Where(id => !current.Contains(id)).Concat(rewritten.Where(tab => before.ContainsKey(tab.Id)).Select(tab => tab.Id)))
+            { Set(clear, ("$id", id.ToString())); clear.ExecuteNonQuery(); }
+        if (!previous.Playlists.Select(tab => (tab.Id, tab.Name)).SequenceEqual(state.Playlists.Select(tab => (tab.Id, tab.Name))))
+        {
+            using (var remove = Command(connection, transaction, "DELETE FROM Playlists WHERE Id=$id"))
+                foreach (var id in previous.Playlists.Select(tab => tab.Id).Where(id => !current.Contains(id))) { Set(remove, ("$id", id.ToString())); remove.ExecuteNonQuery(); }
+            // TabOrder is UNIQUE: park retained tabs on negative orders before assigning the new sequence.
+            Execute(connection, transaction, "UPDATE Playlists SET TabOrder=-1-TabOrder");
+            using var tabs = Command(connection, transaction, "INSERT INTO Playlists(Id,Name,TabOrder) VALUES($id,$name,$order) ON CONFLICT(Id) DO UPDATE SET Name=excluded.Name,TabOrder=excluded.TabOrder");
+            for (var i = 0; i < state.Playlists.Length; i++) { Set(tabs, ("$id", state.Playlists[i].Id.ToString()), ("$name", state.Playlists[i].Name), ("$order", i)); tabs.ExecuteNonQuery(); }
+        }
+        var tracks = LatestTracks(state);
+        WriteTracks(connection, transaction, tracks.Values.Where(track => !previous.Tracks.TryGetValue(track.Id, out var old) || !Equals(old, track)));
+        foreach (var tab in rewritten) WriteEntries(connection, transaction, tab);
+        using (var orphan = Command(connection, transaction, "DELETE FROM Tracks WHERE Id=$id"))
+            foreach (var id in previous.Tracks.Keys.Where(id => !tracks.ContainsKey(id))) { Set(orphan, ("$id", id.ToString())); orphan.ExecuteNonQuery(); }
+        return new(state.Playlists, tracks);
+    }
+    private static bool SameEntries(PlaylistEntry[] left, PlaylistEntry[] right)
+    {
+        if (left.Length != right.Length) return false;
+        for (var i = 0; i < left.Length; i++)
+            if (left[i].Id != right[i].Id || left[i].Track.Id != right[i].Track.Id || left[i].Enabled != right[i].Enabled || left[i].AddedUtcTicks != right[i].AddedUtcTicks) return false;
+        return true;
+    }
+    // Repeated track IDs store the last occurrence, as the full rewrite's upsert always has.
+    private static Dictionary<Guid, MediaTrack> LatestTracks(LibraryState state)
+    {
+        var tracks = new Dictionary<Guid, MediaTrack>();
+        foreach (var tab in state.Playlists) foreach (var entry in tab.Entries) tracks[entry.Track.Id] = entry.Track;
+        return tracks;
+    }
+    private static void WriteTracks(SqliteConnection connection, SqliteTransaction transaction, IEnumerable<MediaTrack> tracks)
+    {
+        using var command = Command(connection, transaction, "INSERT INTO Tracks(Id,Json) VALUES($id,$json) ON CONFLICT(Id) DO UPDATE SET Json=excluded.Json");
+        foreach (var track in tracks) { Set(command, ("$id", track.Id.ToString()), ("$json", JsonSerializer.Serialize(track))); command.ExecuteNonQuery(); }
+    }
+    private static void WriteEntries(SqliteConnection connection, SqliteTransaction transaction, PlaylistState tab)
+    {
+        using var entries = Command(connection, transaction, "INSERT INTO PlaylistEntries(Id,PlaylistId,TrackId,EntryOrder,Enabled,AddedUtcTicks) VALUES($id,$playlist,$track,$order,$enabled,$added)");
+        for (var j = 0; j < tab.Entries.Length; j++)
+        {
+            var entry = tab.Entries[j];
+            Set(entries, ("$id", entry.Id.ToString()), ("$playlist", tab.Id.ToString()), ("$track", entry.Track.Id.ToString()), ("$order", j), ("$enabled", entry.Enabled), ("$added", entry.AddedUtcTicks)); entries.ExecuteNonQuery();
+        }
+    }
+    /// <summary>Rows committed by this owner; any other playlist/track write or failure clears it and forces a full rewrite.</summary>
+    private sealed record SavedPlaylists(PlaylistState[] Playlists, Dictionary<Guid, MediaTrack> Tracks);
+    private SavedPlaylists? _saved;
+    Task ISessionPlayerStore.SaveSessionAsync(SessionState session) => Queue(() =>
     {
         LibraryState.ValidateSession(session);
         var json = SessionJson.Serialize(session);
-        return Queue(() =>
-        {
-            var connection = Open(); using var transaction = connection.BeginTransaction();
-            WriteSession(connection, transaction, json); transaction.Commit(); Interlocked.Increment(ref _sessionOnlyWrites); return true;
-        });
-    }
+        var connection = Open(); using var transaction = connection.BeginTransaction();
+        WriteSession(connection, transaction, json); transaction.Commit(); Interlocked.Increment(ref _sessionOnlyWrites); return true;
+    });
     private static void WriteSession(SqliteConnection connection, SqliteTransaction transaction, string json)
     {
         using var command = Command(connection, transaction, "INSERT INTO Session(Id,Json) VALUES(1,$json) ON CONFLICT(Id) DO UPDATE SET Json=excluded.Json");

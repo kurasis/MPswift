@@ -77,11 +77,13 @@ public sealed class CueAlbumDiscovery(Action<string> diagnostic, CancellationTok
         return CueSheet.Parse(CueSheet.Decode(bytes, fallback), path);
     }
 
+    // CUE FILE entries are untrusted: validate the location before probing it.
+    private static bool Exists(string path) { LocalFileAccess.ValidateFileLocation(path); return File.Exists(path); }
     public static CueSheet ReadAssociated(string path, Encoding? fallback = null)
     {
         var sheet = Read(path, fallback);
         if (sheet.Songs.Length < 2 || sheet.Diagnostics.Length != 0 || sheet.Songs.Any(song => !string.Equals(song.Path, sheet.Songs[0].Path, StringComparison.OrdinalIgnoreCase)) ||
-            File.Exists(sheet.Songs[0].Path)) return sheet;
+            Exists(sheet.Songs[0].Path)) return sheet;
         var directory = Path.GetDirectoryName(path)!; LocalFileAccess.ValidateDirectory(directory);
         var files = Directory.EnumerateFiles(directory).Take(10001).ToArray();
         if (files.Length > 10000) throw new InvalidDataException("Companion folder exceeds the file enumeration limit.");
@@ -93,7 +95,7 @@ public sealed class CueAlbumDiscovery(Action<string> diagnostic, CancellationTok
     {
         if (sheet.Songs.Length == 0 || sheet.Diagnostics.Length != 0) return null;
         var image = sheet.Songs[0].Path;
-        if (!image.EndsWith(".flac", StringComparison.OrdinalIgnoreCase) || !File.Exists(image) ||
+        if (!image.EndsWith(".flac", StringComparison.OrdinalIgnoreCase) || !Exists(image) ||
             sheet.Songs.Any(song => !string.Equals(song.Path, image, StringComparison.OrdinalIgnoreCase))) return null;
         using var native = new NativeDecodeContext();
         var source = BassMixerGraph.OpenSource(new(Guid.NewGuid(), image));

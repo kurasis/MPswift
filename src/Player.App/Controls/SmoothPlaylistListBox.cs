@@ -11,7 +11,8 @@ public sealed class SmoothPlaylistListBox : ListBox
 {
     private ScrollViewer? _viewer;
     private double _from, _target;
-    private long _started, _lastFrame;
+    private long _started;
+    private TimeSpan _lastRenderingTime;
     private bool _animating;
     internal bool IsScrollAnimating => _animating;
     internal bool? ScrollAnimationOverride { get; set; }
@@ -41,7 +42,7 @@ public sealed class SmoothPlaylistListBox : ListBox
         if (_viewer is null || !double.IsFinite(pixels)) return;
         _from = _viewer.VerticalOffset;
         _target = Math.Clamp((_animating ? _target : _from) + pixels, 0, _viewer.ScrollableHeight);
-        _started = Stopwatch.GetTimestamp(); _lastFrame = 0;
+        _started = Stopwatch.GetTimestamp();
         if (!AnimationsEnabled || !IsVisible || Math.Abs(_target - _from) < .5)
         { CancelScrollAnimation(); _viewer.ScrollToVerticalOffset(_target); return; }
         if (_animating) return;
@@ -51,11 +52,13 @@ public sealed class SmoothPlaylistListBox : ListBox
     private void OnScrollFrame(object? sender, EventArgs args)
     {
         if (_viewer is null || !IsVisible) { CancelScrollAnimation(); return; }
-        var now = Stopwatch.GetTimestamp();
-        var elapsed = Stopwatch.GetElapsedTime(_started, now).TotalMilliseconds;
-        if (elapsed < 180 && _lastFrame != 0 && Stopwatch.GetElapsedTime(_lastFrame, now).TotalMilliseconds < 15) return;
-        _lastFrame = now;
-        ApplyScrollFrame(elapsed);
+        // Rendering can be raised more than once per composed frame; advance once per frame at the display's own rate.
+        if (args is RenderingEventArgs rendering)
+        {
+            if (rendering.RenderingTime == _lastRenderingTime) return;
+            _lastRenderingTime = rendering.RenderingTime;
+        }
+        ApplyScrollFrame(Stopwatch.GetElapsedTime(_started).TotalMilliseconds);
     }
     internal void ApplyScrollFrame(double elapsedMilliseconds)
     {
@@ -78,5 +81,9 @@ public sealed class SmoothPlaylistListBox : ListBox
     protected override void OnPreviewTouchDown(TouchEventArgs e) { CancelScrollAnimation(); base.OnPreviewTouchDown(e); }
     protected override void OnDragOver(DragEventArgs e) { CancelScrollAnimation(); base.OnDragOver(e); }
     protected override void OnItemsChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-    { CancelScrollAnimation(); base.OnItemsChanged(e); }
+    {
+        // Rows appended by a streaming import do not move the content being scrolled to.
+        if (e.Action != System.Collections.Specialized.NotifyCollectionChangedAction.Add) CancelScrollAnimation();
+        base.OnItemsChanged(e);
+    }
 }

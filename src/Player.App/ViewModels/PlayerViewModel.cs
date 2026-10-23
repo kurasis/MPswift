@@ -225,11 +225,13 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     {
         if (value is null) return;
         VisibleEntries = CollectionViewSource.GetDefaultView(value.Entries);
-        VisibleEntries.Filter = item => item is PlaylistRowViewModel row && PlaylistSearch.Matches(row.Entry.Track, Search);
+        VisibleEntries.Filter = SearchFilter();
         SelectedEntry = null;
         OnPropertyChanged(nameof(Entries)); OnPropertyChanged(nameof(VisibleEntries));
         UpdateEntries(false); ScheduleSave(false);
     }
+    // An unfiltered view has no per-row predicate, so collection changes never need a Reset.
+    private Predicate<object>? SearchFilter() => string.IsNullOrEmpty(Search) ? null : item => item is PlaylistRowViewModel row && PlaylistSearch.Matches(row.Entry.Track, Search);
     private void AddRow(PlaylistTabViewModel tab, PlaylistEntry entry)
     {
         var row = new PlaylistRowViewModel(entry); row.EligibilityChanged += RowChanged;
@@ -284,32 +286,40 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     private async Task ReconcilePlaylistMetadataAsync()
     {
         if (_index is null) return;
-        var paths = _knownRows.Values.Select(r => r.Path).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
-        foreach (var batch in paths.Chunk(64))
+        var rows = _knownRows.Values.ToLookup(r => r.Path, StringComparer.OrdinalIgnoreCase);
+        var changed = false;
+        foreach (var batch in rows.Select(group => group.Key).Chunk(64))
         {
             foreach (var file in await _index.FindFilesAsync(batch))
-                foreach (var row in _knownRows.Values.Where(r => string.Equals(r.Path, file.Path, StringComparison.OrdinalIgnoreCase)).ToArray())
-                    row.UpdateTrack(row.Entry.Track.Segment is null ? file.Track with { Id = row.Entry.Track.Id, Available = file.Available } : row.Entry.Track with { Available = file.Available });
+                foreach (var row in rows[file.Path])
+                {
+                    if (_knownRows.GetValueOrDefault(row.Id) != row) continue; // Removed while the lookup awaited.
+                    var track = row.Entry.Track.Segment is null ? file.Track with { Id = row.Entry.Track.Id, Available = file.Available } : row.Entry.Track with { Available = file.Available };
+                    if (track != row.Entry.Track) { row.UpdateTrack(track); changed = true; }
+                }
         }
-        _importer.RememberTracks(_knownRows.Values.Select(r => r.Entry.Track)); UpdateEntries();
+        _importer.RememberTracks(_knownRows.Values.Select(r => r.Entry.Track)); UpdateEntries(changed);
     }
     public void AddLibraryTracks(IEnumerable<MediaTrack> tracks)
     {
         if (IsImporting || _closing) { Message = Strings.Get("WaitImport"); return; }
         foreach (var track in tracks.Take(10001)) { if (_knownRows.Count >= 10000) break; AddRow(SelectedPlaylist, new(Guid.NewGuid(), track, AddedUtcTicks: DateTime.UtcNow.Ticks)); }
-        UpdateEntries(); _statisticsTask = ObserveAsync(RefreshRatingsAsync());
+        UpdateEntries(); var refresh = ObserveAsync(RefreshRatingsAsync());
+        lock (_snapshotGate) { var preceding = _statisticsTask; _statisticsTask = Task.WhenAll(preceding, refresh); }
     }
     private async Task RefreshRatingsAsync()
     {
         if (_index is null) return; var stats = await _index.GetStatisticsAsync(_knownRows.Values.Select(r => r.Entry.Track.Id).Distinct().ToArray());
-        _applyingRatings = true; try { foreach (var statistic in stats) foreach (var row in _knownRows.Values.Where(r => r.Entry.Track.Id == statistic.TrackId)) row.Rating = statistic.Rating; } finally { _applyingRatings = false; }
+        var rows = _knownRows.Values.ToLookup(r => r.Entry.Track.Id);
+        _applyingRatings = true; try { foreach (var statistic in stats) foreach (var row in rows[statistic.TrackId]) row.Rating = statistic.Rating; } finally { _applyingRatings = false; }
     }
     private void RatingChanged(PlaylistRowViewModel row)
     {
         if (_applyingRatings || _index is null || _closing) return;
         _applyingRatings = true; try { foreach (var duplicate in _knownRows.Values.Where(r => r.Entry.Track.Id == row.Entry.Track.Id)) duplicate.Rating = Math.Clamp(row.Rating, 0, 5); } finally { _applyingRatings = false; }
         _pendingRatings[row.Entry.Track.Id] = Math.Clamp(row.Rating, 0, 5);
-        _statisticsTask = SaveRatingAfterAsync(_statisticsTask, row.Entry.Track.Id, Math.Clamp(row.Rating, 0, 5));
+        // The engine thread chains listening records onto the same task under _snapshotGate.
+        lock (_snapshotGate) _statisticsTask = SaveRatingAfterAsync(_statisticsTask, row.Entry.Track.Id, Math.Clamp(row.Rating, 0, 5));
     }
     private async Task SaveRatingAfterAsync(Task preceding, Guid track, int rating)
     { await preceding; await ObserveAsync(_index!.SetRatingAsync(track, rating)); }
@@ -322,7 +332,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
             "Duration" => r => r.Entry.Track.DurationHint?.Ticks, "Date added" => r => r.Entry.AddedUtcTicks == 0 ? null : r.Entry.AddedUtcTicks, "Path" => r => r.Path, _ => r => r.Title
         };
         var sorted = Entries.OrderBy(r => key(r) is null).ThenBy(key).ToArray();
-        for (var i = 0; i < sorted.Length; i++) Entries.Move(Entries.IndexOf(sorted[i]), i); UpdateEntries();
+        SelectedPlaylist.Entries.Reorder(sorted); UpdateEntries();
     }
     public async Task ExportPlaylistAsync(string path)
     {
@@ -347,7 +357,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     public void RemoveQueued(Guid id) => _coordinator.RemoveQueued(id);
     public void MoveQueued(Guid id, int delta) => _coordinator.MoveQueued(id, delta);
     [RelayCommand] private void ClearQueue() => _coordinator.ClearQueue();
-    [RelayCommand] private void ClearHistory() { _coordinator.ClearHistory(); if (_index is not null) _statisticsTask = ClearListeningAfterAsync(_statisticsTask); }
+    [RelayCommand] private void ClearHistory() { _coordinator.ClearHistory(); if (_index is not null) lock (_snapshotGate) _statisticsTask = ClearListeningAfterAsync(_statisticsTask); }
     private async Task ClearListeningAfterAsync(Task preceding) { await preceding; await ObserveAsync(_index!.ClearListeningAsync()); }
     private void OnOrderChanged()
     { if (!_closing && !_dispatcher.HasShutdownStarted) _dispatcher.BeginInvoke(() => { RefreshQueue(); ScheduleSave(false); }, DispatcherPriority.Background); }
@@ -439,31 +449,17 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
             {
                 if (_closing || _importCancellation.IsCancellationRequested) return;
                 if (_knownRows.Count >= 10000) { Message = Strings.Get("ImportLimit"); return; }
-                string path;
-                try
-                {
-                    // Match the importer: reject network/device paths before probing them.
-                    path = Path.GetFullPath(input);
-                    Player.Core.Media.LocalMediaPath.Parse(path.EndsWith('\\') ? path + "local-folder" : path);
-                    if (new DriveInfo(Path.GetPathRoot(path)!).DriveType == DriveType.Network) throw new IOException("Network drives are unsupported.");
-                }
+                string path; string? folderName;
+                // Drive, directory and link probes can stall on slow media; run them off the dispatcher.
+                try { (path, folderName) = await Task.Run(() => InspectDroppedPath(input)); }
                 catch (Exception error) when (error is IOException or UnauthorizedAccessException or ArgumentException)
                 { Message = Strings.Get("ErrorFileUnavailable"); Details = error.Message; continue; }
-                if (Directory.Exists(path))
+                if (_closing || _importCancellation.IsCancellationRequested) return;
+                if (folderName is not null)
                 {
                     if (Playlists.Count >= 100) { Message = Strings.Get("TabLimit"); return; }
-                    try
-                    {
-                        Services.Audio.LocalFileAccess.ValidateDirectory(path);
-                        var directory = new DirectoryInfo(path);
-                        var name = directory.Name.Trim();
-                        if (name.Length == 0) name = directory.FullName;
-                        // Folder names can exceed the persisted playlist-name limit.
-                        if (name.Length > 200) name = name[..(char.IsHighSurrogate(name[199]) ? 199 : 200)];
-                        CreatePlaylist(name);
-                    }
-                    catch (Exception error) when (error is IOException or UnauthorizedAccessException or ArgumentException)
-                    { Message = Strings.Get("ErrorFileUnavailable"); Details = error.Message; continue; }
+                    try { CreatePlaylist(folderName); }
+                    catch (ArgumentException error) { Message = Strings.Get("ErrorFileUnavailable"); Details = error.Message; continue; }
                     await ImportBatchAsync([path], SelectedPlaylist, null);
                 }
                 else if (Playlists.Contains(originalTarget)) await ImportBatchAsync([path], originalTarget, null);
@@ -472,6 +468,22 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
             }
         }
         finally { IsImporting = false; _importCancellation.Dispose(); _importCancellation = null; }
+    }
+    /// <summary>Returns the validated full path and, for a folder, its playlist name.</summary>
+    private static (string Path, string? FolderName) InspectDroppedPath(string input)
+    {
+        // Match the importer: reject network/device paths before probing them.
+        var path = Path.GetFullPath(input);
+        Player.Core.Media.LocalMediaPath.Parse(path.EndsWith('\\') ? path + "local-folder" : path);
+        if (new DriveInfo(Path.GetPathRoot(path)!).DriveType == DriveType.Network) throw new IOException("Network drives are unsupported.");
+        if (!Directory.Exists(path)) return (path, null);
+        Services.Audio.LocalFileAccess.ValidateDirectory(path);
+        var directory = new DirectoryInfo(path);
+        var name = directory.Name.Trim();
+        if (name.Length == 0) name = directory.FullName;
+        // Folder names can exceed the persisted playlist-name limit.
+        if (name.Length > 200) name = name[..(char.IsHighSurrogate(name[199]) ? 199 : 200)];
+        return (path, name);
     }
     private async Task ImportAsync(string[] paths, PlaylistTabViewModel target, System.Text.Encoding? fallbackEncoding)
     {
@@ -482,11 +494,15 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     }
     private async Task ImportBatchAsync(string[] paths, PlaylistTabViewModel target, System.Text.Encoding? fallbackEncoding)
     {
+        // Rows appear as each batch arrives; source sync, headings and the save are coalesced while a large import streams in.
+        var completed = false; var pending = false; var updated = Stopwatch.GetTimestamp();
+        void Update() { pending = false; updated = Stopwatch.GetTimestamp(); UpdateEntries(); }
         var progress = new Progress<ImportProgress>(report =>
         {
             if (_closing || !Playlists.Contains(target)) return;
             foreach (var entry in report.Entries) { if (_knownRows.Count >= 10000) { _importCancellation?.Cancel(); Message = Strings.Get("ImportLimit"); break; } AddRow(target, entry); }
-            UpdateEntries();
+            pending = true;
+            if (completed || Stopwatch.GetElapsedTime(updated) >= ImportUpdateInterval) Update();
         });
         try
         {
@@ -497,8 +513,9 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         }
         catch (OperationCanceledException) { Message = Strings.Get("ImportCanceled"); }
         catch (Exception error) { Message = Strings.Get("ErrorUnexpected"); Details = error.Message; }
-        finally { await RefreshRatingsAsync(); }
+        finally { completed = true; if (pending && !_closing) Update(); await RefreshRatingsAsync(); }
     }
+    private static readonly TimeSpan ImportUpdateInterval = TimeSpan.FromMilliseconds(250);
     [RelayCommand(AllowConcurrentExecutions = true)] private Task PlayEntryAsync(PlaylistRowViewModel? row)
     { if (row is null) return Task.CompletedTask; ChooseSource(); return _coordinator.LoadAsync(row.Id); }
     [RelayCommand(AllowConcurrentExecutions = true)] private Task PlayPauseAsync()
@@ -515,8 +532,9 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     [RelayCommand] private void ClearSearch() => Search = "";
     [RelayCommand] private void RemoveEntries(IEnumerable<PlaylistRowViewModel>? rows)
     {
-        foreach (var row in rows?.ToArray() ?? [])
-        { row.EligibilityChanged -= RowChanged; row.RatingChanged -= RatingChanged; Entries.Remove(row); _knownRows.Remove(row.Id); }
+        var removed = rows?.ToHashSet() ?? [];
+        foreach (var row in removed) { row.EligibilityChanged -= RowChanged; row.RatingChanged -= RatingChanged; _knownRows.Remove(row.Id); }
+        SelectedPlaylist.Entries.RemoveRows(removed);
         UpdateEntries();
     }
     public bool RemovePlaylistDuplicates(Guid playlistId, IReadOnlyList<Guid> expectedOrder, IReadOnlyList<Guid> duplicateIds)
@@ -526,8 +544,9 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         var current = PlaylistDuplicates.FindRemovable(tab.Entries.Select(r => r.Entry));
         if (!current.SequenceEqual(duplicateIds)) return false;
         var ids = duplicateIds.ToHashSet();
-        foreach (var row in tab.Entries.Where(r => ids.Contains(r.Id)).ToArray())
-        { row.EligibilityChanged -= RowChanged; row.RatingChanged -= RatingChanged; tab.Entries.Remove(row); _knownRows.Remove(row.Id); }
+        var removed = tab.Entries.Where(r => ids.Contains(r.Id)).ToHashSet();
+        foreach (var row in removed) { row.EligibilityChanged -= RowChanged; row.RatingChanged -= RatingChanged; _knownRows.Remove(row.Id); }
+        tab.Entries.RemoveRows(removed);
         UpdateEntries(); return true;
     }
     public Task ExpandCueImagesAsync(IEnumerable<PlaylistRowViewModel> selected)
@@ -647,13 +666,15 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     {
         if (!CanReorder) { Message = Strings.Get("ReorderFiltered"); return; }
         var selected = rows.ToHashSet();
-        var indices = Enumerable.Range(0, Entries.Count).Where(i => selected.Contains(Entries[i])).ToArray();
+        var order = Entries.ToList();
+        var indices = Enumerable.Range(0, order.Count).Where(i => selected.Contains(order[i])).ToArray();
         if (delta > 0) Array.Reverse(indices);
         foreach (var index in indices)
         {
             var target = index + Math.Sign(delta);
-            if (target >= 0 && target < Entries.Count && !selected.Contains(Entries[target])) Entries.Move(index, target);
+            if (target >= 0 && target < order.Count && !selected.Contains(order[target])) (order[index], order[target]) = (order[target], order[index]);
         }
+        SelectedPlaylist.Entries.Reorder(order);
         UpdateEntries();
     }
     public void DropEntries(IEnumerable<PlaylistRowViewModel> rows, int insertion)
@@ -662,8 +683,9 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         var selected = rows.ToHashSet(); var ordered = Entries.Where(selected.Contains).ToArray();
         insertion = Math.Clamp(insertion, 0, Entries.Count);
         var adjusted = insertion - Entries.Take(insertion).Count(selected.Contains);
-        foreach (var row in ordered) Entries.Remove(row);
-        foreach (var row in ordered) Entries.Insert(adjusted++, row);
+        var order = Entries.Where(row => !selected.Contains(row)).ToList();
+        order.InsertRange(adjusted, ordered);
+        SelectedPlaylist.Entries.Reorder(order);
         UpdateEntries();
     }
     internal bool MoveAlbum(PlaylistRowViewModel heading, int insertion)
@@ -672,11 +694,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         var order = AlbumSections.MoveRun(Entries.Select(row => row.Entry).ToArray(), heading.Id, insertion);
         if (Entries.Select(row => row.Id).SequenceEqual(order.Select(entry => entry.Id))) return false;
         var rows = Entries.ToDictionary(row => row.Id);
-        for (var i = 0; i < order.Length; i++)
-        {
-            var index = Entries.IndexOf(rows[order[i].Id]);
-            if (index != i) Entries.Move(index, i);
-        }
+        SelectedPlaylist.Entries.Reorder(order.Select(entry => rows[entry.Id]).ToArray());
         UpdateEntries(); return true;
     }
     private static string ValidateName(string name)
@@ -697,7 +715,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     partial void OnIsPlayingChanged(bool value) => OnPropertyChanged(nameof(PlayPauseLabel));
     partial void OnIsImportingChanged(bool value)
     { AddFilesCommand.NotifyCanExecuteChanged(); AddFolderCommand.NotifyCanExecuteChanged(); OnPropertyChanged(nameof(CanReorder)); }
-    partial void OnSearchChanged(string value) { VisibleEntries?.Refresh(); UpdatePlaylistStatus(); OnPropertyChanged(nameof(CanReorder)); }
+    partial void OnSearchChanged(string value) { if (VisibleEntries is not null) VisibleEntries.Filter = SearchFilter(); UpdatePlaylistStatus(); OnPropertyChanged(nameof(CanReorder)); }
     public void ApplySnapshot(PlaybackSnapshot snapshot) => ApplySnapshot(snapshot, true);
     private void ApplySnapshot(PlaybackSnapshot snapshot, bool observeListening)
     {
@@ -724,7 +742,7 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
                 Waveform = null; WaveformStatus = Strings.Get(snapshot.State == PlaybackState.Loading ? "StateLoading" : "WaveformUnavailable");
             }
             var track = snapshot.EntryId is { } id && _knownRows.TryGetValue(id, out var row) ? row.Entry.Track : _coordinator.ActiveEntry?.Track;
-            if (track is not null && snapshot.Duration is { } decodedDuration && snapshot.State != PlaybackState.Loading && snapshot.EntryId is { } decodedEntry && _knownRows.TryGetValue(decodedEntry, out var decodedRow) && decodedRow.Entry.Track.DurationHint != decodedDuration)
+            if (track is not null && snapshot.Duration is { } decodedDuration && snapshot.State != PlaybackState.Loading && snapshot.EntryId is { } decodedEntry && _knownRows.TryGetValue(decodedEntry, out var decodedRow) && !(decodedRow.Entry.Track.DurationHint is { } hint && (hint - decodedDuration).Duration() < DurationTolerance))
             { decodedRow.UpdateTrack(track with { DurationHint = decodedDuration }); ScheduleSave(true); }
             if (track is not null && snapshot.EntryId != _artEntry) { _artEntry = snapshot.EntryId; _artTask = LoadArtworkAsync(track.Path); }
             if (observeListening)
@@ -745,8 +763,10 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         if (_transportEntryPresent != (snapshot.EntryId is not null))
         { _transportEntryPresent = snapshot.EntryId is not null; OnPropertyChanged(nameof(CanTransport)); }
         if (snapshot.State != _previousState || DateTime.UtcNow - _lastSessionSave >= TimeSpan.FromSeconds(10))
-        { _previousState = snapshot.State; _lastSessionSave = DateTime.UtcNow; ScheduleSave(false); }
+        { _previousState = snapshot.State; _lastSessionSave = DateTime.UtcNow; ScheduleSave(false, announce: false); }
     }
+    // Tag estimates (notably MP3) rarely match decoded length exactly; a sub-second difference is not worth a library save.
+    private static readonly TimeSpan DurationTolerance = TimeSpan.FromSeconds(0.5);
     private void RefreshFormatLabels(PlaybackSnapshot snapshot)
     {
         var encoded = _coordinator.ActiveEntry?.Track.ChannelsHint ?? 0;
@@ -776,7 +796,10 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         try
         {
             var data = await _waveforms.AnalyzeAsync(path, progress, token, refresh);
-            if (!_closing && generation == _waveGeneration) { Waveform = _coordinator.ActiveEntry?.Track.Segment is { } segment ? data.Slice(segment) : data; WaveformStatus = ""; }
+            if (_closing || generation != _waveGeneration) return;
+            // Slicing validates the whole source envelope; keep it off the dispatcher.
+            if (_coordinator.ActiveEntry?.Track.Segment is { } segment) data = await Task.Run(() => data.Slice(segment), token);
+            if (!_closing && generation == _waveGeneration) { Waveform = data; WaveformStatus = ""; }
         }
         catch (OperationCanceledException) { }
         catch (Exception error) { if (!_closing && generation == _waveGeneration) { WaveformStatus = Strings.Get("WaveformUnavailable"); Details = error.Message; } }
@@ -797,7 +820,13 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         finally { _saveGate.Release(); }
     }
     private void UpdateEntries(bool changed = true)
-    { SyncSource(); VisibleEntries?.Refresh(); if (_initialized) ApplySnapshot(_player.Snapshot); HasEntries = Entries.Count > 0; OnPropertyChanged(nameof(CanTransport)); UpdatePlaylistStatus(); if (changed) ScheduleSave(true); }
+    {
+        SyncSource();
+        // Collection changes reach the view incrementally; only an active filter must re-evaluate changed metadata.
+        if (!string.IsNullOrEmpty(Search)) VisibleEntries?.Refresh();
+        if (_initialized) ApplySnapshot(_player.Snapshot);
+        HasEntries = Entries.Count > 0; OnPropertyChanged(nameof(CanTransport)); UpdatePlaylistStatus(); if (changed) ScheduleSave(true);
+    }
     private void UpdatePlaylistStatus()
     {
         OnPropertyChanged(nameof(HasVisibleEntries));
@@ -816,12 +845,13 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
     }
     private LibraryState Capture()
     { LibraryCaptures++; return new(Playlists.Select(p => p.Capture()).ToArray(), CaptureSession()); }
-    private void ScheduleSave(bool libraryChanged)
+    private void ScheduleSave(bool libraryChanged, bool announce = true)
     {
         if (!_initialized || _closing) return;
         if (libraryChanged) _libraryVersion++;
         _saveCancellation?.Cancel(); _saveCancellation?.Dispose(); _saveCancellation = new();
-        SaveStatus = Strings.Get("Saving");
+        // The periodic playback-position save is silent so the status line does not flicker every ten seconds.
+        if (announce || _libraryVersion != _savedLibraryVersion) SaveStatus = Strings.Get("Saving");
         _saveTask = SaveAfterDelayAsync(_saveCancellation.Token);
     }
     private async Task SaveAfterDelayAsync(CancellationToken token)
@@ -863,7 +893,8 @@ public partial class PlayerViewModel : ObservableObject, IAsyncDisposable
         _closing = true; _coordinator.SnapshotObserved -= OnSnapshot; _coordinator.OrderChanged -= OnOrderChanged;
         lock (_snapshotGate) _snapshotQueue.Clear(); // Synchronize with in-flight statistics before awaiting their chain.
         _scanCancellation?.Cancel(); _artCancellation?.Cancel(); _importCancellation?.Cancel(); _waveCancellation?.Cancel(); _saveCancellation?.Cancel();
-        await _importTask; await _waveTask; await _saveTask; await _scanTask; await _artTask; await _statisticsTask;
+        await _importTask; await _waveTask; await _saveTask; await _scanTask; await _artTask;
+        Task statistics; lock (_snapshotGate) statistics = _statisticsTask; await statistics;
         try { if (save) await SaveNowAsync(); }
         catch { _closing = false; _coordinator.SnapshotObserved += OnSnapshot; _coordinator.OrderChanged += OnOrderChanged; throw; }
         foreach (var row in _knownRows.Values) { row.EligibilityChanged -= RowChanged; row.RatingChanged -= RatingChanged; }

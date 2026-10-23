@@ -19,34 +19,40 @@ public static class AlbumSections
         remaining.InsertRange(insertionIndex > source.StartIndex ? insertionIndex - source.Count : insertionIndex, moved);
         return remaining.ToArray();
     }
-    public static bool IsSameAlbum(MediaTrack first, MediaTrack second)
+    public static bool IsSameAlbum(MediaTrack first, MediaTrack second) =>
+        SameFolder(FolderOf(first.Path), FolderOf(second.Path)) && AlbumOf(first).Equals(AlbumOf(second), StringComparison.OrdinalIgnoreCase);
+    // Headings are rebuilt after every playlist change; compare spans and allocate strings only for a new heading.
+    private static ReadOnlySpan<char> FolderOf(string path) { var slash = path.AsSpan().LastIndexOfAny('\\', '/'); return slash >= 0 ? path.AsSpan(0, slash) : []; }
+    private static ReadOnlySpan<char> AlbumOf(MediaTrack track) => track.Album.AsSpan().Trim();
+    /// <summary>Case-insensitive folder equality treating both separators alike, as Windows paths do in platform-independent tests too.</summary>
+    private static bool SameFolder(ReadOnlySpan<char> left, ReadOnlySpan<char> right)
     {
-        var left = AlbumKey(first); var right = AlbumKey(second);
-        return string.Equals(left.Folder, right.Folder, StringComparison.OrdinalIgnoreCase) &&
-            string.Equals(left.Album, right.Album, StringComparison.OrdinalIgnoreCase);
-    }
-    private static (string Folder, string Album) AlbumKey(MediaTrack track)
-    {
-        // Normalize Windows paths consistently in platform-independent tests too.
-        var path = track.Path.Replace('\\', '/'); var slash = path.LastIndexOf('/');
-        return (slash >= 0 ? path[..slash] : "", track.Album?.Trim() ?? "");
+        if (left.Length != right.Length) return false;
+        while (true)
+        {
+            var leftSlash = left.IndexOfAny('\\', '/'); var rightSlash = right.IndexOfAny('\\', '/');
+            if (leftSlash != rightSlash) return false;
+            if (leftSlash < 0) return left.Equals(right, StringComparison.OrdinalIgnoreCase);
+            if (!left[..leftSlash].Equals(right[..rightSlash], StringComparison.OrdinalIgnoreCase)) return false;
+            left = left[(leftSlash + 1)..]; right = right[(rightSlash + 1)..];
+        }
     }
     public static IReadOnlyList<AlbumSection> Create(IEnumerable<MediaTrack> tracks)
     {
         var sections = new List<AlbumSection>();
-        string? previousFolder = null, previousAlbum = null;
+        MediaTrack? previous = null;
         AlbumSection? current = null;
         var index = 0;
         foreach (var track in tracks)
         {
-            var (folder, album) = AlbumKey(track);
-            if (current is null || !string.Equals(folder, previousFolder, StringComparison.OrdinalIgnoreCase) ||
-                !string.Equals(album, previousAlbum, StringComparison.OrdinalIgnoreCase))
+            var folder = FolderOf(track.Path); var album = AlbumOf(track);
+            if (previous is null || !SameFolder(folder, FolderOf(previous.Path)) || !album.Equals(AlbumOf(previous), StringComparison.OrdinalIgnoreCase))
             {
                 if (current is not null) sections.Add(current with { Count = index - current.StartIndex });
-                var folderName = folder[(folder.LastIndexOf('/') + 1)..];
-                current = new(index, 0, album.Length > 0 ? album : folderName, folder);
-                previousFolder = folder; previousAlbum = album;
+                var normalized = folder.ToString().Replace('\\', '/');
+                var folderName = normalized[(normalized.LastIndexOf('/') + 1)..];
+                current = new(index, 0, album.Length > 0 ? album.ToString() : folderName, normalized);
+                previous = track;
             }
             index++;
         }

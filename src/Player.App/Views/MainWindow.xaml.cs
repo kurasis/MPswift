@@ -151,7 +151,7 @@ public partial class MainWindow : Window
         {
             var container = ItemsControl.ContainerFromElement(PlaylistList, e.OriginalSource as DependencyObject) as ListBoxItem;
             var insertion = container?.DataContext is PlaylistRowViewModel row ? Model.Entries.IndexOf(row) + (e.GetPosition(container).Y > container.ActualHeight / 2 ? 1 : 0) : Model.Entries.Count;
-            var ownRows = rows.Where(Model.Entries.Contains).ToArray();
+            var entries = Model.Entries.ToHashSet(); var ownRows = rows.Where(entries.Contains).ToArray();
             Model.DropEntries(ownRows, insertion);
             PlaylistList.SelectedItems.Clear(); foreach (var ownRow in ownRows) PlaylistList.SelectedItems.Add(ownRow);
         }
@@ -513,8 +513,8 @@ public partial class MainWindow : Window
         System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
         await Model.AddPathsAsync([dialog.FileName], System.Text.Encoding.GetEncoding(new[] { 1251, 1252, 866 }[encodings.SelectedIndex], System.Text.EncoderFallback.ExceptionFallback, System.Text.DecoderFallback.ExceptionFallback));
     }
-    private void OnPlayNext(object sender, RoutedEventArgs e) => Model.Enqueue(Model.Entries.Where(r => PlaylistList.SelectedItems.Contains(r)), true);
-    private void OnAddQueue(object sender, RoutedEventArgs e) => Model.Enqueue(Model.Entries.Where(r => PlaylistList.SelectedItems.Contains(r)), false);
+    private void OnPlayNext(object sender, RoutedEventArgs e) => Model.Enqueue(SelectedRowsInOrder(), true);
+    private void OnAddQueue(object sender, RoutedEventArgs e) => Model.Enqueue(SelectedRowsInOrder(), false);
     private void OnQueue(object sender, RoutedEventArgs e) => new QueueWindow(this, Model).Show();
     private async void OnAudioSettings(object sender, RoutedEventArgs e)
     {
